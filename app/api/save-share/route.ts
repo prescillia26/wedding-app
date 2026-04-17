@@ -1,17 +1,16 @@
+import { Redis } from '@upstash/redis'
 import { randomUUID } from 'crypto'
 
-declare global {
-  // eslint-disable-next-line no-var
-  var shareStore: Map<string, unknown>
-}
-
-globalThis.shareStore = globalThis.shareStore || new Map()
+const redis = new Redis({
+  url: process.env.STORAGE_URL!,
+  token: process.env.STORAGE_TOKEN!,
+})
 
 export async function POST(request: Request) {
   try {
     const data = await request.json()
     const id = randomUUID()
-    globalThis.shareStore.set(id, data)
+    await redis.set(id, data)
     return Response.json({ id })
   } catch (err) {
     console.error('save-share error:', err)

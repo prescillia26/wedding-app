@@ -1,9 +1,9 @@
-declare global {
-  // eslint-disable-next-line no-var
-  var shareStore: Map<string, unknown>
-}
+import { Redis } from '@upstash/redis'
 
-globalThis.shareStore = globalThis.shareStore || new Map()
+const redis = new Redis({
+  url: process.env.STORAGE_URL!,
+  token: process.env.STORAGE_TOKEN!,
+})
 
 export async function GET(request: Request) {
   try {
@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     if (!id || !/^[0-9a-f-]+$/i.test(id)) {
       return Response.json({ error: 'ID invalide' }, { status: 400 })
     }
-    const data = globalThis.shareStore.get(id)
+    const data = await redis.get(id)
     if (!data) {
       return Response.json({ error: 'Faire-part introuvable' }, { status: 404 })
     }
