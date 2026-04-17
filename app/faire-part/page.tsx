@@ -695,23 +695,33 @@ function ElegantCardsContent({ data, theme }: { data: FormData; theme: ThemeObj 
 interface RSVPData {
   nom: string
   nbPersonnes: string
-  presence: '' | 'present' | 'absent'
+  presence: boolean | null
   message: string
 }
 
-function RSVPModal({ accent, onClose, mariee1, mariee2 }: { accent: string; onClose: () => void; mariee1: string; mariee2: string }) {
-  const [rsvp, setRsvp] = useState<RSVPData>({ nom: '', nbPersonnes: '1', presence: '', message: '' })
+interface RSVPResponse {
+  nom: string
+  presence: boolean | null
+  nbPersonnes: string
+  message?: string
+  sentAt?: string
+}
+
+function RSVPModal({ accent, onClose, mariee1, mariee2, shareId }: { accent: string; onClose: () => void; mariee1: string; mariee2: string; shareId: string | null }) {
+  const [rsvp, setRsvp] = useState<RSVPData>({ nom: '', nbPersonnes: '0', presence: null, message: '' })
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
 
+  const disabled = !rsvp.nom || rsvp.presence === null
+
   const send = async () => {
-    if (!rsvp.nom || !rsvp.presence) return
+    if (disabled) return
     setLoading(true)
     try {
       await fetch('/api/rsvp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...rsvp, mariee1, mariee2, sentAt: new Date().toISOString() }),
+        body: JSON.stringify({ ...rsvp, mariee1, mariee2, shareId, sentAt: new Date().toISOString() }),
       })
       setSent(true)
     } catch {
@@ -744,37 +754,37 @@ function RSVPModal({ accent, onClose, mariee1, mariee2 }: { accent: string; onCl
             </div>
 
             <div style={{ marginBottom: 16 }}>
-              <Label>Nom et prénom</Label>
+              <Label>Prénom et nom</Label>
               <input value={rsvp.nom} onChange={e => setRsvp(r => ({ ...r, nom: e.target.value }))} placeholder="Marie Dupont" style={S.input} />
-            </div>
-
-            <div style={{ marginBottom: 16 }}>
-              <Label>Combien de personnes vous accompagnent ?</Label>
-              <input type="number" min="0" max="20" value={rsvp.nbPersonnes} onChange={e => setRsvp(r => ({ ...r, nbPersonnes: e.target.value }))} style={S.input} />
             </div>
 
             <div style={{ marginBottom: 20 }}>
               <Label>Votre réponse</Label>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                <button type="button" onClick={() => setRsvp(r => ({ ...r, presence: 'present' }))} style={{
+                <button type="button" onClick={() => setRsvp(r => ({ ...r, presence: true }))} style={{
                   ...BTN,
-                  padding: '14px 12px', borderRadius: 12, fontSize: 14, fontWeight: 600,
-                  border: `2px solid ${rsvp.presence === 'present' ? accent : '#fecdd3'}`,
-                  background: rsvp.presence === 'present' ? accent : 'white',
-                  color: rsvp.presence === 'present' ? 'white' : '#4a3728',
+                  padding: '14px 12px', borderRadius: 12, fontSize: 13, fontWeight: 600,
+                  border: `2px solid ${rsvp.presence === true ? accent : '#fecdd3'}`,
+                  background: rsvp.presence === true ? accent : 'white',
+                  color: rsvp.presence === true ? 'white' : '#4a3728',
                 }}>
-                  ✓ Je serai présent(e)
+                  Je serai présent(e) ✓
                 </button>
-                <button type="button" onClick={() => setRsvp(r => ({ ...r, presence: 'absent' }))} style={{
+                <button type="button" onClick={() => setRsvp(r => ({ ...r, presence: false }))} style={{
                   ...BTN,
-                  padding: '14px 12px', borderRadius: 12, fontSize: 14, fontWeight: 600,
-                  border: `2px solid ${rsvp.presence === 'absent' ? '#fb7185' : '#fecdd3'}`,
-                  background: rsvp.presence === 'absent' ? '#fb7185' : 'white',
-                  color: rsvp.presence === 'absent' ? 'white' : '#4a3728',
+                  padding: '14px 12px', borderRadius: 12, fontSize: 13, fontWeight: 600,
+                  border: `2px solid ${rsvp.presence === false ? '#fb7185' : '#fecdd3'}`,
+                  background: rsvp.presence === false ? '#fb7185' : 'white',
+                  color: rsvp.presence === false ? 'white' : '#4a3728',
                 }}>
-                  ✗ Je ne pourrai pas
+                  Je ne pourrai pas être là ✗
                 </button>
               </div>
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <Label>Combien de personnes vous accompagnent ?</Label>
+              <input type="number" min="0" max="10" value={rsvp.nbPersonnes} onChange={e => setRsvp(r => ({ ...r, nbPersonnes: e.target.value }))} style={S.input} />
             </div>
 
             <div style={{ marginBottom: 24 }}>
@@ -782,18 +792,77 @@ function RSVPModal({ accent, onClose, mariee1, mariee2 }: { accent: string; onCl
               <textarea value={rsvp.message} onChange={e => setRsvp(r => ({ ...r, message: e.target.value }))} placeholder="Avec toute notre affection..." rows={3} style={{ ...S.input, resize: 'vertical', lineHeight: 1.6 } as React.CSSProperties} />
             </div>
 
-            <button type="button" onClick={send} disabled={!rsvp.nom || !rsvp.presence || loading} style={{
+            <button type="button" onClick={send} disabled={disabled || loading} style={{
               ...BTN,
               width: '100%', padding: '15px 0', borderRadius: 9999, border: 'none',
-              background: (!rsvp.nom || !rsvp.presence) ? '#e5e7eb' : `linear-gradient(135deg, ${accent}, ${accent}cc)`,
-              color: (!rsvp.nom || !rsvp.presence) ? '#9ca3af' : 'white',
+              background: disabled ? '#e5e7eb' : `linear-gradient(135deg, ${accent}, ${accent}cc)`,
+              color: disabled ? '#9ca3af' : 'white',
               fontSize: 15, fontWeight: 700,
-              cursor: (!rsvp.nom || !rsvp.presence) ? 'not-allowed' : 'pointer',
-              boxShadow: (!rsvp.nom || !rsvp.presence) ? 'none' : `0 6px 20px ${accent}44`,
+              cursor: disabled ? 'not-allowed' : 'pointer',
+              boxShadow: disabled ? 'none' : `0 6px 20px ${accent}44`,
             }}>
-              {loading ? 'Envoi...' : 'Envoyer'}
+              {loading ? 'Envoi...' : 'Envoyer ma réponse'}
             </button>
           </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function RSVPListModal({ accent, onClose, shareId }: { accent: string; onClose: () => void; shareId: string | null }) {
+  const [responses, setResponses] = useState<RSVPResponse[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!shareId) { setLoading(false); return }
+    fetch(`/api/get-rsvp?shareId=${shareId}`)
+      .then(r => r.json())
+      .then((d: RSVPResponse[]) => setResponses(Array.isArray(d) ? d : []))
+      .catch(() => setResponses([]))
+      .finally(() => setLoading(false))
+  }, [shareId])
+
+  const totalPresents = responses.filter(r => r.presence === true).reduce((sum, r) => sum + 1 + (parseInt(r.nbPersonnes) || 0), 0)
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)' }} />
+      <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: 32, width: '100%', maxWidth: 600, maxHeight: '80vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
+        <button onClick={onClose} style={{ ...BTN, position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 20, color: '#9ca3af' }}>✕</button>
+        <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: accent, textAlign: 'center', marginBottom: 24 }}>Réponses RSVP</div>
+        <div style={{ overflowY: 'auto', flex: 1 }}>
+          {loading ? (
+            <div style={{ textAlign: 'center', color: '#9ca3af', padding: 32 }}>Chargement...</div>
+          ) : responses.length === 0 ? (
+            <div style={{ textAlign: 'center', color: '#9ca3af', padding: 32, fontStyle: 'italic' }}>Aucune réponse pour le moment</div>
+          ) : (
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+              <thead>
+                <tr style={{ borderBottom: `2px solid ${accent}33` }}>
+                  <th style={{ padding: '10px 12px', textAlign: 'left', color: accent, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Nom</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'center', color: accent, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Présence</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'center', color: accent, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Accompagnants</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'left', color: accent, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Message</th>
+                </tr>
+              </thead>
+              <tbody>
+                {responses.map((r, i) => (
+                  <tr key={i} style={{ borderBottom: '1px solid #fce7f3', background: i % 2 === 0 ? 'white' : '#fdf8f9' }}>
+                    <td style={{ padding: '12px', color: '#4a3728', fontWeight: 500 }}>{r.nom}</td>
+                    <td style={{ padding: '12px', textAlign: 'center', fontSize: 18 }}>{r.presence === true ? '✓' : r.presence === false ? '✗' : '—'}</td>
+                    <td style={{ padding: '12px', textAlign: 'center', color: '#6a5040' }}>{r.nbPersonnes || '0'}</td>
+                    <td style={{ padding: '12px', color: '#6a5040', fontStyle: 'italic', fontSize: 13 }}>{r.message || '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+        {!loading && responses.length > 0 && (
+          <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${accent}33`, textAlign: 'right', color: '#4a3728', fontSize: 14 }}>
+            Total présents (avec accompagnants) : <span style={{ color: accent, fontWeight: 700, fontSize: 16 }}>{totalPresents}</span>
+          </div>
         )}
       </div>
     </div>
@@ -915,8 +984,17 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
   const [splashDone, setSplashDone] = useState(false)
   const [active, setActive] = useState(0)
   const [rsvpOpen, setRsvpOpen] = useState(false)
+  const [rsvpListOpen, setRsvpListOpen] = useState(false)
+  const [lastShareId, setLastShareId] = useState<string | null>(null)
   const refs = useRef<(HTMLDivElement | null)[]>([])
   const isElegant = data.presentationStyle === 'elegant'
+
+  useEffect(() => {
+    if (isShared) {
+      const id = new URLSearchParams(window.location.search).get('share')
+      if (id) setLastShareId(id)
+    }
+  }, [isShared])
 
   useEffect(() => {
     if (!splashDone) return
@@ -933,6 +1011,7 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
     try {
       const res = await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
       const { id } = await res.json()
+      setLastShareId(id)
       await navigator.clipboard.writeText(`${window.location.origin}/faire-part?share=${id}`)
       alert('Lien copié !')
     } catch { alert('Erreur') }
@@ -969,25 +1048,30 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
             ))
           )}
 
-          {/* Bouton RSVP doré */}
-          <div style={{ maxWidth: 600, margin: '40px auto 0', display: 'flex', justifyContent: 'center' }}>
-            <button onClick={() => setRsvpOpen(true)} style={{
-              ...BTN,
-              padding: '15px 48px', borderRadius: 9999,
-              background: 'linear-gradient(135deg, #C9A84C, #e8c96a)',
-              color: 'white', border: 'none',
-              fontSize: 16, fontWeight: 700, letterSpacing: '0.12em',
-              boxShadow: '0 6px 28px rgba(201,168,76,0.45)',
-              fontFamily: 'var(--font-playfair-display)',
-            }}>
-              RSVP
-            </button>
-          </div>
+          {/* Bouton RSVP doré — visible uniquement en vue partagée */}
+          {isShared && (
+            <div style={{ maxWidth: 600, margin: '40px auto 0', display: 'flex', justifyContent: 'center' }}>
+              <button onClick={() => setRsvpOpen(true)} style={{
+                ...BTN,
+                padding: '15px 48px', borderRadius: 9999,
+                background: 'linear-gradient(135deg, #C9A84C, #e8c96a)',
+                color: 'white', border: 'none',
+                fontSize: 16, fontWeight: 700, letterSpacing: '0.12em',
+                boxShadow: '0 6px 28px rgba(201,168,76,0.45)',
+                fontFamily: 'var(--font-playfair-display)',
+              }}>
+                RSVP
+              </button>
+            </div>
+          )}
 
           {!isShared && (
-            <div style={{ maxWidth: 600, margin: '20px auto 0', display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <div style={{ maxWidth: 600, margin: '40px auto 0', display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
               <button onClick={onEdit} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>Modifier</button>
               <button onClick={handleShare} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 14 }}>🔗 Partager</button>
+              {lastShareId && (
+                <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>📋 Voir les RSVP</button>
+              )}
               <button onClick={onReset} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: '1px solid #fecdd3', background: 'transparent', color: '#fb7185', fontSize: 14 }}>Nouveau</button>
             </div>
           )}
@@ -1001,6 +1085,14 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
           onClose={() => setRsvpOpen(false)}
           mariee1={data.marie1Prenom}
           mariee2={data.marie2Prenom}
+          shareId={lastShareId}
+        />
+      )}
+      {rsvpListOpen && (
+        <RSVPListModal
+          accent={theme.accent}
+          onClose={() => setRsvpListOpen(false)}
+          shareId={lastShareId}
         />
       )}
     </div>
