@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
 type Theme = 'classique-dore' | 'moderne' | 'champetre' | 'oriental'
+type PresentationStyle = 'photo' | 'elegant'
 
 const THEMES = {
   'classique-dore': { fond: '#fdf0f3', accent: '#C9A84C', texte: '#4a3728', textSecondaire: '#6a5040' },
@@ -41,6 +42,7 @@ interface FormData {
   famille2GpMaternels: string
   ceremonies: Ceremony[]
   style: Theme
+  presentationStyle: PresentationStyle
   mariageJuif: boolean
   youtubeUrl: string
   photoFond: string
@@ -58,7 +60,7 @@ const defaultFormData: FormData = {
   famille1Pere: '', famille1Mere: '', famille1GpPaternels: '', famille1GpMaternels: '',
   famille2Pere: '', famille2Mere: '', famille2GpPaternels: '', famille2GpMaternels: '',
   ceremonies: [{ ...defaultCeremony }],
-  style: 'classique-dore', mariageJuif: false, youtubeUrl: '', photoFond: '',
+  style: 'classique-dore', presentationStyle: 'photo', mariageJuif: false, youtubeUrl: '', photoFond: '',
 }
 
 function getYouTubeId(url: string): string | null {
@@ -301,6 +303,30 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
   return (
     <div>
       <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#4a3728', marginBottom: 24 }}>Style & options</h2>
+
+      <div style={{ marginBottom: 24 }}>
+        <Label>Présentation</Label>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          {([
+            { key: 'photo' as PresentationStyle, label: '📷 Style photo en fond', desc: 'Votre photo en arrière-plan' },
+            { key: 'elegant' as PresentationStyle, label: '✨ Style élégant', desc: 'Monogramme & calligraphie' },
+          ]).map(opt => (
+            <button key={opt.key} type="button" onClick={() => onChange({ presentationStyle: opt.key })} style={{
+              padding: 16, borderRadius: 12,
+              border: `2px solid ${data.presentationStyle === opt.key ? '#C9A84C' : '#fecdd3'}`,
+              background: data.presentationStyle === opt.key ? '#fdf5e4' : 'white',
+              cursor: 'pointer', textAlign: 'left', position: 'relative',
+            }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: data.presentationStyle === opt.key ? '#C9A84C' : '#4a3728', marginBottom: 4 }}>{opt.label}</div>
+              <div style={{ fontSize: 11, color: '#9ca3af' }}>{opt.desc}</div>
+              {data.presentationStyle === opt.key && (
+                <div style={{ position: 'absolute', top: 8, right: 8, width: 18, height: 18, borderRadius: '50%', background: '#C9A84C', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>✓</div>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <Label>Style visuel</Label>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
         {(Object.entries(THEMES) as [Theme, typeof THEMES[Theme]][]).map(([key, t]) => (
@@ -546,6 +572,221 @@ function renderCard(ceremony: Ceremony, data: FormData, theme: ThemeObj) {
   return <CardAutre {...props} />
 }
 
+// ── Style élégant ──────────────────────────────────────────────────────────────
+
+function MonogramSVG({ initial1, initial2, color, size = 220 }: { initial1: string; initial2: string; color: string; size?: number }) {
+  return (
+    <svg viewBox="0 0 220 220" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
+      <circle cx="110" cy="110" r="100" fill="none" stroke={color} strokeWidth="0.8" opacity="0.35" />
+      <circle cx="110" cy="110" r="93" fill="none" stroke={color} strokeWidth="0.4" opacity="0.2" />
+      <text x="78" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{initial1 || 'A'}</text>
+      <text x="142" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{initial2 || 'B'}</text>
+      <path d="M 28 170 Q 110 163 192 170" fill="none" stroke={color} strokeWidth="0.6" opacity="0.5" />
+      <path d="M 38 176 Q 110 169 182 176" fill="none" stroke={color} strokeWidth="0.3" opacity="0.3" />
+    </svg>
+  )
+}
+
+function ElegantSeparator({ color, initial1, initial2 }: { color: string; initial1: string; initial2: string }) {
+  return (
+    <div style={{ maxWidth: 600, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 14, padding: '20px 24px' }}>
+      <div style={{ flex: 1, height: '0.5px', background: color, opacity: 0.45 }} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+        <span style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 14, color, opacity: 0.75 }}>{initial1}</span>
+        <span style={{ color, opacity: 0.4, fontSize: 9 }}>✦</span>
+        <span style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 14, color, opacity: 0.75 }}>{initial2}</span>
+      </div>
+      <div style={{ flex: 1, height: '0.5px', background: color, opacity: 0.45 }} />
+    </div>
+  )
+}
+
+function ElegantPage1({ data, theme }: { data: FormData; theme: ThemeObj }) {
+  return (
+    <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', position: 'relative', height: 560 }}>
+      {data.photoFond ? (
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img src={data.photoFond} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+      ) : (
+        <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(160deg, ${theme.fond}, ${theme.accent}22)` }} />
+      )}
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.58) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)' }} />
+      <div style={{ position: 'absolute', bottom: 44, left: 40, right: 40 }}>
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(44px, 12vw, 76px)', color: 'white', lineHeight: 1.15, textShadow: '0 2px 24px rgba(0,0,0,0.35)' }}>
+          {data.marie1Prenom || 'Prénom'}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '4px 0' }}>
+          <div style={{ width: 48, height: '0.5px', background: 'rgba(255,255,255,0.6)' }} />
+          <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: 'rgba(255,255,255,0.85)' }}>&</span>
+        </div>
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(44px, 12vw, 76px)', color: 'white', lineHeight: 1.15, textShadow: '0 2px 24px rgba(0,0,0,0.35)' }}>
+          {data.marie2Prenom || 'Prénom'}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ElegantPage2({ data, theme }: { data: FormData; theme: ThemeObj }) {
+  const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
+  const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
+  const firstDate = sortByDate(data.ceremonies)[0]?.date
+  return (
+    <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', backgroundColor: theme.fond, padding: '56px 48px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+      {data.mariageJuif && <div style={{ fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl', marginBottom: 20 }}>בס״ד</div>}
+      <MonogramSVG initial1={i1} initial2={i2} color={theme.accent} size={200} />
+      <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, marginTop: 20, textAlign: 'center', lineHeight: 1.2 }}>
+        {data.marie1Prenom} & {data.marie2Prenom}
+      </div>
+      {firstDate && (
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 13, color: theme.textSecondaire, letterSpacing: 4, textTransform: 'uppercase', marginTop: 18 }}>
+          {formatDateFr(firstDate)}
+        </div>
+      )}
+      <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: theme.texte, marginTop: 18, textAlign: 'center', lineHeight: 1.8 }}>
+        vous invitent à célébrer leur union
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 24, opacity: 0.5 }}>
+        <div style={{ width: 32, height: '0.5px', background: theme.accent }} />
+        <span style={{ color: theme.accent, fontSize: 10 }}>✦</span>
+        <div style={{ width: 32, height: '0.5px', background: theme.accent }} />
+      </div>
+    </div>
+  )
+}
+
+function ElegantCardsContent({ data, theme }: { data: FormData; theme: ThemeObj }) {
+  const sorted = sortByDate(data.ceremonies)
+  const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
+  const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
+  const noPhotoData = { ...data, photoFond: '' }
+
+  return (
+    <>
+      <ElegantPage1 data={data} theme={theme} />
+      <ElegantSeparator color={theme.accent} initial1={i1} initial2={i2} />
+      <ElegantPage2 data={data} theme={theme} />
+      <ElegantSeparator color={theme.accent} initial1={i1} initial2={i2} />
+      {sorted.map((ceremony, i) => (
+        <div key={i}>
+          <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden' }}>
+            {renderCard(ceremony, noPhotoData, theme)}
+          </div>
+          {i < sorted.length - 1 && <ElegantSeparator color={theme.accent} initial1={i1} initial2={i2} />}
+        </div>
+      ))}
+    </>
+  )
+}
+
+// ── RSVP ──────────────────────────────────────────────────────────────────────
+
+interface RSVPData {
+  nom: string
+  nbPersonnes: string
+  presence: '' | 'present' | 'absent'
+  message: string
+}
+
+function RSVPModal({ accent, onClose, mariee1, mariee2 }: { accent: string; onClose: () => void; mariee1: string; mariee2: string }) {
+  const [rsvp, setRsvp] = useState<RSVPData>({ nom: '', nbPersonnes: '1', presence: '', message: '' })
+  const [sent, setSent] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+  const send = async () => {
+    if (!rsvp.nom || !rsvp.presence) return
+    setLoading(true)
+    try {
+      await fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...rsvp, mariee1, mariee2, sentAt: new Date().toISOString() }),
+      })
+      setSent(true)
+    } catch {
+      alert("Erreur lors de l'envoi")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)' }} />
+      <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: 36, width: '100%', maxWidth: 480, boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
+        <button onClick={onClose} style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#9ca3af' }}>✕</button>
+
+        {sent ? (
+          <div style={{ textAlign: 'center', padding: '24px 0' }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>💌</div>
+            <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: accent, marginBottom: 12 }}>Merci !</div>
+            <p style={{ fontSize: 15, color: '#6a5040', lineHeight: 1.7 }}>
+              Votre réponse a bien été transmise à {mariee1} & {mariee2}.
+            </p>
+            <button onClick={onClose} style={{ marginTop: 24, padding: '12px 32px', borderRadius: 9999, background: accent, color: 'white', border: 'none', cursor: 'pointer', fontSize: 14 }}>Fermer</button>
+          </div>
+        ) : (
+          <>
+            <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 24, color: accent, textAlign: 'center', marginBottom: 6 }}>RSVP</div>
+            <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', textAlign: 'center', marginBottom: 28 }}>
+              {mariee1} & {mariee2}
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <Label>Nom et prénom</Label>
+              <input value={rsvp.nom} onChange={e => setRsvp(r => ({ ...r, nom: e.target.value }))} placeholder="Marie Dupont" style={S.input} />
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <Label>Combien de personnes vous accompagnent ?</Label>
+              <input type="number" min="0" max="20" value={rsvp.nbPersonnes} onChange={e => setRsvp(r => ({ ...r, nbPersonnes: e.target.value }))} style={S.input} />
+            </div>
+
+            <div style={{ marginBottom: 20 }}>
+              <Label>Votre réponse</Label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <button type="button" onClick={() => setRsvp(r => ({ ...r, presence: 'present' }))} style={{
+                  padding: '14px 12px', borderRadius: 12, fontSize: 14, cursor: 'pointer', fontWeight: 600,
+                  border: `2px solid ${rsvp.presence === 'present' ? accent : '#fecdd3'}`,
+                  background: rsvp.presence === 'present' ? accent : 'white',
+                  color: rsvp.presence === 'present' ? 'white' : '#4a3728',
+                }}>
+                  ✓ Je serai présent(e)
+                </button>
+                <button type="button" onClick={() => setRsvp(r => ({ ...r, presence: 'absent' }))} style={{
+                  padding: '14px 12px', borderRadius: 12, fontSize: 14, cursor: 'pointer', fontWeight: 600,
+                  border: `2px solid ${rsvp.presence === 'absent' ? '#fb7185' : '#fecdd3'}`,
+                  background: rsvp.presence === 'absent' ? '#fb7185' : 'white',
+                  color: rsvp.presence === 'absent' ? 'white' : '#4a3728',
+                }}>
+                  ✗ Je ne pourrai pas
+                </button>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 24 }}>
+              <Label>Un petit mot pour les mariés (optionnel)</Label>
+              <textarea value={rsvp.message} onChange={e => setRsvp(r => ({ ...r, message: e.target.value }))} placeholder="Avec toute notre affection..." rows={3} style={{ ...S.input, resize: 'vertical', lineHeight: 1.6 } as React.CSSProperties} />
+            </div>
+
+            <button type="button" onClick={send} disabled={!rsvp.nom || !rsvp.presence || loading} style={{
+              width: '100%', padding: '15px 0', borderRadius: 9999, border: 'none',
+              background: (!rsvp.nom || !rsvp.presence) ? '#e5e7eb' : `linear-gradient(135deg, ${accent}, ${accent}cc)`,
+              color: (!rsvp.nom || !rsvp.presence) ? '#9ca3af' : 'white',
+              fontSize: 15, fontWeight: 700, cursor: (!rsvp.nom || !rsvp.presence) ? 'not-allowed' : 'pointer',
+              boxShadow: (!rsvp.nom || !rsvp.presence) ? 'none' : `0 6px 20px ${accent}44`,
+            }}>
+              {loading ? 'Envoi...' : 'Envoyer'}
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── Splash + Music ─────────────────────────────────────────────────────────────
+
 function SplashScreen({ data, theme, onDone, isShared }: { data: FormData; theme: ThemeObj; onDone: () => void; isShared: boolean }) {
   const [out, setOut] = useState(false)
   const firstDate = sortByDate(data.ceremonies)[0]?.date
@@ -584,12 +825,16 @@ function MusicPlayer({ youtubeUrl, accent }: { youtubeUrl: string; accent: strin
   )
 }
 
+// ── CardsView ─────────────────────────────────────────────────────────────────
+
 function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit: () => void; onReset: () => void; isShared: boolean }) {
   const theme = THEMES[data.style]
   const sorted = sortByDate(data.ceremonies)
   const [splashDone, setSplashDone] = useState(false)
   const [active, setActive] = useState(0)
+  const [rsvpOpen, setRsvpOpen] = useState(false)
   const refs = useRef<(HTMLDivElement | null)[]>([])
+  const isElegant = data.presentationStyle === 'elegant'
 
   useEffect(() => {
     if (!splashDone) return
@@ -615,28 +860,49 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
     <div style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
       {!splashDone && <SplashScreen data={data} theme={theme} onDone={() => setSplashDone(true)} isShared={isShared} />}
       {splashDone && <>
-        <div style={{ position: 'fixed', left: 16, top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', gap: 10, zIndex: 40 }}>
-          {sorted.map((_, i) => (
-            <button key={i} onClick={() => refs.current[i]?.scrollIntoView({ behavior: 'smooth' })} style={{ width: 10, height: 10, borderRadius: '50%', border: `1.5px solid ${theme.accent}`, background: active === i ? theme.accent : 'transparent', cursor: 'pointer', padding: 0 }} />
-          ))}
-        </div>
+        {!isElegant && (
+          <div style={{ position: 'fixed', left: 16, top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', gap: 10, zIndex: 40 }}>
+            {sorted.map((_, i) => (
+              <button key={i} onClick={() => refs.current[i]?.scrollIntoView({ behavior: 'smooth' })} style={{ width: 10, height: 10, borderRadius: '50%', border: `1.5px solid ${theme.accent}`, background: active === i ? theme.accent : 'transparent', cursor: 'pointer', padding: 0 }} />
+            ))}
+          </div>
+        )}
         <div style={{ padding: '40px 20px 80px' }}>
-          {sorted.map((ceremony, i) => (
-            <div key={i}>
-              <div ref={el => { refs.current[i] = el }} style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden' }}>
-                {renderCard(ceremony, data, theme)}
-              </div>
-              {i < sorted.length - 1 && (
-                <div style={{ maxWidth: 600, margin: '32px auto', display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ flex: 1, height: 1, background: theme.accent, opacity: 0.3 }} />
-                  <span style={{ color: theme.accent }}>✦</span>
-                  <div style={{ flex: 1, height: 1, background: theme.accent, opacity: 0.3 }} />
+          {isElegant ? (
+            <ElegantCardsContent data={data} theme={theme} />
+          ) : (
+            sorted.map((ceremony, i) => (
+              <div key={i}>
+                <div ref={el => { refs.current[i] = el }} style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden' }}>
+                  {renderCard(ceremony, data, theme)}
                 </div>
-              )}
-            </div>
-          ))}
+                {i < sorted.length - 1 && (
+                  <div style={{ maxWidth: 600, margin: '32px auto', display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ flex: 1, height: 1, background: theme.accent, opacity: 0.3 }} />
+                    <span style={{ color: theme.accent }}>✦</span>
+                    <div style={{ flex: 1, height: 1, background: theme.accent, opacity: 0.3 }} />
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+
+          {/* Bouton RSVP doré */}
+          <div style={{ maxWidth: 600, margin: '40px auto 0', display: 'flex', justifyContent: 'center' }}>
+            <button onClick={() => setRsvpOpen(true)} style={{
+              padding: '15px 48px', borderRadius: 9999,
+              background: 'linear-gradient(135deg, #C9A84C, #e8c96a)',
+              color: 'white', border: 'none', cursor: 'pointer',
+              fontSize: 16, fontWeight: 700, letterSpacing: '0.12em',
+              boxShadow: '0 6px 28px rgba(201,168,76,0.45)',
+              fontFamily: 'var(--font-playfair-display)',
+            }}>
+              RSVP
+            </button>
+          </div>
+
           {!isShared && (
-            <div style={{ maxWidth: 600, margin: '48px auto 0', display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <div style={{ maxWidth: 600, margin: '20px auto 0', display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
               <button onClick={onEdit} style={{ padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, cursor: 'pointer', fontSize: 14 }}>Modifier</button>
               <button onClick={handleShare} style={{ padding: '12px 28px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', cursor: 'pointer', fontSize: 14 }}>🔗 Partager</button>
               <button onClick={onReset} style={{ padding: '12px 28px', borderRadius: 9999, border: '1px solid #fecdd3', background: 'transparent', color: '#fb7185', cursor: 'pointer', fontSize: 14 }}>Nouveau</button>
@@ -645,9 +911,20 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
         </div>
         {data.youtubeUrl && <MusicPlayer youtubeUrl={data.youtubeUrl} accent={theme.accent} />}
       </>}
+
+      {rsvpOpen && (
+        <RSVPModal
+          accent={theme.accent}
+          onClose={() => setRsvpOpen(false)}
+          mariee1={data.marie1Prenom}
+          mariee2={data.marie2Prenom}
+        />
+      )}
     </div>
   )
 }
+
+// ── Page principale ────────────────────────────────────────────────────────────
 
 export default function FairePartPage() {
   const [step, setStep] = useState(1)
