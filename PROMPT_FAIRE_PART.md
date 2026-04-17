@@ -1,20 +1,19 @@
-Fais ces 4 corrections dans app/faire-part/page.tsx :
+Vérifie et corrige complètement le système de partage dans app/faire-part/page.tsx et les routes API.
 
-1. RSVP PAR ÉVÉNEMENT : Dans la modal RSVP, ajouter une section "À quel(s) événement(s) serez-vous présent(e) ?" avec une case à cocher par cérémonie (afficher le type et la date de chaque cérémonie). Envoyer les événements sélectionnés dans le POST /api/rsvp.
+1. Vérifie que app/api/save-share/route.ts existe et fonctionne — il doit recevoir les données en POST, générer un id unique, sauvegarder dans /tmp/shares/[id].json et retourner { id }
 
-2. NOMS DES PARENTS : Dans CardHouppa, vérifier que les noms des parents s'affichent correctement des deux côtés. Côté gauche : père mariée, gp paternels mariée, gp maternels mariée. Côté droit : mère marié, gp paternels marié, gp maternels marié. S'assurer que les champs non remplis ne laissent pas de lignes vides.
+2. Vérifie que app/api/get-share/route.ts existe — il doit recevoir ?id=xxx et retourner les données du faire-part
 
-3. ADRESSE AFTER MAIRIE : Dans CardMairie, le champ "evenementSuivant" doit afficher proprement : le nom de l'événement suivant en gras, puis l'adresse en italique. Dans le formulaire Step3, pour la Mairie, améliorer les deux champs : "Nom de l'événement suivant" et "Adresse de l'événement suivant" séparément au lieu d'un seul champ.
-
-4. PLUSIEURS PHOTOS : Dans Step4, remplacer l'upload d'une seule photo par un upload multiple (max 5 photos). Les photos s'affichent en miniatures. Dans les cartes, chaque cérémonie utilise une photo différente selon son index, ou la première photo si pas assez de photos.
-
-
-5. PARTAGE DU LIEN : Vérifier et corriger le bouton "Partager" dans la vue créateur. Il doit :
-- Appeler /api/save-share en POST avec toutes les données
-- Générer l'URL complète : https://wedding-e8t1cx1ei-prescwedding.vercel.app/faire-part?share=[id]
-- Copier automatiquement dans le presse-papier
+3. Dans la vue créateur, le bouton "Partager" doit :
+- Appeler /api/save-share avec toutes les données formData
+- Récupérer l'id retourné
+- Construire l'URL : window.location.origin + "/faire-part?share=" + id
+- Copier dans le presse-papier avec navigator.clipboard.writeText
 - Afficher "✓ Lien copié !" pendant 3 secondes
-- Ce lien doit s'ouvrir directement sur la carte sans formulaire ni code d'accès
 
-Aussi vérifier que /api/save-share et /api/get-share fonctionnent bien sur Vercel avec /tmp pour stocker les fichiers.
-Faire git add -A && git commit -m "Fix feedback copine" && git push après.
+4. Quand un invité ouvre le lien ?share=xxx :
+- Charger les données via /api/get-share?id=xxx
+- Afficher directement la carte sans formulaire ni code d'accès
+- Afficher le bouton RSVP en bas
+
+Faire git add -A && git commit -m "Fix lien partage invités" && git push

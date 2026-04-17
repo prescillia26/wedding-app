@@ -1073,7 +1073,7 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
       const res = await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
       const { id } = await res.json()
       setLastShareId(id)
-      const url = `https://wedding-e8t1cx1ei-prescwedding.vercel.app/faire-part?share=${id}`
+      const url = window.location.origin + '/faire-part?share=' + id
       await navigator.clipboard.writeText(url)
       setShareFeedback(true)
       setTimeout(() => setShareFeedback(false), 3000)
@@ -1170,6 +1170,7 @@ export default function FairePartPage() {
   const [formData, setFormData] = useState<FormData>(defaultFormData)
   const [showCards, setShowCards] = useState(false)
   const [isShared, setIsShared] = useState(false)
+  const [loadingShare, setLoadingShare] = useState(false)
   // Prevents double-firing when both onTouchEnd and onClick trigger
   const lastTap = useRef(0)
 
@@ -1177,7 +1178,12 @@ export default function FairePartPage() {
     const id = new URLSearchParams(window.location.search).get('share')
     if (id) {
       setIsShared(true)
-      fetch(`/api/get-share?id=${id}`).then(r => r.json()).then((d: FormData) => { setFormData(d); setShowCards(true) }).catch(console.error)
+      setLoadingShare(true)
+      fetch(`/api/get-share?id=${id}`)
+        .then(r => r.json())
+        .then((d: FormData) => { setFormData(d); setShowCards(true) })
+        .catch(() => { setLoadingShare(false) })
+        .finally(() => setLoadingShare(false))
     }
   }, [])
 
@@ -1209,6 +1215,15 @@ export default function FairePartPage() {
   }, [prev])
 
   if (showCards) return <CardsView data={formData} onEdit={() => { setShowCards(false); setStep(4) }} onReset={() => { setFormData(defaultFormData); setShowCards(false); setStep(1) }} isShared={isShared} />
+
+  if (loadingShare) return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fdf0f3 0%, #fff5f7 50%, #fdf0f3 100%)' }}>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 28, color: '#C9A84C', marginBottom: 16 }}>Chargement…</div>
+        <div style={{ width: 40, height: 1, background: '#C9A84C', opacity: 0.4, margin: '0 auto' }} />
+      </div>
+    </div>
+  )
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '48px 16px', background: 'linear-gradient(160deg, #fdf0f3 0%, #fff5f7 50%, #fdf0f3 100%)' }}>
