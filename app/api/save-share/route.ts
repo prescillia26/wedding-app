@@ -1,15 +1,17 @@
-import { writeFile, mkdir } from 'fs/promises'
 import { randomUUID } from 'crypto'
-import path from 'path'
 
-const SHARES_DIR = '/tmp/shares'
+declare global {
+  // eslint-disable-next-line no-var
+  var shareStore: Map<string, unknown>
+}
+
+globalThis.shareStore = globalThis.shareStore || new Map()
 
 export async function POST(request: Request) {
   try {
     const data = await request.json()
     const id = randomUUID()
-    await mkdir(SHARES_DIR, { recursive: true })
-    await writeFile(path.join(SHARES_DIR, `${id}.json`), JSON.stringify(data), 'utf8')
+    globalThis.shareStore.set(id, data)
     return Response.json({ id })
   } catch (err) {
     console.error('save-share error:', err)
