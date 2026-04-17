@@ -1047,6 +1047,7 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
   const [rsvpListOpen, setRsvpListOpen] = useState(false)
   const [lastShareId, setLastShareId] = useState<string | null>(null)
   const [shareFeedback, setShareFeedback] = useState(false)
+  const [shareUrl, setShareUrl] = useState<string | null>(null)
   const refs = useRef<(HTMLDivElement | null)[]>([])
   const isElegant = data.presentationStyle === 'elegant'
 
@@ -1077,23 +1078,14 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
       const id = json.id
       setLastShareId(id)
       const url = window.location.origin + '/faire-part?share=' + id
-      console.log('URL générée:', url)
+      setShareUrl(url)
       try {
         await navigator.clipboard.writeText(url)
-      } catch (clipErr) {
-        console.log('clipboard API échouée, fallback execCommand:', clipErr)
-        const ta = document.createElement('textarea')
-        ta.value = url
-        ta.style.position = 'fixed'
-        ta.style.opacity = '0'
-        document.body.appendChild(ta)
-        ta.focus()
-        ta.select()
-        document.execCommand('copy')
-        document.body.removeChild(ta)
+        setShareFeedback(true)
+        setTimeout(() => setShareFeedback(false), 3000)
+      } catch {
+        // clipboard échouée — le lien reste affiché dans l'UI
       }
-      setShareFeedback(true)
-      setTimeout(() => setShareFeedback(false), 3000)
     } catch (err) {
       console.error('handleShare erreur:', err)
       alert('Erreur : ' + (err instanceof Error ? err.message : String(err)))
@@ -1149,13 +1141,44 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
           )}
 
           {!isShared && (
-            <div style={{ maxWidth: 600, margin: '40px auto 0', display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <button onClick={onEdit} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>Modifier</button>
-              <button onClick={handleShare} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, background: shareFeedback ? '#22c55e' : theme.accent, color: 'white', border: 'none', fontSize: 14, transition: 'background 0.3s' }}>{shareFeedback ? '✓ Lien copié !' : '🔗 Partager'}</button>
-              {lastShareId && (
-                <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>📋 Voir les RSVP</button>
+            <div style={{ maxWidth: 600, margin: '40px auto 0' }}>
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <button onClick={onEdit} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>Modifier</button>
+                <button onClick={handleShare} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, background: shareFeedback ? '#22c55e' : theme.accent, color: 'white', border: 'none', fontSize: 14, transition: 'background 0.3s' }}>{shareFeedback ? '✓ Lien copié !' : '🔗 Partager'}</button>
+                {lastShareId && (
+                  <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>📋 Voir les RSVP</button>
+                )}
+                <button onClick={onReset} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: '1px solid #fecdd3', background: 'transparent', color: '#fb7185', fontSize: 14 }}>Nouveau</button>
+              </div>
+              {shareUrl && (
+                <div style={{ marginTop: 16, padding: '12px 16px', background: `${theme.accent}11`, border: `1px solid ${theme.accent}44`, borderRadius: 10 }}>
+                  <div style={{ fontSize: 11, color: theme.accent, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Lien à envoyer à tes invités</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <input
+                      readOnly
+                      value={shareUrl}
+                      onFocus={e => e.target.select()}
+                      style={{ flex: 1, fontSize: 12, color: theme.texte, background: 'white', border: `1px solid ${theme.accent}33`, borderRadius: 6, padding: '8px 10px', outline: 'none' }}
+                    />
+                    <button onClick={() => {
+                      navigator.clipboard.writeText(shareUrl).catch(() => {
+                        const ta = document.createElement('textarea')
+                        ta.value = shareUrl
+                        ta.style.position = 'fixed'
+                        ta.style.opacity = '0'
+                        document.body.appendChild(ta)
+                        ta.focus(); ta.select()
+                        document.execCommand('copy')
+                        document.body.removeChild(ta)
+                      })
+                      setShareFeedback(true)
+                      setTimeout(() => setShareFeedback(false), 3000)
+                    }} style={{ ...BTN, padding: '8px 14px', borderRadius: 6, background: theme.accent, color: 'white', border: 'none', fontSize: 12, whiteSpace: 'nowrap' }}>
+                      {shareFeedback ? '✓' : 'Copier'}
+                    </button>
+                  </div>
+                </div>
               )}
-              <button onClick={onReset} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: '1px solid #fecdd3', background: 'transparent', color: '#fb7185', fontSize: 14 }}>Nouveau</button>
             </div>
           )}
         </div>
