@@ -469,11 +469,13 @@ function CardHouppa({ ceremony, data, theme }: CardProps) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, marginBottom: 24, alignItems: 'start' }}>
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: theme.accent, lineHeight: 2 }}>
             {data.famille1Pere && <div>{data.famille1Pere}</div>}
+            {data.famille1Mere && <div>{data.famille1Mere}</div>}
             {data.famille1GpPaternels && <div>{data.famille1GpPaternels}</div>}
             {data.famille1GpMaternels && <div>{data.famille1GpMaternels}</div>}
           </div>
           <div style={{ width: 1, background: theme.accent, opacity: 0.3, alignSelf: 'stretch', minHeight: 40 }} />
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: theme.accent, textAlign: 'right', lineHeight: 2 }}>
+            {data.famille2Pere && <div>{data.famille2Pere}</div>}
             {data.famille2Mere && <div>{data.famille2Mere}</div>}
             {data.famille2GpPaternels && <div>{data.famille2GpPaternels}</div>}
             {data.famille2GpMaternels && <div>{data.famille2GpMaternels}</div>}
