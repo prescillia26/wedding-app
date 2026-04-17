@@ -2,10 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 
-// ============================================================
-// TYPES & CONSTANTS
-// ============================================================
-
 type Theme = 'classique-dore' | 'moderne' | 'champetre' | 'oriental'
 
 const THEMES = {
@@ -15,15 +11,7 @@ const THEMES = {
   'oriental': { fond: '#1a0a00', accent: '#D4A847', texte: '#f5e6c8', textSecondaire: '#d4c0a0' },
 } as const
 
-const CEREMONY_TYPES = [
-  'Mairie',
-  'Cérémonie religieuse / Houppa',
-  'Henné',
-  'Cocktail',
-  'Soirée',
-  'Boat Party',
-  'Autre',
-]
+const CEREMONY_TYPES = ['Mairie', 'Cérémonie religieuse / Houppa', 'Henné', 'Cocktail', 'Soirée', 'Boat Party', 'Autre']
 
 interface Ceremony {
   type: string
@@ -60,40 +48,18 @@ interface FormData {
 
 const defaultCeremony: Ceremony = {
   type: 'Cérémonie religieuse / Houppa',
-  customName: '',
-  lieu: '',
-  adresse: '',
-  date: '',
-  heure: '',
-  suiviDAutre: false,
-  evenementSuivant: '',
+  customName: '', lieu: '', adresse: '', date: '', heure: '',
+  suiviDAutre: false, evenementSuivant: '',
 }
 
 const defaultFormData: FormData = {
-  marie1Prenom: '',
-  marie1Nom: '',
-  marie1Prenom2: '',
-  marie2Prenom: '',
-  marie2Nom: '',
-  marie2Prenom2: '',
-  famille1Pere: '',
-  famille1Mere: '',
-  famille1GpPaternels: '',
-  famille1GpMaternels: '',
-  famille2Pere: '',
-  famille2Mere: '',
-  famille2GpPaternels: '',
-  famille2GpMaternels: '',
+  marie1Prenom: '', marie1Nom: '', marie1Prenom2: '',
+  marie2Prenom: '', marie2Nom: '', marie2Prenom2: '',
+  famille1Pere: '', famille1Mere: '', famille1GpPaternels: '', famille1GpMaternels: '',
+  famille2Pere: '', famille2Mere: '', famille2GpPaternels: '', famille2GpMaternels: '',
   ceremonies: [{ ...defaultCeremony }],
-  style: 'classique-dore',
-  mariageJuif: false,
-  youtubeUrl: '',
-  photoFond: '',
+  style: 'classique-dore', mariageJuif: false, youtubeUrl: '', photoFond: '',
 }
-
-// ============================================================
-// HELPERS
-// ============================================================
 
 function getYouTubeId(url: string): string | null {
   const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)
@@ -102,66 +68,45 @@ function getYouTubeId(url: string): string | null {
 
 function formatDateFr(dateStr: string): string {
   if (!dateStr) return ''
-  const date = new Date(dateStr + 'T12:00:00')
-  return new Intl.DateTimeFormat('fr-FR', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  }).format(date).toUpperCase()
+  return new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+    .format(new Date(dateStr + 'T12:00:00')).toUpperCase()
 }
 
-function formatDateFrCapitalized(dateStr: string): string {
+function formatDateFrCap(dateStr: string): string {
   if (!dateStr) return ''
-  const date = new Date(dateStr + 'T12:00:00')
-  const parts = new Intl.DateTimeFormat('fr-FR', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  }).formatToParts(date)
+  const d = new Date(dateStr + 'T12:00:00')
+  const parts = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).formatToParts(d)
   const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
-  const weekday = parts.find(p => p.type === 'weekday')?.value || ''
+  const w = parts.find(p => p.type === 'weekday')?.value || ''
   const day = parts.find(p => p.type === 'day')?.value || ''
-  const month = parts.find(p => p.type === 'month')?.value || ''
-  const year = parts.find(p => p.type === 'year')?.value || ''
-  return `Le ${cap(weekday)} ${day} ${cap(month)} ${year}`
+  const m = parts.find(p => p.type === 'month')?.value || ''
+  const y = parts.find(p => p.type === 'year')?.value || ''
+  return `Le ${cap(w)} ${day} ${cap(m)} ${y}`
 }
 
-function formatHeure(heure: string): string {
-  if (!heure) return ''
-  return 'À ' + heure.replace(':', 'H')
+function formatHeure(h: string): string {
+  if (!h) return ''
+  return 'À ' + h.replace(':', 'H')
 }
 
 function formatLieu(lieu: string): string {
   if (!lieu) return ''
-  const lower = lieu.toLowerCase()
-  if (lower.includes('salon') || lower.includes('salle')) return `Dans les salons ${lieu}`
-  if (lower.includes('château') || lower.includes('chateau')) return `Au château ${lieu}`
-  if (lower.includes('domaine')) return `Au domaine ${lieu}`
+  const l = lieu.toLowerCase()
+  if (l.includes('salon') || l.includes('salle')) return `Dans les salons ${lieu}`
+  if (l.includes('château') || l.includes('chateau')) return `Au château ${lieu}`
+  if (l.includes('domaine')) return `Au domaine ${lieu}`
   return `À ${lieu}`
 }
 
 function getHebrewDate(dateStr: string): string {
   if (!dateStr) return ''
   try {
-    const date = new Date(dateStr + 'T12:00:00')
-    return new Intl.DateTimeFormat('he-IL-u-ca-hebrew', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    }).format(date)
-  } catch {
-    return ''
-  }
+    return new Intl.DateTimeFormat('he-IL-u-ca-hebrew', { year: 'numeric', month: 'long', day: 'numeric' })
+      .format(new Date(dateStr + 'T12:00:00'))
+  } catch { return '' }
 }
 
-function getEventDisplayName(type: string, customName: string): string {
-  if (type === 'Autre') return customName || 'Événement'
-  return type
-}
-
-function sortCeremoniesByDate(ceremonies: Ceremony[]): Ceremony[] {
+function sortByDate(ceremonies: Ceremony[]): Ceremony[] {
   return [...ceremonies].sort((a, b) => {
     if (!a.date) return 1
     if (!b.date) return -1
@@ -169,180 +114,93 @@ function sortCeremoniesByDate(ceremonies: Ceremony[]): Ceremony[] {
   })
 }
 
-// ============================================================
-// FORM HELPERS
-// ============================================================
-
-function FormLabel({ children, required }: { children: React.ReactNode; required?: boolean }) {
-  return (
-    <label className="block text-[10px] uppercase tracking-[0.15em] text-[#C9A84C] mb-1.5">
-      {children}
-      {required && <span className="text-[#fb7185] ml-1">*</span>}
-    </label>
-  )
+const S: Record<string, React.CSSProperties> = {
+  input: {
+    width: '100%', border: '1px solid #fecdd3', borderRadius: 10, padding: '10px 14px',
+    background: 'white', fontSize: 14, outline: 'none', color: '#4a3728', boxSizing: 'border-box',
+  },
+  label: {
+    display: 'block', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.15em',
+    color: '#C9A84C', marginBottom: 6, fontWeight: 600,
+  },
 }
 
-const inputCls =
-  'w-full border border-[#fecdd3] rounded-[10px] px-3 py-2.5 bg-white focus:border-[#C9A84C] focus:outline-none text-sm transition-colors'
+function Label({ children }: { children: React.ReactNode }) {
+  return <label style={S.label}>{children}</label>
+}
 
-function FormInput({
-  label,
-  value,
-  onChange,
-  placeholder,
-  required,
-  type = 'text',
-  hint,
-}: {
-  label: string
-  value: string
-  onChange: (v: string) => void
-  placeholder?: string
-  required?: boolean
-  type?: string
-  hint?: string
+function Field({ label, value, onChange, placeholder, type = 'text' }: {
+  label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string
 }) {
   return (
-    <div className="mb-4">
-      <FormLabel required={required}>{label}</FormLabel>
-      <input
-        type={type}
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        placeholder={placeholder}
-        className={inputCls}
-      />
-      {hint && <p className="text-[11px] text-gray-400 mt-1 italic">{hint}</p>}
+    <div style={{ marginBottom: 16 }}>
+      <Label>{label}</Label>
+      <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={S.input} />
     </div>
   )
 }
-
-// ============================================================
-// PROGRESS BAR
-// ============================================================
 
 function ProgressBar({ step }: { step: number }) {
   const steps = ['Les mariés', 'Les familles', 'Cérémonies', 'Style']
   return (
-    <div className="flex items-start mb-8">
-      {steps.map((label, i) => (
-        <div key={i} className="flex items-center flex-1">
-          <div className="flex flex-col items-center">
-            <div
-              className="w-3 h-3 rounded-full border-2 transition-all duration-300"
-              style={{
-                backgroundColor: i + 1 <= step ? '#C9A84C' : 'white',
-                borderColor: '#C9A84C',
-              }}
-            />
-            <span className="text-[9px] uppercase tracking-wider text-[#C9A84C] mt-1 text-center leading-tight max-w-[60px]">
-              {label}
-            </span>
-          </div>
-          {i < steps.length - 1 && (
-            <div
-              className="flex-1 h-px mb-4 transition-all duration-300"
-              style={{ backgroundColor: i + 1 < step ? '#C9A84C' : '#fecdd3' }}
-            />
-          )}
+    <div style={{ marginBottom: 32 }}>
+      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', marginBottom: 10 }}>
+        <div style={{ position: 'absolute', left: 0, right: 0, height: 1, background: '#fce7f3' }} />
+        <div style={{
+          position: 'absolute', left: 0, height: 1,
+          background: 'linear-gradient(to right, rgba(201,168,76,0.4), #C9A84C)',
+          width: `${((step - 1) / (steps.length - 1)) * 100}%`,
+          transition: 'width 0.5s ease',
+        }} />
+        <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+          {steps.map((_, i) => (
+            <div key={i} style={{
+              width: 10, height: 10, borderRadius: '50%',
+              border: `2px solid ${i + 1 <= step ? '#C9A84C' : '#fecdd3'}`,
+              background: i + 1 < step ? '#C9A84C' : 'white',
+              boxShadow: i + 1 === step ? '0 0 0 4px rgba(201,168,76,0.15)' : 'none',
+              transition: 'all 0.3s',
+            }} />
+          ))}
         </div>
-      ))}
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        {steps.map((label, i) => (
+          <span key={i} style={{
+            flex: 1, textAlign: 'center', fontSize: 9, fontWeight: 600,
+            letterSpacing: '0.12em', textTransform: 'uppercase',
+            color: i + 1 === step ? '#C9A84C' : i + 1 < step ? 'rgba(201,168,76,0.45)' : '#fecdd3',
+          }}>{label}</span>
+        ))}
+      </div>
     </div>
   )
 }
-
-// ============================================================
-// STEP 1 — LES MARIÉS
-// ============================================================
 
 function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
   return (
     <div>
-      <h2 className="text-center text-xl font-semibold text-[#4a3728] mb-6">Les mariés</h2>
-
-      <div className="mb-2">
-        <FormInput label="Prénom" value={data.marie1Prenom} onChange={v => onChange({ marie1Prenom: v })} required />
-        <FormInput label="Nom" value={data.marie1Nom} onChange={v => onChange({ marie1Nom: v })} required />
-        <FormInput
-          label="2ème prénom ou prénom hébreu"
-          value={data.marie1Prenom2}
-          onChange={v => onChange({ marie1Prenom2: v })}
-        />
+      <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#4a3728', marginBottom: 24 }}>Les mariés</h2>
+      <div style={{ background: '#fdf8f9', borderRadius: 12, padding: 20, marginBottom: 16 }}>
+        <div style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Marié·e 1</div>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <Field label="Prénom" value={data.marie1Prenom} onChange={v => onChange({ marie1Prenom: v })} placeholder="Sophie" />
+          <Field label="Nom" value={data.marie1Nom} onChange={v => onChange({ marie1Nom: v })} placeholder="Martin" />
+        </div>
+        <Field label="2ème prénom (optionnel)" value={data.marie1Prenom2} onChange={v => onChange({ marie1Prenom2: v })} placeholder="Marie" />
       </div>
-
-      <div className="flex items-center my-6">
-        <div className="flex-1 h-px bg-[#fecdd3]" />
-        <span
-          className="mx-4 text-2xl text-[#C9A84C] font-light"
-          style={{ fontFamily: 'var(--font-cormorant-garamond)' }}
-        >
-          &
-        </span>
-        <div className="flex-1 h-px bg-[#fecdd3]" />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '16px 0' }}>
+        <div style={{ flex: 1, height: 1, background: '#fecdd3' }} />
+        <span style={{ color: '#C9A84C', fontSize: 20 }}>&</span>
+        <div style={{ flex: 1, height: 1, background: '#fecdd3' }} />
       </div>
-
-      <div>
-        <FormInput label="Prénom" value={data.marie2Prenom} onChange={v => onChange({ marie2Prenom: v })} required />
-        <FormInput label="Nom" value={data.marie2Nom} onChange={v => onChange({ marie2Nom: v })} required />
-        <FormInput
-          label="2ème prénom ou prénom hébreu"
-          value={data.marie2Prenom2}
-          onChange={v => onChange({ marie2Prenom2: v })}
-        />
-      </div>
-    </div>
-  )
-}
-
-// ============================================================
-// STEP 2 — LES FAMILLES
-// ============================================================
-
-function FamilleColumn({
-  title,
-  pere,
-  mere,
-  gpPaternels,
-  gpMaternels,
-  onChangePere,
-  onChangeMere,
-  onChangeGpP,
-  onChangeGpM,
-}: {
-  title: string
-  pere: string
-  mere: string
-  gpPaternels: string
-  gpMaternels: string
-  onChangePere: (v: string) => void
-  onChangeMere: (v: string) => void
-  onChangeGpP: (v: string) => void
-  onChangeGpM: (v: string) => void
-}) {
-  return (
-    <div>
-      <h3 className="text-center text-[11px] font-medium text-[#C9A84C] mb-4 uppercase tracking-widest">
-        {title}
-      </h3>
-      <div className="mb-3">
-        <FormLabel>Père</FormLabel>
-        <input type="text" value={pere} onChange={e => onChangePere(e.target.value)} className={inputCls} />
-        <p className="text-[10px] text-gray-400 mt-0.5">ex: M. Richard Portugais</p>
-      </div>
-      <div className="mb-3">
-        <FormLabel>Mère</FormLabel>
-        <input type="text" value={mere} onChange={e => onChangeMere(e.target.value)} className={inputCls} />
-        <p className="text-[10px] text-gray-400 mt-0.5">ex: Mme Marie Benchetrit</p>
-      </div>
-      <div className="mb-3">
-        <FormLabel>GP paternels</FormLabel>
-        <input type="text" value={gpPaternels} onChange={e => onChangeGpP(e.target.value)} className={inputCls} />
-        <p className="text-[10px] text-gray-400 mt-0.5">ex: M. &amp; Mme Sydney Zeitoun</p>
-      </div>
-      <div className="mb-3">
-        <FormLabel>GP maternels</FormLabel>
-        <input type="text" value={gpMaternels} onChange={e => onChangeGpM(e.target.value)} className={inputCls} />
-        <p className="text-[10px] text-gray-400 mt-0.5">ex: M. &amp; Mme Jacques Portugais</p>
+      <div style={{ background: '#fdf8f9', borderRadius: 12, padding: 20 }}>
+        <div style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Marié·e 2</div>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <Field label="Prénom" value={data.marie2Prenom} onChange={v => onChange({ marie2Prenom: v })} placeholder="Thomas" />
+          <Field label="Nom" value={data.marie2Nom} onChange={v => onChange({ marie2Nom: v })} placeholder="Dupont" />
+        </div>
+        <Field label="2ème prénom (optionnel)" value={data.marie2Prenom2} onChange={v => onChange({ marie2Prenom2: v })} placeholder="David" />
       </div>
     </div>
   )
@@ -351,333 +209,144 @@ function FamilleColumn({
 function Step2({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
   return (
     <div>
-      <h2 className="text-center text-xl font-semibold text-[#4a3728] mb-6">Les familles</h2>
-      <div className="grid grid-cols-2 gap-5">
-        <FamilleColumn
-          title={data.marie1Prenom || 'Marié(e) 1'}
-          pere={data.famille1Pere}
-          mere={data.famille1Mere}
-          gpPaternels={data.famille1GpPaternels}
-          gpMaternels={data.famille1GpMaternels}
-          onChangePere={v => onChange({ famille1Pere: v })}
-          onChangeMere={v => onChange({ famille1Mere: v })}
-          onChangeGpP={v => onChange({ famille1GpPaternels: v })}
-          onChangeGpM={v => onChange({ famille1GpMaternels: v })}
-        />
-        <FamilleColumn
-          title={data.marie2Prenom || 'Marié(e) 2'}
-          pere={data.famille2Pere}
-          mere={data.famille2Mere}
-          gpPaternels={data.famille2GpPaternels}
-          gpMaternels={data.famille2GpMaternels}
-          onChangePere={v => onChange({ famille2Pere: v })}
-          onChangeMere={v => onChange({ famille2Mere: v })}
-          onChangeGpP={v => onChange({ famille2GpPaternels: v })}
-          onChangeGpM={v => onChange({ famille2GpMaternels: v })}
-        />
+      <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#4a3728', marginBottom: 24 }}>Les familles</h2>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        {[
+          { title: data.marie1Prenom || 'Marié·e 1', fields: [
+            { label: 'Père', value: data.famille1Pere, key: 'famille1Pere', hint: 'M. Richard Portugais' },
+            { label: 'Mère', value: data.famille1Mere, key: 'famille1Mere', hint: 'Mme Marie Benchetrit' },
+            { label: 'GP paternels', value: data.famille1GpPaternels, key: 'famille1GpPaternels', hint: 'M. & Mme Sydney Zeitoun' },
+            { label: 'GP maternels', value: data.famille1GpMaternels, key: 'famille1GpMaternels', hint: 'M. & Mme Jacques Portugais' },
+          ]},
+          { title: data.marie2Prenom || 'Marié·e 2', fields: [
+            { label: 'Père', value: data.famille2Pere, key: 'famille2Pere', hint: 'M. Paul Dupont' },
+            { label: 'Mère', value: data.famille2Mere, key: 'famille2Mere', hint: 'Mme Claire Dupont' },
+            { label: 'GP paternels', value: data.famille2GpPaternels, key: 'famille2GpPaternels', hint: 'M. & Mme Georges Dupont' },
+            { label: 'GP maternels', value: data.famille2GpMaternels, key: 'famille2GpMaternels', hint: 'M. & Mme André Leroy' },
+          ]},
+        ].map((col, ci) => (
+          <div key={ci}>
+            <div style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'center', marginBottom: 12 }}>{col.title}</div>
+            {col.fields.map(f => (
+              <div key={f.key} style={{ marginBottom: 12 }}>
+                <Label>{f.label}</Label>
+                <input type="text" value={f.value} onChange={e => onChange({ [f.key]: e.target.value } as Partial<FormData>)} style={S.input} />
+                <p style={{ fontSize: 10, color: '#9ca3af', marginTop: 3 }}>ex: {f.hint}</p>
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
-    </div>
-  )
-}
-
-// ============================================================
-// STEP 3 — CÉRÉMONIES
-// ============================================================
-
-function CeremonyBlock({
-  ceremony,
-  index,
-  total,
-  onUpdate,
-  onRemove,
-}: {
-  ceremony: Ceremony
-  index: number
-  total: number
-  onUpdate: (updates: Partial<Ceremony>) => void
-  onRemove: () => void
-}) {
-  return (
-    <div className="mb-8 pb-8 border-b border-[#fecdd3] last:border-0 last:pb-0 last:mb-0">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-[#4a3728]">Événement {index + 1}</h3>
-        {total > 1 && (
-          <button
-            type="button"
-            onClick={onRemove}
-            className="text-[#fb7185] text-xs hover:text-[#f87171] transition-colors"
-          >
-            Supprimer
-          </button>
-        )}
-      </div>
-
-      {/* Type buttons */}
-      <div className="mb-4">
-        <FormLabel>Type d&apos;événement</FormLabel>
-        <div className="flex flex-wrap gap-2">
-          {CEREMONY_TYPES.map(type => (
-            <button
-              key={type}
-              type="button"
-              onClick={() => onUpdate({ type })}
-              className="px-3 py-1.5 rounded-full text-xs border transition-all"
-              style={{
-                backgroundColor: ceremony.type === type ? '#C9A84C' : 'transparent',
-                borderColor: '#C9A84C',
-                color: ceremony.type === type ? 'white' : '#C9A84C',
-              }}
-            >
-              {type}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {ceremony.type === 'Autre' && (
-        <div className="mb-4">
-          <FormLabel>Nom de l&apos;événement</FormLabel>
-          <input
-            type="text"
-            value={ceremony.customName}
-            onChange={e => onUpdate({ customName: e.target.value })}
-            className={inputCls}
-          />
-        </div>
-      )}
-
-      <div className="mb-4">
-        <FormLabel>Lieu / Salle</FormLabel>
-        <input
-          type="text"
-          value={ceremony.lieu}
-          onChange={e => onUpdate({ lieu: e.target.value })}
-          placeholder="ex: Salons Kahi Resort"
-          className={inputCls}
-        />
-      </div>
-
-      <div className="mb-4">
-        <FormLabel>Adresse complète (optionnel)</FormLabel>
-        <input
-          type="text"
-          value={ceremony.adresse}
-          onChange={e => onUpdate({ adresse: e.target.value })}
-          className={inputCls}
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <FormLabel>Date</FormLabel>
-          <input
-            type="date"
-            value={ceremony.date}
-            onChange={e => onUpdate({ date: e.target.value })}
-            className={inputCls}
-          />
-        </div>
-        <div>
-          <FormLabel>Heure</FormLabel>
-          <input
-            type="time"
-            value={ceremony.heure}
-            onChange={e => onUpdate({ heure: e.target.value })}
-            className={inputCls}
-          />
-        </div>
-      </div>
-
-      {ceremony.type === 'Mairie' && (
-        <div className="mb-2">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={ceremony.suiviDAutre}
-              onChange={e => onUpdate({ suiviDAutre: e.target.checked })}
-              className="accent-[#C9A84C] w-4 h-4"
-            />
-            <span className="text-sm text-[#4a3728]">Cet événement est suivi d&apos;un autre ?</span>
-          </label>
-          {ceremony.suiviDAutre && (
-            <div className="mt-3">
-              <FormLabel>Lequel ?</FormLabel>
-              <input
-                type="text"
-                value={ceremony.evenementSuivant}
-                onChange={e => onUpdate({ evenementSuivant: e.target.value })}
-                placeholder="ex: Henné à la salle Michkenot Israël, 6 rue Jean Nohain Paris 75019"
-                className={inputCls}
-              />
-            </div>
-          )}
-        </div>
-      )}
     </div>
   )
 }
 
 function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
-  const updateCeremony = (index: number, updates: Partial<Ceremony>) => {
-    onChange({
-      ceremonies: data.ceremonies.map((c, i) => (i === index ? { ...c, ...updates } : c)),
-    })
-  }
-
-  const addCeremony = () => {
-    if (data.ceremonies.length < 6) {
-      onChange({ ceremonies: [...data.ceremonies, { ...defaultCeremony, type: 'Soirée' }] })
-    }
-  }
-
-  const removeCeremony = (index: number) => {
-    onChange({ ceremonies: data.ceremonies.filter((_, i) => i !== index) })
-  }
+  const update = (i: number, u: Partial<Ceremony>) =>
+    onChange({ ceremonies: data.ceremonies.map((c, idx) => idx === i ? { ...c, ...u } : c) })
+  const add = () => data.ceremonies.length < 6 && onChange({ ceremonies: [...data.ceremonies, { ...defaultCeremony, type: 'Soirée' }] })
+  const remove = (i: number) => onChange({ ceremonies: data.ceremonies.filter((_, idx) => idx !== i) })
 
   return (
     <div>
-      <h2 className="text-center text-xl font-semibold text-[#4a3728] mb-6">Les cérémonies</h2>
-      {data.ceremonies.map((ceremony, i) => (
-        <CeremonyBlock
-          key={i}
-          ceremony={ceremony}
-          index={i}
-          total={data.ceremonies.length}
-          onUpdate={updates => updateCeremony(i, updates)}
-          onRemove={() => removeCeremony(i)}
-        />
+      <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#4a3728', marginBottom: 24 }}>Les cérémonies</h2>
+      {data.ceremonies.map((c, i) => (
+        <div key={i} style={{ background: '#fdf8f9', borderRadius: 12, padding: 20, marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <span style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Événement {i + 1}</span>
+            {data.ceremonies.length > 1 && (
+              <button type="button" onClick={() => remove(i)} style={{ background: 'none', border: 'none', color: '#fb7185', cursor: 'pointer', fontSize: 12 }}>Supprimer</button>
+            )}
+          </div>
+          <Label>Type</Label>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
+            {CEREMONY_TYPES.map(t => (
+              <button key={t} type="button" onClick={() => update(i, { type: t })} style={{
+                padding: '6px 14px', borderRadius: 9999, fontSize: 12, cursor: 'pointer',
+                border: '1px solid #C9A84C',
+                background: c.type === t ? '#C9A84C' : 'transparent',
+                color: c.type === t ? 'white' : '#C9A84C',
+              }}>{t}</button>
+            ))}
+          </div>
+          {c.type === 'Autre' && <Field label="Nom de l'événement" value={c.customName} onChange={v => update(i, { customName: v })} />}
+          <Field label="Lieu / Salle" value={c.lieu} onChange={v => update(i, { lieu: v })} placeholder="Salons Kahi Resort" />
+          <Field label="Adresse (optionnel)" value={c.adresse} onChange={v => update(i, { adresse: v })} />
+          <div style={{ display: 'flex', gap: 12 }}>
+            <Field label="Date" value={c.date} onChange={v => update(i, { date: v })} type="date" />
+            <Field label="Heure" value={c.heure} onChange={v => update(i, { heure: v })} type="time" />
+          </div>
+          {c.type === 'Mairie' && (
+            <div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: '#4a3728' }}>
+                <input type="checkbox" checked={c.suiviDAutre} onChange={e => update(i, { suiviDAutre: e.target.checked })} />
+                Suivi d'un autre événement ?
+              </label>
+              {c.suiviDAutre && <Field label="Lequel ?" value={c.evenementSuivant} onChange={v => update(i, { evenementSuivant: v })} placeholder="Henné à la salle Michkenot Israël, 6 rue Jean Nohain Paris 75019" />}
+            </div>
+          )}
+        </div>
       ))}
       {data.ceremonies.length < 6 && (
-        <button
-          type="button"
-          onClick={addCeremony}
-          className="w-full border border-dashed border-[#C9A84C] text-[#C9A84C] rounded-[10px] py-3 text-sm hover:bg-[#fdf0f3] transition-colors mt-4"
-        >
-          + Ajouter un événement
-        </button>
+        <button type="button" onClick={add} style={{
+          width: '100%', padding: 12, border: '2px dashed #C9A84C', borderRadius: 10,
+          background: 'transparent', color: '#C9A84C', cursor: 'pointer', fontSize: 14,
+        }}>+ Ajouter un événement</button>
       )}
     </div>
   )
 }
 
-// ============================================================
-// STEP 4 — STYLE & OPTIONS
-// ============================================================
-
 function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = ev => onChange({ photoFond: ev.target?.result as string })
-    reader.readAsDataURL(file)
-  }
-
-  const themeLabels: Record<Theme, string> = {
-    'classique-dore': 'Classique doré',
-    'moderne': 'Moderne minimaliste',
-    'champetre': 'Champêtre',
-    'oriental': 'Oriental',
-  }
-
   return (
     <div>
-      <h2 className="text-center text-xl font-semibold text-[#4a3728] mb-6">Style & options</h2>
-
-      {/* Style grid */}
-      <div className="mb-6">
-        <FormLabel>Style visuel</FormLabel>
-        <div className="grid grid-cols-2 gap-3 mt-2">
-          {(Object.keys(THEMES) as Theme[]).map(key => {
-            const theme = THEMES[key]
-            const selected = data.style === key
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={() => onChange({ style: key })}
-                className="relative p-4 rounded-[10px] border-2 text-left transition-all"
-                style={{
-                  backgroundColor: theme.fond,
-                  borderColor: selected ? theme.accent : '#fecdd3',
-                }}
-              >
-                <div className="text-xs font-semibold mb-1" style={{ color: theme.texte }}>
-                  {themeLabels[key]}
-                </div>
-                <div className="text-xs" style={{ color: theme.accent }}>
-                  ✦ Accent
-                </div>
-                {selected && (
-                  <div
-                    className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] font-bold"
-                    style={{ backgroundColor: theme.accent }}
-                  >
-                    ✓
-                  </div>
-                )}
-              </button>
-            )
-          })}
-        </div>
+      <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#4a3728', marginBottom: 24 }}>Style & options</h2>
+      <Label>Style visuel</Label>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
+        {(Object.entries(THEMES) as [Theme, typeof THEMES[Theme]][]).map(([key, t]) => (
+          <button key={key} type="button" onClick={() => onChange({ style: key })} style={{
+            padding: 16, borderRadius: 12, border: `2px solid ${data.style === key ? t.accent : '#fecdd3'}`,
+            background: t.fond, cursor: 'pointer', textAlign: 'left', position: 'relative',
+          }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: t.texte, marginBottom: 4 }}>
+              {{ 'classique-dore': 'Classique doré', 'moderne': 'Moderne', 'champetre': 'Champêtre', 'oriental': 'Oriental' }[key]}
+            </div>
+            <div style={{ fontSize: 11, color: t.accent }}>✦ Accent</div>
+            {data.style === key && (
+              <div style={{ position: 'absolute', top: 8, right: 8, width: 18, height: 18, borderRadius: '50%', background: t.accent, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>✓</div>
+            )}
+          </button>
+        ))}
       </div>
-
-      {/* Mariage juif */}
-      <div className="mb-6">
-        <label className="flex items-center gap-3 cursor-pointer p-3 border border-[#fecdd3] rounded-[10px] hover:bg-[#fdf0f3] transition-colors select-none">
-          <input
-            type="checkbox"
-            checked={data.mariageJuif}
-            onChange={e => onChange({ mariageJuif: e.target.checked })}
-            className="accent-[#C9A84C] w-4 h-4"
-          />
-          <span className="text-sm text-[#4a3728]">Mariage juif ✡</span>
-        </label>
+      <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 14, border: '1px solid #fecdd3', borderRadius: 10, cursor: 'pointer', marginBottom: 20, fontSize: 14, color: '#4a3728' }}>
+        <input type="checkbox" checked={data.mariageJuif} onChange={e => onChange({ mariageJuif: e.target.checked })} />
+        Mariage juif ✡
+      </label>
+      <div style={{ marginBottom: 20 }}>
+        <Label>Musique de fond (lien YouTube)</Label>
+        <input type="url" value={data.youtubeUrl} onChange={e => onChange({ youtubeUrl: e.target.value })} placeholder="https://www.youtube.com/watch?v=..." style={S.input} />
+        <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>La musique jouera à l'ouverture de la carte</p>
       </div>
-
-      {/* YouTube */}
-      <div className="mb-6">
-        <FormLabel>Musique de fond</FormLabel>
-        <input
-          type="url"
-          value={data.youtubeUrl}
-          onChange={e => onChange({ youtubeUrl: e.target.value })}
-          placeholder="https://www.youtube.com/watch?v=..."
-          className={inputCls}
-        />
-        <p className="text-[11px] text-gray-400 mt-1">
-          La musique jouera automatiquement à l&apos;ouverture de la carte
-        </p>
-      </div>
-
-      {/* Photo upload */}
-      <div className="mb-2">
-        <FormLabel>Photo de fond</FormLabel>
-        <label className="block cursor-pointer">
-          <div className="border border-dashed border-[#fecdd3] rounded-[10px] p-5 text-center hover:bg-[#fdf0f3] transition-colors">
-            <div className="text-2xl mb-1">📷</div>
-            <p className="text-sm text-[#4a3728]">Cliquer pour uploader une photo</p>
-            <p className="text-[11px] text-gray-400 mt-1">
-              La photo sera appliquée en fond de toutes les cartes
-            </p>
+      <div>
+        <Label>Photo de fond (optionnel)</Label>
+        <label style={{ display: 'block', cursor: 'pointer' }}>
+          <div style={{ border: '2px dashed #fecdd3', borderRadius: 10, padding: 24, textAlign: 'center' }}>
+            <div style={{ fontSize: 24, marginBottom: 8 }}>📷</div>
+            <p style={{ fontSize: 13, color: '#4a3728' }}>Cliquer pour choisir une photo</p>
           </div>
-          <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
+          <input type="file" accept="image/*" onChange={e => {
+            const f = e.target.files?.[0]
+            if (!f) return
+            const r = new FileReader()
+            r.onload = ev => onChange({ photoFond: ev.target?.result as string })
+            r.readAsDataURL(f)
+          }} style={{ display: 'none' }} />
         </label>
         {data.photoFond && (
-          <div className="mt-3 relative">
+          <div style={{ marginTop: 12, position: 'relative' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={data.photoFond}
-              alt="Aperçu fond"
-              className="w-full h-32 object-cover rounded-[10px]"
-            />
-            <button
-              type="button"
-              onClick={() => onChange({ photoFond: '' })}
-              className="absolute top-2 right-2 bg-white rounded-full w-6 h-6 flex items-center justify-center text-[#fb7185] text-xs shadow hover:shadow-md transition-shadow"
-            >
-              ✕
-            </button>
+            <img src={data.photoFond} alt="" style={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 10 }} />
+            <button type="button" onClick={() => onChange({ photoFond: '' })} style={{ position: 'absolute', top: 8, right: 8, background: 'white', border: 'none', borderRadius: '50%', width: 24, height: 24, cursor: 'pointer', color: '#fb7185' }}>✕</button>
           </div>
         )}
       </div>
@@ -685,1239 +354,300 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
   )
 }
 
-// ============================================================
-// MAIRIE SVG ILLUSTRATION
-// ============================================================
-
 function MairieIllustration({ color }: { color: string }) {
   return (
-    <svg viewBox="0 0 200 120" width="160" height="96" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 200 120" width="140" height="84" xmlns="http://www.w3.org/2000/svg">
       <rect x="10" y="92" width="180" height="7" fill={color} opacity="0.7" />
       <rect x="40" y="52" width="120" height="44" fill="none" stroke={color} strokeWidth="1.5" />
-      {[56, 74, 92, 110, 128].map(x => (
-        <rect key={x} x={x} y="52" width="4" height="44" fill={color} opacity="0.5" />
-      ))}
+      {[56, 74, 92, 110, 128].map(x => <rect key={x} x={x} y="52" width="4" height="44" fill={color} opacity="0.5" />)}
       <polygon points="28,52 100,14 172,52" fill="none" stroke={color} strokeWidth="1.5" />
       <path d="M 87 96 L 87 68 Q 100 58 113 68 L 113 96 Z" fill="none" stroke={color} strokeWidth="1.2" />
       <rect x="50" y="60" width="16" height="14" rx="2" fill="none" stroke={color} strokeWidth="1" />
       <rect x="134" y="60" width="16" height="14" rx="2" fill="none" stroke={color} strokeWidth="1" />
       <line x1="100" y1="4" x2="100" y2="14" stroke={color} strokeWidth="1.5" />
-      <rect x="100" y="4" width="16" height="9" fill={color} opacity="0.6" />
       <circle cx="100" cy="33" r="3" fill={color} opacity="0.4" />
     </svg>
   )
 }
 
-// ============================================================
-// CARD BACKGROUND WRAPPER
-// ============================================================
-
-function CardBackground({
-  photoFond,
-  fond,
-  isOriental,
-  children,
-}: {
-  photoFond: string
-  fond: string
-  isOriental: boolean
-  children: React.ReactNode
-}) {
-  return (
-    <div style={{ position: 'relative', overflow: 'hidden', backgroundColor: fond }}>
-      {photoFond && (
-        <>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={photoFond}
-            alt=""
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              backgroundColor: isOriental ? 'rgba(26,10,0,0.83)' : 'rgba(255,255,255,0.86)',
-            }}
-          />
-        </>
-      )}
-      <div style={{ position: 'relative', zIndex: 1 }}>{children}</div>
-    </div>
-  )
-}
-
-// ============================================================
-// CARD TYPE 1 — HOUPPA / CÉRÉMONIE RELIGIEUSE
-// ============================================================
-
-type ThemeObj = {
-  fond: string
-  accent: string
-  texte: string
-  textSecondaire: string
-}
-
-interface CardProps {
-  ceremony: Ceremony
-  data: FormData
-  theme: ThemeObj
-}
+type ThemeObj = { fond: string; accent: string; texte: string; textSecondaire: string }
+interface CardProps { ceremony: Ceremony; data: FormData; theme: ThemeObj }
 
 function CardHouppa({ ceremony, data, theme }: CardProps) {
-  const hasGp =
-    data.famille1GpPaternels ||
-    data.famille1GpMaternels ||
-    data.famille2GpPaternels ||
-    data.famille2GpMaternels
+  const hasGp = data.famille1GpPaternels || data.famille1GpMaternels || data.famille2GpPaternels || data.famille2GpMaternels
   const hebrewDate = getHebrewDate(ceremony.date)
-  const isOriental = theme.fond === '#1a0a00'
-
   return (
-    <CardBackground photoFond={data.photoFond} fond={theme.fond} isOriental={isOriental}>
-      <div style={{ padding: '60px 48px', position: 'relative' }}>
-        {data.mariageJuif && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 20,
-              right: 24,
-              fontSize: 14,
-              fontFamily: 'serif',
-              color: theme.accent,
-              direction: 'rtl',
-            }}
-          >
-            בס״ד
-          </div>
-        )}
-
-        {/* [1] Titre */}
-        <div
-          style={{
-            fontFamily: 'var(--font-great-vibes)',
-            fontSize: 42,
-            color: theme.accent,
-            textAlign: 'center',
-            marginBottom: 24,
-            lineHeight: 1.2,
-          }}
-        >
+    <div style={{ backgroundColor: theme.fond, padding: '60px 48px', position: 'relative' }}>
+      {data.photoFond && <>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={data.photoFond} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: theme.fond === '#1a0a00' ? 'rgba(26,10,0,0.85)' : 'rgba(255,255,255,0.88)' }} />
+      </>}
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        {data.mariageJuif && <div style={{ position: 'absolute', top: -40, right: 0, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 42, color: theme.accent, textAlign: 'center', marginBottom: 20, lineHeight: 1.2 }}>
           {data.mariageJuif ? 'Houppa & Soirée' : 'Cérémonie religieuse & Soirée'}
         </div>
-
-        {/* [2] Verset hébreu */}
         {data.mariageJuif && (
-          <div style={{ marginBottom: 28 }}>
-            <div style={{ height: 1, backgroundColor: theme.accent, opacity: 0.35, marginBottom: 14 }} />
-            <div
-              style={{
-                fontFamily: 'serif',
-                fontSize: 16,
-                color: theme.accent,
-                direction: 'rtl',
-                textAlign: 'center',
-                lineHeight: 1.9,
-              }}
-            >
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ height: 1, background: theme.accent, opacity: 0.35, marginBottom: 12 }} />
+            <div style={{ fontFamily: 'serif', fontSize: 16, color: theme.accent, direction: 'rtl', textAlign: 'center', lineHeight: 1.9 }}>
               קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה, קוֹל חָתָן וְקוֹל כַּלָּה
             </div>
-            <div style={{ height: 1, backgroundColor: theme.accent, opacity: 0.35, marginTop: 14 }} />
+            <div style={{ height: 1, background: theme.accent, opacity: 0.35, marginTop: 12 }} />
           </div>
         )}
-
-        {/* [3] Familles */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr auto 1fr',
-            gap: 16,
-            marginBottom: 28,
-            alignItems: 'start',
-          }}
-        >
-          <div
-            style={{
-              fontFamily: 'var(--font-cormorant-garamond)',
-              fontStyle: 'italic',
-              fontSize: 13,
-              color: theme.accent,
-              lineHeight: 2,
-            }}
-          >
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, marginBottom: 24, alignItems: 'start' }}>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: theme.accent, lineHeight: 2 }}>
             {data.famille1Pere && <div>{data.famille1Pere}</div>}
             {data.famille1GpPaternels && <div>{data.famille1GpPaternels}</div>}
             {data.famille1GpMaternels && <div>{data.famille1GpMaternels}</div>}
           </div>
-          <div
-            style={{
-              width: 1,
-              backgroundColor: theme.accent,
-              opacity: 0.35,
-              alignSelf: 'stretch',
-              minHeight: 40,
-            }}
-          />
-          <div
-            style={{
-              fontFamily: 'var(--font-cormorant-garamond)',
-              fontStyle: 'italic',
-              fontSize: 13,
-              color: theme.accent,
-              textAlign: 'right',
-              lineHeight: 2,
-            }}
-          >
+          <div style={{ width: 1, background: theme.accent, opacity: 0.3, alignSelf: 'stretch', minHeight: 40 }} />
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: theme.accent, textAlign: 'right', lineHeight: 2 }}>
             {data.famille2Mere && <div>{data.famille2Mere}</div>}
             {data.famille2GpPaternels && <div>{data.famille2GpPaternels}</div>}
             {data.famille2GpMaternels && <div>{data.famille2GpMaternels}</div>}
           </div>
         </div>
-
-        {/* [4] Phrase centrale */}
-        <div
-          style={{
-            fontFamily: 'var(--font-cormorant-garamond)',
-            fontStyle: 'italic',
-            fontSize: 22,
-            textAlign: 'center',
-            color: theme.texte,
-            marginBottom: 28,
-            lineHeight: 1.5,
-          }}
-        >
-          {hasGp
-            ? 'Ont la joie de vous faire part du mariage de leurs petits-enfants et enfants'
-            : 'Ont la joie de vous faire part du mariage de leurs enfants'}
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, textAlign: 'center', color: theme.texte, marginBottom: 24, lineHeight: 1.5 }}>
+          {hasGp ? 'Ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'Ont la joie de vous faire part du mariage de leurs enfants'}
         </div>
-
-        {/* [5] Prénoms */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr auto 1fr',
-            alignItems: 'center',
-            gap: 12,
-            marginBottom: 28,
-          }}
-        >
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 8, marginBottom: 24 }}>
           <div style={{ textAlign: 'center' }}>
-            <div
-              style={{
-                fontFamily: 'var(--font-great-vibes)',
-                fontSize: 'clamp(36px, 10vw, 70px)',
-                color: theme.accent,
-                lineHeight: 1.1,
-              }}
-            >
-              {data.marie2Prenom || 'Prénom'}
-            </div>
-            {data.marie2Prenom2 && (
-              <div
-                style={{
-                  fontFamily: 'var(--font-playfair-display)',
-                  fontSize: 11,
-                  letterSpacing: 2,
-                  color: theme.textSecondaire,
-                  marginTop: 4,
-                }}
-              >
-                {data.marie2Prenom2}
-              </div>
-            )}
+            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(32px, 10vw, 68px)', color: theme.accent, lineHeight: 1.1 }}>{data.marie1Prenom || 'Prénom'}</div>
+            {data.marie1Prenom2 && <div style={{ fontSize: 11, letterSpacing: 2, color: theme.textSecondaire, marginTop: 4 }}>{data.marie1Prenom2}</div>}
           </div>
-          <div
-            style={{
-              fontFamily: 'var(--font-cormorant-garamond)',
-              fontSize: 'clamp(28px, 6vw, 42px)',
-              color: theme.accent,
-              lineHeight: 1,
-            }}
-          >
-            &
-          </div>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 'clamp(24px, 5vw, 36px)', color: theme.accent }}>&</div>
           <div style={{ textAlign: 'center' }}>
-            <div
-              style={{
-                fontFamily: 'var(--font-great-vibes)',
-                fontSize: 'clamp(36px, 10vw, 70px)',
-                color: theme.accent,
-                lineHeight: 1.1,
-              }}
-            >
-              {data.marie1Prenom || 'Prénom'}
-            </div>
-            {data.marie1Prenom2 && (
-              <div
-                style={{
-                  fontFamily: 'var(--font-playfair-display)',
-                  fontSize: 11,
-                  letterSpacing: 2,
-                  color: theme.textSecondaire,
-                  marginTop: 4,
-                }}
-              >
-                {data.marie1Prenom2}
-              </div>
-            )}
+            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(32px, 10vw, 68px)', color: theme.accent, lineHeight: 1.1 }}>{data.marie2Prenom || 'Prénom'}</div>
+            {data.marie2Prenom2 && <div style={{ fontSize: 11, letterSpacing: 2, color: theme.textSecondaire, marginTop: 4 }}>{data.marie2Prenom2}</div>}
           </div>
         </div>
-
-        {/* [6] Phrase de présence */}
-        <div
-          style={{
-            fontFamily: 'var(--font-cormorant-garamond)',
-            fontStyle: 'italic',
-            fontSize: 18,
-            textAlign: 'center',
-            color: theme.texte,
-            marginBottom: 20,
-            lineHeight: 1.6,
-          }}
-        >
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, textAlign: 'center', color: theme.texte, marginBottom: 16, lineHeight: 1.6 }}>
           et seront honorés de votre présence à la cérémonie religieuse qui sera célébrée le
         </div>
-
-        {/* [7] Date */}
-        <div
-          style={{
-            fontFamily: 'var(--font-playfair-display)',
-            fontSize: 22,
-            color: theme.accent,
-            textAlign: 'center',
-            letterSpacing: 3,
-            textTransform: 'uppercase',
-            marginBottom: 8,
-          }}
-        >
-          {formatDateFr(ceremony.date)}
-        </div>
-
-        {/* [8] Date hébraïque */}
-        {data.mariageJuif && hebrewDate && (
-          <div
-            style={{
-              fontFamily: 'serif',
-              fontSize: 18,
-              color: theme.accent,
-              direction: 'rtl',
-              textAlign: 'center',
-              marginBottom: 20,
-            }}
-          >
-            {hebrewDate}
-          </div>
-        )}
-
-        {/* [9] Heure */}
-        <div
-          style={{
-            fontFamily: 'var(--font-playfair-display)',
-            fontSize: 26,
-            color: theme.accent,
-            textAlign: 'center',
-            marginBottom: 20,
-            letterSpacing: 2,
-          }}
-        >
-          {formatHeure(ceremony.heure)}
-        </div>
-
-        {/* [10] Lieu */}
-        <div
-          style={{
-            fontFamily: 'var(--font-cormorant-garamond)',
-            fontStyle: 'italic',
-            fontSize: 20,
-            textAlign: 'center',
-            color: theme.texte,
-            lineHeight: 1.6,
-          }}
-        >
-          {ceremony.lieu && (
-            <>
-              <div>{formatLieu(ceremony.lieu)}</div>
-              <div>ainsi qu&apos;à la réception qui suivra</div>
-            </>
-          )}
-          {ceremony.adresse && (
-            <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>
-              {ceremony.adresse}
-            </div>
-          )}
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, color: theme.accent, textAlign: 'center', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>{formatDateFr(ceremony.date)}</div>
+        {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 18, color: theme.accent, direction: 'rtl', textAlign: 'center', marginBottom: 16 }}>{hebrewDate}</div>}
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 26, color: theme.accent, textAlign: 'center', marginBottom: 16, letterSpacing: 2 }}>{formatHeure(ceremony.heure)}</div>
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte, lineHeight: 1.6 }}>
+          {ceremony.lieu && <><div>{formatLieu(ceremony.lieu)}</div><div>ainsi qu'à la réception qui suivra</div></>}
+          {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
         </div>
       </div>
-    </CardBackground>
+    </div>
   )
 }
 
-// ============================================================
-// CARD TYPE 2 — MAIRIE
-// ============================================================
-
 function CardMairie({ ceremony, data, theme }: CardProps) {
-  const isOriental = theme.fond === '#1a0a00'
   return (
-    <CardBackground photoFond={data.photoFond} fond={theme.fond} isOriental={isOriental}>
-      <div style={{ padding: '60px 48px', position: 'relative' }}>
-        {data.mariageJuif && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 20,
-              right: 24,
-              fontSize: 14,
-              fontFamily: 'serif',
-              color: theme.accent,
-              direction: 'rtl',
-            }}
-          >
-            בס״ד
-          </div>
-        )}
-
-        {/* [1] Titre */}
-        <div
-          style={{
-            fontFamily: 'var(--font-great-vibes)',
-            fontSize: 48,
-            color: theme.accent,
-            textAlign: 'center',
-            marginBottom: 24,
-          }}
-        >
-          Mairie
-        </div>
-
-        {/* [2] Illustration */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
-          <MairieIllustration color={theme.accent} />
-        </div>
-
-        {/* [3] Prénoms */}
-        <div
-          style={{
-            fontFamily: 'var(--font-great-vibes)',
-            fontSize: 'clamp(40px, 8vw, 64px)',
-            color: theme.accent,
-            textAlign: 'center',
-            marginBottom: 16,
-            lineHeight: 1.2,
-          }}
-        >
-          {data.marie2Prenom || 'Prénom'} &amp; {data.marie1Prenom || 'Prénom'}
-        </div>
-
-        {/* [4] se diront */}
-        <div
-          style={{
-            fontFamily: 'var(--font-cormorant-garamond)',
-            fontStyle: 'italic',
-            fontSize: 22,
-            textAlign: 'center',
-            color: theme.texte,
-            marginBottom: 12,
-          }}
-        >
-          se diront
-        </div>
-
-        {/* [5] OUI */}
-        <div
-          style={{
-            fontFamily: 'var(--font-great-vibes)',
-            fontSize: 72,
-            color: theme.accent,
-            textAlign: 'center',
-            marginBottom: 24,
-            lineHeight: 1,
-          }}
-        >
-          « Oui »
-        </div>
-
-        {/* [6] Date */}
-        <div
-          style={{
-            fontFamily: 'var(--font-playfair-display)',
-            fontWeight: 'bold',
-            fontSize: 20,
-            textAlign: 'center',
-            color: theme.texte,
-            marginBottom: 16,
-          }}
-        >
-          {formatDateFrCapitalized(ceremony.date)}
-        </div>
-
-        {/* [7] Lieu */}
-        <div
-          style={{
-            fontFamily: 'var(--font-cormorant-garamond)',
-            fontStyle: 'italic',
-            fontSize: 18,
-            textAlign: 'center',
-            color: theme.texte,
-            marginBottom: 16,
-            lineHeight: 1.6,
-          }}
-        >
+    <div style={{ backgroundColor: theme.fond, padding: '60px 48px', position: 'relative' }}>
+      {data.photoFond && <>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={data.photoFond} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: theme.fond === '#1a0a00' ? 'rgba(26,10,0,0.85)' : 'rgba(255,255,255,0.88)' }} />
+      </>}
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        {data.mariageJuif && <div style={{ position: 'absolute', top: -40, right: 0, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: theme.accent, textAlign: 'center', marginBottom: 20 }}>Mairie</div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}><MairieIllustration color={theme.accent} /></div>
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(36px, 8vw, 60px)', color: theme.accent, textAlign: 'center', marginBottom: 12, lineHeight: 1.2 }}>{data.marie1Prenom} & {data.marie2Prenom}</div>
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, textAlign: 'center', color: theme.texte, marginBottom: 8 }}>se diront</div>
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 72, color: theme.accent, textAlign: 'center', marginBottom: 20, lineHeight: 1 }}>« Oui »</div>
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontWeight: 'bold', fontSize: 20, textAlign: 'center', color: theme.texte, marginBottom: 12 }}>{formatDateFrCap(ceremony.date)}</div>
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, textAlign: 'center', color: theme.texte, marginBottom: 12, lineHeight: 1.6 }}>
           <div>à la Mairie {ceremony.lieu}</div>
-          {ceremony.adresse && (
-            <div style={{ fontSize: 14, marginTop: 6, color: theme.textSecondaire }}>
-              {ceremony.adresse}
-            </div>
-          )}
+          {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 6, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
         </div>
-
-        {/* [8] Heure */}
-        <div
-          style={{
-            fontFamily: 'var(--font-playfair-display)',
-            fontSize: 22,
-            color: theme.accent,
-            textAlign: 'center',
-            marginBottom: 24,
-            letterSpacing: 2,
-          }}
-        >
-          {formatHeure(ceremony.heure)}
-        </div>
-
-        {/* [9] Itinéraire */}
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, color: theme.accent, textAlign: 'center', marginBottom: 20 }}>{formatHeure(ceremony.heure)}</div>
         {ceremony.adresse && (
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
-            <a
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ceremony.adresse)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                backgroundColor: theme.accent,
-                color: isOriental ? '#1a0a00' : 'white',
-                padding: '10px 24px',
-                borderRadius: 8,
-                fontFamily: 'var(--font-playfair-display)',
-                fontSize: 14,
-                textDecoration: 'none',
-                display: 'inline-block',
-              }}
-            >
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ceremony.adresse)}`} target="_blank" rel="noopener noreferrer"
+              style={{ background: theme.accent, color: 'white', padding: '10px 24px', borderRadius: 8, fontSize: 14, textDecoration: 'none' }}>
               📍 Itinéraire
             </a>
           </div>
         )}
-
-        {/* [10] Suite de l'événement */}
         {ceremony.suiviDAutre && ceremony.evenementSuivant && (
-          <div
-            style={{
-              textAlign: 'center',
-              lineHeight: 1.7,
-              marginTop: 8,
-              paddingTop: 20,
-              borderTop: `1px solid ${theme.accent}`,
-              opacity: 0.85,
-            }}
-          >
-            <div
-              style={{
-                fontFamily: 'var(--font-playfair-display)',
-                fontWeight: 'bold',
-                fontSize: 16,
-                color: theme.texte,
-              }}
-            >
-              La mairie sera suivie de{' '}
-              {ceremony.evenementSuivant.includes(',')
-                ? ceremony.evenementSuivant.split(',')[0].trim()
-                : ceremony.evenementSuivant}
+          <div style={{ textAlign: 'center', paddingTop: 20, borderTop: `1px solid ${theme.accent}`, lineHeight: 1.8 }}>
+            <div style={{ fontFamily: 'var(--font-playfair-display)', fontWeight: 'bold', fontSize: 16, color: theme.texte }}>
+              La mairie sera suivie {ceremony.evenementSuivant.includes(',') ? `de ${ceremony.evenementSuivant.split(',')[0].trim()}` : `de ${ceremony.evenementSuivant}`}
             </div>
             {ceremony.evenementSuivant.includes(',') && (
-              <div
-                style={{
-                  fontFamily: 'var(--font-cormorant-garamond)',
-                  fontStyle: 'italic',
-                  fontSize: 14,
-                  color: theme.textSecondaire,
-                  marginTop: 6,
-                }}
-              >
-                {ceremony.evenementSuivant
-                  .split(',')
-                  .slice(1)
-                  .join(',')
-                  .trim()}
+              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: theme.textSecondaire, marginTop: 4 }}>
+                {ceremony.evenementSuivant.split(',').slice(1).join(',').trim()}
               </div>
             )}
           </div>
         )}
       </div>
-    </CardBackground>
+    </div>
   )
 }
-
-// ============================================================
-// CARD TYPE 3 — HENNÉ
-// ============================================================
 
 function CardHenne({ ceremony, data, theme }: CardProps) {
-  const isOriental = theme.fond === '#1a0a00'
   return (
-    <CardBackground photoFond={data.photoFond} fond={theme.fond} isOriental={isOriental}>
-      <div style={{ padding: '60px 48px', position: 'relative' }}>
-        {data.mariageJuif && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 20,
-              right: 24,
-              fontSize: 14,
-              fontFamily: 'serif',
-              color: theme.accent,
-              direction: 'rtl',
-            }}
-          >
-            בס״ד
-          </div>
-        )}
-
-        {/* [1] Titre */}
-        <div
-          style={{
-            fontFamily: 'var(--font-great-vibes)',
-            fontSize: 52,
-            color: theme.accent,
-            textAlign: 'center',
-            marginBottom: 20,
-          }}
-        >
-          Soirée Henné
+    <div style={{ backgroundColor: theme.fond, padding: '60px 48px', position: 'relative' }}>
+      {data.photoFond && <>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={data.photoFond} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.88)' }} />
+      </>}
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        {data.mariageJuif && <div style={{ position: 'absolute', top: -40, right: 0, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, textAlign: 'center', marginBottom: 16 }}>Soirée Henné</div>
+        <div style={{ textAlign: 'center', fontSize: 24, letterSpacing: '0.5em', color: theme.accent, marginBottom: 24 }}>❋ ✿ ❀</div>
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte, lineHeight: 1.7, marginBottom: 28 }}>
+          Vous êtes chaleureusement invités à célébrer la soirée du henné de<br />
+          <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 36, color: theme.accent }}>{data.marie1Prenom} & {data.marie2Prenom}</span>
         </div>
-
-        {/* [2] Ornements */}
-        <div
-          style={{
-            textAlign: 'center',
-            fontSize: 24,
-            letterSpacing: '0.5em',
-            color: theme.accent,
-            marginBottom: 28,
-          }}
-        >
-          ❋ ✿ ❀
-        </div>
-
-        {/* [3] Texte */}
-        <div
-          style={{
-            fontFamily: 'var(--font-cormorant-garamond)',
-            fontStyle: 'italic',
-            fontSize: 20,
-            textAlign: 'center',
-            color: theme.texte,
-            lineHeight: 1.7,
-            marginBottom: 32,
-          }}
-        >
-          Vous êtes chaleureusement invités à célébrer la soirée du henné de
-          <br />
-          <span
-            style={{
-              fontFamily: 'var(--font-great-vibes)',
-              fontSize: 36,
-              color: theme.accent,
-              display: 'inline-block',
-              marginTop: 8,
-            }}
-          >
-            {data.marie2Prenom || 'Prénom'} &amp; {data.marie1Prenom || 'Prénom'}
-          </span>
-        </div>
-
-        {/* [4] Date, Heure, Lieu */}
-        <div
-          style={{
-            fontFamily: 'var(--font-playfair-display)',
-            fontSize: 22,
-            color: theme.accent,
-            textAlign: 'center',
-            letterSpacing: 3,
-            textTransform: 'uppercase',
-            marginBottom: 12,
-          }}
-        >
-          {formatDateFr(ceremony.date)}
-        </div>
-        <div
-          style={{
-            fontFamily: 'var(--font-playfair-display)',
-            fontSize: 24,
-            color: theme.accent,
-            textAlign: 'center',
-            marginBottom: 16,
-            letterSpacing: 2,
-          }}
-        >
-          {formatHeure(ceremony.heure)}
-        </div>
-        <div
-          style={{
-            fontFamily: 'var(--font-cormorant-garamond)',
-            fontStyle: 'italic',
-            fontSize: 20,
-            textAlign: 'center',
-            color: theme.texte,
-            lineHeight: 1.6,
-          }}
-        >
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, color: theme.accent, textAlign: 'center', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 12 }}>{formatDateFr(ceremony.date)}</div>
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 24, color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{formatHeure(ceremony.heure)}</div>
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte }}>
           {ceremony.lieu && <div>{formatLieu(ceremony.lieu)}</div>}
-          {ceremony.adresse && (
-            <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>
-              {ceremony.adresse}
-            </div>
-          )}
+          {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
         </div>
       </div>
-    </CardBackground>
+    </div>
   )
 }
 
-// ============================================================
-// CARD TYPE 4 — AUTRES ÉVÉNEMENTS
-// ============================================================
-
 function CardAutre({ ceremony, data, theme }: CardProps) {
-  const eventName = getEventDisplayName(ceremony.type, ceremony.customName)
-  const isOriental = theme.fond === '#1a0a00'
+  const name = ceremony.type === 'Autre' ? (ceremony.customName || 'Événement') : ceremony.type
   return (
-    <CardBackground photoFond={data.photoFond} fond={theme.fond} isOriental={isOriental}>
-      <div style={{ padding: '60px 48px', position: 'relative' }}>
-        {data.mariageJuif && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 20,
-              right: 24,
-              fontSize: 14,
-              fontFamily: 'serif',
-              color: theme.accent,
-              direction: 'rtl',
-            }}
-          >
-            בס״ד
-          </div>
-        )}
-
-        {/* [1] Titre */}
-        <div
-          style={{
-            fontFamily: 'var(--font-great-vibes)',
-            fontSize: 52,
-            color: theme.accent,
-            textAlign: 'center',
-            marginBottom: 24,
-          }}
-        >
-          {eventName}
+    <div style={{ backgroundColor: theme.fond, padding: '60px 48px', position: 'relative' }}>
+      {data.photoFond && <>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={data.photoFond} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.88)' }} />
+      </>}
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        {data.mariageJuif && <div style={{ position: 'absolute', top: -40, right: 0, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, textAlign: 'center', marginBottom: 20 }}>{name}</div>
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte, lineHeight: 1.7, marginBottom: 28 }}>
+          Rejoignez <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: theme.accent }}>{data.marie1Prenom} & {data.marie2Prenom}</span> pour {name.toLowerCase()}
         </div>
-
-        {/* [2] Texte */}
-        <div
-          style={{
-            fontFamily: 'var(--font-cormorant-garamond)',
-            fontStyle: 'italic',
-            fontSize: 20,
-            textAlign: 'center',
-            color: theme.texte,
-            lineHeight: 1.7,
-            marginBottom: 32,
-          }}
-        >
-          Rejoignez{' '}
-          <span
-            style={{
-              fontFamily: 'var(--font-great-vibes)',
-              fontSize: 32,
-              color: theme.accent,
-            }}
-          >
-            {data.marie2Prenom || 'Prénom'} &amp; {data.marie1Prenom || 'Prénom'}
-          </span>
-          {' '}pour {eventName.toLowerCase()}
-        </div>
-
-        {/* [3] Date, Heure, Lieu */}
-        <div
-          style={{
-            fontFamily: 'var(--font-playfair-display)',
-            fontSize: 22,
-            color: theme.accent,
-            textAlign: 'center',
-            letterSpacing: 3,
-            textTransform: 'uppercase',
-            marginBottom: 12,
-          }}
-        >
-          {formatDateFr(ceremony.date)}
-        </div>
-        <div
-          style={{
-            fontFamily: 'var(--font-playfair-display)',
-            fontSize: 24,
-            color: theme.accent,
-            textAlign: 'center',
-            marginBottom: 16,
-            letterSpacing: 2,
-          }}
-        >
-          {formatHeure(ceremony.heure)}
-        </div>
-        <div
-          style={{
-            fontFamily: 'var(--font-cormorant-garamond)',
-            fontStyle: 'italic',
-            fontSize: 20,
-            textAlign: 'center',
-            color: theme.texte,
-            lineHeight: 1.6,
-          }}
-        >
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, color: theme.accent, textAlign: 'center', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 12 }}>{formatDateFr(ceremony.date)}</div>
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 24, color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{formatHeure(ceremony.heure)}</div>
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte }}>
           {ceremony.lieu && <div>{formatLieu(ceremony.lieu)}</div>}
-          {ceremony.adresse && (
-            <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>
-              {ceremony.adresse}
-            </div>
-          )}
+          {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
         </div>
       </div>
-    </CardBackground>
+    </div>
   )
 }
 
 function renderCard(ceremony: Ceremony, data: FormData, theme: ThemeObj) {
   const props = { ceremony, data, theme }
-  switch (ceremony.type) {
-    case 'Mairie':
-      return <CardMairie {...props} />
-    case 'Cérémonie religieuse / Houppa':
-      return <CardHouppa {...props} />
-    case 'Henné':
-      return <CardHenne {...props} />
-    default:
-      return <CardAutre {...props} />
-  }
+  if (ceremony.type === 'Mairie') return <CardMairie {...props} />
+  if (ceremony.type === 'Cérémonie religieuse / Houppa') return <CardHouppa {...props} />
+  if (ceremony.type === 'Henné') return <CardHenne {...props} />
+  return <CardAutre {...props} />
 }
 
-// ============================================================
-// SPLASH SCREEN
-// ============================================================
-
-function SplashScreen({
-  data,
-  theme,
-  onDone,
-  isShared,
-}: {
-  data: FormData
-  theme: ThemeObj
-  onDone: () => void
-  isShared: boolean
-}) {
-  const [fadeOut, setFadeOut] = useState(false)
-  const sorted = sortCeremoniesByDate(data.ceremonies)
-  const firstDate = sorted[0]?.date
-
-  const handleDone = useCallback(() => {
-    setFadeOut(true)
-    setTimeout(onDone, 600)
-  }, [onDone])
-
-  useEffect(() => {
-    if (!isShared) {
-      const t = setTimeout(handleDone, 2200)
-      return () => clearTimeout(t)
-    }
-  }, [isShared, handleDone])
-
+function SplashScreen({ data, theme, onDone, isShared }: { data: FormData; theme: ThemeObj; onDone: () => void; isShared: boolean }) {
+  const [out, setOut] = useState(false)
+  const firstDate = sortByDate(data.ceremonies)[0]?.date
+  const done = useCallback(() => { setOut(true); setTimeout(onDone, 600) }, [onDone])
+  useEffect(() => { if (!isShared) { const t = setTimeout(done, 2200); return () => clearTimeout(t) } }, [isShared, done])
   return (
-    <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 100,
-        backgroundColor: theme.fond,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        opacity: fadeOut ? 0 : 1,
-        transition: 'opacity 0.6s ease',
-      }}
-    >
-      <div
-        style={{
-          fontFamily: 'var(--font-great-vibes)',
-          fontSize: 'clamp(48px, 12vw, 96px)',
-          color: theme.accent,
-          textAlign: 'center',
-          animation: 'splashFadeIn 1s ease forwards',
-          lineHeight: 1.2,
-        }}
-      >
-        {data.marie2Prenom || 'Prénom'}
-        <br />
-        &amp;
-        <br />
-        {data.marie1Prenom || 'Prénom'}
+    <div style={{ position: 'fixed', inset: 0, zIndex: 100, backgroundColor: theme.fond, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: out ? 0 : 1, transition: 'opacity 0.6s ease' }}>
+      <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px, 12vw, 96px)', color: theme.accent, textAlign: 'center', lineHeight: 1.2 }}>
+        {data.marie1Prenom || 'Prénom'}<br />&amp;<br />{data.marie2Prenom || 'Prénom'}
       </div>
-      {firstDate && (
-        <div
-          style={{
-            fontFamily: 'var(--font-playfair-display)',
-            fontSize: 14,
-            color: theme.textSecondaire,
-            letterSpacing: 3,
-            marginTop: 24,
-            textTransform: 'uppercase',
-            animation: 'splashFadeIn 1.4s ease forwards',
-          }}
-        >
-          {formatDateFr(firstDate)}
-        </div>
-      )}
+      {firstDate && <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 14, color: theme.textSecondaire, letterSpacing: 3, marginTop: 24, textTransform: 'uppercase' }}>{formatDateFr(firstDate)}</div>}
       {isShared && (
-        <button
-          onClick={handleDone}
-          style={{
-            marginTop: 48,
-            padding: '16px 40px',
-            border: `1px solid ${theme.accent}`,
-            borderRadius: 9999,
-            backgroundColor: 'transparent',
-            color: theme.accent,
-            fontFamily: 'var(--font-playfair-display)',
-            fontSize: 16,
-            cursor: 'pointer',
-            letterSpacing: 1,
-            animation: 'splashFadeIn 1.8s ease forwards',
-          }}
-        >
+        <button onClick={done} style={{ marginTop: 48, padding: '16px 40px', border: `1px solid ${theme.accent}`, borderRadius: 9999, background: 'transparent', color: theme.accent, fontSize: 16, cursor: 'pointer', fontFamily: 'var(--font-playfair-display)' }}>
           Découvrir votre faire-part
         </button>
       )}
-      <style>{`
-        @keyframes splashFadeIn {
-          from { opacity: 0; transform: translateY(24px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   )
 }
 
-// ============================================================
-// MUSIC PLAYER
-// ============================================================
-
-function MusicPlayer({ youtubeUrl, themeAccent }: { youtubeUrl: string; themeAccent: string }) {
+function MusicPlayer({ youtubeUrl, accent }: { youtubeUrl: string; accent: string }) {
   const [muted, setMuted] = useState(false)
-  const [muteKey, setMuteKey] = useState(0)
-  const [showMobileBtn, setShowMobileBtn] = useState(false)
-  const videoId = getYouTubeId(youtubeUrl)
-
-  useEffect(() => {
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-    setShowMobileBtn(isMobile)
-  }, [])
-
-  const toggleMute = () => {
-    setMuted(m => !m)
-    setMuteKey(k => k + 1)
-  }
-
-  if (!videoId) return null
-
+  const [key, setKey] = useState(0)
+  const [mobile, setMobile] = useState(false)
+  const id = getYouTubeId(youtubeUrl)
+  useEffect(() => { setMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) }, [])
+  if (!id) return null
   return (
     <>
-      <iframe
-        key={muteKey}
-        src={`https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=0&mute=${muted ? 1 : 0}`}
-        style={{ position: 'fixed', top: -9999, opacity: 0, pointerEvents: 'none', width: 1, height: 1 }}
-        allow="autoplay"
-        title="background music"
-      />
-      {showMobileBtn && (
-        <button
-          onClick={() => setShowMobileBtn(false)}
-          style={{
-            position: 'fixed',
-            bottom: 80,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            backgroundColor: themeAccent,
-            color: 'white',
-            padding: '12px 28px',
-            borderRadius: 9999,
-            border: 'none',
-            cursor: 'pointer',
-            zIndex: 50,
-            fontSize: 14,
-            fontFamily: 'var(--font-playfair-display)',
-          }}
-        >
-          ▶ Lancer la musique
-        </button>
-      )}
-      <button
-        onClick={toggleMute}
-        title={muted ? 'Activer le son' : 'Couper le son'}
-        style={{
-          position: 'fixed',
-          bottom: 24,
-          right: 24,
-          width: 40,
-          height: 40,
-          borderRadius: '50%',
-          backgroundColor: themeAccent,
-          color: 'white',
-          border: 'none',
-          cursor: 'pointer',
-          zIndex: 50,
-          fontSize: 16,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+      <iframe key={key} src={`https://www.youtube.com/embed/${id}?autoplay=1&loop=1&playlist=${id}&controls=0&mute=${muted ? 1 : 0}`} style={{ position: 'fixed', top: -9999, opacity: 0, pointerEvents: 'none', width: 1, height: 1 }} allow="autoplay" title="music" />
+      {mobile && <button onClick={() => setMobile(false)} style={{ position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)', background: accent, color: 'white', padding: '12px 28px', borderRadius: 9999, border: 'none', cursor: 'pointer', zIndex: 50, fontSize: 14 }}>▶ Lancer la musique</button>}
+      <button onClick={() => { setMuted(m => !m); setKey(k => k + 1) }} style={{ position: 'fixed', bottom: 24, right: 24, width: 40, height: 40, borderRadius: '50%', background: accent, color: 'white', border: 'none', cursor: 'pointer', zIndex: 50, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {muted ? '🔇' : '🔊'}
       </button>
     </>
   )
 }
 
-// ============================================================
-// CARDS VIEW
-// ============================================================
-
-function CardsView({
-  data,
-  onEdit,
-  onReset,
-  isShared,
-}: {
-  data: FormData
-  onEdit: () => void
-  onReset: () => void
-  isShared: boolean
-}) {
+function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit: () => void; onReset: () => void; isShared: boolean }) {
   const theme = THEMES[data.style]
-  const sortedCeremonies = sortCeremoniesByDate(data.ceremonies)
+  const sorted = sortByDate(data.ceremonies)
   const [splashDone, setSplashDone] = useState(false)
-  const [activeCard, setActiveCard] = useState(0)
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
+  const [active, setActive] = useState(0)
+  const refs = useRef<(HTMLDivElement | null)[]>([])
 
   useEffect(() => {
     if (!splashDone) return
-    const observers = cardRefs.current.map((ref, i) => {
-      if (!ref) return null
-      const obs = new IntersectionObserver(
-        entries => {
-          if (entries[0].isIntersecting) setActiveCard(i)
-        },
-        { threshold: 0.4 }
-      )
-      obs.observe(ref)
-      return obs
+    const obs = refs.current.map((r, i) => {
+      if (!r) return null
+      const o = new IntersectionObserver(e => { if (e[0].isIntersecting) setActive(i) }, { threshold: 0.4 })
+      o.observe(r)
+      return o
     })
-    return () => observers.forEach(obs => obs?.disconnect())
-  }, [splashDone, sortedCeremonies.length])
-
-  const scrollTo = (i: number) => {
-    cardRefs.current[i]?.scrollIntoView({ behavior: 'smooth' })
-  }
+    return () => obs.forEach(o => o?.disconnect())
+  }, [splashDone, sorted.length])
 
   const handleShare = async () => {
     try {
-      const res = await fetch('/api/save-share', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
+      const res = await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
       const { id } = await res.json()
-      const url = `${window.location.origin}/faire-part?share=${id}`
-      await navigator.clipboard.writeText(url)
-      alert('Lien copié dans le presse-papier !')
-    } catch {
-      alert('Erreur lors du partage')
-    }
+      await navigator.clipboard.writeText(`${window.location.origin}/faire-part?share=${id}`)
+      alert('Lien copié !')
+    } catch { alert('Erreur') }
   }
 
   return (
     <div style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
-      {!splashDone && (
-        <SplashScreen
-          data={data}
-          theme={theme}
-          onDone={() => setSplashDone(true)}
-          isShared={isShared}
-        />
-      )}
-
-      {splashDone && (
-        <>
-          {/* Side navigation */}
-          <div
-            style={{
-              position: 'fixed',
-              left: 20,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 10,
-              zIndex: 40,
-            }}
-          >
-            {sortedCeremonies.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => scrollTo(i)}
-                title={getEventDisplayName(sortedCeremonies[i].type, sortedCeremonies[i].customName)}
-                style={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: '50%',
-                  border: `1.5px solid ${theme.accent}`,
-                  backgroundColor: activeCard === i ? theme.accent : 'transparent',
-                  cursor: 'pointer',
-                  padding: 0,
-                  transition: 'background-color 0.3s ease',
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Cards */}
-          <div style={{ padding: '40px 20px 80px' }}>
-            {sortedCeremonies.map((ceremony, i) => (
-              <div key={i}>
-                <div
-                  ref={el => {
-                    cardRefs.current[i] = el
-                  }}
-                  style={{
-                    maxWidth: 600,
-                    margin: '0 auto',
-                    borderRadius: 4,
-                    boxShadow: '0 8px 40px rgba(0,0,0,0.13)',
-                    overflow: 'hidden',
-                    animation: `cardFadeIn 0.7s ease ${i * 0.12}s both`,
-                  }}
-                >
-                  {renderCard(ceremony, data, theme)}
+      {!splashDone && <SplashScreen data={data} theme={theme} onDone={() => setSplashDone(true)} isShared={isShared} />}
+      {splashDone && <>
+        <div style={{ position: 'fixed', left: 16, top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', gap: 10, zIndex: 40 }}>
+          {sorted.map((_, i) => (
+            <button key={i} onClick={() => refs.current[i]?.scrollIntoView({ behavior: 'smooth' })} style={{ width: 10, height: 10, borderRadius: '50%', border: `1.5px solid ${theme.accent}`, background: active === i ? theme.accent : 'transparent', cursor: 'pointer', padding: 0 }} />
+          ))}
+        </div>
+        <div style={{ padding: '40px 20px 80px' }}>
+          {sorted.map((ceremony, i) => (
+            <div key={i}>
+              <div ref={el => { refs.current[i] = el }} style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden' }}>
+                {renderCard(ceremony, data, theme)}
+              </div>
+              {i < sorted.length - 1 && (
+                <div style={{ maxWidth: 600, margin: '32px auto', display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ flex: 1, height: 1, background: theme.accent, opacity: 0.3 }} />
+                  <span style={{ color: theme.accent }}>✦</span>
+                  <div style={{ flex: 1, height: 1, background: theme.accent, opacity: 0.3 }} />
                 </div>
-
-                {i < sortedCeremonies.length - 1 && (
-                  <div
-                    style={{
-                      maxWidth: 600,
-                      margin: '36px auto',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                    }}
-                  >
-                    <div
-                      style={{ flex: 1, height: 1, backgroundColor: theme.accent, opacity: 0.3 }}
-                    />
-                    <span style={{ color: theme.accent, fontSize: 16 }}>✦</span>
-                    <div
-                      style={{ flex: 1, height: 1, backgroundColor: theme.accent, opacity: 0.3 }}
-                    />
-                  </div>
-                )}
-              </div>
-            ))}
-
-            {!isShared && (
-              <div
-                style={{
-                  maxWidth: 600,
-                  margin: '48px auto 0',
-                  display: 'flex',
-                  gap: 12,
-                  justifyContent: 'center',
-                  flexWrap: 'wrap',
-                }}
-              >
-                <button
-                  onClick={onEdit}
-                  style={{
-                    padding: '12px 28px',
-                    borderRadius: 9999,
-                    border: `1px solid ${theme.accent}`,
-                    backgroundColor: 'transparent',
-                    color: theme.accent,
-                    cursor: 'pointer',
-                    fontSize: 14,
-                    fontFamily: 'var(--font-playfair-display)',
-                  }}
-                >
-                  Modifier
-                </button>
-                <button
-                  onClick={handleShare}
-                  style={{
-                    padding: '12px 28px',
-                    borderRadius: 9999,
-                    backgroundColor: theme.accent,
-                    color: theme.fond === '#1a0a00' ? '#1a0a00' : 'white',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontSize: 14,
-                    fontFamily: 'var(--font-playfair-display)',
-                  }}
-                >
-                  🔗 Partager
-                </button>
-                <button
-                  onClick={onReset}
-                  style={{
-                    padding: '12px 28px',
-                    borderRadius: 9999,
-                    border: '1px solid #fecdd3',
-                    backgroundColor: 'transparent',
-                    color: '#fb7185',
-                    cursor: 'pointer',
-                    fontSize: 14,
-                    fontFamily: 'var(--font-playfair-display)',
-                  }}
-                >
-                  Nouveau
-                </button>
-              </div>
-            )}
-          </div>
-
-          {data.youtubeUrl && (
-            <MusicPlayer youtubeUrl={data.youtubeUrl} themeAccent={theme.accent} />
+              )}
+            </div>
+          ))}
+          {!isShared && (
+            <div style={{ maxWidth: 600, margin: '48px auto 0', display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button onClick={onEdit} style={{ padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, cursor: 'pointer', fontSize: 14 }}>Modifier</button>
+              <button onClick={handleShare} style={{ padding: '12px 28px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', cursor: 'pointer', fontSize: 14 }}>🔗 Partager</button>
+              <button onClick={onReset} style={{ padding: '12px 28px', borderRadius: 9999, border: '1px solid #fecdd3', background: 'transparent', color: '#fb7185', cursor: 'pointer', fontSize: 14 }}>Nouveau</button>
+            </div>
           )}
-        </>
-      )}
-
-      <style>{`
-        @keyframes cardFadeIn {
-          from { opacity: 0; transform: translateY(40px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+        </div>
+        {data.youtubeUrl && <MusicPlayer youtubeUrl={data.youtubeUrl} accent={theme.accent} />}
+      </>}
     </div>
   )
 }
-
-// ============================================================
-// MAIN COMPONENT
-// ============================================================
 
 export default function FairePartPage() {
   const [step, setStep] = useState(1)
@@ -1926,83 +656,42 @@ export default function FairePartPage() {
   const [isShared, setIsShared] = useState(false)
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const shareId = params.get('share')
-    if (shareId) {
+    const id = new URLSearchParams(window.location.search).get('share')
+    if (id) {
       setIsShared(true)
-      fetch(`/api/get-share?id=${shareId}`)
-        .then(r => r.json())
-        .then((d: FormData) => {
-          setFormData(d)
-          setShowCards(true)
-        })
-        .catch(console.error)
+      fetch(`/api/get-share?id=${id}`).then(r => r.json()).then((d: FormData) => { setFormData(d); setShowCards(true) }).catch(console.error)
     }
   }, [])
 
-  const updateFormData = useCallback((updates: Partial<FormData>) => {
-    setFormData(prev => ({ ...prev, ...updates }))
-  }, [])
+  const update = useCallback((u: Partial<FormData>) => setFormData(p => ({ ...p, ...u })), [])
+  const next = () => step < 4 ? setStep(s => s + 1) : setShowCards(true)
+  const prev = () => setStep(s => s - 1)
 
-  const handleNext = () => {
-    if (step < 4) setStep(step + 1)
-    else setShowCards(true)
-  }
-
-  const handlePrev = () => {
-    if (step > 1) setStep(step - 1)
-  }
-
-  if (showCards) {
-    return (
-      <CardsView
-        data={formData}
-        onEdit={() => { setShowCards(false); setStep(4) }}
-        onReset={() => { setFormData(defaultFormData); setShowCards(false); setStep(1) }}
-        isShared={isShared}
-      />
-    )
-  }
+  if (showCards) return <CardsView data={formData} onEdit={() => { setShowCards(false); setStep(4) }} onReset={() => { setFormData(defaultFormData); setShowCards(false); setStep(1) }} isShared={isShared} />
 
   return (
-    <div
-      className="min-h-screen flex items-start justify-center py-12 px-4"
-      style={{ background: 'linear-gradient(160deg, #fdf0f3 0%, #fff5f7 50%, #fdf0f3 100%)' }}
-    >
-      <div
-        className="w-full"
-        style={{
-          maxWidth: 600,
-          backgroundColor: 'white',
-          borderRadius: 20,
-          padding: 40,
-          boxShadow: '0 12px 48px rgba(0,0,0,0.07)',
-        }}
-      >
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '48px 16px', background: 'linear-gradient(160deg, #fdf0f3 0%, #fff5f7 50%, #fdf0f3 100%)' }}>
+      <div style={{ textAlign: 'center', marginBottom: 36 }}>
+        <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(201,168,76,0.65)', fontWeight: 600, marginBottom: 10 }}>Invitation de mariage</p>
+        <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '2.2rem', fontWeight: 300, color: 'rgba(74,55,40,0.7)', letterSpacing: '0.06em', margin: '0 0 12px' }}>Votre faire-part</h1>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+          <div style={{ width: 40, height: 1, background: 'rgba(201,168,76,0.3)' }} />
+          <span style={{ color: 'rgba(201,168,76,0.4)' }}>✦</span>
+          <div style={{ width: 40, height: 1, background: 'rgba(201,168,76,0.3)' }} />
+        </div>
+      </div>
+      <div style={{ width: '100%', maxWidth: 600, background: 'white', borderRadius: 20, padding: 40, boxShadow: '0 12px 48px rgba(0,0,0,0.07)', border: '1px solid #fce7f3', boxSizing: 'border-box' }}>
         <ProgressBar step={step} />
-
-        {step === 1 && <Step1 data={formData} onChange={updateFormData} />}
-        {step === 2 && <Step2 data={formData} onChange={updateFormData} />}
-        {step === 3 && <Step3 data={formData} onChange={updateFormData} />}
-        {step === 4 && <Step4 data={formData} onChange={updateFormData} />}
-
-        <div className="flex gap-3 mt-8">
+        {step === 1 && <Step1 data={formData} onChange={update} />}
+        {step === 2 && <Step2 data={formData} onChange={update} />}
+        {step === 3 && <Step3 data={formData} onChange={update} />}
+        {step === 4 && <Step4 data={formData} onChange={update} />}
+        <div style={{ display: 'flex', gap: 12, marginTop: 32 }}>
           {step > 1 && (
-            <button
-              type="button"
-              onClick={handlePrev}
-              className="flex-1 border border-[#fecdd3] bg-transparent text-[#fb7185] rounded-full py-4 font-medium hover:bg-[#fdf0f3] transition-colors"
-            >
-              Précédent
-            </button>
+            <button type="button" onClick={prev} style={{ flex: 1, padding: '16px 0', borderRadius: 9999, border: '1.5px solid #fecdd3', background: 'white', color: '#fb7185', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>← Précédent</button>
           )}
-          <button
-            type="button"
-            onClick={handleNext}
-            className="flex-1 text-white rounded-full py-4 font-bold hover:opacity-90 transition-opacity"
-            style={{ background: 'linear-gradient(to right, #f87171, #fb7185)' }}
-          >
-            {step === 4 ? 'Générer le faire-part ✦' : 'Suivant →'}
+          <button type="button" onClick={next} style={{ flex: 1, padding: '16px 0', borderRadius: 9999, border: 'none', background: step === 4 ? 'linear-gradient(135deg, #C9A84C, #e8c96a)' : 'linear-gradient(135deg, #fb7185, #f43f5e)', color: 'white', fontSize: 13, fontWeight: 700, cursor: 'pointer', boxShadow: '0 6px 20px rgba(251,113,133,0.35)' }}>
+            {step === 4 ? 'Générer ✦' : 'Suivant →'}
           </button>
         </div>
       </div>
