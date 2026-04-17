@@ -46,6 +46,7 @@ interface FormData {
   presentationStyle: PresentationStyle
   mariageJuif: boolean
   youtubeUrl: string
+  musicUrl: string
   photoFond: string
   photosFond: string[]
 }
@@ -62,7 +63,7 @@ const defaultFormData: FormData = {
   famille1Pere: '', famille1Mere: '', famille1GpPaternels: '', famille1GpMaternels: '',
   famille2Pere: '', famille2Mere: '', famille2GpPaternels: '', famille2GpMaternels: '',
   ceremonies: [{ ...defaultCeremony }],
-  style: 'classique-dore', presentationStyle: 'photo', mariageJuif: false, youtubeUrl: '', photoFond: '', photosFond: [],
+  style: 'classique-dore', presentationStyle: 'photo', mariageJuif: false, youtubeUrl: '', musicUrl: '', photoFond: '', photosFond: [],
 }
 
 // Propriétés mobiles partagées pour tous les boutons
@@ -367,9 +368,18 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         Mariage juif ✡
       </label>
       <div style={{ marginBottom: 20 }}>
-        <Label>Musique de fond (lien YouTube)</Label>
-        <input type="url" value={data.youtubeUrl} onChange={e => onChange({ youtubeUrl: e.target.value })} placeholder="https://www.youtube.com/watch?v=..." style={S.input} />
-        <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>La musique jouera à l'ouverture de la carte</p>
+        <Label>Musique de fond — Fichier MP3</Label>
+        <MusicUploader musicUrl={data.musicUrl ?? ''} onChange={url => onChange({ musicUrl: url })} />
+        {!data.musicUrl && (
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 0' }}>
+              <div style={{ flex: 1, height: 1, background: '#fecdd3' }} />
+              <span style={{ fontSize: 11, color: '#9ca3af' }}>ou lien YouTube</span>
+              <div style={{ flex: 1, height: 1, background: '#fecdd3' }} />
+            </div>
+            <input type="url" value={data.youtubeUrl} onChange={e => onChange({ youtubeUrl: e.target.value })} placeholder="https://www.youtube.com/watch?v=..." style={S.input} />
+          </>
+        )}
       </div>
       <div>
         <Label>Photos de fond (optionnel — max 5)</Label>
@@ -611,7 +621,7 @@ function CardAutre({ ceremony, data, theme }: CardProps) {
 
 function renderCard(ceremony: Ceremony, data: FormData, theme: ThemeObj, photoIdx = 0) {
   const photos = data.photosFond ?? []
-  const photoFond = photos[photoIdx] ?? photos[0] ?? data.photoFond ?? ''
+  const photoFond = photos[photoIdx] ?? photos[photos.length - 1] ?? data.photoFond ?? ''
   const props = { ceremony, data: { ...data, photoFond }, theme }
   if (ceremony.type === 'Mairie') return <CardMairie {...props} />
   if (ceremony.type === 'Cérémonie religieuse / Houppa') return <CardHouppa {...props} />
@@ -929,6 +939,118 @@ function RSVPListModal({ accent, onClose, shareId }: { accent: string; onClose: 
   )
 }
 
+// ── Music Upload (Cloudinary) ──────────────────────────────────────────────────
+
+function MusicUploader({ musicUrl, onChange }: { musicUrl: string; onChange: (url: string) => void }) {
+  const [uploading, setUploading] = useState(false)
+  const [error, setError] = useState('')
+
+  const upload = async (file: File) => {
+    setUploading(true)
+    setError('')
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      fd.append('upload_preset', 'wedding_music')
+      const res = await fetch('https://api.cloudinary.com/v1_1/wedding-app-music/video/upload', { method: 'POST', body: fd })
+      const json = await res.json()
+      if (json.secure_url) {
+        onChange(json.secure_url)
+      } else {
+        setError("Erreur upload : " + (json.error?.message ?? 'inconnu'))
+      }
+    } catch (e) {
+      setError("Erreur réseau : " + (e instanceof Error ? e.message : String(e)))
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  if (musicUrl) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', border: '1px solid #C9A84C44', borderRadius: 10, background: '#fdf5e4' }}>
+        <span style={{ fontSize: 18 }}>🎵</span>
+        <span style={{ flex: 1, fontSize: 12, color: '#4a3728', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Musique uploadée</span>
+        <button type="button" onClick={() => onChange('')} style={{ ...BTN, background: 'none', border: 'none', color: '#fb7185', fontSize: 13 }}>✕ Supprimer</button>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <label style={{ display: 'block', cursor: uploading ? 'wait' : 'pointer' }}>
+        <div style={{ border: '2px dashed #C9A84C66', borderRadius: 10, padding: 20, textAlign: 'center', background: uploading ? '#fdf5e4' : 'white' }}>
+          <div style={{ fontSize: 24, marginBottom: 6 }}>{uploading ? '⏳' : '🎵'}</div>
+          <p style={{ fontSize: 13, color: '#4a3728', margin: 0 }}>{uploading ? 'Upload en cours…' : 'Cliquer pour uploader un fichier MP3'}</p>
+          <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>Format MP3, max 10 Mo</p>
+        </div>
+        <input type="file" accept="audio/mp3,audio/mpeg,audio/*" disabled={uploading} onChange={e => { const f = e.target.files?.[0]; if (f) upload(f); e.target.value = '' }} style={{ display: 'none' }} />
+      </label>
+      {error && <p style={{ fontSize: 12, color: '#fb7185', marginTop: 6 }}>{error}</p>}
+    </div>
+  )
+}
+
+// ── AudioPlayer HTML5 ──────────────────────────────────────────────────────────
+
+function AudioPlayer({ musicUrl, accent }: { musicUrl: string; accent: string }) {
+  const audioRef = useRef<HTMLAudioElement>(null)
+  const [muted, setMuted] = useState(false)
+  const [needsInteraction, setNeedsInteraction] = useState(false)
+  const [started, setStarted] = useState(false)
+
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    audio.play().then(() => setStarted(true)).catch(() => setNeedsInteraction(true))
+  }, [])
+
+  const toggleMute = () => {
+    if (!audioRef.current) return
+    audioRef.current.muted = !muted
+    setMuted(m => !m)
+  }
+
+  const startMusic = () => {
+    if (!audioRef.current) return
+    audioRef.current.play().then(() => { setStarted(true); setNeedsInteraction(false) }).catch(() => {})
+  }
+
+  return (
+    <>
+      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+      <audio ref={audioRef} src={musicUrl} loop autoPlay style={{ display: 'none' }} />
+
+      {needsInteraction && !started && (
+        <button
+          onClick={startMusic}
+          onTouchEnd={e => { e.preventDefault(); startMusic() }}
+          style={{
+            ...BTN,
+            position: 'fixed', bottom: 24, right: 72, zIndex: 50,
+            background: `${accent}dd`, color: 'white', border: 'none',
+            borderRadius: 9999, padding: '11px 18px',
+            fontSize: 14, fontWeight: 600, letterSpacing: '0.05em',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.22)',
+          }}
+        >
+          ♪ Lancer la musique
+        </button>
+      )}
+
+      {(started || !needsInteraction) && (
+        <button
+          onClick={toggleMute}
+          onTouchEnd={e => { e.preventDefault(); toggleMute() }}
+          style={{ ...BTN, position: 'fixed', bottom: 24, right: 24, zIndex: 50, width: 40, height: 40, borderRadius: '50%', background: accent, color: 'white', border: 'none', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        >
+          {muted ? '🔇' : '🔊'}
+        </button>
+      )}
+    </>
+  )
+}
+
 // ── Splash + Music ─────────────────────────────────────────────────────────────
 
 function SplashScreen({ data, theme, onDone, isShared }: { data: FormData; theme: ThemeObj; onDone: () => void; isShared: boolean }) {
@@ -1182,7 +1304,7 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
             </div>
           )}
         </div>
-        {data.youtubeUrl && <MusicPlayer youtubeUrl={data.youtubeUrl} accent={theme.accent} />}
+        {data.musicUrl ? <AudioPlayer musicUrl={data.musicUrl} accent={theme.accent} /> : data.youtubeUrl && <MusicPlayer youtubeUrl={data.youtubeUrl} accent={theme.accent} />}
       </>}
 
       {rsvpOpen && (
