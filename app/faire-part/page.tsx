@@ -1053,11 +1053,17 @@ function AudioPlayer({ musicUrl, accent }: { musicUrl: string; accent: string })
 
 // ── Splash + Music ─────────────────────────────────────────────────────────────
 
-function SplashScreen({ data, theme, onDone, isShared }: { data: FormData; theme: ThemeObj; onDone: () => void; isShared: boolean }) {
+function SplashScreen({ data, theme, onDone, isShared, onStartMusic }: { data: FormData; theme: ThemeObj; onDone: () => void; isShared: boolean; onStartMusic?: () => void }) {
   const [out, setOut] = useState(false)
   const firstDate = sortByDate(data.ceremonies)[0]?.date
   const done = useCallback(() => { setOut(true); setTimeout(onDone, 600) }, [onDone])
   useEffect(() => { if (!isShared) { const t = setTimeout(done, 2200); return () => clearTimeout(t) } }, [isShared, done])
+
+  const handleDiscover = useCallback(() => {
+    onStartMusic?.()
+    done()
+  }, [onStartMusic, done])
+
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 100, backgroundColor: theme.fond, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: out ? 0 : 1, transition: 'opacity 0.6s ease', pointerEvents: out ? 'none' : 'auto' }}>
       <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px, 12vw, 96px)', color: theme.accent, textAlign: 'center', lineHeight: 1.2 }}>
@@ -1065,7 +1071,11 @@ function SplashScreen({ data, theme, onDone, isShared }: { data: FormData; theme
       </div>
       {firstDate && <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 14, color: theme.textSecondaire, letterSpacing: 3, marginTop: 24, textTransform: 'uppercase' }}>{formatDateFr(firstDate)}</div>}
       {isShared && (
-        <button onClick={done} style={{ ...BTN, marginTop: 48, padding: '16px 40px', border: `1px solid ${theme.accent}`, borderRadius: 9999, background: 'transparent', color: theme.accent, fontSize: 16, fontFamily: 'var(--font-playfair-display)' }}>
+        <button
+          onClick={handleDiscover}
+          onTouchEnd={e => { e.preventDefault(); handleDiscover() }}
+          style={{ ...BTN, marginTop: 48, padding: '16px 40px', border: `1px solid ${theme.accent}`, borderRadius: 9999, background: 'transparent', color: theme.accent, fontSize: 16, fontFamily: 'var(--font-playfair-display)' }}
+        >
           Découvrir votre faire-part
         </button>
       )}
@@ -1170,6 +1180,27 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
   const [lastShareId, setLastShareId] = useState<string | null>(null)
   const [shareFeedback, setShareFeedback] = useState(false)
   const [shareUrl, setShareUrl] = useState<string | null>(null)
+  const [ytMuted, setYtMuted] = useState(false)
+  const ytIframeRef = useRef<HTMLIFrameElement | null>(null)
+
+  const startYoutubeMusic = useCallback((videoId: string) => {
+    if (ytIframeRef.current) return // déjà démarré
+    const iframe = document.createElement('iframe')
+    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=0&enablejsapi=1`
+    iframe.style.cssText = 'position:fixed;top:-9999px;width:1px;height:1px;border:none;pointer-events:none;'
+    iframe.allow = 'autoplay; encrypted-media'
+    iframe.title = 'music'
+    document.body.appendChild(iframe)
+    ytIframeRef.current = iframe
+  }, [])
+
+  const toggleYtMute = useCallback(() => {
+    const iframe = ytIframeRef.current
+    if (!iframe?.contentWindow) return
+    const func = ytMuted ? 'unmuteVideo' : 'muteVideo'
+    iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args: [] }), '*')
+    setYtMuted(m => !m)
+  }, [ytMuted])
   const refs = useRef<(HTMLDivElement | null)[]>([])
   const isElegant = data.presentationStyle === 'elegant'
 
@@ -1216,7 +1247,7 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
 
   return (
     <div style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
-      {!splashDone && <SplashScreen data={data} theme={theme} onDone={() => setSplashDone(true)} isShared={isShared} />}
+      {!splashDone && <SplashScreen data={data} theme={theme} onDone={() => setSplashDone(true)} isShared={isShared} onStartMusic={isShared && data.youtubeUrl ? () => { const vid = getYouTubeId(data.youtubeUrl); if (vid) startYoutubeMusic(vid) } : undefined} />}
       {splashDone && <>
         {!isElegant && (
           <div style={{ position: 'fixed', left: 16, top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', gap: 10, zIndex: 40 }}>
@@ -1304,7 +1335,24 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
             </div>
           )}
         </div>
-        {data.musicUrl ? <AudioPlayer musicUrl={data.musicUrl} accent={theme.accent} /> : data.youtubeUrl && <MusicPlayer youtubeUrl={data.youtubeUrl} accent={theme.accent} />}
+        {data.musicUrl
+          ? <AudioPlayer musicUrl={data.musicUrl} accent={theme.accent} />
+          : data.youtubeUrl && (
+            isShared
+              ? /* Vue partagée : iframe créée au clic sur splash, on affiche juste le bouton mute */
+                ytIframeRef.current && (
+                  <button
+                    onClick={toggleYtMute}
+                    onTouchEnd={e => { e.preventDefault(); toggleYtMute() }}
+                    style={{ ...BTN, position: 'fixed', bottom: 24, right: 24, zIndex: 50, width: 44, height: 44, borderRadius: '50%', background: theme.accent, color: 'white', border: 'none', fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }}
+                  >
+                    {ytMuted ? '🔇' : '🔊'}
+                  </button>
+                )
+              : /* Vue créateur : MusicPlayer classique */
+                <MusicPlayer youtubeUrl={data.youtubeUrl} accent={theme.accent} />
+          )
+        }
       </>}
 
       {rsvpOpen && (
