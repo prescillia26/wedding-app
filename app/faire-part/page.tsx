@@ -952,7 +952,7 @@ function MusicUploader({ musicUrl, onChange }: { musicUrl: string; onChange: (ur
       const fd = new FormData()
       fd.append('file', file)
       fd.append('upload_preset', 'wedding_music')
-      const res = await fetch('https://api.cloudinary.com/v1_1/wedding-app-music/video/upload', { method: 'POST', body: fd })
+      const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
       const json = await res.json()
       if (json.secure_url) {
         onChange(json.secure_url)
