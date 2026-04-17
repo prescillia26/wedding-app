@@ -1071,13 +1071,33 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
   const handleShare = async () => {
     try {
       const res = await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
-      const { id } = await res.json()
+      const json = await res.json()
+      console.log('save-share response:', json)
+      if (!json.id) throw new Error('Pas d\'id retourné : ' + JSON.stringify(json))
+      const id = json.id
       setLastShareId(id)
       const url = window.location.origin + '/faire-part?share=' + id
-      await navigator.clipboard.writeText(url)
+      console.log('URL générée:', url)
+      try {
+        await navigator.clipboard.writeText(url)
+      } catch (clipErr) {
+        console.log('clipboard API échouée, fallback execCommand:', clipErr)
+        const ta = document.createElement('textarea')
+        ta.value = url
+        ta.style.position = 'fixed'
+        ta.style.opacity = '0'
+        document.body.appendChild(ta)
+        ta.focus()
+        ta.select()
+        document.execCommand('copy')
+        document.body.removeChild(ta)
+      }
       setShareFeedback(true)
       setTimeout(() => setShareFeedback(false), 3000)
-    } catch { alert('Erreur') }
+    } catch (err) {
+      console.error('handleShare erreur:', err)
+      alert('Erreur : ' + (err instanceof Error ? err.message : String(err)))
+    }
   }
 
   return (
