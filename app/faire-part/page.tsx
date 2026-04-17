@@ -73,6 +73,34 @@ const BTN: React.CSSProperties = {
   cursor: 'pointer',
 }
 
+// ── Formatage automatique des titres famille ───────────────────────────────────
+
+function hasTitle(s: string) {
+  return /^(M\.|Mme|M\s*&|Dr\.?|Me\s|Rav)/i.test(s.trim())
+}
+function lastWord(s: string) {
+  return s.trim().split(/\s+/).pop() ?? s.trim()
+}
+function fmtPere(s: string) {
+  return s && !hasTitle(s) ? 'M. ' + s : s
+}
+function fmtMere(s: string) {
+  return s && !hasTitle(s) ? 'Mme ' + s : s
+}
+function fmtGp(s: string) {
+  return s && !hasTitle(s) ? 'M. & Mme ' + s : s
+}
+function fmtParents(pere: string, mere: string): string[] {
+  if (!pere && !mere) return []
+  if (pere && mere && !hasTitle(pere) && !hasTitle(mere) && lastWord(pere) === lastWord(mere)) {
+    return ['M. & Mme ' + lastWord(pere)]
+  }
+  const lines: string[] = []
+  if (pere) lines.push(fmtPere(pere))
+  if (mere) lines.push(fmtMere(mere))
+  return lines
+}
+
 function compressBase64(base64: string, maxDim = 1200, quality = 0.72): Promise<string> {
   return new Promise(resolve => {
     const img = new Image()
@@ -245,16 +273,16 @@ function Step2({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         {[
           { title: data.marie1Prenom || 'Marié·e 1', fields: [
-            { label: 'Père', value: data.famille1Pere, key: 'famille1Pere', hint: 'M. Richard Portugais' },
-            { label: 'Mère', value: data.famille1Mere, key: 'famille1Mere', hint: 'Mme Marie Benchetrit' },
-            { label: 'GP paternels', value: data.famille1GpPaternels, key: 'famille1GpPaternels', hint: 'M. & Mme Sydney Zeitoun' },
-            { label: 'GP maternels', value: data.famille1GpMaternels, key: 'famille1GpMaternels', hint: 'M. & Mme Jacques Portugais' },
+            { label: 'Père', value: data.famille1Pere, key: 'famille1Pere', placeholder: 'Richard Portugais', note: 'M.' },
+            { label: 'Mère', value: data.famille1Mere, key: 'famille1Mere', placeholder: 'Marie Benchetrit', note: 'Mme' },
+            { label: 'GP paternels', value: data.famille1GpPaternels, key: 'famille1GpPaternels', placeholder: 'Sydney Zeitoun', note: 'M. & Mme' },
+            { label: 'GP maternels', value: data.famille1GpMaternels, key: 'famille1GpMaternels', placeholder: 'Jacques Portugais', note: 'M. & Mme' },
           ]},
           { title: data.marie2Prenom || 'Marié·e 2', fields: [
-            { label: 'Père', value: data.famille2Pere, key: 'famille2Pere', hint: 'M. Paul Dupont' },
-            { label: 'Mère', value: data.famille2Mere, key: 'famille2Mere', hint: 'Mme Claire Dupont' },
-            { label: 'GP paternels', value: data.famille2GpPaternels, key: 'famille2GpPaternels', hint: 'M. & Mme Georges Dupont' },
-            { label: 'GP maternels', value: data.famille2GpMaternels, key: 'famille2GpMaternels', hint: 'M. & Mme André Leroy' },
+            { label: 'Père', value: data.famille2Pere, key: 'famille2Pere', placeholder: 'Paul Dupont', note: 'M.' },
+            { label: 'Mère', value: data.famille2Mere, key: 'famille2Mere', placeholder: 'Claire Dupont', note: 'Mme' },
+            { label: 'GP paternels', value: data.famille2GpPaternels, key: 'famille2GpPaternels', placeholder: 'Georges Dupont', note: 'M. & Mme' },
+            { label: 'GP maternels', value: data.famille2GpMaternels, key: 'famille2GpMaternels', placeholder: 'André Leroy', note: 'M. & Mme' },
           ]},
         ].map((col, ci) => (
           <div key={ci}>
@@ -262,8 +290,8 @@ function Step2({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             {col.fields.map(f => (
               <div key={f.key} style={{ marginBottom: 12 }}>
                 <Label>{f.label}</Label>
-                <input type="text" value={f.value} onChange={e => onChange({ [f.key]: e.target.value } as Partial<FormData>)} style={S.input} />
-                <p style={{ fontSize: 10, color: '#9ca3af', marginTop: 3 }}>ex: {f.hint}</p>
+                <input type="text" value={f.value} placeholder={f.placeholder} onChange={e => onChange({ [f.key]: e.target.value } as Partial<FormData>)} style={S.input} />
+                <p style={{ fontSize: 10, color: '#C9A84C99', marginTop: 3 }}>Le titre <strong>{f.note}</strong> sera ajouté automatiquement</p>
               </div>
             ))}
           </div>
@@ -498,17 +526,15 @@ function CardHouppa({ ceremony, data, theme }: CardProps) {
         )}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, marginBottom: 24, alignItems: 'start' }}>
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: theme.accent, lineHeight: 2 }}>
-            {data.famille1Pere && <div>{data.famille1Pere}</div>}
-            {data.famille1Mere && <div>{data.famille1Mere}</div>}
-            {data.famille1GpPaternels && <div>{data.famille1GpPaternels}</div>}
-            {data.famille1GpMaternels && <div>{data.famille1GpMaternels}</div>}
+            {fmtParents(data.famille1Pere, data.famille1Mere).map((l, i) => <div key={i}>{l}</div>)}
+            {data.famille1GpPaternels && <div>{fmtGp(data.famille1GpPaternels)}</div>}
+            {data.famille1GpMaternels && <div>{fmtGp(data.famille1GpMaternels)}</div>}
           </div>
           <div style={{ width: 1, background: theme.accent, opacity: 0.3, alignSelf: 'stretch', minHeight: 40 }} />
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: theme.accent, textAlign: 'right', lineHeight: 2 }}>
-            {data.famille2Pere && <div>{data.famille2Pere}</div>}
-            {data.famille2Mere && <div>{data.famille2Mere}</div>}
-            {data.famille2GpPaternels && <div>{data.famille2GpPaternels}</div>}
-            {data.famille2GpMaternels && <div>{data.famille2GpMaternels}</div>}
+            {fmtParents(data.famille2Pere, data.famille2Mere).map((l, i) => <div key={i}>{l}</div>)}
+            {data.famille2GpPaternels && <div>{fmtGp(data.famille2GpPaternels)}</div>}
+            {data.famille2GpMaternels && <div>{fmtGp(data.famille2GpMaternels)}</div>}
           </div>
         </div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, textAlign: 'center', color: theme.texte, marginBottom: 24, lineHeight: 1.5 }}>
