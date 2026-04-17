@@ -823,17 +823,84 @@ function SplashScreen({ data, theme, onDone, isShared }: { data: FormData; theme
 }
 
 function MusicPlayer({ youtubeUrl, accent }: { youtubeUrl: string; accent: string }) {
-  const [muted, setMuted] = useState(false)
-  const [key, setKey] = useState(0)
   const [mobile, setMobile] = useState(false)
+  const [playerOpen, setPlayerOpen] = useState(false)
+  const [muted, setMuted] = useState(false)
+  const [desktopKey, setDesktopKey] = useState(0)
   const id = getYouTubeId(youtubeUrl)
-  useEffect(() => { setMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) }, [])
+
+  useEffect(() => {
+    setMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent))
+  }, [])
+
   if (!id) return null
+
+  // ── Mobile : bouton fixe + popup lecteur 300×80 ──────────────────────────
+  if (mobile) {
+    return (
+      <>
+        {/* iframe 1×1 visible — tente l'autoplay en arrière-plan sur iOS */}
+        <iframe
+          src={`https://www.youtube.com/embed/${id}?autoplay=1&loop=1&playlist=${id}&controls=0&mute=1`}
+          style={{ position: 'fixed', bottom: 0, right: 0, width: 1, height: 1, opacity: 0.01, border: 'none', pointerEvents: 'none' }}
+          allow="autoplay; encrypted-media"
+          title="music-bg"
+        />
+
+        {/* Bouton élégant fixe */}
+        <button
+          onTouchEnd={e => { e.preventDefault(); setPlayerOpen(o => !o) }}
+          onClick={() => setPlayerOpen(o => !o)}
+          style={{
+            ...BTN,
+            position: 'fixed', bottom: 24, right: 24, zIndex: 50,
+            background: playerOpen ? accent : `${accent}dd`,
+            color: 'white', border: 'none', borderRadius: 9999,
+            padding: '11px 18px', fontSize: 14, fontWeight: 600,
+            letterSpacing: '0.05em',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.22)',
+            display: 'flex', alignItems: 'center', gap: 6,
+          }}
+        >
+          ♪ Musique
+        </button>
+
+        {/* Popup lecteur YouTube 300×80 */}
+        {playerOpen && (
+          <div style={{
+            position: 'fixed', bottom: 76, right: 16, zIndex: 51,
+            borderRadius: 14, overflow: 'hidden',
+            boxShadow: '0 8px 36px rgba(0,0,0,0.28)',
+            width: 300, height: 80,
+          }}>
+            <iframe
+              src={`https://www.youtube.com/embed/${id}?autoplay=1&loop=1&playlist=${id}&controls=1`}
+              width="300"
+              height="80"
+              allow="autoplay; encrypted-media"
+              style={{ display: 'block', border: 'none' }}
+              title="music-player"
+            />
+          </div>
+        )}
+      </>
+    )
+  }
+
+  // ── Desktop : iframe cachée + bouton mute ────────────────────────────────
   return (
     <>
-      <iframe key={key} src={`https://www.youtube.com/embed/${id}?autoplay=1&loop=1&playlist=${id}&controls=0&mute=${muted ? 1 : 0}`} style={{ position: 'fixed', top: -9999, opacity: 0, pointerEvents: 'none', width: 1, height: 1 }} allow="autoplay" title="music" />
-      {mobile && <button onClick={() => setMobile(false)} style={{ ...BTN, position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)', background: accent, color: 'white', padding: '12px 28px', borderRadius: 9999, border: 'none', zIndex: 50, fontSize: 14 }}>▶ Lancer la musique</button>}
-      <button onClick={() => { setMuted(m => !m); setKey(k => k + 1) }} style={{ ...BTN, position: 'fixed', bottom: 24, right: 24, width: 40, height: 40, borderRadius: '50%', background: accent, color: 'white', border: 'none', zIndex: 50, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <iframe
+        key={desktopKey}
+        src={`https://www.youtube.com/embed/${id}?autoplay=1&loop=1&playlist=${id}&controls=0&mute=${muted ? 1 : 0}`}
+        style={{ position: 'fixed', top: -9999, opacity: 0, pointerEvents: 'none', width: 1, height: 1 }}
+        allow="autoplay"
+        title="music"
+      />
+      <button
+        onClick={() => { setMuted(m => !m); setDesktopKey(k => k + 1) }}
+        style={{ ...BTN, position: 'fixed', bottom: 24, right: 24, width: 40, height: 40, borderRadius: '50%', background: accent, color: 'white', border: 'none', zIndex: 50, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      >
         {muted ? '🔇' : '🔊'}
       </button>
     </>
