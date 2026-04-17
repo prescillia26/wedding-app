@@ -63,6 +63,13 @@ const defaultFormData: FormData = {
   style: 'classique-dore', presentationStyle: 'photo', mariageJuif: false, youtubeUrl: '', photoFond: '',
 }
 
+// Propriétés mobiles partagées pour tous les boutons
+const BTN: React.CSSProperties = {
+  touchAction: 'manipulation',
+  WebkitTapHighlightColor: 'transparent',
+  cursor: 'pointer',
+}
+
 function getYouTubeId(url: string): string | null {
   const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)
   return match ? match[1] : null
@@ -257,14 +264,15 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <span style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Événement {i + 1}</span>
             {data.ceremonies.length > 1 && (
-              <button type="button" onClick={() => remove(i)} style={{ background: 'none', border: 'none', color: '#fb7185', cursor: 'pointer', fontSize: 12 }}>Supprimer</button>
+              <button type="button" onClick={() => remove(i)} style={{ ...BTN, background: 'none', border: 'none', color: '#fb7185', fontSize: 12 }}>Supprimer</button>
             )}
           </div>
           <Label>Type</Label>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
             {CEREMONY_TYPES.map(t => (
               <button key={t} type="button" onClick={() => update(i, { type: t })} style={{
-                padding: '6px 14px', borderRadius: 9999, fontSize: 12, cursor: 'pointer',
+                ...BTN,
+                padding: '6px 14px', borderRadius: 9999, fontSize: 12,
                 border: '1px solid #C9A84C',
                 background: c.type === t ? '#C9A84C' : 'transparent',
                 color: c.type === t ? 'white' : '#C9A84C',
@@ -291,8 +299,9 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       ))}
       {data.ceremonies.length < 6 && (
         <button type="button" onClick={add} style={{
+          ...BTN,
           width: '100%', padding: 12, border: '2px dashed #C9A84C', borderRadius: 10,
-          background: 'transparent', color: '#C9A84C', cursor: 'pointer', fontSize: 14,
+          background: 'transparent', color: '#C9A84C', fontSize: 14,
         }}>+ Ajouter un événement</button>
       )}
     </div>
@@ -312,10 +321,11 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             { key: 'elegant' as PresentationStyle, label: '✨ Style élégant', desc: 'Monogramme & calligraphie' },
           ]).map(opt => (
             <button key={opt.key} type="button" onClick={() => onChange({ presentationStyle: opt.key })} style={{
+              ...BTN,
               padding: 16, borderRadius: 12,
               border: `2px solid ${data.presentationStyle === opt.key ? '#C9A84C' : '#fecdd3'}`,
               background: data.presentationStyle === opt.key ? '#fdf5e4' : 'white',
-              cursor: 'pointer', textAlign: 'left', position: 'relative',
+              textAlign: 'left', position: 'relative',
             }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: data.presentationStyle === opt.key ? '#C9A84C' : '#4a3728', marginBottom: 4 }}>{opt.label}</div>
               <div style={{ fontSize: 11, color: '#9ca3af' }}>{opt.desc}</div>
@@ -331,8 +341,9 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
         {(Object.entries(THEMES) as [Theme, typeof THEMES[Theme]][]).map(([key, t]) => (
           <button key={key} type="button" onClick={() => onChange({ style: key })} style={{
+            ...BTN,
             padding: 16, borderRadius: 12, border: `2px solid ${data.style === key ? t.accent : '#fecdd3'}`,
-            background: t.fond, cursor: 'pointer', textAlign: 'left', position: 'relative',
+            background: t.fond, textAlign: 'left', position: 'relative',
           }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: t.texte, marginBottom: 4 }}>
               {{ 'classique-dore': 'Classique doré', 'moderne': 'Moderne', 'champetre': 'Champêtre', 'oriental': 'Oriental' }[key]}
@@ -372,7 +383,7 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           <div style={{ marginTop: 12, position: 'relative' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={data.photoFond} alt="" style={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 10 }} />
-            <button type="button" onClick={() => onChange({ photoFond: '' })} style={{ position: 'absolute', top: 8, right: 8, background: 'white', border: 'none', borderRadius: '50%', width: 24, height: 24, cursor: 'pointer', color: '#fb7185' }}>✕</button>
+            <button type="button" onClick={() => onChange({ photoFond: '' })} style={{ ...BTN, position: 'absolute', top: 8, right: 8, background: 'white', border: 'none', borderRadius: '50%', width: 24, height: 24, color: '#fb7185' }}>✕</button>
           </div>
         )}
       </div>
@@ -714,7 +725,7 @@ function RSVPModal({ accent, onClose, mariee1, mariee2 }: { accent: string; onCl
     <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)' }} />
       <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: 36, width: '100%', maxWidth: 480, boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
-        <button onClick={onClose} style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#9ca3af' }}>✕</button>
+        <button onClick={onClose} style={{ ...BTN, position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 20, color: '#9ca3af' }}>✕</button>
 
         {sent ? (
           <div style={{ textAlign: 'center', padding: '24px 0' }}>
@@ -723,7 +734,7 @@ function RSVPModal({ accent, onClose, mariee1, mariee2 }: { accent: string; onCl
             <p style={{ fontSize: 15, color: '#6a5040', lineHeight: 1.7 }}>
               Votre réponse a bien été transmise à {mariee1} & {mariee2}.
             </p>
-            <button onClick={onClose} style={{ marginTop: 24, padding: '12px 32px', borderRadius: 9999, background: accent, color: 'white', border: 'none', cursor: 'pointer', fontSize: 14 }}>Fermer</button>
+            <button onClick={onClose} style={{ ...BTN, marginTop: 24, padding: '12px 32px', borderRadius: 9999, background: accent, color: 'white', border: 'none', fontSize: 14 }}>Fermer</button>
           </div>
         ) : (
           <>
@@ -746,7 +757,8 @@ function RSVPModal({ accent, onClose, mariee1, mariee2 }: { accent: string; onCl
               <Label>Votre réponse</Label>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <button type="button" onClick={() => setRsvp(r => ({ ...r, presence: 'present' }))} style={{
-                  padding: '14px 12px', borderRadius: 12, fontSize: 14, cursor: 'pointer', fontWeight: 600,
+                  ...BTN,
+                  padding: '14px 12px', borderRadius: 12, fontSize: 14, fontWeight: 600,
                   border: `2px solid ${rsvp.presence === 'present' ? accent : '#fecdd3'}`,
                   background: rsvp.presence === 'present' ? accent : 'white',
                   color: rsvp.presence === 'present' ? 'white' : '#4a3728',
@@ -754,7 +766,8 @@ function RSVPModal({ accent, onClose, mariee1, mariee2 }: { accent: string; onCl
                   ✓ Je serai présent(e)
                 </button>
                 <button type="button" onClick={() => setRsvp(r => ({ ...r, presence: 'absent' }))} style={{
-                  padding: '14px 12px', borderRadius: 12, fontSize: 14, cursor: 'pointer', fontWeight: 600,
+                  ...BTN,
+                  padding: '14px 12px', borderRadius: 12, fontSize: 14, fontWeight: 600,
                   border: `2px solid ${rsvp.presence === 'absent' ? '#fb7185' : '#fecdd3'}`,
                   background: rsvp.presence === 'absent' ? '#fb7185' : 'white',
                   color: rsvp.presence === 'absent' ? 'white' : '#4a3728',
@@ -770,10 +783,12 @@ function RSVPModal({ accent, onClose, mariee1, mariee2 }: { accent: string; onCl
             </div>
 
             <button type="button" onClick={send} disabled={!rsvp.nom || !rsvp.presence || loading} style={{
+              ...BTN,
               width: '100%', padding: '15px 0', borderRadius: 9999, border: 'none',
               background: (!rsvp.nom || !rsvp.presence) ? '#e5e7eb' : `linear-gradient(135deg, ${accent}, ${accent}cc)`,
               color: (!rsvp.nom || !rsvp.presence) ? '#9ca3af' : 'white',
-              fontSize: 15, fontWeight: 700, cursor: (!rsvp.nom || !rsvp.presence) ? 'not-allowed' : 'pointer',
+              fontSize: 15, fontWeight: 700,
+              cursor: (!rsvp.nom || !rsvp.presence) ? 'not-allowed' : 'pointer',
               boxShadow: (!rsvp.nom || !rsvp.presence) ? 'none' : `0 6px 20px ${accent}44`,
             }}>
               {loading ? 'Envoi...' : 'Envoyer'}
@@ -793,13 +808,13 @@ function SplashScreen({ data, theme, onDone, isShared }: { data: FormData; theme
   const done = useCallback(() => { setOut(true); setTimeout(onDone, 600) }, [onDone])
   useEffect(() => { if (!isShared) { const t = setTimeout(done, 2200); return () => clearTimeout(t) } }, [isShared, done])
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 100, backgroundColor: theme.fond, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: out ? 0 : 1, transition: 'opacity 0.6s ease' }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 100, backgroundColor: theme.fond, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: out ? 0 : 1, transition: 'opacity 0.6s ease', pointerEvents: out ? 'none' : 'auto' }}>
       <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px, 12vw, 96px)', color: theme.accent, textAlign: 'center', lineHeight: 1.2 }}>
         {data.marie1Prenom || 'Prénom'}<br />&amp;<br />{data.marie2Prenom || 'Prénom'}
       </div>
       {firstDate && <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 14, color: theme.textSecondaire, letterSpacing: 3, marginTop: 24, textTransform: 'uppercase' }}>{formatDateFr(firstDate)}</div>}
       {isShared && (
-        <button onClick={done} style={{ marginTop: 48, padding: '16px 40px', border: `1px solid ${theme.accent}`, borderRadius: 9999, background: 'transparent', color: theme.accent, fontSize: 16, cursor: 'pointer', fontFamily: 'var(--font-playfair-display)' }}>
+        <button onClick={done} style={{ ...BTN, marginTop: 48, padding: '16px 40px', border: `1px solid ${theme.accent}`, borderRadius: 9999, background: 'transparent', color: theme.accent, fontSize: 16, fontFamily: 'var(--font-playfair-display)' }}>
           Découvrir votre faire-part
         </button>
       )}
@@ -817,8 +832,8 @@ function MusicPlayer({ youtubeUrl, accent }: { youtubeUrl: string; accent: strin
   return (
     <>
       <iframe key={key} src={`https://www.youtube.com/embed/${id}?autoplay=1&loop=1&playlist=${id}&controls=0&mute=${muted ? 1 : 0}`} style={{ position: 'fixed', top: -9999, opacity: 0, pointerEvents: 'none', width: 1, height: 1 }} allow="autoplay" title="music" />
-      {mobile && <button onClick={() => setMobile(false)} style={{ position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)', background: accent, color: 'white', padding: '12px 28px', borderRadius: 9999, border: 'none', cursor: 'pointer', zIndex: 50, fontSize: 14 }}>▶ Lancer la musique</button>}
-      <button onClick={() => { setMuted(m => !m); setKey(k => k + 1) }} style={{ position: 'fixed', bottom: 24, right: 24, width: 40, height: 40, borderRadius: '50%', background: accent, color: 'white', border: 'none', cursor: 'pointer', zIndex: 50, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      {mobile && <button onClick={() => setMobile(false)} style={{ ...BTN, position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)', background: accent, color: 'white', padding: '12px 28px', borderRadius: 9999, border: 'none', zIndex: 50, fontSize: 14 }}>▶ Lancer la musique</button>}
+      <button onClick={() => { setMuted(m => !m); setKey(k => k + 1) }} style={{ ...BTN, position: 'fixed', bottom: 24, right: 24, width: 40, height: 40, borderRadius: '50%', background: accent, color: 'white', border: 'none', zIndex: 50, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {muted ? '🔇' : '🔊'}
       </button>
     </>
@@ -863,7 +878,7 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
         {!isElegant && (
           <div style={{ position: 'fixed', left: 16, top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', gap: 10, zIndex: 40 }}>
             {sorted.map((_, i) => (
-              <button key={i} onClick={() => refs.current[i]?.scrollIntoView({ behavior: 'smooth' })} style={{ width: 10, height: 10, borderRadius: '50%', border: `1.5px solid ${theme.accent}`, background: active === i ? theme.accent : 'transparent', cursor: 'pointer', padding: 0 }} />
+              <button key={i} onClick={() => refs.current[i]?.scrollIntoView({ behavior: 'smooth' })} style={{ ...BTN, width: 10, height: 10, borderRadius: '50%', border: `1.5px solid ${theme.accent}`, background: active === i ? theme.accent : 'transparent', padding: 0 }} />
             ))}
           </div>
         )}
@@ -890,9 +905,10 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
           {/* Bouton RSVP doré */}
           <div style={{ maxWidth: 600, margin: '40px auto 0', display: 'flex', justifyContent: 'center' }}>
             <button onClick={() => setRsvpOpen(true)} style={{
+              ...BTN,
               padding: '15px 48px', borderRadius: 9999,
               background: 'linear-gradient(135deg, #C9A84C, #e8c96a)',
-              color: 'white', border: 'none', cursor: 'pointer',
+              color: 'white', border: 'none',
               fontSize: 16, fontWeight: 700, letterSpacing: '0.12em',
               boxShadow: '0 6px 28px rgba(201,168,76,0.45)',
               fontFamily: 'var(--font-playfair-display)',
@@ -903,9 +919,9 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
 
           {!isShared && (
             <div style={{ maxWidth: 600, margin: '20px auto 0', display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <button onClick={onEdit} style={{ padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, cursor: 'pointer', fontSize: 14 }}>Modifier</button>
-              <button onClick={handleShare} style={{ padding: '12px 28px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', cursor: 'pointer', fontSize: 14 }}>🔗 Partager</button>
-              <button onClick={onReset} style={{ padding: '12px 28px', borderRadius: 9999, border: '1px solid #fecdd3', background: 'transparent', color: '#fb7185', cursor: 'pointer', fontSize: 14 }}>Nouveau</button>
+              <button onClick={onEdit} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>Modifier</button>
+              <button onClick={handleShare} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 14 }}>🔗 Partager</button>
+              <button onClick={onReset} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: '1px solid #fecdd3', background: 'transparent', color: '#fb7185', fontSize: 14 }}>Nouveau</button>
             </div>
           )}
         </div>
@@ -963,11 +979,11 @@ export default function FairePartPage() {
         {step === 2 && <Step2 data={formData} onChange={update} />}
         {step === 3 && <Step3 data={formData} onChange={update} />}
         {step === 4 && <Step4 data={formData} onChange={update} />}
-        <div style={{ display: 'flex', gap: 12, marginTop: 32 }}>
+        <div style={{ display: 'flex', gap: 12, marginTop: 32, position: 'relative', zIndex: 1 }}>
           {step > 1 && (
-            <button type="button" onClick={prev} style={{ flex: 1, padding: '16px 0', borderRadius: 9999, border: '1.5px solid #fecdd3', background: 'white', color: '#fb7185', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>← Précédent</button>
+            <button type="button" onClick={prev} style={{ ...BTN, flex: 1, padding: '16px 0', borderRadius: 9999, border: '1.5px solid #fecdd3', background: 'white', color: '#fb7185', fontSize: 13, fontWeight: 600 }}>← Précédent</button>
           )}
-          <button type="button" onClick={next} style={{ flex: 1, padding: '16px 0', borderRadius: 9999, border: 'none', background: step === 4 ? 'linear-gradient(135deg, #C9A84C, #e8c96a)' : 'linear-gradient(135deg, #fb7185, #f43f5e)', color: 'white', fontSize: 13, fontWeight: 700, cursor: 'pointer', boxShadow: '0 6px 20px rgba(251,113,133,0.35)' }}>
+          <button type="button" onClick={next} style={{ ...BTN, flex: 1, padding: '16px 0', borderRadius: 9999, border: 'none', background: step === 4 ? 'linear-gradient(135deg, #C9A84C, #e8c96a)' : 'linear-gradient(135deg, #fb7185, #f43f5e)', color: 'white', fontSize: 13, fontWeight: 700, boxShadow: '0 6px 20px rgba(251,113,133,0.35)' }}>
             {step === 4 ? 'Générer ✦' : 'Suivant →'}
           </button>
         </div>
