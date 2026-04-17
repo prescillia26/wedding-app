@@ -22,7 +22,8 @@ interface Ceremony {
   date: string
   heure: string
   suiviDAutre: boolean
-  evenementSuivant: string
+  evenementSuivantNom: string
+  evenementSuivantAdresse: string
 }
 
 interface FormData {
@@ -46,12 +47,13 @@ interface FormData {
   mariageJuif: boolean
   youtubeUrl: string
   photoFond: string
+  photosFond: string[]
 }
 
 const defaultCeremony: Ceremony = {
   type: 'Cérémonie religieuse / Houppa',
   customName: '', lieu: '', adresse: '', date: '', heure: '',
-  suiviDAutre: false, evenementSuivant: '',
+  suiviDAutre: false, evenementSuivantNom: '', evenementSuivantAdresse: '',
 }
 
 const defaultFormData: FormData = {
@@ -60,7 +62,7 @@ const defaultFormData: FormData = {
   famille1Pere: '', famille1Mere: '', famille1GpPaternels: '', famille1GpMaternels: '',
   famille2Pere: '', famille2Mere: '', famille2GpPaternels: '', famille2GpMaternels: '',
   ceremonies: [{ ...defaultCeremony }],
-  style: 'classique-dore', presentationStyle: 'photo', mariageJuif: false, youtubeUrl: '', photoFond: '',
+  style: 'classique-dore', presentationStyle: 'photo', mariageJuif: false, youtubeUrl: '', photoFond: '', photosFond: [],
 }
 
 // Propriétés mobiles partagées pour tous les boutons
@@ -292,7 +294,12 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                 <input type="checkbox" checked={c.suiviDAutre} onChange={e => update(i, { suiviDAutre: e.target.checked })} />
                 Suivi d'un autre événement ?
               </label>
-              {c.suiviDAutre && <Field label="Lequel ?" value={c.evenementSuivant} onChange={v => update(i, { evenementSuivant: v })} placeholder="Henné à la salle Michkenot Israël, 6 rue Jean Nohain Paris 75019" />}
+              {c.suiviDAutre && (
+                <div style={{ marginTop: 10 }}>
+                  <Field label="Nom de l'événement suivant" value={c.evenementSuivantNom} onChange={v => update(i, { evenementSuivantNom: v })} placeholder="Soirée Henné" />
+                  <Field label="Adresse de l'événement suivant" value={c.evenementSuivantAdresse} onChange={v => update(i, { evenementSuivantAdresse: v })} placeholder="Salle Michkenot Israël, 6 rue Jean Nohain Paris 75019" />
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -365,25 +372,50 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>La musique jouera à l'ouverture de la carte</p>
       </div>
       <div>
-        <Label>Photo de fond (optionnel)</Label>
-        <label style={{ display: 'block', cursor: 'pointer' }}>
-          <div style={{ border: '2px dashed #fecdd3', borderRadius: 10, padding: 24, textAlign: 'center' }}>
-            <div style={{ fontSize: 24, marginBottom: 8 }}>📷</div>
-            <p style={{ fontSize: 13, color: '#4a3728' }}>Cliquer pour choisir une photo</p>
-          </div>
-          <input type="file" accept="image/*" onChange={e => {
-            const f = e.target.files?.[0]
-            if (!f) return
-            const r = new FileReader()
-            r.onload = ev => onChange({ photoFond: ev.target?.result as string })
-            r.readAsDataURL(f)
-          }} style={{ display: 'none' }} />
-        </label>
-        {data.photoFond && (
-          <div style={{ marginTop: 12, position: 'relative' }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={data.photoFond} alt="" style={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 10 }} />
-            <button type="button" onClick={() => onChange({ photoFond: '' })} style={{ ...BTN, position: 'absolute', top: 8, right: 8, background: 'white', border: 'none', borderRadius: '50%', width: 24, height: 24, color: '#fb7185' }}>✕</button>
+        <Label>Photos de fond (optionnel — max 5)</Label>
+        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Chaque cérémonie utilisera une photo différente selon son ordre</p>
+        {(data.photosFond ?? []).length < 5 && (
+          <label style={{ display: 'block', cursor: 'pointer' }}>
+            <div style={{ border: '2px dashed #fecdd3', borderRadius: 10, padding: 20, textAlign: 'center' }}>
+              <div style={{ fontSize: 24, marginBottom: 6 }}>📷</div>
+              <p style={{ fontSize: 13, color: '#4a3728' }}>Cliquer pour ajouter une photo</p>
+            </div>
+            <input type="file" accept="image/*" multiple onChange={e => {
+              const files = Array.from(e.target.files ?? [])
+              const current = data.photosFond ?? []
+              const toAdd = files.slice(0, 5 - current.length)
+              if (!toAdd.length) return
+              const results: string[] = new Array(toAdd.length)
+              let done = 0
+              toAdd.forEach((f, fi) => {
+                const r = new FileReader()
+                r.onload = ev => {
+                  results[fi] = ev.target?.result as string
+                  done++
+                  if (done === toAdd.length) {
+                    const updated = [...current, ...results].slice(0, 5)
+                    onChange({ photosFond: updated, photoFond: updated[0] ?? '' })
+                  }
+                }
+                r.readAsDataURL(f)
+              })
+              e.target.value = ''
+            }} style={{ display: 'none' }} />
+          </label>
+        )}
+        {(data.photosFond ?? []).length > 0 && (
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>
+            {(data.photosFond ?? []).map((photo, idx) => (
+              <div key={idx} style={{ position: 'relative', width: 88, height: 72 }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 8 }} />
+                <div style={{ position: 'absolute', bottom: 2, left: 2, background: 'rgba(0,0,0,0.55)', color: 'white', fontSize: 9, borderRadius: 4, padding: '1px 4px' }}>Photo {idx + 1}</div>
+                <button type="button" onClick={() => {
+                  const updated = (data.photosFond ?? []).filter((_, i) => i !== idx)
+                  onChange({ photosFond: updated, photoFond: updated[0] ?? '' })
+                }} style={{ ...BTN, position: 'absolute', top: 2, right: 2, background: 'white', border: 'none', borderRadius: '50%', width: 18, height: 18, fontSize: 10, color: '#fb7185', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -505,14 +537,14 @@ function CardMairie({ ceremony, data, theme }: CardProps) {
             </a>
           </div>
         )}
-        {ceremony.suiviDAutre && ceremony.evenementSuivant && (
+        {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
           <div style={{ textAlign: 'center', paddingTop: 20, borderTop: `1px solid ${theme.accent}`, lineHeight: 1.8 }}>
             <div style={{ fontFamily: 'var(--font-playfair-display)', fontWeight: 'bold', fontSize: 16, color: theme.texte }}>
-              La mairie sera suivie {ceremony.evenementSuivant.includes(',') ? `de ${ceremony.evenementSuivant.split(',')[0].trim()}` : `de ${ceremony.evenementSuivant}`}
+              La mairie sera suivie de {ceremony.evenementSuivantNom}
             </div>
-            {ceremony.evenementSuivant.includes(',') && (
+            {ceremony.evenementSuivantAdresse && (
               <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: theme.textSecondaire, marginTop: 4 }}>
-                {ceremony.evenementSuivant.split(',').slice(1).join(',').trim()}
+                {ceremony.evenementSuivantAdresse}
               </div>
             )}
           </div>
@@ -575,8 +607,10 @@ function CardAutre({ ceremony, data, theme }: CardProps) {
   )
 }
 
-function renderCard(ceremony: Ceremony, data: FormData, theme: ThemeObj) {
-  const props = { ceremony, data, theme }
+function renderCard(ceremony: Ceremony, data: FormData, theme: ThemeObj, photoIdx = 0) {
+  const photos = data.photosFond ?? []
+  const photoFond = photos[photoIdx] ?? photos[0] ?? data.photoFond ?? ''
+  const props = { ceremony, data: { ...data, photoFond }, theme }
   if (ceremony.type === 'Mairie') return <CardMairie {...props} />
   if (ceremony.type === 'Cérémonie religieuse / Houppa') return <CardHouppa {...props} />
   if (ceremony.type === 'Henné') return <CardHenne {...props} />
@@ -613,11 +647,12 @@ function ElegantSeparator({ color, initial1, initial2 }: { color: string; initia
 }
 
 function ElegantPage1({ data, theme }: { data: FormData; theme: ThemeObj }) {
+  const coverPhoto = (data.photosFond ?? [])[0] ?? data.photoFond ?? ''
   return (
     <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', position: 'relative', height: 560 }}>
-      {data.photoFond ? (
+      {coverPhoto ? (
         /* eslint-disable-next-line @next/next/no-img-element */
-        <img src={data.photoFond} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <img src={coverPhoto} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
       ) : (
         <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(160deg, ${theme.fond}, ${theme.accent}22)` }} />
       )}
@@ -670,7 +705,7 @@ function ElegantCardsContent({ data, theme }: { data: FormData; theme: ThemeObj 
   const sorted = sortByDate(data.ceremonies)
   const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
   const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
-  const noPhotoData = { ...data, photoFond: '' }
+  const noPhotoData = { ...data, photoFond: '', photosFond: [] }
 
   return (
     <>
@@ -681,7 +716,7 @@ function ElegantCardsContent({ data, theme }: { data: FormData; theme: ThemeObj 
       {sorted.map((ceremony, i) => (
         <div key={i}>
           <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden' }}>
-            {renderCard(ceremony, noPhotoData, theme)}
+            {renderCard(ceremony, noPhotoData, theme, i)}
           </div>
           {i < sorted.length - 1 && <ElegantSeparator color={theme.accent} initial1={i1} initial2={i2} />}
         </div>
@@ -696,6 +731,7 @@ interface RSVPData {
   nom: string
   nbPersonnes: string
   presence: boolean | null
+  evenements: string[]
   message: string
 }
 
@@ -707,8 +743,8 @@ interface RSVPResponse {
   sentAt?: string
 }
 
-function RSVPModal({ accent, onClose, mariee1, mariee2, shareId }: { accent: string; onClose: () => void; mariee1: string; mariee2: string; shareId: string | null }) {
-  const [rsvp, setRsvp] = useState<RSVPData>({ nom: '', nbPersonnes: '0', presence: null, message: '' })
+function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: { accent: string; onClose: () => void; mariee1: string; mariee2: string; shareId: string | null; ceremonies: Ceremony[] }) {
+  const [rsvp, setRsvp] = useState<RSVPData>({ nom: '', nbPersonnes: '0', presence: null, evenements: [], message: '' })
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -786,6 +822,28 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId }: { accent: str
               <Label>Combien de personnes vous accompagnent ?</Label>
               <input type="number" min="0" max="10" value={rsvp.nbPersonnes} onChange={e => setRsvp(r => ({ ...r, nbPersonnes: e.target.value }))} style={S.input} />
             </div>
+
+            {ceremonies.length > 1 && (
+              <div style={{ marginBottom: 16 }}>
+                <Label>À quel(s) événement(s) serez-vous présent(e) ?</Label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
+                  {ceremonies.map((c, i) => {
+                    const label = c.type === 'Autre' ? (c.customName || 'Événement') : c.type
+                    const key = `${label}${c.date ? ' – ' + formatDateFrCap(c.date) : ''}`
+                    const checked = rsvp.evenements.includes(key)
+                    return (
+                      <label key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: 13, color: '#4a3728', padding: '8px 12px', borderRadius: 8, border: `1px solid ${checked ? accent : '#fecdd3'}`, background: checked ? `${accent}11` : 'white' }}>
+                        <input type="checkbox" checked={checked} onChange={() => setRsvp(r => ({
+                          ...r,
+                          evenements: checked ? r.evenements.filter(e => e !== key) : [...r.evenements, key]
+                        }))} style={{ accentColor: accent }} />
+                        <span>{label}{c.date ? <span style={{ color: '#9ca3af', fontSize: 11 }}> – {formatDateFrCap(c.date)}</span> : null}</span>
+                      </label>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
             <div style={{ marginBottom: 24 }}>
               <Label>Un petit mot pour les mariés (optionnel)</Label>
@@ -986,6 +1044,7 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
   const [rsvpOpen, setRsvpOpen] = useState(false)
   const [rsvpListOpen, setRsvpListOpen] = useState(false)
   const [lastShareId, setLastShareId] = useState<string | null>(null)
+  const [shareFeedback, setShareFeedback] = useState(false)
   const refs = useRef<(HTMLDivElement | null)[]>([])
   const isElegant = data.presentationStyle === 'elegant'
 
@@ -1012,8 +1071,10 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
       const res = await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
       const { id } = await res.json()
       setLastShareId(id)
-      await navigator.clipboard.writeText(`${window.location.origin}/faire-part?share=${id}`)
-      alert('Lien copié !')
+      const url = `https://wedding-e8t1cx1ei-prescwedding.vercel.app/faire-part?share=${id}`
+      await navigator.clipboard.writeText(url)
+      setShareFeedback(true)
+      setTimeout(() => setShareFeedback(false), 3000)
     } catch { alert('Erreur') }
   }
 
@@ -1035,7 +1096,7 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
             sorted.map((ceremony, i) => (
               <div key={i}>
                 <div ref={el => { refs.current[i] = el }} style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden' }}>
-                  {renderCard(ceremony, data, theme)}
+                  {renderCard(ceremony, data, theme, i)}
                 </div>
                 {i < sorted.length - 1 && (
                   <div style={{ maxWidth: 600, margin: '32px auto', display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -1068,7 +1129,7 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
           {!isShared && (
             <div style={{ maxWidth: 600, margin: '40px auto 0', display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
               <button onClick={onEdit} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>Modifier</button>
-              <button onClick={handleShare} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 14 }}>🔗 Partager</button>
+              <button onClick={handleShare} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, background: shareFeedback ? '#22c55e' : theme.accent, color: 'white', border: 'none', fontSize: 14, transition: 'background 0.3s' }}>{shareFeedback ? '✓ Lien copié !' : '🔗 Partager'}</button>
               {lastShareId && (
                 <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>📋 Voir les RSVP</button>
               )}
@@ -1086,6 +1147,7 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
           mariee1={data.marie1Prenom}
           mariee2={data.marie2Prenom}
           shareId={lastShareId}
+          ceremonies={sorted}
         />
       )}
       {rsvpListOpen && (
