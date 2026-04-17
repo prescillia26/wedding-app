@@ -73,6 +73,26 @@ const BTN: React.CSSProperties = {
   cursor: 'pointer',
 }
 
+function compressBase64(base64: string, maxDim = 1200, quality = 0.72): Promise<string> {
+  return new Promise(resolve => {
+    const img = new Image()
+    img.onload = () => {
+      const scale = Math.min(1, maxDim / Math.max(img.width || 1, img.height || 1))
+      const w = Math.round(img.width * scale)
+      const h = Math.round(img.height * scale)
+      const canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      const ctx = canvas.getContext('2d')
+      if (!ctx) { resolve(base64); return }
+      ctx.drawImage(img, 0, 0, w, h)
+      resolve(canvas.toDataURL('image/jpeg', quality))
+    }
+    img.onerror = () => resolve(base64)
+    img.src = base64
+  })
+}
+
 function getYouTubeId(url: string): string | null {
   const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)
   return match ? match[1] : null
@@ -1224,10 +1244,29 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
 
   const handleShare = async () => {
     try {
-      const res = await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+      // Compresser les photos avant envoi pour rester sous la limite Upstash (1MB)
+      const originalPhotos = data.photosFond ?? []
+      const compressedPhotos = originalPhotos.length > 0
+        ? await Promise.all(originalPhotos.map(p => compressBase64(p)))
+        : []
+      const dataToSend = { ...data, photosFond: compressedPhotos, photoFond: compressedPhotos[0] ?? '' }
+
+      // Vérification taille côté client
+      const sizeKB = Math.round(new TextEncoder().encode(JSON.stringify(dataToSend)).length / 1024)
+      if (sizeKB > 900) {
+        const ok = window.confirm(`Les photos sont volumineuses (${sizeKB} Ko). Le lien sera partagé sans photos de fond. Continuer ?`)
+        if (!ok) return
+        dataToSend.photosFond = []
+        dataToSend.photoFond = ''
+      }
+
+      const res = await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataToSend) })
       const json = await res.json()
       console.log('save-share response:', json)
       if (!json.id) throw new Error('Pas d\'id retourné : ' + JSON.stringify(json))
+      if (json.photosStripped) {
+        console.warn('Photos retirées côté serveur car trop volumineuses')
+      }
       const id = json.id
       setLastShareId(id)
       const url = window.location.origin + '/faire-part?share=' + id
