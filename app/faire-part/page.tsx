@@ -947,6 +947,8 @@ export default function FairePartPage() {
   const [formData, setFormData] = useState<FormData>(defaultFormData)
   const [showCards, setShowCards] = useState(false)
   const [isShared, setIsShared] = useState(false)
+  // Prevents double-firing when both onTouchEnd and onClick trigger
+  const lastTap = useRef(0)
 
   useEffect(() => {
     const id = new URLSearchParams(window.location.search).get('share')
@@ -957,8 +959,31 @@ export default function FairePartPage() {
   }, [])
 
   const update = useCallback((u: Partial<FormData>) => setFormData(p => ({ ...p, ...u })), [])
-  const next = () => step < 4 ? setStep(s => s + 1) : setShowCards(true)
-  const prev = () => setStep(s => s - 1)
+
+  const next = useCallback(() => {
+    if (step < 4) setStep(s => s + 1)
+    else setShowCards(true)
+  }, [step])
+
+  const prev = useCallback(() => setStep(s => s - 1), [])
+
+  // onTouchEnd handler: fires immediately on touch release (bypasses iOS delays)
+  // e.preventDefault() stops the subsequent click event so the action only runs once
+  const onTouchNext = useCallback((e: React.TouchEvent) => {
+    e.preventDefault()
+    const now = Date.now()
+    if (now - lastTap.current < 500) return
+    lastTap.current = now
+    next()
+  }, [next])
+
+  const onTouchPrev = useCallback((e: React.TouchEvent) => {
+    e.preventDefault()
+    const now = Date.now()
+    if (now - lastTap.current < 500) return
+    lastTap.current = now
+    prev()
+  }, [prev])
 
   if (showCards) return <CardsView data={formData} onEdit={() => { setShowCards(false); setStep(4) }} onReset={() => { setFormData(defaultFormData); setShowCards(false); setStep(1) }} isShared={isShared} />
 
@@ -973,7 +998,7 @@ export default function FairePartPage() {
           <div style={{ width: 40, height: 1, background: 'rgba(201,168,76,0.3)' }} />
         </div>
       </div>
-      <div style={{ width: '100%', maxWidth: 600, background: 'white', borderRadius: 20, padding: 40, boxShadow: '0 12px 48px rgba(0,0,0,0.07)', border: '1px solid #fce7f3', boxSizing: 'border-box' }}>
+      <div style={{ width: '100%', maxWidth: 600, background: 'white', borderRadius: 20, padding: '32px 24px', boxShadow: '0 12px 48px rgba(0,0,0,0.07)', border: '1px solid #fce7f3', boxSizing: 'border-box' }}>
         <ProgressBar step={step} />
         {step === 1 && <Step1 data={formData} onChange={update} />}
         {step === 2 && <Step2 data={formData} onChange={update} />}
@@ -981,9 +1006,19 @@ export default function FairePartPage() {
         {step === 4 && <Step4 data={formData} onChange={update} />}
         <div style={{ display: 'flex', gap: 12, marginTop: 32, position: 'relative', zIndex: 1 }}>
           {step > 1 && (
-            <button type="button" onClick={prev} style={{ ...BTN, flex: 1, padding: '16px 0', borderRadius: 9999, border: '1.5px solid #fecdd3', background: 'white', color: '#fb7185', fontSize: 13, fontWeight: 600 }}>← Précédent</button>
+            <button
+              type="button"
+              onClick={prev}
+              onTouchEnd={onTouchPrev}
+              style={{ ...BTN, flex: 1, padding: '18px 0', borderRadius: 9999, border: '1.5px solid #fecdd3', background: 'white', color: '#fb7185', fontSize: 14, fontWeight: 600 }}
+            >← Précédent</button>
           )}
-          <button type="button" onClick={next} style={{ ...BTN, flex: 1, padding: '16px 0', borderRadius: 9999, border: 'none', background: step === 4 ? 'linear-gradient(135deg, #C9A84C, #e8c96a)' : 'linear-gradient(135deg, #fb7185, #f43f5e)', color: 'white', fontSize: 13, fontWeight: 700, boxShadow: '0 6px 20px rgba(251,113,133,0.35)' }}>
+          <button
+            type="button"
+            onClick={next}
+            onTouchEnd={onTouchNext}
+            style={{ ...BTN, flex: 1, padding: '18px 0', borderRadius: 9999, border: 'none', background: step === 4 ? 'linear-gradient(135deg, #C9A84C, #e8c96a)' : 'linear-gradient(135deg, #fb7185, #f43f5e)', color: 'white', fontSize: 14, fontWeight: 700, boxShadow: '0 6px 20px rgba(251,113,133,0.35)' }}
+          >
             {step === 4 ? 'Générer ✦' : 'Suivant →'}
           </button>
         </div>
