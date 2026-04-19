@@ -641,10 +641,7 @@ function CardHouppa({ ceremony, data, theme }: CardProps) {
       <CarouselBackground photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} theme={theme} />
       <div style={{ position: 'relative', zIndex: 1 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: -40, right: 0, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
-        {data.logoUrl && <div style={{ textAlign: 'center', marginBottom: 16 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={data.logoUrl} alt="" style={{ maxHeight: 80, maxWidth: '100%', objectFit: 'contain' }} />
-        </div>}
+        <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 42, color: theme.accent, textAlign: 'center', marginBottom: 20, lineHeight: 1.2 }}>
           {data.mariageJuif ? 'Houppa & Soirée' : 'Cérémonie religieuse & Soirée'}
         </div>
@@ -705,10 +702,7 @@ function CardMairie({ ceremony, data, theme }: CardProps) {
       <CarouselBackground photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} theme={theme} />
       <div style={{ position: 'relative', zIndex: 1 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: -40, right: 0, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
-        {data.logoUrl && <div style={{ textAlign: 'center', marginBottom: 16 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={data.logoUrl} alt="" style={{ maxHeight: 80, maxWidth: '100%', objectFit: 'contain' }} />
-        </div>}
+        <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: theme.accent, textAlign: 'center', marginBottom: 20 }}>Mairie</div>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}><MairieIllustration color={theme.accent} /></div>
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(36px, 8vw, 60px)', color: theme.accent, textAlign: 'center', marginBottom: 12, lineHeight: 1.2 }}>{data.marie1Prenom} & {data.marie2Prenom}</div>
@@ -751,10 +745,7 @@ function CardHenne({ ceremony, data, theme }: CardProps) {
       <CarouselBackground photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} theme={theme} />
       <div style={{ position: 'relative', zIndex: 1 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: -40, right: 0, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
-        {data.logoUrl && <div style={{ textAlign: 'center', marginBottom: 16 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={data.logoUrl} alt="" style={{ maxHeight: 80, maxWidth: '100%', objectFit: 'contain' }} />
-        </div>}
+        <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, textAlign: 'center', marginBottom: 16 }}>Soirée Henné</div>
         <div style={{ textAlign: 'center', fontSize: 24, letterSpacing: '0.5em', color: theme.accent, marginBottom: 24 }}>❋ ✿ ❀</div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte, lineHeight: 1.7, marginBottom: 28 }}>
@@ -779,10 +770,7 @@ function CardAutre({ ceremony, data, theme }: CardProps) {
       <CarouselBackground photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} theme={theme} />
       <div style={{ position: 'relative', zIndex: 1 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: -40, right: 0, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
-        {data.logoUrl && <div style={{ textAlign: 'center', marginBottom: 16 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={data.logoUrl} alt="" style={{ maxHeight: 80, maxWidth: '100%', objectFit: 'contain' }} />
-        </div>}
+        <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, textAlign: 'center', marginBottom: 20 }}>{name}</div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte, lineHeight: 1.7, marginBottom: 28 }}>
           Rejoignez <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: theme.accent }}>{data.marie1Prenom} & {data.marie2Prenom}</span> pour {name.toLowerCase()}
@@ -809,6 +797,24 @@ function renderCard(ceremony: Ceremony, data: FormData, theme: ThemeObj, photoId
 }
 
 // ── Style élégant ──────────────────────────────────────────────────────────────
+
+function LogoOrMonogram({ data, theme }: { data: FormData; theme: ThemeObj }) {
+  const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
+  const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
+  if (data.logoUrl) {
+    return (
+      <div style={{ textAlign: 'center', marginBottom: 20 }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={data.logoUrl} alt="" style={{ maxHeight: 100, maxWidth: '100%', width: 'auto', objectFit: 'contain' }} />
+      </div>
+    )
+  }
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
+      <MonogramSVG initial1={i1} initial2={i2} color={theme.accent} size={110} />
+    </div>
+  )
+}
 
 function MonogramSVG({ initial1, initial2, color, size = 220 }: { initial1: string; initial2: string; color: string; size?: number }) {
   return (
