@@ -58,6 +58,7 @@ interface FormData {
   musicUrl: string
   photoFond: string
   photosFond: string[]
+  logoUrl: string
 }
 
 const defaultCeremony: Ceremony = {
@@ -74,7 +75,7 @@ const defaultFormData: FormData = {
   famille2PerePrenom: '', famille2PereNom: '', famille2MerePrenom: '', famille2MereNom: '',
   famille2GpPaPrenom: '', famille2GpPaNomdeFamille: '', famille2GpMaPrenom: '', famille2GpMaNomdeFamille: '',
   ceremonies: [{ ...defaultCeremony }],
-  style: 'classique-dore', presentationStyle: 'photo', mariageJuif: false, youtubeUrl: '', musicUrl: '', photoFond: '', photosFond: [],
+  style: 'classique-dore', presentationStyle: 'photo', mariageJuif: false, youtubeUrl: '', musicUrl: '', photoFond: '', photosFond: [], logoUrl: '',
 }
 
 // Propriétés mobiles partagées pour tous les boutons
@@ -488,6 +489,33 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           </div>
         )}
       </div>
+      <div style={{ marginTop: 20 }}>
+        <Label>Logo personnalisé (optionnel — PNG transparent recommandé)</Label>
+        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Affiché en haut de chaque carte, max 80px de hauteur</p>
+        {data.logoUrl ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', border: '1px solid #C9A84C44', borderRadius: 10, background: '#fdf5e4' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={data.logoUrl} alt="" style={{ maxHeight: 60, maxWidth: 120, objectFit: 'contain' }} />
+            <span style={{ flex: 1, fontSize: 12, color: '#4a3728' }}>Logo chargé</span>
+            <button type="button" onClick={() => onChange({ logoUrl: '' })} style={{ ...BTN, background: 'none', border: 'none', color: '#fb7185', fontSize: 13 }}>✕ Supprimer</button>
+          </div>
+        ) : (
+          <label style={{ display: 'block', cursor: 'pointer' }}>
+            <div style={{ border: '2px dashed #C9A84C66', borderRadius: 10, padding: 20, textAlign: 'center' }}>
+              <div style={{ fontSize: 24, marginBottom: 6 }}>🖼️</div>
+              <p style={{ fontSize: 13, color: '#4a3728', margin: 0 }}>Cliquer pour uploader votre logo</p>
+            </div>
+            <input type="file" accept="image/*" onChange={e => {
+              const f = e.target.files?.[0]
+              if (!f) return
+              const r = new FileReader()
+              r.onload = ev => onChange({ logoUrl: ev.target?.result as string ?? '' })
+              r.readAsDataURL(f)
+              e.target.value = ''
+            }} style={{ display: 'none' }} />
+          </label>
+        )}
+      </div>
     </div>
   )
 }
@@ -511,18 +539,46 @@ function MairieIllustration({ color }: { color: string }) {
 type ThemeObj = { fond: string; accent: string; texte: string; textSecondaire: string }
 interface CardProps { ceremony: Ceremony; data: FormData; theme: ThemeObj }
 
+function CarouselBackground({ photos, theme }: { photos: string[]; theme: ThemeObj }) {
+  const [idx, setIdx] = useState(0)
+  const [visible, setVisible] = useState(true)
+  useEffect(() => {
+    if (photos.length <= 1) return
+    const t = setInterval(() => {
+      setVisible(false)
+      setTimeout(() => { setIdx(i => (i + 1) % photos.length); setVisible(true) }, 450)
+    }, 5000)
+    return () => clearInterval(t)
+  }, [photos.length])
+  if (!photos.length) return null
+  const isDark = theme.fond === '#1a0a00'
+  return (
+    <>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={photos[idx]} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: visible ? 1 : 0, transition: 'opacity 0.45s ease' }} />
+      <div style={{ position: 'absolute', inset: 0, background: isDark ? 'rgba(26,10,0,0.85)' : 'rgba(255,255,255,0.88)' }} />
+    </>
+  )
+}
+
 function CardHouppa({ ceremony, data, theme }: CardProps) {
-  const hasGp = data.famille1GpPaternels || data.famille1GpMaternels || data.famille2GpPaternels || data.famille2GpMaternels
+  const gpPa1 = fmtGpLine(data.famille1GpPaPrenom, data.famille1GpPaNomdeFamille)
+  const gpMa1 = fmtGpLine(data.famille1GpMaPrenom, data.famille1GpMaNomdeFamille)
+  const gpPa2 = fmtGpLine(data.famille2GpPaPrenom, data.famille2GpPaNomdeFamille)
+  const gpMa2 = fmtGpLine(data.famille2GpMaPrenom, data.famille2GpMaNomdeFamille)
+  const hasGp = gpPa1 || gpMa1 || gpPa2 || gpMa2
+  const parents1 = fmtParentsLines(data.famille1PerePrenom, data.famille1PereNom, data.famille1MerePrenom, data.famille1MereNom)
+  const parents2 = fmtParentsLines(data.famille2PerePrenom, data.famille2PereNom, data.famille2MerePrenom, data.famille2MereNom)
   const hebrewDate = getHebrewDate(ceremony.date)
   return (
     <div style={{ backgroundColor: theme.fond, padding: '60px 48px', position: 'relative' }}>
-      {data.photoFond && <>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={data.photoFond} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: theme.fond === '#1a0a00' ? 'rgba(26,10,0,0.85)' : 'rgba(255,255,255,0.88)' }} />
-      </>}
+      <CarouselBackground photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} theme={theme} />
       <div style={{ position: 'relative', zIndex: 1 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: -40, right: 0, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
+        {data.logoUrl && <div style={{ textAlign: 'center', marginBottom: 16 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={data.logoUrl} alt="" style={{ maxHeight: 80, maxWidth: '100%', objectFit: 'contain' }} />
+        </div>}
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 42, color: theme.accent, textAlign: 'center', marginBottom: 20, lineHeight: 1.2 }}>
           {data.mariageJuif ? 'Houppa & Soirée' : 'Cérémonie religieuse & Soirée'}
         </div>
@@ -537,15 +593,15 @@ function CardHouppa({ ceremony, data, theme }: CardProps) {
         )}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, marginBottom: 24, alignItems: 'start' }}>
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: theme.accent, lineHeight: 2 }}>
-            {fmtParents(data.famille1Pere, data.famille1Mere).map((l, i) => <div key={i}>{l}</div>)}
-            {data.famille1GpPaternels && <div>{fmtGp(data.famille1GpPaternels)}</div>}
-            {data.famille1GpMaternels && <div>{fmtGp(data.famille1GpMaternels)}</div>}
+            {parents1.map((l, i) => <div key={i}>{l}</div>)}
+            {gpPa1 && <div>{gpPa1}</div>}
+            {gpMa1 && <div>{gpMa1}</div>}
           </div>
           <div style={{ width: 1, background: theme.accent, opacity: 0.3, alignSelf: 'stretch', minHeight: 40 }} />
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: theme.accent, textAlign: 'right', lineHeight: 2 }}>
-            {fmtParents(data.famille2Pere, data.famille2Mere).map((l, i) => <div key={i}>{l}</div>)}
-            {data.famille2GpPaternels && <div>{fmtGp(data.famille2GpPaternels)}</div>}
-            {data.famille2GpMaternels && <div>{fmtGp(data.famille2GpMaternels)}</div>}
+            {parents2.map((l, i) => <div key={i}>{l}</div>)}
+            {gpPa2 && <div>{gpPa2}</div>}
+            {gpMa2 && <div>{gpMa2}</div>}
           </div>
         </div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, textAlign: 'center', color: theme.texte, marginBottom: 24, lineHeight: 1.5 }}>
@@ -580,13 +636,13 @@ function CardHouppa({ ceremony, data, theme }: CardProps) {
 function CardMairie({ ceremony, data, theme }: CardProps) {
   return (
     <div style={{ backgroundColor: theme.fond, padding: '60px 48px', position: 'relative' }}>
-      {data.photoFond && <>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={data.photoFond} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: theme.fond === '#1a0a00' ? 'rgba(26,10,0,0.85)' : 'rgba(255,255,255,0.88)' }} />
-      </>}
+      <CarouselBackground photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} theme={theme} />
       <div style={{ position: 'relative', zIndex: 1 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: -40, right: 0, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
+        {data.logoUrl && <div style={{ textAlign: 'center', marginBottom: 16 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={data.logoUrl} alt="" style={{ maxHeight: 80, maxWidth: '100%', objectFit: 'contain' }} />
+        </div>}
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: theme.accent, textAlign: 'center', marginBottom: 20 }}>Mairie</div>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}><MairieIllustration color={theme.accent} /></div>
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(36px, 8vw, 60px)', color: theme.accent, textAlign: 'center', marginBottom: 12, lineHeight: 1.2 }}>{data.marie1Prenom} & {data.marie2Prenom}</div>
@@ -626,13 +682,13 @@ function CardMairie({ ceremony, data, theme }: CardProps) {
 function CardHenne({ ceremony, data, theme }: CardProps) {
   return (
     <div style={{ backgroundColor: theme.fond, padding: '60px 48px', position: 'relative' }}>
-      {data.photoFond && <>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={data.photoFond} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.88)' }} />
-      </>}
+      <CarouselBackground photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} theme={theme} />
       <div style={{ position: 'relative', zIndex: 1 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: -40, right: 0, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
+        {data.logoUrl && <div style={{ textAlign: 'center', marginBottom: 16 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={data.logoUrl} alt="" style={{ maxHeight: 80, maxWidth: '100%', objectFit: 'contain' }} />
+        </div>}
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, textAlign: 'center', marginBottom: 16 }}>Soirée Henné</div>
         <div style={{ textAlign: 'center', fontSize: 24, letterSpacing: '0.5em', color: theme.accent, marginBottom: 24 }}>❋ ✿ ❀</div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte, lineHeight: 1.7, marginBottom: 28 }}>
@@ -654,13 +710,13 @@ function CardAutre({ ceremony, data, theme }: CardProps) {
   const name = ceremony.type === 'Autre' ? (ceremony.customName || 'Événement') : ceremony.type
   return (
     <div style={{ backgroundColor: theme.fond, padding: '60px 48px', position: 'relative' }}>
-      {data.photoFond && <>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={data.photoFond} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.88)' }} />
-      </>}
+      <CarouselBackground photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} theme={theme} />
       <div style={{ position: 'relative', zIndex: 1 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: -40, right: 0, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
+        {data.logoUrl && <div style={{ textAlign: 'center', marginBottom: 16 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={data.logoUrl} alt="" style={{ maxHeight: 80, maxWidth: '100%', objectFit: 'contain' }} />
+        </div>}
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, textAlign: 'center', marginBottom: 20 }}>{name}</div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte, lineHeight: 1.7, marginBottom: 28 }}>
           Rejoignez <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: theme.accent }}>{data.marie1Prenom} & {data.marie2Prenom}</span> pour {name.toLowerCase()}
@@ -799,13 +855,6 @@ function ElegantCardsContent({ data, theme }: { data: FormData; theme: ThemeObj 
 interface EvenementRSVP {
   nom: string
   present: boolean
-}
-
-interface RSVPData {
-  nom: string
-  nbPersonnes: string
-  evenements: { nom: string; present: boolean | null }[]
-  message: string
 }
 
 interface RSVPResponse {
@@ -1301,6 +1350,9 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [ytMuted, setYtMuted] = useState(false)
   const ytIframeRef = useRef<HTMLIFrameElement | null>(null)
+  const [editMode, setEditMode] = useState(false)
+  const [editHtmls, setEditHtmls] = useState<Record<number, string>>({})
+  const [savedHtmls, setSavedHtmls] = useState<Record<number, string>>({})
 
   const startYoutubeMusic = useCallback((videoId: string) => {
     if (ytIframeRef.current) return // déjà démarré
@@ -1320,6 +1372,23 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
     iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args: [] }), '*')
     setYtMuted(m => !m)
   }, [ytMuted])
+
+  const enterEditMode = useCallback(() => {
+    const htmls: Record<number, string> = {}
+    refs.current.forEach((el, i) => { if (el) htmls[i] = el.innerHTML })
+    setEditHtmls(htmls)
+    setEditMode(true)
+  }, [])
+
+  const saveEdits = useCallback(() => {
+    setSavedHtmls(prev => ({ ...prev, ...editHtmls }))
+    setEditMode(false)
+  }, [editHtmls])
+
+  const cancelEdits = useCallback(() => {
+    setEditMode(false)
+  }, [])
+
   const refs = useRef<(HTMLDivElement | null)[]>([])
   const isElegant = data.presentationStyle === 'elegant'
 
@@ -1400,9 +1469,26 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
           ) : (
             sorted.map((ceremony, i) => (
               <div key={i}>
-                <div ref={el => { refs.current[i] = el }} style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden' }}>
-                  {renderCard(ceremony, data, theme, i)}
-                </div>
+                {editMode ? (
+                  <div
+                    ref={el => { refs.current[i] = el }}
+                    contentEditable
+                    suppressContentEditableWarning
+                    dangerouslySetInnerHTML={{ __html: editHtmls[i] ?? '' }}
+                    onInput={e => setEditHtmls(prev => ({ ...prev, [i]: (e.target as HTMLElement).innerHTML }))}
+                    style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden', outline: `2px dashed ${theme.accent}`, outlineOffset: 2 }}
+                  />
+                ) : savedHtmls[i] ? (
+                  <div
+                    ref={el => { refs.current[i] = el }}
+                    dangerouslySetInnerHTML={{ __html: savedHtmls[i] }}
+                    style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden' }}
+                  />
+                ) : (
+                  <div ref={el => { refs.current[i] = el }} style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden' }}>
+                    {renderCard(ceremony, data, theme, i)}
+                  </div>
+                )}
                 {i < sorted.length - 1 && (
                   <div style={{ maxWidth: 600, margin: '32px auto', display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{ flex: 1, height: 1, background: theme.accent, opacity: 0.3 }} />
@@ -1433,14 +1519,22 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
 
           {!isShared && (
             <div style={{ maxWidth: 600, margin: '40px auto 0' }}>
-              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-                <button onClick={onEdit} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>Modifier</button>
-                <button onClick={handleShare} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, background: shareFeedback ? '#22c55e' : theme.accent, color: 'white', border: 'none', fontSize: 14, transition: 'background 0.3s' }}>{shareFeedback ? '✓ Lien copié !' : '🔗 Partager'}</button>
-                {lastShareId && (
-                  <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>📋 Voir les RSVP</button>
-                )}
-                <button onClick={onReset} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: '1px solid #fecdd3', background: 'transparent', color: '#fb7185', fontSize: 14 }}>Nouveau</button>
-              </div>
+              {editMode ? (
+                <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <button onClick={saveEdits} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, background: '#22c55e', color: 'white', border: 'none', fontSize: 14, fontWeight: 700 }}>✅ Valider les modifications</button>
+                  <button onClick={cancelEdits} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: '1px solid #fecdd3', background: 'transparent', color: '#fb7185', fontSize: 14 }}>✕ Annuler</button>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <button onClick={onEdit} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>Modifier</button>
+                  <button onClick={handleShare} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, background: shareFeedback ? '#22c55e' : theme.accent, color: 'white', border: 'none', fontSize: 14, transition: 'background 0.3s' }}>{shareFeedback ? '✓ Lien copié !' : '🔗 Partager'}</button>
+                  {lastShareId && (
+                    <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>📋 Voir les RSVP</button>
+                  )}
+                  {!isElegant && <button onClick={enterEditMode} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>✏️ Modifier le texte</button>}
+                  <button onClick={onReset} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: '1px solid #fecdd3', background: 'transparent', color: '#fb7185', fontSize: 14 }}>Nouveau</button>
+                </div>
+              )}
               {shareUrl && (
                 <div style={{ marginTop: 16, padding: '12px 16px', background: `${theme.accent}11`, border: `1px solid ${theme.accent}44`, borderRadius: 10 }}>
                   <div style={{ fontSize: 11, color: theme.accent, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Lien à envoyer à tes invités</div>
@@ -1455,11 +1549,10 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
                       navigator.clipboard.writeText(shareUrl).catch(() => {
                         const ta = document.createElement('textarea')
                         ta.value = shareUrl
-                        ta.style.position = 'fixed'
-                        ta.style.opacity = '0'
+                        ta.style.cssText = 'position:fixed;opacity:0'
                         document.body.appendChild(ta)
                         ta.focus(); ta.select()
-                        document.execCommand('copy')
+                        try { (document as unknown as { execCommand(c: string): void }).execCommand('copy') } catch { /* ignore */ }
                         document.body.removeChild(ta)
                       })
                       setShareFeedback(true)
