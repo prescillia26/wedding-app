@@ -74,6 +74,7 @@ interface FormData {
   photoFond: string
   photosFond: string[]
   emailMaries: string
+  textOverrides?: Record<string, string>
 }
 
 const defaultCeremony: Ceremony = {
@@ -92,7 +93,7 @@ const defaultFormData: FormData = {
   famille2GpPaPerePrenom: '', famille2GpPaPereNom: '', famille2GpPaMerePrenom: '', famille2GpPaMereNom: '',
   famille2GpMaPerePrenom: '', famille2GpMaPereNom: '', famille2GpMaMerePrenom: '', famille2GpMaMereNom: '',
   ceremonies: [{ ...defaultCeremony }],
-  style: 'classique-dore', presentationStyle: 'photo', mariageJuif: false, youtubeUrl: '', musicUrl: '', photoFond: '', photosFond: [], emailMaries: '',
+  style: 'classique-dore', presentationStyle: 'photo', mariageJuif: false, youtubeUrl: '', musicUrl: '', photoFond: '', photosFond: [], emailMaries: '', textOverrides: {},
 }
 
 // Propriétés mobiles partagées pour tous les boutons
@@ -565,7 +566,7 @@ function MairieIllustration({ color }: { color: string }) {
 }
 
 type ThemeObj = { fond: string; pageFond: string; accent: string; texte: string; textSecondaire: string; nom: string; carteBordure?: string }
-interface CardProps { ceremony: Ceremony; data: FormData; theme: ThemeObj }
+interface CardProps { ceremony: Ceremony; data: FormData; theme: ThemeObj; isShared?: boolean; cardIdx?: number }
 
 function CarouselBackground({ photos, fond, isOriental, children }: {
   photos: string[],
@@ -644,7 +645,7 @@ function CarouselBackground({ photos, fond, isOriental, children }: {
   )
 }
 
-function CardHouppa({ ceremony, data, theme }: CardProps) {
+function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const gpPa1 = fmtGpCouple(data.famille1GpPaPerePrenom, data.famille1GpPaPereNom, data.famille1GpPaMerePrenom, data.famille1GpPaMereNom)
   const gpMa1 = fmtGpCouple(data.famille1GpMaPerePrenom, data.famille1GpMaPereNom, data.famille1GpMaMerePrenom, data.famille1GpMaMereNom)
   const gpPa2 = fmtGpCouple(data.famille2GpPaPerePrenom, data.famille2GpPaPereNom, data.famille2GpPaMerePrenom, data.famille2GpPaMereNom)
@@ -654,13 +655,19 @@ function CardHouppa({ ceremony, data, theme }: CardProps) {
   const parents2 = fmtParentsLines(data.famille2PerePrenom, data.famille2PereNom, data.famille2MerePrenom, data.famille2MereNom)
   const hebrewDate = getHebrewDate(ceremony.date)
   const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
+  const ov = data.textOverrides ?? {}
+  const ci = cardIdx ?? 0
+  const titre = ov[`ceremony_${ci}_titre`] || (data.mariageJuif ? 'Houppa & Soirée' : 'Cérémonie religieuse & Soirée')
+  const joie = ov[`ceremony_${ci}_joie`] || (hasGp ? 'Ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'Ont la joie de vous faire part du mariage de leurs enfants')
+  const honore = ov[`ceremony_${ci}_honore`] || 'et seront honorés de votre présence à la cérémonie religieuse qui sera célébrée le'
+  const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
     <CarouselBackground photos={(() => { const p = data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : []); return p.length ? [p[0]] : [] })()} fond={theme.fond} isOriental={isDark}>
       <div style={{ padding: '60px 48px', position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 42, color: theme.accent, textAlign: 'center', marginBottom: 20, lineHeight: 1.2 }}>
-          {data.mariageJuif ? 'Houppa & Soirée' : 'Cérémonie religieuse & Soirée'}
+          {titre}
         </div>
         {data.mariageJuif && (
           <div style={{ marginBottom: 24 }}>
@@ -685,7 +692,7 @@ function CardHouppa({ ceremony, data, theme }: CardProps) {
           </div>
         </div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, textAlign: 'center', color: theme.texte, marginBottom: 24, lineHeight: 1.5 }}>
-          {hasGp ? 'Ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'Ont la joie de vous faire part du mariage de leurs enfants'}
+          {joie}
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 8, marginBottom: 24 }}>
           <div style={{ textAlign: 'center' }}>
@@ -699,22 +706,33 @@ function CardHouppa({ ceremony, data, theme }: CardProps) {
           </div>
         </div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, textAlign: 'center', color: theme.texte, marginBottom: 16, lineHeight: 1.6 }}>
-          et seront honorés de votre présence à la cérémonie religieuse qui sera célébrée le
+          {honore}
         </div>
         <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, color: theme.accent, textAlign: 'center', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>{formatDateFr(ceremony.date)}</div>
         {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 18, color: theme.accent, direction: 'rtl', textAlign: 'center', marginBottom: 16 }}>{hebrewDate}</div>}
         <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 26, color: theme.accent, textAlign: 'center', marginBottom: 16, letterSpacing: 2 }}>{formatHeure(ceremony.heure)}</div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte, lineHeight: 1.6 }}>
-          {ceremony.lieu && <><div>{formatLieu(ceremony.lieu)}</div><div>ainsi qu'à la réception qui suivra</div></>}
+          {lieuDisplay && <><div>{formatLieu(lieuDisplay)}</div><div>ainsi qu'à la réception qui suivra</div></>}
           {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
         </div>
+        {isShared && ceremony.adresse && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20, paddingBottom: 8 }}>
+            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ceremony.adresse)}`} target="_blank" rel="noopener noreferrer"
+              style={{ padding: '10px 24px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textDecoration: 'none' }}>
+              📍 Itinéraire
+            </a>
+          </div>
+        )}
       </div>
     </CarouselBackground>
   )
 }
 
-function CardMairie({ ceremony, data, theme }: CardProps) {
+function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
+  const ov = data.textOverrides ?? {}
+  const ci = cardIdx ?? 0
+  const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
     <CarouselBackground photos={(() => { const p = data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : []); return p.length ? [p[0]] : [] })()} fond={theme.fond} isOriental={isDark}>
       <div style={{ padding: '60px 48px', position: 'relative' }}>
@@ -728,14 +746,14 @@ function CardMairie({ ceremony, data, theme }: CardProps) {
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 72, color: theme.accent, textAlign: 'center', marginBottom: 20, lineHeight: 1 }}>« Oui »</div>
         <div style={{ fontFamily: 'var(--font-playfair-display)', fontWeight: 'bold', fontSize: 20, textAlign: 'center', color: theme.texte, marginBottom: 12 }}>{formatDateFrCap(ceremony.date)}</div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, textAlign: 'center', color: theme.texte, marginBottom: 12, lineHeight: 1.6 }}>
-          <div>à la Mairie {ceremony.lieu}</div>
+          <div>à la Mairie {lieuDisplay}</div>
           {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 6, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
         </div>
         <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, color: theme.accent, textAlign: 'center', marginBottom: 20 }}>{formatHeure(ceremony.heure)}</div>
-        {ceremony.adresse && (
+        {isShared && ceremony.adresse && (
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
             <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ceremony.adresse)}`} target="_blank" rel="noopener noreferrer"
-              style={{ background: theme.accent, color: 'white', padding: '10px 24px', borderRadius: 8, fontSize: 14, textDecoration: 'none' }}>
+              style={{ padding: '10px 24px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textDecoration: 'none' }}>
               📍 Itinéraire
             </a>
           </div>
@@ -757,8 +775,11 @@ function CardMairie({ ceremony, data, theme }: CardProps) {
   )
 }
 
-function CardHenne({ ceremony, data, theme }: CardProps) {
+function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
+  const ov = data.textOverrides ?? {}
+  const ci = cardIdx ?? 0
+  const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
     <CarouselBackground photos={(() => { const p = data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : []); return p.length ? [p[0]] : [] })()} fond={theme.fond} isOriental={isDark}>
       <div style={{ padding: '60px 48px', position: 'relative' }}>
@@ -773,41 +794,61 @@ function CardHenne({ ceremony, data, theme }: CardProps) {
         <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, color: theme.accent, textAlign: 'center', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 12 }}>{formatDateFr(ceremony.date)}</div>
         <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 24, color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{formatHeure(ceremony.heure)}</div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte }}>
-          {ceremony.lieu && <div>{formatLieu(ceremony.lieu)}</div>}
+          {lieuDisplay && <div>{formatLieu(lieuDisplay)}</div>}
           {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
         </div>
+        {isShared && ceremony.adresse && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20, paddingBottom: 8 }}>
+            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ceremony.adresse)}`} target="_blank" rel="noopener noreferrer"
+              style={{ padding: '10px 24px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textDecoration: 'none' }}>
+              📍 Itinéraire
+            </a>
+          </div>
+        )}
       </div>
     </CarouselBackground>
   )
 }
 
-function CardAutre({ ceremony, data, theme }: CardProps) {
+function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const name = ceremony.type === 'Autre' ? (ceremony.customName || 'Événement') : ceremony.type
   const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
+  const ov = data.textOverrides ?? {}
+  const ci = cardIdx ?? 0
+  const titreDisplay = ov[`ceremony_${ci}_titre`] || name
+  const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
     <CarouselBackground photos={(() => { const p = data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : []); return p.length ? [p[0]] : [] })()} fond={theme.fond} isOriental={isDark}>
       <div style={{ padding: '60px 48px', position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
-        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, textAlign: 'center', marginBottom: 20 }}>{name}</div>
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, textAlign: 'center', marginBottom: 20 }}>{titreDisplay}</div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte, lineHeight: 1.7, marginBottom: 28 }}>
-          Rejoignez <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: theme.accent }}>{data.marie1Prenom} & {data.marie2Prenom}</span> pour {name.toLowerCase()}
+          Rejoignez <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: theme.accent }}>{data.marie1Prenom} & {data.marie2Prenom}</span> pour {titreDisplay.toLowerCase()}
         </div>
         <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, color: theme.accent, textAlign: 'center', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 12 }}>{formatDateFr(ceremony.date)}</div>
         <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 24, color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{formatHeure(ceremony.heure)}</div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte }}>
-          {ceremony.lieu && <div>{formatLieu(ceremony.lieu)}</div>}
+          {lieuDisplay && <div>{formatLieu(lieuDisplay)}</div>}
           {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
         </div>
+        {isShared && ceremony.adresse && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20, paddingBottom: 8 }}>
+            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ceremony.adresse)}`} target="_blank" rel="noopener noreferrer"
+              style={{ padding: '10px 24px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textDecoration: 'none' }}>
+              📍 Itinéraire
+            </a>
+          </div>
+        )}
       </div>
     </CarouselBackground>
   )
 }
 
-function renderCard(ceremony: Ceremony, data: FormData, theme: ThemeObj, photoIdx = 0) {
+function renderCard(ceremony: Ceremony, data: FormData, theme: ThemeObj, photoIdx = 0, isShared = false) {
   const photos = data.photosFond ?? []
   const photoFond = photos[photoIdx] ?? photos[photos.length - 1] ?? data.photoFond ?? ''
-  const props = { ceremony, data: { ...data, photoFond }, theme }
+  const props = { ceremony, data: { ...data, photoFond }, theme, isShared, cardIdx: photoIdx }
   if (ceremony.type === 'Mairie') return <CardMairie {...props} />
   if (ceremony.type === 'Cérémonie religieuse / Houppa') return <CardHouppa {...props} />
   if (ceremony.type === 'Henné') return <CardHenne {...props} />
@@ -945,7 +986,7 @@ function ElegantPage2({ data, theme }: { data: FormData; theme: ThemeObj }) {
   )
 }
 
-function ElegantCardsContent({ data, theme }: { data: FormData; theme: ThemeObj }) {
+function ElegantCardsContent({ data, theme, isShared }: { data: FormData; theme: ThemeObj; isShared?: boolean }) {
   const sorted = sortByDate(data.ceremonies)
   const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
   const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
@@ -958,7 +999,7 @@ function ElegantCardsContent({ data, theme }: { data: FormData; theme: ThemeObj 
       {sorted.map((ceremony, i) => (
         <div key={i}>
           <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden' }}>
-            {renderCard(ceremony, data, theme, i)}
+            {renderCard(ceremony, data, theme, i, isShared)}
           </div>
           {i < sorted.length - 1 && <ElegantSeparator color={theme.accent} initial1={i1} initial2={i2} />}
         </div>
@@ -1619,6 +1660,57 @@ function ShareModal({ accent, guestUrl, coupleUrl, onClose }: { accent: string; 
   )
 }
 
+function TextEditModal({ ceremonies, textOverrides, onApply, onClose, theme }: {
+  ceremonies: Ceremony[]
+  textOverrides: Record<string, string>
+  onApply: (overrides: Record<string, string>) => void
+  onClose: () => void
+  theme: ThemeObj
+}) {
+  const [local, setLocal] = useState<Record<string, string>>(textOverrides)
+  const set = (k: string, v: string) => setLocal(prev => ({ ...prev, [k]: v }))
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+      <div style={{ background: 'white', width: '100%', maxWidth: 600, borderRadius: '16px 16px 0 0', maxHeight: '80vh', overflowY: 'auto', padding: '28px 24px 40px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+          <h2 style={{ margin: 0, fontFamily: 'var(--font-playfair-display)', fontSize: 20, color: theme.texte }}>Modifier le texte</h2>
+          <button type="button" onClick={onClose} style={{ ...BTN, background: 'none', border: 'none', fontSize: 22, color: '#9ca3af', padding: 0 }}>✕</button>
+        </div>
+        {ceremonies.map((c, i) => {
+          const name = c.type === 'Autre' ? (c.customName || 'Événement') : c.type
+          const isHouppa = c.type === 'Cérémonie religieuse / Houppa'
+          return (
+            <div key={i} style={{ marginBottom: 28, paddingBottom: 24, borderBottom: i < ceremonies.length - 1 ? `1px solid ${theme.accent}33` : 'none' }}>
+              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: theme.accent, marginBottom: 12 }}>{name}</div>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Titre de la cérémonie</label>
+              <input value={local[`ceremony_${i}_titre`] ?? ''} onChange={e => set(`ceremony_${i}_titre`, e.target.value)} placeholder={name}
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box', marginBottom: 12 }} />
+              {isHouppa && (
+                <>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Phrase &quot;Ont la joie de...&quot;</label>
+                  <textarea value={local[`ceremony_${i}_joie`] ?? ''} onChange={e => set(`ceremony_${i}_joie`, e.target.value)} placeholder="Ont la joie de vous faire part du mariage de leurs enfants"
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 64, marginBottom: 12 }} />
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Phrase &quot;et seront honorés...&quot;</label>
+                  <textarea value={local[`ceremony_${i}_honore`] ?? ''} onChange={e => set(`ceremony_${i}_honore`, e.target.value)} placeholder="et seront honorés de votre présence à la cérémonie qui sera célébrée le"
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 64, marginBottom: 12 }} />
+                </>
+              )}
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Lieu (nom)</label>
+              <input value={local[`ceremony_${i}_lieu`] ?? ''} onChange={e => set(`ceremony_${i}_lieu`, e.target.value)} placeholder={c.lieu || 'Nom du lieu'}
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box' }} />
+            </div>
+          )
+        })}
+        <button type="button" onClick={() => { onApply(local); onClose() }}
+          style={{ ...BTN, width: '100%', padding: '14px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 15, fontWeight: 700, letterSpacing: 1 }}>
+          ✓ Appliquer les modifications
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ── CardsView ─────────────────────────────────────────────────────────────────
 
 function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; onEdit: () => void; onReset: () => void; isShared: boolean; role: string | null }) {
@@ -1632,9 +1724,8 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
 
   const [ytMuted, setYtMuted] = useState(false)
   const ytIframeRef = useRef<HTMLIFrameElement | null>(null)
-  const [editMode, setEditMode] = useState(false)
-  const [editHtmls, setEditHtmls] = useState<Record<number, string>>({})
-  const [savedHtmls, setSavedHtmls] = useState<Record<number, string>>({})
+  const [textOverrides, setTextOverrides] = useState<Record<string, string>>({})
+  const [textEditOpen, setTextEditOpen] = useState(false)
   const [shareModalOpen, setShareModalOpen] = useState(false)
   const [guestUrl, setGuestUrl] = useState<string | null>(null)
   const [coupleUrl, setCoupleUrl] = useState<string | null>(null)
@@ -1657,22 +1748,6 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
     iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args: [] }), '*')
     setYtMuted(m => !m)
   }, [ytMuted])
-
-  const enterEditMode = useCallback(() => {
-    const htmls: Record<number, string> = {}
-    refs.current.forEach((el, i) => { if (el) htmls[i] = el.innerHTML })
-    setEditHtmls(htmls)
-    setEditMode(true)
-  }, [])
-
-  const saveEdits = useCallback(() => {
-    setSavedHtmls(prev => ({ ...prev, ...editHtmls }))
-    setEditMode(false)
-  }, [editHtmls])
-
-  const cancelEdits = useCallback(() => {
-    setEditMode(false)
-  }, [])
 
   const refs = useRef<(HTMLDivElement | null)[]>([])
   const isElegant = data.presentationStyle === 'elegant'
@@ -1747,30 +1822,13 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
         )}
         <div style={{ padding: '40px 20px 80px' }}>
           {isElegant ? (
-            <ElegantCardsContent data={data} theme={theme} />
+            <ElegantCardsContent data={{ ...data, textOverrides }} theme={theme} isShared={isShared} />
           ) : (
             sorted.map((ceremony, i) => (
               <div key={i}>
-                {editMode ? (
-                  <div
-                    ref={el => { refs.current[i] = el }}
-                    contentEditable
-                    suppressContentEditableWarning
-                    dangerouslySetInnerHTML={{ __html: editHtmls[i] ?? '' }}
-                    onInput={e => setEditHtmls(prev => ({ ...prev, [i]: (e.target as HTMLElement).innerHTML }))}
-                    style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden', border: theme.carteBordure, outline: `2px dashed ${theme.accent}`, outlineOffset: 2 }}
-                  />
-                ) : savedHtmls[i] ? (
-                  <div
-                    ref={el => { refs.current[i] = el }}
-                    dangerouslySetInnerHTML={{ __html: savedHtmls[i] }}
-                    style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden', border: theme.carteBordure }}
-                  />
-                ) : (
-                  <div ref={el => { refs.current[i] = el }} style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden', border: theme.carteBordure }}>
-                    {renderCard(ceremony, data, theme, i)}
-                  </div>
-                )}
+                <div ref={el => { refs.current[i] = el }} style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden', border: theme.carteBordure }}>
+                  {renderCard(ceremony, { ...data, textOverrides }, theme, i, isShared)}
+                </div>
                 {i < sorted.length - 1 && (
                   <div style={{ maxWidth: 600, margin: '32px auto', display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{ flex: 1, height: 1, background: theme.accent, opacity: 0.3 }} />
@@ -1809,22 +1867,15 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
           {/* Vue créateur */}
           {!isShared && (
             <div style={{ maxWidth: 600, margin: '40px auto 0' }}>
-              {editMode ? (
-                <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-                  <button onClick={saveEdits} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, background: '#22c55e', color: 'white', border: 'none', fontSize: 14, fontWeight: 700 }}>✅ Valider les modifications</button>
-                  <button onClick={cancelEdits} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: '1px solid #fecdd3', background: 'transparent', color: '#fb7185', fontSize: 14 }}>✕ Annuler</button>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-                  <button onClick={onEdit} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>Modifier</button>
-                  <button onClick={handleShare} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 14 }}>🔗 Partager</button>
-                  {lastShareId && (
-                    <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>📋 Voir les RSVP</button>
-                  )}
-                  {!isElegant && <button onClick={enterEditMode} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>✏️ Modifier le texte</button>}
-                  <button onClick={onReset} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: '1px solid #fecdd3', background: 'transparent', color: '#fb7185', fontSize: 14 }}>Nouveau</button>
-                </div>
-              )}
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <button onClick={onEdit} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>Modifier</button>
+                <button onClick={handleShare} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 14 }}>🔗 Partager</button>
+                {lastShareId && (
+                  <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>📋 Voir les RSVP</button>
+                )}
+                <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>✏️ Modifier le texte</button>
+                <button onClick={onReset} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: '1px solid #fecdd3', background: 'transparent', color: '#fb7185', fontSize: 14 }}>Nouveau</button>
+              </div>
             </div>
           )}
         </div>
@@ -1864,6 +1915,15 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
           onClose={() => setRsvpListOpen(false)}
           shareId={lastShareId}
           ceremonies={sorted}
+        />
+      )}
+      {textEditOpen && (
+        <TextEditModal
+          ceremonies={sorted}
+          textOverrides={textOverrides}
+          onApply={setTextOverrides}
+          onClose={() => setTextEditOpen(false)}
+          theme={theme}
         />
       )}
       {shareModalOpen && guestUrl && coupleUrl && (
