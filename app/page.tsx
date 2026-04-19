@@ -99,7 +99,6 @@ export default function Home() {
         </p>
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 64 }}>
           <a href="/faire-part" style={S.btnPrimary}>Créer mon faire-part</a>
-          <a href="/faire-part?share=demo" style={S.btnOutline}>Voir un exemple</a>
         </div>
         {/* Aperçu carte */}
         <div style={{ maxWidth: 420, margin: '0 auto', transform: 'rotate(-1.5deg)', boxShadow: '0 24px 80px rgba(0,0,0,0.14)', borderRadius: 16, overflow: 'hidden' }}>
