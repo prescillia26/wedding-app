@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import * as XLSX from 'xlsx'
 
 type Theme = 'classique-dore' | 'moderne' | 'champetre' | 'oriental'
 type PresentationStyle = 'photo' | 'elegant'
@@ -1087,42 +1086,23 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
   const totalPresents = entries.reduce((s, e) => s + (e.reponses?.some(r => r.present) ? 1 : 0), 0)
   const totalPersonnes = entries.reduce((s, e) => s + (e.reponses?.filter(r => r.present).reduce((a, r) => a + (r.nbPersonnes || 0), 0) || 0), 0)
 
-  const downloadExcel = () => {
-    const wb = XLSX.utils.book_new()
-
-    // Résumé sheet
-    const resumeRows = ceremonies.map(c => {
-      const nomEvt = getCeremonyName(c)
-      const presentEntries = entries.filter(e => e.reponses?.find(r => r.ceremonie === nomEvt && r.present))
-      const nb = presentEntries.reduce((s, e) => s + (e.reponses?.find(r => r.ceremonie === nomEvt)?.nbPersonnes || 0), 0)
-      return { 'Événement': nomEvt, 'Date': c.date || '', 'Réponses présentes': presentEntries.length, 'Total personnes': nb }
-    })
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(resumeRows), 'Résumé')
-
-    // One sheet per event
-    ceremonies.forEach(c => {
-      const nomEvt = getCeremonyName(c)
-      const rows = entries.map(e => {
-        const rep = e.reponses?.find(r => r.ceremonie === nomEvt)
-        return {
-          'Nom': e.nom,
-          'Email': e.email || '',
-          'Présence': rep ? (rep.present ? 'Présent' : 'Absent') : '—',
-          'Personnes': rep?.present ? rep.nbPersonnes : 0,
-          'Message': e.message || '',
-        }
+  const downloadCSV = () => {
+    const evtNames = ceremonies.map(getCeremonyName)
+    // En-têtes : Nom, Email, Message, puis une colonne Présence + Personnes par événement
+    const headers = ['Nom', 'Email', ...evtNames.flatMap(n => [`${n} - Présence`, `${n} - Personnes`]), 'Message']
+    const csvRows = entries.map(e => {
+      const evtCols = evtNames.flatMap(nom => {
+        const rep = e.reponses?.find(r => r.ceremonie === nom)
+        return [rep ? (rep.present ? 'Présent' : 'Absent') : '—', rep?.present ? String(rep.nbPersonnes) : '0']
       })
-      const presentRows = rows.filter(r => r['Présence'] === 'Présent')
-      rows.push({ 'Nom': 'TOTAL', 'Email': '', 'Présence': `${presentRows.length} présent(s)`, 'Personnes': presentRows.reduce((s, r) => s + (r['Personnes'] as number), 0), 'Message': '' })
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), nomEvt.slice(0, 31))
+      return [e.nom, e.email || '', ...evtCols, e.message || ''].map(v => `"${String(v).replace(/"/g, '""')}"`)
     })
-
-    const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
-    const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const csv = [headers.map(h => `"${h}"`), ...csvRows].map(r => r.join(',')).join('\r\n')
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'rsvp.xlsx'
+    a.download = 'rsvp.csv'
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -1150,8 +1130,8 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
               </div>
             </div>
             <div style={{ textAlign: 'center', marginBottom: 20 }}>
-              <button onClick={downloadExcel} style={{ ...BTN, padding: '10px 24px', borderRadius: 9999, background: '#22c55e', color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: '0 4px 14px rgba(34,197,94,0.35)' }}>
-                Télécharger Excel
+              <button onClick={downloadCSV} style={{ ...BTN, padding: '10px 24px', borderRadius: 9999, background: '#22c55e', color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: '0 4px 14px rgba(34,197,94,0.35)' }}>
+                Télécharger CSV
               </button>
             </div>
           </>
