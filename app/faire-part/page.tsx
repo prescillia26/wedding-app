@@ -73,7 +73,6 @@ interface FormData {
   musicUrl: string
   photoFond: string
   photosFond: string[]
-  logoUrl: string
   emailMaries: string
 }
 
@@ -93,7 +92,7 @@ const defaultFormData: FormData = {
   famille2GpPaPerePrenom: '', famille2GpPaPereNom: '', famille2GpPaMerePrenom: '', famille2GpPaMereNom: '',
   famille2GpMaPerePrenom: '', famille2GpMaPereNom: '', famille2GpMaMerePrenom: '', famille2GpMaMereNom: '',
   ceremonies: [{ ...defaultCeremony }],
-  style: 'classique-dore', presentationStyle: 'photo', mariageJuif: false, youtubeUrl: '', musicUrl: '', photoFond: '', photosFond: [], logoUrl: '', emailMaries: '',
+  style: 'classique-dore', presentationStyle: 'photo', mariageJuif: false, youtubeUrl: '', musicUrl: '', photoFond: '', photosFond: [], emailMaries: '',
 }
 
 // Propriétés mobiles partagées pour tous les boutons
@@ -541,33 +540,6 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         )}
       </div>
       <div style={{ marginTop: 20 }}>
-        <Label>Logo personnalisé (optionnel — PNG transparent recommandé)</Label>
-        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Affiché en haut de chaque carte, max 80px de hauteur</p>
-        {data.logoUrl ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', border: '1px solid #C9A84C44', borderRadius: 10, background: '#fdf5e4' }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={data.logoUrl} alt="" style={{ maxHeight: 60, maxWidth: 120, objectFit: 'contain' }} />
-            <span style={{ flex: 1, fontSize: 12, color: '#4a3728' }}>Logo chargé</span>
-            <button type="button" onClick={() => onChange({ logoUrl: '' })} style={{ ...BTN, background: 'none', border: 'none', color: '#fb7185', fontSize: 13 }}>✕ Supprimer</button>
-          </div>
-        ) : (
-          <label style={{ display: 'block', cursor: 'pointer' }}>
-            <div style={{ border: '2px dashed #C9A84C66', borderRadius: 10, padding: 20, textAlign: 'center' }}>
-              <div style={{ fontSize: 24, marginBottom: 6 }}>🖼️</div>
-              <p style={{ fontSize: 13, color: '#4a3728', margin: 0 }}>Cliquer pour uploader votre logo</p>
-            </div>
-            <input type="file" accept="image/*" onChange={e => {
-              const f = e.target.files?.[0]
-              if (!f) return
-              const r = new FileReader()
-              r.onload = ev => onChange({ logoUrl: ev.target?.result as string ?? '' })
-              r.readAsDataURL(f)
-              e.target.value = ''
-            }} style={{ display: 'none' }} />
-          </label>
-        )}
-      </div>
-      <div style={{ marginTop: 20 }}>
         <Label>Votre email (notifications RSVP)</Label>
         <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Recevez une notification à chaque nouvelle réponse RSVP</p>
         <input type="email" value={data.emailMaries ?? ''} onChange={e => onChange({ emailMaries: e.target.value })} placeholder="marie@exemple.com" style={S.input} />
@@ -810,24 +782,6 @@ function renderCard(ceremony: Ceremony, data: FormData, theme: ThemeObj, photoId
 function LogoOrMonogram({ data, theme }: { data: FormData; theme: ThemeObj }) {
   const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
   const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
-  const isDark = (['oriental', 'bleu-nuit', 'bordeaux'] as Theme[]).includes(data.style)
-  if (data.logoUrl) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={data.logoUrl}
-        alt=""
-        style={{
-          display: 'block',
-          margin: '0 auto 20px',
-          maxHeight: 90,
-          width: 'auto',
-          mixBlendMode: isDark ? 'screen' : 'multiply',
-          filter: 'contrast(1.1)',
-        }}
-      />
-    )
-  }
   return (
     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
       <MonogramSVG initial1={i1} initial2={i2} color={theme.accent} size={110} />
