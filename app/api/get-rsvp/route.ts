@@ -1,20 +1,19 @@
-import { readFile } from 'fs/promises'
-import path from 'path'
+import { Redis } from '@upstash/redis'
 
-const RSVP_DIR = '/tmp/rsvp'
+const redis = new Redis({
+  url: process.env.KV_REST_API_URL!,
+  token: process.env.KV_REST_API_TOKEN!,
+})
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const shareId = searchParams.get('shareId')
     if (!shareId) return Response.json({ error: 'shareId manquant' }, { status: 400 })
-    const file = path.join(RSVP_DIR, `${shareId}.json`)
-    try {
-      const content = await readFile(file, 'utf8')
-      return Response.json(JSON.parse(content))
-    } catch {
-      return Response.json([])
-    }
+
+    const key = `rsvp:${shareId}`
+    const entries = await redis.get<unknown[]>(key) ?? []
+    return Response.json(entries)
   } catch (err) {
     console.error('get-rsvp error:', err)
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })

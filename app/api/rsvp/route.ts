@@ -1,21 +1,21 @@
-import { writeFile, mkdir, readFile } from 'fs/promises'
-import path from 'path'
+import { Redis } from '@upstash/redis'
 
-const RSVP_DIR = '/tmp/rsvp'
+const redis = new Redis({
+  url: process.env.KV_REST_API_URL!,
+  token: process.env.KV_REST_API_TOKEN!,
+})
 
 export async function POST(request: Request) {
   try {
     const data = await request.json()
-    const shareId = data.shareId || 'default'
-    await mkdir(RSVP_DIR, { recursive: true })
-    const file = path.join(RSVP_DIR, `${shareId}.json`)
-    let existing: unknown[] = []
-    try {
-      const content = await readFile(file, 'utf8')
-      existing = JSON.parse(content)
-    } catch { /* fichier inexistant, on commence à zéro */ }
+    const shareId = data.shareId
+    if (!shareId) return Response.json({ error: 'shareId manquant' }, { status: 400 })
+
+    const key = `rsvp:${shareId}`
+    const existing = await redis.get<unknown[]>(key) ?? []
     existing.push(data)
-    await writeFile(file, JSON.stringify(existing, null, 2), 'utf8')
+    await redis.set(key, existing)
+
     return Response.json({ ok: true })
   } catch (err) {
     console.error('rsvp error:', err)

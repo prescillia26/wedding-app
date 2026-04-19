@@ -873,52 +873,62 @@ function ElegantCardsContent({ data, theme }: { data: FormData; theme: ThemeObj 
 
 // ── RSVP ──────────────────────────────────────────────────────────────────────
 
-interface EvenementRSVP {
-  nom: string
+interface RSVPReponse {
+  ceremonie: string
+  date: string
   present: boolean
+  nbPersonnes: number
 }
 
-interface RSVPResponse {
+interface RSVPEntry {
   nom: string
-  nbPersonnes: string
-  evenements?: EvenementRSVP[]
+  email?: string
   message?: string
-  sentAt?: string
+  reponses: RSVPReponse[]
+  sentAt: string
+  shareId?: string
+  mariee1?: string
+  mariee2?: string
 }
 
 function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: { accent: string; onClose: () => void; mariee1: string; mariee2: string; shareId: string | null; ceremonies: Ceremony[] }) {
+  const getCeremonyName = (c: Ceremony) => c.type === 'Autre' ? (c.customName || 'Événement') : c.type
+
+  const [step, setStep] = useState(1)
   const [nom, setNom] = useState('')
-  const [nbPersonnes, setNbPersonnes] = useState('0')
-  const [evenements, setEvenements] = useState<{ nom: string; present: boolean | null }[]>(
-    ceremonies.map(c => ({ nom: c.type === 'Autre' ? (c.customName || 'Événement') : c.type, present: null }))
+  const [email, setEmail] = useState('')
+  const [reponses, setReponses] = useState<{ ceremonie: string; date: string; present: boolean | null; nbPersonnes: number }[]>(
+    ceremonies.map(c => ({ ceremonie: getCeremonyName(c), date: c.date || '', present: null, nbPersonnes: 1 }))
   )
   const [message, setMessage] = useState('')
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const disabled = !nom
+  const setPresent = (i: number, val: boolean) => {
+    setReponses(rs => rs.map((r, idx) => idx === i ? { ...r, present: r.present === val ? null : val } : r))
+  }
 
-  const toggleEvent = (i: number, present: boolean) => {
-    setEvenements(evs => evs.map((e, idx) => idx === i ? { ...e, present: e.present === present ? null : present } : e))
+  const setNbPersonnes = (i: number, delta: number) => {
+    setReponses(rs => rs.map((r, idx) => idx === i ? { ...r, nbPersonnes: Math.max(1, r.nbPersonnes + delta) } : r))
   }
 
   const send = async () => {
-    if (disabled) return
     setLoading(true)
     try {
+      const entry: RSVPEntry = {
+        nom,
+        email: email || undefined,
+        message: message || undefined,
+        reponses: reponses.map(r => ({ ceremonie: r.ceremonie, date: r.date, present: r.present ?? false, nbPersonnes: r.present ? r.nbPersonnes : 0 })),
+        sentAt: new Date().toISOString(),
+        shareId: shareId ?? undefined,
+        mariee1,
+        mariee2,
+      }
       await fetch('/api/rsvp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nom,
-          nbPersonnes,
-          message,
-          shareId,
-          mariee1,
-          mariee2,
-          sentAt: new Date().toISOString(),
-          evenements: evenements.map(e => ({ nom: e.nom, present: e.present ?? false })),
-        }),
+        body: JSON.stringify(entry),
       })
       setSent(true)
     } catch {
@@ -928,84 +938,124 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
     }
   }
 
+  const STEPS = 3
+  const progressPct = (step / STEPS) * 100
+
+  if (sent) {
+    return (
+      <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+        <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)' }} />
+        <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: 48, width: '100%', maxWidth: 420, textAlign: 'center', boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
+          <div style={{ fontSize: 52, marginBottom: 16 }}>🎉</div>
+          <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: accent, marginBottom: 12 }}>
+            Merci {nom.split(' ')[0]} !
+          </div>
+          <p style={{ fontSize: 15, color: '#6a5040', lineHeight: 1.7 }}>
+            Les mariés ont bien reçu votre réponse.
+          </p>
+          <button onClick={onClose} style={{ ...BTN, marginTop: 24, padding: '12px 32px', borderRadius: 9999, background: accent, color: 'white', border: 'none', fontSize: 14, fontWeight: 600 }}>Fermer</button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)' }} />
-      <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: 36, width: '100%', maxWidth: 480, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
+      <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: '32px 36px', width: '100%', maxWidth: 480, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
         <button onClick={onClose} style={{ ...BTN, position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 20, color: '#9ca3af' }}>✕</button>
 
-        {sent ? (
-          <div style={{ textAlign: 'center', padding: '24px 0' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>💌</div>
-            <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: accent, marginBottom: 12 }}>Merci !</div>
-            <p style={{ fontSize: 15, color: '#6a5040', lineHeight: 1.7 }}>
-              Votre réponse a bien été transmise à {mariee1} & {mariee2}.
-            </p>
-            <button onClick={onClose} style={{ ...BTN, marginTop: 24, padding: '12px 32px', borderRadius: 9999, background: accent, color: 'white', border: 'none', fontSize: 14 }}>Fermer</button>
-          </div>
-        ) : (
-          <>
-            <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 24, color: accent, textAlign: 'center', marginBottom: 6 }}>RSVP</div>
-            <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', textAlign: 'center', marginBottom: 28 }}>
-              {mariee1} & {mariee2}
-            </div>
+        <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: accent, textAlign: 'center', marginBottom: 4 }}>RSVP</div>
+        <div style={{ fontSize: 13, color: '#9ca3af', textAlign: 'center', marginBottom: 20 }}>{mariee1} & {mariee2}</div>
 
-            <div style={{ marginBottom: 20 }}>
-              <Label>Prénom et nom</Label>
+        {/* Progress bar */}
+        <div style={{ height: 4, background: '#f3e8ff', borderRadius: 9999, marginBottom: 28, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${progressPct}%`, background: accent, borderRadius: 9999, transition: 'width 0.3s ease' }} />
+        </div>
+
+        {step === 1 && (
+          <>
+            <div style={{ fontSize: 12, color: '#9ca3af', textAlign: 'center', marginBottom: 20, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Étape 1 / 3 — Vos coordonnées</div>
+            <div style={{ marginBottom: 18 }}>
+              <Label>Prénom et nom *</Label>
               <input value={nom} onChange={e => setNom(e.target.value)} placeholder="Marie Dupont" style={S.input} />
             </div>
+            <div style={{ marginBottom: 28 }}>
+              <Label>Email (optionnel)</Label>
+              <input value={email} onChange={e => setEmail(e.target.value)} placeholder="marie@exemple.com" type="email" style={S.input} />
+            </div>
+            <button onClick={() => setStep(2)} disabled={!nom.trim()} style={{
+              ...BTN, width: '100%', padding: '14px 0', borderRadius: 9999, border: 'none',
+              background: !nom.trim() ? '#e5e7eb' : `linear-gradient(135deg, ${accent}, ${accent}cc)`,
+              color: !nom.trim() ? '#9ca3af' : 'white', fontSize: 15, fontWeight: 700,
+              cursor: !nom.trim() ? 'not-allowed' : 'pointer',
+            }}>Suivant →</button>
+          </>
+        )}
 
-            <div style={{ marginBottom: 20 }}>
-              <Label>Votre présence aux événements</Label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 8 }}>
-                {evenements.map((ev, i) => (
-                  <div key={i} style={{ border: `1px solid ${ev.present !== null ? (ev.present ? accent : '#fb7185') : '#fecdd3'}`, borderRadius: 12, padding: '14px 16px', transition: 'border-color 0.2s' }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#4a3728', marginBottom: 10 }}>
-                      {ev.nom}
-                      {ceremonies[i]?.date ? <span style={{ fontWeight: 400, color: '#9ca3af', fontSize: 11 }}> — {formatDateFrCap(ceremonies[i].date)}</span> : null}
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                      <button type="button" onClick={() => toggleEvent(i, true)} style={{
-                        ...BTN,
-                        padding: '10px 8px', borderRadius: 9, fontSize: 13, fontWeight: 600,
-                        border: `2px solid ${ev.present === true ? accent : '#fecdd3'}`,
-                        background: ev.present === true ? accent : 'white',
-                        color: ev.present === true ? 'white' : '#4a3728',
-                      }}>Présent ✓</button>
-                      <button type="button" onClick={() => toggleEvent(i, false)} style={{
-                        ...BTN,
-                        padding: '10px 8px', borderRadius: 9, fontSize: 13, fontWeight: 600,
-                        border: `2px solid ${ev.present === false ? '#fb7185' : '#fecdd3'}`,
-                        background: ev.present === false ? '#fb7185' : 'white',
-                        color: ev.present === false ? 'white' : '#4a3728',
-                      }}>Absent ✗</button>
-                    </div>
+        {step === 2 && (
+          <>
+            <div style={{ fontSize: 12, color: '#9ca3af', textAlign: 'center', marginBottom: 20, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Étape 2 / 3 — Votre présence</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 28 }}>
+              {reponses.map((r, i) => (
+                <div key={i} style={{ border: `1.5px solid ${r.present === true ? accent : r.present === false ? '#fb7185' : '#fecdd3'}`, borderRadius: 14, padding: '14px 16px', transition: 'border-color 0.2s' }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#4a3728', marginBottom: 4 }}>{r.ceremonie}</div>
+                  {r.date && <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>{formatDateFrCap(r.date)}</div>}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: r.present === true ? 12 : 0 }}>
+                    <button type="button" onClick={() => setPresent(i, true)} style={{
+                      ...BTN, padding: '10px 8px', borderRadius: 9, fontSize: 13, fontWeight: 600,
+                      border: `2px solid ${r.present === true ? accent : '#fecdd3'}`,
+                      background: r.present === true ? accent : 'white',
+                      color: r.present === true ? 'white' : '#4a3728',
+                    }}>Présent ✓</button>
+                    <button type="button" onClick={() => setPresent(i, false)} style={{
+                      ...BTN, padding: '10px 8px', borderRadius: 9, fontSize: 13, fontWeight: 600,
+                      border: `2px solid ${r.present === false ? '#fb7185' : '#fecdd3'}`,
+                      background: r.present === false ? '#fb7185' : 'white',
+                      color: r.present === false ? 'white' : '#4a3728',
+                    }}>Absent ✗</button>
                   </div>
-                ))}
-              </div>
+                  {r.present === true && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4 }}>
+                      <span style={{ fontSize: 12, color: '#6a5040' }}>Nb de personnes :</span>
+                      <button type="button" onClick={() => setNbPersonnes(i, -1)} style={{ ...BTN, width: 28, height: 28, borderRadius: 9999, border: `1.5px solid ${accent}44`, background: 'white', color: accent, fontWeight: 700, fontSize: 16, padding: 0 }}>−</button>
+                      <span style={{ fontSize: 15, fontWeight: 700, color: accent, minWidth: 20, textAlign: 'center' }}>{r.nbPersonnes}</span>
+                      <button type="button" onClick={() => setNbPersonnes(i, 1)} style={{ ...BTN, width: 28, height: 28, borderRadius: 9999, border: `1.5px solid ${accent}44`, background: 'white', color: accent, fontWeight: 700, fontSize: 16, padding: 0 }}>+</button>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-
-            <div style={{ marginBottom: 16 }}>
-              <Label>Combien de personnes vous accompagnent ?</Label>
-              <input type="number" min="0" max="10" value={nbPersonnes} onChange={e => setNbPersonnes(e.target.value)} style={S.input} />
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => setStep(1)} style={{ ...BTN, flex: 1, padding: '14px 0', borderRadius: 9999, border: `1.5px solid ${accent}44`, background: 'white', color: accent, fontSize: 14, fontWeight: 600 }}>← Retour</button>
+              <button onClick={() => setStep(3)} style={{ ...BTN, flex: 2, padding: '14px 0', borderRadius: 9999, border: 'none', background: `linear-gradient(135deg, ${accent}, ${accent}cc)`, color: 'white', fontSize: 15, fontWeight: 700 }}>Suivant →</button>
             </div>
+          </>
+        )}
 
+        {step === 3 && (
+          <>
+            <div style={{ fontSize: 12, color: '#9ca3af', textAlign: 'center', marginBottom: 20, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Étape 3 / 3 — Message</div>
             <div style={{ marginBottom: 24 }}>
               <Label>Un petit mot pour les mariés (optionnel)</Label>
-              <textarea value={message} onChange={e => setMessage(e.target.value)} placeholder="Avec toute notre affection..." rows={3} style={{ ...S.input, resize: 'vertical', lineHeight: 1.6 } as React.CSSProperties} />
+              <textarea
+                value={message}
+                onChange={e => e.target.value.length <= 300 && setMessage(e.target.value)}
+                placeholder="Avec toute notre affection..."
+                rows={4}
+                style={{ ...S.input, resize: 'vertical', lineHeight: 1.6 } as React.CSSProperties}
+              />
+              <div style={{ fontSize: 11, color: '#9ca3af', textAlign: 'right', marginTop: 4 }}>{message.length}/300</div>
             </div>
-
-            <button type="button" onClick={send} disabled={disabled || loading} style={{
-              ...BTN,
-              width: '100%', padding: '15px 0', borderRadius: 9999, border: 'none',
-              background: disabled ? '#e5e7eb' : `linear-gradient(135deg, ${accent}, ${accent}cc)`,
-              color: disabled ? '#9ca3af' : 'white',
-              fontSize: 15, fontWeight: 700,
-              cursor: disabled ? 'not-allowed' : 'pointer',
-              boxShadow: disabled ? 'none' : `0 6px 20px ${accent}44`,
-            }}>
-              {loading ? 'Envoi...' : 'Envoyer ma réponse'}
-            </button>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => setStep(2)} style={{ ...BTN, flex: 1, padding: '14px 0', borderRadius: 9999, border: `1.5px solid ${accent}44`, background: 'white', color: accent, fontSize: 14, fontWeight: 600 }}>← Retour</button>
+              <button onClick={send} disabled={loading} style={{
+                ...BTN, flex: 2, padding: '14px 0', borderRadius: 9999, border: 'none',
+                background: `linear-gradient(135deg, ${accent}, ${accent}cc)`,
+                color: 'white', fontSize: 15, fontWeight: 700,
+                boxShadow: `0 6px 20px ${accent}44`,
+              }}>{loading ? 'Envoi...' : 'Envoyer ma réponse'}</button>
+            </div>
           </>
         )}
       </div>
@@ -1014,36 +1064,53 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
 }
 
 function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: string; onClose: () => void; shareId: string | null; ceremonies: Ceremony[] }) {
-  const [responses, setResponses] = useState<RSVPResponse[]>([])
+  const [entries, setEntries] = useState<RSVPEntry[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!shareId) { setLoading(false); return }
     fetch(`/api/get-rsvp?shareId=${shareId}`)
       .then(r => r.json())
-      .then((d: RSVPResponse[]) => setResponses(Array.isArray(d) ? d : []))
-      .catch(() => setResponses([]))
+      .then((d: RSVPEntry[]) => setEntries(Array.isArray(d) ? d : []))
+      .catch(() => setEntries([]))
       .finally(() => setLoading(false))
   }, [shareId])
 
   const getCeremonyName = (c: Ceremony) => c.type === 'Autre' ? (c.customName || 'Événement') : c.type
 
+  const totalPresents = entries.reduce((s, e) => s + (e.reponses?.some(r => r.present) ? 1 : 0), 0)
+  const totalPersonnes = entries.reduce((s, e) => s + (e.reponses?.filter(r => r.present).reduce((a, r) => a + (r.nbPersonnes || 0), 0) || 0), 0)
+
   const downloadExcel = () => {
     const wb = XLSX.utils.book_new()
+
+    // Résumé sheet
+    const resumeRows = ceremonies.map(c => {
+      const nomEvt = getCeremonyName(c)
+      const presentEntries = entries.filter(e => e.reponses?.find(r => r.ceremonie === nomEvt && r.present))
+      const nb = presentEntries.reduce((s, e) => s + (e.reponses?.find(r => r.ceremonie === nomEvt)?.nbPersonnes || 0), 0)
+      return { 'Événement': nomEvt, 'Date': c.date || '', 'Réponses présentes': presentEntries.length, 'Total personnes': nb }
+    })
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(resumeRows), 'Résumé')
+
+    // One sheet per event
     ceremonies.forEach(c => {
       const nomEvt = getCeremonyName(c)
-      const rows = responses.map(r => {
-        const evtResponse = r.evenements?.find(e => e.nom === nomEvt)
-        const present = evtResponse ? (evtResponse.present ? 'Présent' : 'Absent') : '—'
-        const nbTotal = evtResponse?.present ? 1 + (parseInt(r.nbPersonnes) || 0) : 0
-        return { 'Nom': r.nom, 'Présent / Absent': present, 'Nb personnes': nbTotal || '', 'Message': r.message || '' }
+      const rows = entries.map(e => {
+        const rep = e.reponses?.find(r => r.ceremonie === nomEvt)
+        return {
+          'Nom': e.nom,
+          'Email': e.email || '',
+          'Présence': rep ? (rep.present ? 'Présent' : 'Absent') : '—',
+          'Personnes': rep?.present ? rep.nbPersonnes : 0,
+          'Message': e.message || '',
+        }
       })
-      const totalPresents = rows.filter(r => r['Présent / Absent'] === 'Présent').length
-      const totalPersonnes = rows.filter(r => r['Présent / Absent'] === 'Présent').reduce((s, r) => s + (r['Nb personnes'] as number || 0), 0)
-      rows.push({ 'Nom': 'TOTAL', 'Présent / Absent': `${totalPresents} présent(s)`, 'Nb personnes': totalPersonnes, 'Message': '' })
-      const ws = XLSX.utils.json_to_sheet(rows)
-      XLSX.utils.book_append_sheet(wb, ws, nomEvt.slice(0, 31))
+      const presentRows = rows.filter(r => r['Présence'] === 'Présent')
+      rows.push({ 'Nom': 'TOTAL', 'Email': '', 'Présence': `${presentRows.length} présent(s)`, 'Personnes': presentRows.reduce((s, r) => s + (r['Personnes'] as number), 0), 'Message': '' })
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), nomEvt.slice(0, 31))
     })
+
     XLSX.writeFile(wb, 'rsvp.xlsx')
   }
 
@@ -1052,29 +1119,44 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
       <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)' }} />
       <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: 32, width: '100%', maxWidth: 700, maxHeight: '85vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
         <button onClick={onClose} style={{ ...BTN, position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 20, color: '#9ca3af' }}>✕</button>
-        <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: accent, textAlign: 'center', marginBottom: 8 }}>Réponses RSVP</div>
-        {!loading && responses.length > 0 && (
-          <div style={{ textAlign: 'center', marginBottom: 20 }}>
-            <button onClick={downloadExcel} style={{ ...BTN, padding: '10px 24px', borderRadius: 9999, background: '#22c55e', color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: '0 4px 14px rgba(34,197,94,0.35)' }}>
-              📥 Télécharger Excel
-            </button>
-          </div>
+        <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: accent, textAlign: 'center', marginBottom: 20 }}>Réponses RSVP</div>
+
+        {!loading && entries.length > 0 && (
+          <>
+            {/* Summary cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+              <div style={{ borderRadius: 12, padding: '16px 20px', background: `${accent}12`, textAlign: 'center' }}>
+                <div style={{ fontSize: 28, fontWeight: 800, color: accent }}>{entries.length}</div>
+                <div style={{ fontSize: 12, color: '#6a5040', marginTop: 2 }}>Réponse{entries.length > 1 ? 's' : ''} reçue{entries.length > 1 ? 's' : ''}</div>
+              </div>
+              <div style={{ borderRadius: 12, padding: '16px 20px', background: '#f0fdf4', textAlign: 'center' }}>
+                <div style={{ fontSize: 28, fontWeight: 800, color: '#22c55e' }}>{totalPersonnes}</div>
+                <div style={{ fontSize: 12, color: '#6a5040', marginTop: 2 }}>Personne{totalPersonnes > 1 ? 's' : ''} présente{totalPersonnes > 1 ? 's' : ''}</div>
+              </div>
+            </div>
+            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+              <button onClick={downloadExcel} style={{ ...BTN, padding: '10px 24px', borderRadius: 9999, background: '#22c55e', color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: '0 4px 14px rgba(34,197,94,0.35)' }}>
+                Télécharger Excel
+              </button>
+            </div>
+          </>
         )}
+
         <div style={{ overflowY: 'auto', flex: 1 }}>
           {loading ? (
             <div style={{ textAlign: 'center', color: '#9ca3af', padding: 32 }}>Chargement...</div>
-          ) : responses.length === 0 ? (
+          ) : entries.length === 0 ? (
             <div style={{ textAlign: 'center', color: '#9ca3af', padding: 32, fontStyle: 'italic' }}>Aucune réponse pour le moment</div>
           ) : (
             ceremonies.map((c, ci) => {
               const nomEvt = getCeremonyName(c)
-              const tableRows = responses.map(r => {
-                const evtResponse = r.evenements?.find(e => e.nom === nomEvt)
-                return { r, present: evtResponse !== undefined ? evtResponse.present : null }
+              const tableRows = entries.map(e => {
+                const rep = e.reponses?.find(r => r.ceremonie === nomEvt)
+                return { e, present: rep ? rep.present : null, nb: rep?.present ? rep.nbPersonnes : 0 }
               })
               const presentRows = tableRows.filter(x => x.present === true)
               const totalPresents = presentRows.length
-              const totalPersonnes = presentRows.reduce((s, x) => s + 1 + (parseInt(x.r.nbPersonnes) || 0), 0)
+              const totalNb = presentRows.reduce((s, x) => s + (x.nb || 0), 0)
               return (
                 <div key={ci} style={{ marginBottom: 36 }}>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 12, paddingBottom: 10, borderBottom: `2px solid ${accent}33` }}>
@@ -1087,34 +1169,32 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
                         <th style={{ padding: '8px 10px', textAlign: 'left', color: accent, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Nom</th>
                         <th style={{ padding: '8px 10px', textAlign: 'center', color: accent, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Présence</th>
                         <th style={{ padding: '8px 10px', textAlign: 'center', color: accent, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Personnes</th>
+                        <th style={{ padding: '8px 10px', textAlign: 'left', color: accent, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Email</th>
                         <th style={{ padding: '8px 10px', textAlign: 'left', color: accent, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Message</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {tableRows.map(({ r, present }, i) => (
+                      {tableRows.map(({ e, present, nb }, i) => (
                         <tr key={i} style={{ borderBottom: '1px solid #fce7f3', background: i % 2 === 0 ? 'white' : '#fdf8f9' }}>
-                          <td style={{ padding: '10px', color: '#4a3728', fontWeight: 500 }}>{r.nom}</td>
+                          <td style={{ padding: '10px', color: '#4a3728', fontWeight: 500 }}>{e.nom}</td>
                           <td style={{ padding: '10px', textAlign: 'center', fontSize: 16 }}>
-                            {present === true
-                              ? <span style={{ color: '#22c55e', fontWeight: 700 }}>✓</span>
-                              : present === false
-                                ? <span style={{ color: '#fb7185', fontWeight: 700 }}>✗</span>
-                                : <span style={{ color: '#9ca3af' }}>—</span>}
+                            {present === true ? <span style={{ color: '#22c55e', fontWeight: 700 }}>✓</span>
+                              : present === false ? <span style={{ color: '#fb7185', fontWeight: 700 }}>✗</span>
+                              : <span style={{ color: '#9ca3af' }}>—</span>}
                           </td>
-                          <td style={{ padding: '10px', textAlign: 'center', color: '#6a5040' }}>
-                            {present === true ? 1 + (parseInt(r.nbPersonnes) || 0) : '—'}
-                          </td>
-                          <td style={{ padding: '10px', color: '#6a5040', fontStyle: 'italic', fontSize: 13 }}>{r.message || '—'}</td>
+                          <td style={{ padding: '10px', textAlign: 'center', color: '#6a5040' }}>{present === true ? nb : '—'}</td>
+                          <td style={{ padding: '10px', color: '#6a5040', fontSize: 12 }}>{e.email || '—'}</td>
+                          <td style={{ padding: '10px', color: '#6a5040', fontStyle: 'italic', fontSize: 13 }}>{e.message || '—'}</td>
                         </tr>
                       ))}
                     </tbody>
                     <tfoot>
                       <tr style={{ borderTop: `2px solid ${accent}33`, background: `${accent}08` }}>
-                        <td colSpan={2} style={{ padding: '10px 10px', color: '#4a3728', fontWeight: 700, fontSize: 13 }}>
+                        <td colSpan={2} style={{ padding: '10px', color: '#4a3728', fontWeight: 700, fontSize: 13 }}>
                           Total présents : <span style={{ color: accent, fontSize: 15 }}>{totalPresents}</span>
                         </td>
-                        <td style={{ padding: '10px', textAlign: 'center', color: accent, fontWeight: 700, fontSize: 15 }}>{totalPersonnes}</td>
-                        <td />
+                        <td style={{ padding: '10px', textAlign: 'center', color: accent, fontWeight: 700, fontSize: 15 }}>{totalNb}</td>
+                        <td colSpan={2} />
                       </tr>
                     </tfoot>
                   </table>
