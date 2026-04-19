@@ -595,35 +595,43 @@ function MairieIllustration({ color }: { color: string }) {
 type ThemeObj = { fond: string; pageFond: string; accent: string; texte: string; textSecondaire: string; nom: string; carteBordure?: string }
 interface CardProps { ceremony: Ceremony; data: FormData; theme: ThemeObj }
 
-function CarouselBackground({ photos, theme }: { photos: string[]; theme: ThemeObj }) {
-  const [idx, setIdx] = useState(0)
-  const [fading, setFading] = useState(false)
+function CardBackground({ photosFond, fond, isOriental, children }: { photosFond?: string[], fond: string, isOriental: boolean, children: React.ReactNode }) {
+  const photos = (photosFond || []).filter(Boolean)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isTransitioning, setIsTransitioning] = useState(false)
 
   useEffect(() => {
     if (photos.length <= 1) return
-    const interval = setInterval(() => {
-      setFading(true)
+    const timer = setInterval(() => {
+      setIsTransitioning(true)
       setTimeout(() => {
-        setIdx(i => (i + 1) % photos.length)
-        setFading(false)
-      }, 600)
+        setCurrentIndex(prev => (prev + 1) % photos.length)
+        setIsTransitioning(false)
+      }, 500)
     }, 4000)
-    return () => clearInterval(interval)
+    return () => clearInterval(timer)
   }, [photos.length])
 
-  if (!photos.length) return null
-  // Thèmes sombres : fond très sombre → overlay sombre, sinon overlay blanc
-  const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
+  const overlay = isOriental ? 'rgba(26,10,0,0.82)' : 'rgba(255,255,255,0.85)'
+
   return (
-    <>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={photos[idx]}
-        alt=""
-        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: fading ? 0 : 1, transition: 'opacity 0.6s ease' }}
-      />
-      <div style={{ position: 'absolute', inset: 0, background: isDark ? 'rgba(0,0,0,0.82)' : 'rgba(255,255,255,0.85)', opacity: fading ? 0 : 1, transition: 'opacity 0.6s ease' }} />
-    </>
+    <div style={{ position: 'relative', overflow: 'hidden', backgroundColor: fond, minHeight: '100%' }}>
+      {photos.length > 0 && (
+        <div style={{ position: 'absolute', inset: 0, opacity: isTransitioning ? 0 : 1, transition: 'opacity 0.5s ease' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img key={currentIndex} src={photos[currentIndex]} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+          <div style={{ position: 'absolute', inset: 0, backgroundColor: overlay }} />
+        </div>
+      )}
+      {photos.length > 1 && (
+        <div style={{ position: 'absolute', bottom: 12, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6, zIndex: 2 }}>
+          {photos.map((_, i) => (
+            <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: i === currentIndex ? '#C9A84C' : 'rgba(255,255,255,0.5)', transition: 'background 0.3s' }} />
+          ))}
+        </div>
+      )}
+      <div style={{ position: 'relative', zIndex: 1 }}>{children}</div>
+    </div>
   )
 }
 
@@ -636,11 +644,11 @@ function CardHouppa({ ceremony, data, theme }: CardProps) {
   const parents1 = fmtParentsLines(data.famille1PerePrenom, data.famille1PereNom, data.famille1MerePrenom, data.famille1MereNom)
   const parents2 = fmtParentsLines(data.famille2PerePrenom, data.famille2PereNom, data.famille2MerePrenom, data.famille2MereNom)
   const hebrewDate = getHebrewDate(ceremony.date)
+  const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
   return (
-    <div style={{ backgroundColor: theme.fond, padding: '60px 48px', position: 'relative' }}>
-      <CarouselBackground photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} theme={theme} />
-      <div style={{ position: 'relative', zIndex: 1 }}>
-        {data.mariageJuif && <div style={{ position: 'absolute', top: -40, right: 0, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
+    <CardBackground photosFond={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} fond={theme.fond} isOriental={isDark}>
+      <div style={{ padding: '60px 48px', position: 'relative' }}>
+        {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 42, color: theme.accent, textAlign: 'center', marginBottom: 20, lineHeight: 1.2 }}>
           {data.mariageJuif ? 'Houppa & Soirée' : 'Cérémonie religieuse & Soirée'}
@@ -692,18 +700,19 @@ function CardHouppa({ ceremony, data, theme }: CardProps) {
           {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
         </div>
       </div>
-    </div>
+    </CardBackground>
   )
 }
 
 function CardMairie({ ceremony, data, theme }: CardProps) {
+  const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
   return (
-    <div style={{ backgroundColor: theme.fond, padding: '60px 48px', position: 'relative' }}>
-      <CarouselBackground photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} theme={theme} />
-      <div style={{ position: 'relative', zIndex: 1 }}>
-        {data.mariageJuif && <div style={{ position: 'absolute', top: -40, right: 0, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
+    <CardBackground photosFond={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} fond={theme.fond} isOriental={isDark}>
+      <div style={{ padding: '60px 48px', position: 'relative' }}>
+        {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: theme.accent, textAlign: 'center', marginBottom: 20 }}>Mairie</div>
+
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}><MairieIllustration color={theme.accent} /></div>
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(36px, 8vw, 60px)', color: theme.accent, textAlign: 'center', marginBottom: 12, lineHeight: 1.2 }}>{data.marie1Prenom} & {data.marie2Prenom}</div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, textAlign: 'center', color: theme.texte, marginBottom: 8 }}>se diront</div>
@@ -735,16 +744,16 @@ function CardMairie({ ceremony, data, theme }: CardProps) {
           </div>
         )}
       </div>
-    </div>
+    </CardBackground>
   )
 }
 
 function CardHenne({ ceremony, data, theme }: CardProps) {
+  const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
   return (
-    <div style={{ backgroundColor: theme.fond, padding: '60px 48px', position: 'relative' }}>
-      <CarouselBackground photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} theme={theme} />
-      <div style={{ position: 'relative', zIndex: 1 }}>
-        {data.mariageJuif && <div style={{ position: 'absolute', top: -40, right: 0, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
+    <CardBackground photosFond={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} fond={theme.fond} isOriental={isDark}>
+      <div style={{ padding: '60px 48px', position: 'relative' }}>
+        {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, textAlign: 'center', marginBottom: 16 }}>Soirée Henné</div>
         <div style={{ textAlign: 'center', fontSize: 24, letterSpacing: '0.5em', color: theme.accent, marginBottom: 24 }}>❋ ✿ ❀</div>
@@ -759,17 +768,17 @@ function CardHenne({ ceremony, data, theme }: CardProps) {
           {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
         </div>
       </div>
-    </div>
+    </CardBackground>
   )
 }
 
 function CardAutre({ ceremony, data, theme }: CardProps) {
   const name = ceremony.type === 'Autre' ? (ceremony.customName || 'Événement') : ceremony.type
+  const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
   return (
-    <div style={{ backgroundColor: theme.fond, padding: '60px 48px', position: 'relative' }}>
-      <CarouselBackground photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} theme={theme} />
-      <div style={{ position: 'relative', zIndex: 1 }}>
-        {data.mariageJuif && <div style={{ position: 'absolute', top: -40, right: 0, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
+    <CardBackground photosFond={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} fond={theme.fond} isOriental={isDark}>
+      <div style={{ padding: '60px 48px', position: 'relative' }}>
+        {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, textAlign: 'center', marginBottom: 20 }}>{name}</div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte, lineHeight: 1.7, marginBottom: 28 }}>
@@ -782,7 +791,7 @@ function CardAutre({ ceremony, data, theme }: CardProps) {
           {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
         </div>
       </div>
-    </div>
+    </CardBackground>
   )
 }
 
