@@ -854,16 +854,38 @@ function ElegantSeparator({ color, initial1, initial2 }: { color: string; initia
 }
 
 function ElegantPage1({ data, theme }: { data: FormData; theme: ThemeObj }) {
-  const coverPhoto = (data.photosFond ?? [])[0] ?? data.photoFond ?? ''
+  const photos = data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])
+  const [idx, setIdx] = useState(0)
+  const [visible, setVisible] = useState(true)
+
+  useEffect(() => {
+    if (photos.length <= 1) return
+    const interval = setInterval(() => {
+      setVisible(false)
+      setTimeout(() => {
+        setIdx(prev => (prev + 1) % photos.length)
+        setVisible(true)
+      }, 600)
+    }, 4000)
+    return () => clearInterval(interval)
+  }, [photos.length])
+
   return (
     <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', position: 'relative', height: 560 }}>
-      {coverPhoto ? (
+      {photos.length > 0 ? (
         /* eslint-disable-next-line @next/next/no-img-element */
-        <img src={coverPhoto} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <img src={photos[idx]} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease' }} />
       ) : (
         <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(160deg, ${theme.fond}, ${theme.accent}22)` }} />
       )}
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.58) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)' }} />
+      {photos.length > 1 && (
+        <div style={{ position: 'absolute', bottom: 16, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6, zIndex: 10 }}>
+          {photos.map((_, i) => (
+            <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: i === idx ? '#C9A84C' : 'rgba(255,255,255,0.6)', transition: 'background 0.3s' }} />
+          ))}
+        </div>
+      )}
       <div style={{ position: 'absolute', bottom: 44, left: 40, right: 40 }}>
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(44px, 12vw, 76px)', color: 'white', lineHeight: 1.15, textShadow: '0 2px 24px rgba(0,0,0,0.35)' }}>
           {data.marie1Prenom || 'Prénom'}
@@ -912,8 +934,6 @@ function ElegantCardsContent({ data, theme }: { data: FormData; theme: ThemeObj 
   const sorted = sortByDate(data.ceremonies)
   const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
   const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
-  const noPhotoData = { ...data, photoFond: '', photosFond: [] }
-
   return (
     <>
       <ElegantPage1 data={data} theme={theme} />
@@ -923,7 +943,7 @@ function ElegantCardsContent({ data, theme }: { data: FormData; theme: ThemeObj 
       {sorted.map((ceremony, i) => (
         <div key={i}>
           <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden' }}>
-            {renderCard(ceremony, noPhotoData, theme, i)}
+            {renderCard(ceremony, data, theme, i)}
           </div>
           {i < sorted.length - 1 && <ElegantSeparator color={theme.accent} initial1={i1} initial2={i2} />}
         </div>
