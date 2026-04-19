@@ -5,19 +5,19 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 type Theme = 'classique-dore' | 'ivoire-or' | 'blanc-argent' | 'bleu-nuit' | 'bleu-ciel' | 'vert-sauge' | 'rose-poudre' | 'champetre' | 'oriental' | 'bordeaux' | 'ardoise' | 'minimaliste'
 type PresentationStyle = 'photo' | 'elegant'
 
-const THEMES: Record<Theme, { fond: string; accent: string; texte: string; textSecondaire: string; nom: string }> = {
-  'classique-dore': { fond: '#fdf0f3', accent: '#C9A84C', texte: '#4a3728', textSecondaire: '#6a5040', nom: 'Classique doré' },
-  'ivoire-or':      { fond: '#faf6ef', accent: '#b8860b', texte: '#3d3020', textSecondaire: '#6a5040', nom: 'Ivoire & Or' },
-  'blanc-argent':   { fond: '#ffffff', accent: '#9e9e9e', texte: '#2a2a2a', textSecondaire: '#555555', nom: 'Blanc & Argent' },
-  'bleu-nuit':      { fond: '#0f1a2e', accent: '#c9a84c', texte: '#e8e0d0', textSecondaire: '#b0a890', nom: 'Bleu nuit' },
-  'bleu-ciel':      { fond: '#eef4fb', accent: '#4a90c4', texte: '#1a3a5c', textSecondaire: '#4a6a8a', nom: 'Bleu ciel' },
-  'vert-sauge':     { fond: '#f0f4ee', accent: '#7a9e7e', texte: '#2d4a2d', textSecondaire: '#4a6a4a', nom: 'Vert sauge' },
-  'rose-poudre':    { fond: '#fff0f5', accent: '#d4829a', texte: '#5a2d3a', textSecondaire: '#8a5060', nom: 'Rose poudré' },
-  'champetre':      { fond: '#f5f0e8', accent: '#8fad6a', texte: '#3d4a2e', textSecondaire: '#5a6040', nom: 'Champêtre' },
-  'oriental':       { fond: '#1a0a00', accent: '#D4A847', texte: '#f5e6c8', textSecondaire: '#d4c0a0', nom: 'Oriental' },
-  'bordeaux':       { fond: '#2d0a14', accent: '#e8a0b0', texte: '#f5e0e5', textSecondaire: '#d0b0b8', nom: 'Bordeaux' },
-  'ardoise':        { fond: '#f2f4f5', accent: '#546e7a', texte: '#1a2a30', textSecondaire: '#4a6070', nom: 'Ardoise' },
-  'minimaliste':    { fond: '#f8f8f8', accent: '#333333', texte: '#1a1a1a', textSecondaire: '#555555', nom: 'Minimaliste' },
+const THEMES: Record<Theme, ThemeObj> = {
+  'classique-dore': { fond: '#fdf0f3', pageFond: '#f0e8ec', accent: '#C9A84C', texte: '#4a3728', textSecondaire: '#6a5040', nom: 'Classique doré' },
+  'ivoire-or':      { fond: '#faf6ef', pageFond: '#ede8df', accent: '#b8860b', texte: '#3d3020', textSecondaire: '#6a5040', nom: 'Ivoire & Or' },
+  'blanc-argent':   { fond: '#ffffff', pageFond: '#e8e8e8', accent: '#9e9e9e', texte: '#2a2a2a', textSecondaire: '#555555', nom: 'Blanc & Argent' },
+  'bleu-nuit':      { fond: '#0f1a2e', pageFond: '#060e1a', accent: '#c9a84c', texte: '#e8e0d0', textSecondaire: '#b0a890', nom: 'Bleu nuit',  carteBordure: '1px solid rgba(201,168,76,0.4)' },
+  'bleu-ciel':      { fond: '#eef4fb', pageFond: '#dce8f5', accent: '#4a90c4', texte: '#1a3a5c', textSecondaire: '#4a6a8a', nom: 'Bleu ciel' },
+  'vert-sauge':     { fond: '#f0f4ee', pageFond: '#dde5db', accent: '#7a9e7e', texte: '#2d4a2d', textSecondaire: '#4a6a4a', nom: 'Vert sauge' },
+  'rose-poudre':    { fond: '#fff0f5', pageFond: '#f0d8e5', accent: '#d4829a', texte: '#5a2d3a', textSecondaire: '#8a5060', nom: 'Rose poudré' },
+  'champetre':      { fond: '#f5f0e8', pageFond: '#e5dfd0', accent: '#8fad6a', texte: '#3d4a2e', textSecondaire: '#5a6040', nom: 'Champêtre' },
+  'oriental':       { fond: '#1a0a00', pageFond: '#000000', accent: '#D4A847', texte: '#f5e6c8', textSecondaire: '#d4c0a0', nom: 'Oriental',   carteBordure: '1px solid rgba(212,168,71,0.4)' },
+  'bordeaux':       { fond: '#2d0a14', pageFond: '#1a0008', accent: '#e8a0b0', texte: '#f5e0e5', textSecondaire: '#d0b0b8', nom: 'Bordeaux',   carteBordure: '1px solid rgba(232,160,176,0.4)' },
+  'ardoise':        { fond: '#f2f4f5', pageFond: '#dde2e5', accent: '#546e7a', texte: '#1a2a30', textSecondaire: '#4a6070', nom: 'Ardoise' },
+  'minimaliste':    { fond: '#f8f8f8', pageFond: '#e5e5e5', accent: '#333333', texte: '#1a1a1a', textSecondaire: '#555555', nom: 'Minimaliste' },
 }
 
 const CEREMONY_TYPES = ['Mairie', 'Cérémonie religieuse / Houppa', 'Henné', 'Cocktail', 'Soirée', 'Boat Party', 'Autre']
@@ -592,7 +592,7 @@ function MairieIllustration({ color }: { color: string }) {
   )
 }
 
-type ThemeObj = { fond: string; accent: string; texte: string; textSecondaire: string; nom: string }
+type ThemeObj = { fond: string; pageFond: string; accent: string; texte: string; textSecondaire: string; nom: string; carteBordure?: string }
 interface CardProps { ceremony: Ceremony; data: FormData; theme: ThemeObj }
 
 function CarouselBackground({ photos, theme }: { photos: string[]; theme: ThemeObj }) {
@@ -1640,7 +1640,7 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
   }
 
   return (
-    <div style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
+    <div style={{ backgroundColor: theme.pageFond, minHeight: '100vh', color: theme.texte }}>
       {!splashDone && <SplashScreen data={data} theme={theme} onDone={() => setSplashDone(true)} isShared={isShared} onStartMusic={isShared && data.youtubeUrl ? () => { const vid = getYouTubeId(data.youtubeUrl); if (vid) startYoutubeMusic(vid) } : undefined} />}
       {splashDone && <>
         {!isElegant && (
@@ -1663,16 +1663,16 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
                     suppressContentEditableWarning
                     dangerouslySetInnerHTML={{ __html: editHtmls[i] ?? '' }}
                     onInput={e => setEditHtmls(prev => ({ ...prev, [i]: (e.target as HTMLElement).innerHTML }))}
-                    style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden', outline: `2px dashed ${theme.accent}`, outlineOffset: 2 }}
+                    style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden', border: theme.carteBordure, outline: `2px dashed ${theme.accent}`, outlineOffset: 2 }}
                   />
                 ) : savedHtmls[i] ? (
                   <div
                     ref={el => { refs.current[i] = el }}
                     dangerouslySetInnerHTML={{ __html: savedHtmls[i] }}
-                    style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden' }}
+                    style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden', border: theme.carteBordure }}
                   />
                 ) : (
-                  <div ref={el => { refs.current[i] = el }} style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden' }}>
+                  <div ref={el => { refs.current[i] = el }} style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden', border: theme.carteBordure }}>
                     {renderCard(ceremony, data, theme, i)}
                   </div>
                 )}
