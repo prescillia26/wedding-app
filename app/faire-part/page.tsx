@@ -37,18 +37,26 @@ interface FormData {
   famille1PereNom: string
   famille1MerePrenom: string
   famille1MereNom: string
-  famille1GpPaPrenom: string
-  famille1GpPaNomdeFamille: string
-  famille1GpMaPrenom: string
-  famille1GpMaNomdeFamille: string
+  famille1GpPaPerePrenom: string
+  famille1GpPaPereNom: string
+  famille1GpPaMerePrenom: string
+  famille1GpPaMereNom: string
+  famille1GpMaPerePrenom: string
+  famille1GpMaPereNom: string
+  famille1GpMaMerePrenom: string
+  famille1GpMaMereNom: string
   famille2PerePrenom: string
   famille2PereNom: string
   famille2MerePrenom: string
   famille2MereNom: string
-  famille2GpPaPrenom: string
-  famille2GpPaNomdeFamille: string
-  famille2GpMaPrenom: string
-  famille2GpMaNomdeFamille: string
+  famille2GpPaPerePrenom: string
+  famille2GpPaPereNom: string
+  famille2GpPaMerePrenom: string
+  famille2GpPaMereNom: string
+  famille2GpMaPerePrenom: string
+  famille2GpMaPereNom: string
+  famille2GpMaMerePrenom: string
+  famille2GpMaMereNom: string
   ceremonies: Ceremony[]
   style: Theme
   presentationStyle: PresentationStyle
@@ -71,9 +79,11 @@ const defaultFormData: FormData = {
   marie1Prenom: '', marie1Nom: '', marie1Prenom2: '',
   marie2Prenom: '', marie2Nom: '', marie2Prenom2: '',
   famille1PerePrenom: '', famille1PereNom: '', famille1MerePrenom: '', famille1MereNom: '',
-  famille1GpPaPrenom: '', famille1GpPaNomdeFamille: '', famille1GpMaPrenom: '', famille1GpMaNomdeFamille: '',
+  famille1GpPaPerePrenom: '', famille1GpPaPereNom: '', famille1GpPaMerePrenom: '', famille1GpPaMereNom: '',
+  famille1GpMaPerePrenom: '', famille1GpMaPereNom: '', famille1GpMaMerePrenom: '', famille1GpMaMereNom: '',
   famille2PerePrenom: '', famille2PereNom: '', famille2MerePrenom: '', famille2MereNom: '',
-  famille2GpPaPrenom: '', famille2GpPaNomdeFamille: '', famille2GpMaPrenom: '', famille2GpMaNomdeFamille: '',
+  famille2GpPaPerePrenom: '', famille2GpPaPereNom: '', famille2GpPaMerePrenom: '', famille2GpPaMereNom: '',
+  famille2GpMaPerePrenom: '', famille2GpMaPereNom: '', famille2GpMaMerePrenom: '', famille2GpMaMereNom: '',
   ceremonies: [{ ...defaultCeremony }],
   style: 'classique-dore', presentationStyle: 'photo', mariageJuif: false, youtubeUrl: '', musicUrl: '', photoFond: '', photosFond: [], logoUrl: '', emailMaries: '',
 }
@@ -90,9 +100,13 @@ const BTN: React.CSSProperties = {
 function joinName(prenom: string, nom: string) {
   return [prenom, nom].filter(Boolean).join(' ')
 }
-function fmtGpLine(prenom: string, nom: string) {
-  const full = joinName(prenom, nom)
-  return full ? 'M. & Mme ' + full : ''
+function fmtGpCouple(perePrenom: string, pereNom: string, merePrenom: string, mereNom: string): string {
+  const hasPere = perePrenom || pereNom
+  const hasMere = merePrenom || mereNom
+  if (hasPere && hasMere) return 'M. & Mme ' + (pereNom || mereNom)
+  if (hasPere) return ['M.', perePrenom, pereNom].filter(Boolean).join(' ')
+  if (hasMere) return ['Mme', merePrenom, mereNom].filter(Boolean).join(' ')
+  return ''
 }
 function fmtParentsLines(pPrenom: string, pNom: string, mPrenom: string, mNom: string): string[] {
   const pFull = joinName(pPrenom, pNom)
@@ -268,25 +282,46 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
   )
 }
 
+type GpGroupDef = {
+  label: string
+  perePrenom: keyof FormData; pereNom: keyof FormData
+  merePrenom: keyof FormData; mereNom: keyof FormData
+}
+
+function GpGroupFields({ label, data, onChange, perePrenom, pereNom, merePrenom, mereNom }: GpGroupDef & { data: FormData; onChange: (d: Partial<FormData>) => void }) {
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <Label>{label}</Label>
+      <div style={{ fontSize: 10, color: '#C9A84C99', marginTop: -6, marginBottom: 6 }}>Grand-père puis grand-mère (optionnels)</div>
+      <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
+        <input type="text" value={data[perePrenom] as string} placeholder="Prénom GP" onChange={e => onChange({ [perePrenom]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1, fontSize: 11 }} />
+        <input type="text" value={data[pereNom] as string} placeholder="Nom GP" onChange={e => onChange({ [pereNom]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1, fontSize: 11 }} />
+      </div>
+      <div style={{ display: 'flex', gap: 6 }}>
+        <input type="text" value={data[merePrenom] as string} placeholder="Prénom GM" onChange={e => onChange({ [merePrenom]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1, fontSize: 11 }} />
+        <input type="text" value={data[mereNom] as string} placeholder="Nom GM" onChange={e => onChange({ [mereNom]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1, fontSize: 11 }} />
+      </div>
+    </div>
+  )
+}
+
 function Step2({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
-  const cols = [
+  const cols: Array<{ title: string; gps: GpGroupDef[]; pereKey: keyof FormData; pereNomKey: keyof FormData; mereKey: keyof FormData; mereNomKey: keyof FormData }> = [
     {
       title: data.marie1Prenom || 'Marié·e 1',
-      groups: [
-        { label: 'Grands-parents paternels', note: 'M. & Mme', prenomKey: 'famille1GpPaPrenom' as keyof FormData, nomKey: 'famille1GpPaNomdeFamille' as keyof FormData, prenomPh: 'Sydney', nomPh: 'Zeitoun' },
-        { label: 'Grands-parents maternels', note: 'M. & Mme', prenomKey: 'famille1GpMaPrenom' as keyof FormData, nomKey: 'famille1GpMaNomdeFamille' as keyof FormData, prenomPh: 'Jacques', nomPh: 'Portugais' },
-        { label: 'Père', note: 'M.', prenomKey: 'famille1PerePrenom' as keyof FormData, nomKey: 'famille1PereNom' as keyof FormData, prenomPh: 'Richard', nomPh: 'Portugais' },
-        { label: 'Mère', note: 'Mme', prenomKey: 'famille1MerePrenom' as keyof FormData, nomKey: 'famille1MereNom' as keyof FormData, prenomPh: 'Marie', nomPh: 'Benchetrit' },
+      gps: [
+        { label: 'GP paternels', perePrenom: 'famille1GpPaPerePrenom', pereNom: 'famille1GpPaPereNom', merePrenom: 'famille1GpPaMerePrenom', mereNom: 'famille1GpPaMereNom' },
+        { label: 'GP maternels', perePrenom: 'famille1GpMaPerePrenom', pereNom: 'famille1GpMaPereNom', merePrenom: 'famille1GpMaMerePrenom', mereNom: 'famille1GpMaMereNom' },
       ],
+      pereKey: 'famille1PerePrenom', pereNomKey: 'famille1PereNom', mereKey: 'famille1MerePrenom', mereNomKey: 'famille1MereNom',
     },
     {
       title: data.marie2Prenom || 'Marié·e 2',
-      groups: [
-        { label: 'Grands-parents paternels', note: 'M. & Mme', prenomKey: 'famille2GpPaPrenom' as keyof FormData, nomKey: 'famille2GpPaNomdeFamille' as keyof FormData, prenomPh: 'Georges', nomPh: 'Dupont' },
-        { label: 'Grands-parents maternels', note: 'M. & Mme', prenomKey: 'famille2GpMaPrenom' as keyof FormData, nomKey: 'famille2GpMaNomdeFamille' as keyof FormData, prenomPh: 'André', nomPh: 'Leroy' },
-        { label: 'Père', note: 'M.', prenomKey: 'famille2PerePrenom' as keyof FormData, nomKey: 'famille2PereNom' as keyof FormData, prenomPh: 'Paul', nomPh: 'Dupont' },
-        { label: 'Mère', note: 'Mme', prenomKey: 'famille2MerePrenom' as keyof FormData, nomKey: 'famille2MereNom' as keyof FormData, prenomPh: 'Claire', nomPh: 'Dupont' },
+      gps: [
+        { label: 'GP paternels', perePrenom: 'famille2GpPaPerePrenom', pereNom: 'famille2GpPaPereNom', merePrenom: 'famille2GpPaMerePrenom', mereNom: 'famille2GpPaMereNom' },
+        { label: 'GP maternels', perePrenom: 'famille2GpMaPerePrenom', pereNom: 'famille2GpMaPereNom', merePrenom: 'famille2GpMaMerePrenom', mereNom: 'famille2GpMaMereNom' },
       ],
+      pereKey: 'famille2PerePrenom', pereNomKey: 'famille2PereNom', mereKey: 'famille2MerePrenom', mereNomKey: 'famille2MereNom',
     },
   ]
   return (
@@ -296,16 +331,23 @@ function Step2({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         {cols.map((col, ci) => (
           <div key={ci}>
             <div style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'center', marginBottom: 12 }}>{col.title}</div>
-            {col.groups.map(g => (
-              <div key={String(g.prenomKey)} style={{ marginBottom: 14 }}>
-                <Label>{g.label}</Label>
-                <p style={{ fontSize: 10, color: '#C9A84C99', marginTop: -6, marginBottom: 4 }}>Le titre <strong>{g.note}</strong> sera ajouté automatiquement</p>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <input type="text" value={data[g.prenomKey] as string} placeholder={g.prenomPh} onChange={e => onChange({ [g.prenomKey]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1 }} />
-                  <input type="text" value={data[g.nomKey] as string} placeholder={g.nomPh} onChange={e => onChange({ [g.nomKey]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1 }} />
-                </div>
-              </div>
+            {col.gps.map(g => (
+              <GpGroupFields key={g.label + ci} {...g} data={data} onChange={onChange} />
             ))}
+            <div style={{ marginBottom: 14 }}>
+              <Label>Père</Label>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <input type="text" value={data[col.pereKey] as string} placeholder="Prénom" onChange={e => onChange({ [col.pereKey]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1 }} />
+                <input type="text" value={data[col.pereNomKey] as string} placeholder="Nom" onChange={e => onChange({ [col.pereNomKey]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1 }} />
+              </div>
+            </div>
+            <div style={{ marginBottom: 14 }}>
+              <Label>Mère</Label>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <input type="text" value={data[col.mereKey] as string} placeholder="Prénom" onChange={e => onChange({ [col.mereKey]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1 }} />
+                <input type="text" value={data[col.mereNomKey] as string} placeholder="Nom" onChange={e => onChange({ [col.mereNomKey]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1 }} />
+              </div>
+            </div>
           </div>
         ))}
       </div>
@@ -588,10 +630,10 @@ function CarouselBackground({ photos, theme }: { photos: string[]; theme: ThemeO
 }
 
 function CardHouppa({ ceremony, data, theme }: CardProps) {
-  const gpPa1 = fmtGpLine(data.famille1GpPaPrenom, data.famille1GpPaNomdeFamille)
-  const gpMa1 = fmtGpLine(data.famille1GpMaPrenom, data.famille1GpMaNomdeFamille)
-  const gpPa2 = fmtGpLine(data.famille2GpPaPrenom, data.famille2GpPaNomdeFamille)
-  const gpMa2 = fmtGpLine(data.famille2GpMaPrenom, data.famille2GpMaNomdeFamille)
+  const gpPa1 = fmtGpCouple(data.famille1GpPaPerePrenom, data.famille1GpPaPereNom, data.famille1GpPaMerePrenom, data.famille1GpPaMereNom)
+  const gpMa1 = fmtGpCouple(data.famille1GpMaPerePrenom, data.famille1GpMaPereNom, data.famille1GpMaMerePrenom, data.famille1GpMaMereNom)
+  const gpPa2 = fmtGpCouple(data.famille2GpPaPerePrenom, data.famille2GpPaPereNom, data.famille2GpPaMerePrenom, data.famille2GpPaMereNom)
+  const gpMa2 = fmtGpCouple(data.famille2GpMaPerePrenom, data.famille2GpMaPereNom, data.famille2GpMaMerePrenom, data.famille2GpMaMereNom)
   const hasGp = gpPa1 || gpMa1 || gpPa2 || gpMa2
   const parents1 = fmtParentsLines(data.famille1PerePrenom, data.famille1PereNom, data.famille1MerePrenom, data.famille1MereNom)
   const parents2 = fmtParentsLines(data.famille2PerePrenom, data.famille2PereNom, data.famille2MerePrenom, data.famille2MereNom)
