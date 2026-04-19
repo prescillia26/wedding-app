@@ -1117,7 +1117,16 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), nomEvt.slice(0, 31))
     })
 
-    XLSX.writeFile(wb, 'rsvp.xlsx')
+    const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+    const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'rsvp.xlsx'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
   }
 
   return (
@@ -1505,8 +1514,7 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
   const [rsvpOpen, setRsvpOpen] = useState(false)
   const [rsvpListOpen, setRsvpListOpen] = useState(false)
   const [lastShareId, setLastShareId] = useState<string | null>(null)
-  const [shareFeedback, setShareFeedback] = useState(false)
-  const [shareUrl, setShareUrl] = useState<string | null>(null)
+
   const [ytMuted, setYtMuted] = useState(false)
   const ytIframeRef = useRef<HTMLIFrameElement | null>(null)
   const [editMode, setEditMode] = useState(false)
@@ -1602,7 +1610,6 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
       const base = window.location.origin + '/faire-part?share=' + id
       const guest = base + '&role=guest'
       const couple = base + '&role=couple'
-      setShareUrl(guest)
       setGuestUrl(guest)
       setCoupleUrl(couple)
       setShareModalOpen(true)
