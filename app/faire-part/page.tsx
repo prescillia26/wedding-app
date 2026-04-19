@@ -103,7 +103,7 @@ function joinName(prenom: string, nom: string) {
 function fmtGpCouple(perePrenom: string, pereNom: string, merePrenom: string, mereNom: string): string {
   const hasPere = perePrenom || pereNom
   const hasMere = merePrenom || mereNom
-  if (hasPere && hasMere) return 'M. & Mme ' + (pereNom || mereNom)
+  if (hasPere && hasMere) return ['M. & Mme', perePrenom, pereNom || mereNom].filter(Boolean).join(' ')
   if (hasPere) return ['M.', perePrenom, pereNom].filter(Boolean).join(' ')
   if (hasMere) return ['Mme', merePrenom, mereNom].filter(Boolean).join(' ')
   return ''
