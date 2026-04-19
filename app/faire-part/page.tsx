@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import * as XLSX from 'xlsx'
 
 type Theme = 'classique-dore' | 'moderne' | 'champetre' | 'oriental'
 type PresentationStyle = 'photo' | 'elegant'
@@ -33,14 +34,22 @@ interface FormData {
   marie2Prenom: string
   marie2Nom: string
   marie2Prenom2: string
-  famille1Pere: string
-  famille1Mere: string
-  famille1GpPaternels: string
-  famille1GpMaternels: string
-  famille2Pere: string
-  famille2Mere: string
-  famille2GpPaternels: string
-  famille2GpMaternels: string
+  famille1PerePrenom: string
+  famille1PereNom: string
+  famille1MerePrenom: string
+  famille1MereNom: string
+  famille1GpPaPrenom: string
+  famille1GpPaNomdeFamille: string
+  famille1GpMaPrenom: string
+  famille1GpMaNomdeFamille: string
+  famille2PerePrenom: string
+  famille2PereNom: string
+  famille2MerePrenom: string
+  famille2MereNom: string
+  famille2GpPaPrenom: string
+  famille2GpPaNomdeFamille: string
+  famille2GpMaPrenom: string
+  famille2GpMaNomdeFamille: string
   ceremonies: Ceremony[]
   style: Theme
   presentationStyle: PresentationStyle
@@ -60,8 +69,10 @@ const defaultCeremony: Ceremony = {
 const defaultFormData: FormData = {
   marie1Prenom: '', marie1Nom: '', marie1Prenom2: '',
   marie2Prenom: '', marie2Nom: '', marie2Prenom2: '',
-  famille1Pere: '', famille1Mere: '', famille1GpPaternels: '', famille1GpMaternels: '',
-  famille2Pere: '', famille2Mere: '', famille2GpPaternels: '', famille2GpMaternels: '',
+  famille1PerePrenom: '', famille1PereNom: '', famille1MerePrenom: '', famille1MereNom: '',
+  famille1GpPaPrenom: '', famille1GpPaNomdeFamille: '', famille1GpMaPrenom: '', famille1GpMaNomdeFamille: '',
+  famille2PerePrenom: '', famille2PereNom: '', famille2MerePrenom: '', famille2MereNom: '',
+  famille2GpPaPrenom: '', famille2GpPaNomdeFamille: '', famille2GpMaPrenom: '', famille2GpMaNomdeFamille: '',
   ceremonies: [{ ...defaultCeremony }],
   style: 'classique-dore', presentationStyle: 'photo', mariageJuif: false, youtubeUrl: '', musicUrl: '', photoFond: '', photosFond: [],
 }
@@ -73,32 +84,22 @@ const BTN: React.CSSProperties = {
   cursor: 'pointer',
 }
 
-// ── Formatage automatique des titres famille ───────────────────────────────────
+// ── Formatage affichage famille ────────────────────────────────────────────────
 
-function hasTitle(s: string) {
-  return /^(M\.|Mme|M\s*&|Dr\.?|Me\s|Rav)/i.test(s.trim())
+function joinName(prenom: string, nom: string) {
+  return [prenom, nom].filter(Boolean).join(' ')
 }
-function lastWord(s: string) {
-  return s.trim().split(/\s+/).pop() ?? s.trim()
+function fmtGpLine(prenom: string, nom: string) {
+  const full = joinName(prenom, nom)
+  return full ? 'M. & Mme ' + full : ''
 }
-function fmtPere(s: string) {
-  return s && !hasTitle(s) ? 'M. ' + s : s
-}
-function fmtMere(s: string) {
-  return s && !hasTitle(s) ? 'Mme ' + s : s
-}
-function fmtGp(s: string) {
-  return s && !hasTitle(s) ? 'M. & Mme ' + s : s
-}
-function fmtParents(pere: string, mere: string): string[] {
-  if (!pere && !mere) return []
-  if (pere && mere && !hasTitle(pere) && !hasTitle(mere) && lastWord(pere) === lastWord(mere)) {
-    return ['M. & Mme ' + lastWord(pere)]
-  }
-  const lines: string[] = []
-  if (pere) lines.push(fmtPere(pere))
-  if (mere) lines.push(fmtMere(mere))
-  return lines
+function fmtParentsLines(pPrenom: string, pNom: string, mPrenom: string, mNom: string): string[] {
+  const pFull = joinName(pPrenom, pNom)
+  const mFull = joinName(mPrenom, mNom)
+  if (pFull && mFull) return ['M. & Mme ' + pFull]
+  if (pFull) return ['M. ' + pFull]
+  if (mFull) return ['Mme ' + mFull]
+  return []
 }
 
 function compressBase64(base64: string, maxDim = 1200, quality = 0.72): Promise<string> {
@@ -267,31 +268,41 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
 }
 
 function Step2({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
+  const cols = [
+    {
+      title: data.marie1Prenom || 'Marié·e 1',
+      groups: [
+        { label: 'Grands-parents paternels', note: 'M. & Mme', prenomKey: 'famille1GpPaPrenom' as keyof FormData, nomKey: 'famille1GpPaNomdeFamille' as keyof FormData, prenomPh: 'Sydney', nomPh: 'Zeitoun' },
+        { label: 'Grands-parents maternels', note: 'M. & Mme', prenomKey: 'famille1GpMaPrenom' as keyof FormData, nomKey: 'famille1GpMaNomdeFamille' as keyof FormData, prenomPh: 'Jacques', nomPh: 'Portugais' },
+        { label: 'Père', note: 'M.', prenomKey: 'famille1PerePrenom' as keyof FormData, nomKey: 'famille1PereNom' as keyof FormData, prenomPh: 'Richard', nomPh: 'Portugais' },
+        { label: 'Mère', note: 'Mme', prenomKey: 'famille1MerePrenom' as keyof FormData, nomKey: 'famille1MereNom' as keyof FormData, prenomPh: 'Marie', nomPh: 'Benchetrit' },
+      ],
+    },
+    {
+      title: data.marie2Prenom || 'Marié·e 2',
+      groups: [
+        { label: 'Grands-parents paternels', note: 'M. & Mme', prenomKey: 'famille2GpPaPrenom' as keyof FormData, nomKey: 'famille2GpPaNomdeFamille' as keyof FormData, prenomPh: 'Georges', nomPh: 'Dupont' },
+        { label: 'Grands-parents maternels', note: 'M. & Mme', prenomKey: 'famille2GpMaPrenom' as keyof FormData, nomKey: 'famille2GpMaNomdeFamille' as keyof FormData, prenomPh: 'André', nomPh: 'Leroy' },
+        { label: 'Père', note: 'M.', prenomKey: 'famille2PerePrenom' as keyof FormData, nomKey: 'famille2PereNom' as keyof FormData, prenomPh: 'Paul', nomPh: 'Dupont' },
+        { label: 'Mère', note: 'Mme', prenomKey: 'famille2MerePrenom' as keyof FormData, nomKey: 'famille2MereNom' as keyof FormData, prenomPh: 'Claire', nomPh: 'Dupont' },
+      ],
+    },
+  ]
   return (
     <div>
       <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#4a3728', marginBottom: 24 }}>Les familles</h2>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-        {[
-          { title: data.marie1Prenom || 'Marié·e 1', fields: [
-            { label: 'Père', value: data.famille1Pere, key: 'famille1Pere', placeholder: 'Richard Portugais', note: 'M.' },
-            { label: 'Mère', value: data.famille1Mere, key: 'famille1Mere', placeholder: 'Marie Benchetrit', note: 'Mme' },
-            { label: 'GP paternels', value: data.famille1GpPaternels, key: 'famille1GpPaternels', placeholder: 'Sydney Zeitoun', note: 'M. & Mme' },
-            { label: 'GP maternels', value: data.famille1GpMaternels, key: 'famille1GpMaternels', placeholder: 'Jacques Portugais', note: 'M. & Mme' },
-          ]},
-          { title: data.marie2Prenom || 'Marié·e 2', fields: [
-            { label: 'Père', value: data.famille2Pere, key: 'famille2Pere', placeholder: 'Paul Dupont', note: 'M.' },
-            { label: 'Mère', value: data.famille2Mere, key: 'famille2Mere', placeholder: 'Claire Dupont', note: 'Mme' },
-            { label: 'GP paternels', value: data.famille2GpPaternels, key: 'famille2GpPaternels', placeholder: 'Georges Dupont', note: 'M. & Mme' },
-            { label: 'GP maternels', value: data.famille2GpMaternels, key: 'famille2GpMaternels', placeholder: 'André Leroy', note: 'M. & Mme' },
-          ]},
-        ].map((col, ci) => (
+        {cols.map((col, ci) => (
           <div key={ci}>
             <div style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'center', marginBottom: 12 }}>{col.title}</div>
-            {col.fields.map(f => (
-              <div key={f.key} style={{ marginBottom: 12 }}>
-                <Label>{f.label}</Label>
-                <input type="text" value={f.value} placeholder={f.placeholder} onChange={e => onChange({ [f.key]: e.target.value } as Partial<FormData>)} style={S.input} />
-                <p style={{ fontSize: 10, color: '#C9A84C99', marginTop: 3 }}>Le titre <strong>{f.note}</strong> sera ajouté automatiquement</p>
+            {col.groups.map(g => (
+              <div key={String(g.prenomKey)} style={{ marginBottom: 14 }}>
+                <Label>{g.label}</Label>
+                <p style={{ fontSize: 10, color: '#C9A84C99', marginTop: -6, marginBottom: 4 }}>Le titre <strong>{g.note}</strong> sera ajouté automatiquement</p>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input type="text" value={data[g.prenomKey] as string} placeholder={g.prenomPh} onChange={e => onChange({ [g.prenomKey]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1 }} />
+                  <input type="text" value={data[g.nomKey] as string} placeholder={g.nomPh} onChange={e => onChange({ [g.nomKey]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1 }} />
+                </div>
               </div>
             ))}
           </div>
@@ -785,28 +796,41 @@ function ElegantCardsContent({ data, theme }: { data: FormData; theme: ThemeObj 
 
 // ── RSVP ──────────────────────────────────────────────────────────────────────
 
+interface EvenementRSVP {
+  nom: string
+  present: boolean
+}
+
 interface RSVPData {
   nom: string
   nbPersonnes: string
-  presence: boolean | null
-  evenements: string[]
+  evenements: { nom: string; present: boolean | null }[]
   message: string
 }
 
 interface RSVPResponse {
   nom: string
-  presence: boolean | null
   nbPersonnes: string
+  evenements?: EvenementRSVP[]
   message?: string
   sentAt?: string
 }
 
 function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: { accent: string; onClose: () => void; mariee1: string; mariee2: string; shareId: string | null; ceremonies: Ceremony[] }) {
-  const [rsvp, setRsvp] = useState<RSVPData>({ nom: '', nbPersonnes: '0', presence: null, evenements: [], message: '' })
+  const [nom, setNom] = useState('')
+  const [nbPersonnes, setNbPersonnes] = useState('0')
+  const [evenements, setEvenements] = useState<{ nom: string; present: boolean | null }[]>(
+    ceremonies.map(c => ({ nom: c.type === 'Autre' ? (c.customName || 'Événement') : c.type, present: null }))
+  )
+  const [message, setMessage] = useState('')
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const disabled = !rsvp.nom || rsvp.presence === null
+  const disabled = !nom
+
+  const toggleEvent = (i: number, present: boolean) => {
+    setEvenements(evs => evs.map((e, idx) => idx === i ? { ...e, present: e.present === present ? null : present } : e))
+  }
 
   const send = async () => {
     if (disabled) return
@@ -815,7 +839,16 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
       await fetch('/api/rsvp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...rsvp, mariee1, mariee2, shareId, sentAt: new Date().toISOString() }),
+        body: JSON.stringify({
+          nom,
+          nbPersonnes,
+          message,
+          shareId,
+          mariee1,
+          mariee2,
+          sentAt: new Date().toISOString(),
+          evenements: evenements.map(e => ({ nom: e.nom, present: e.present ?? false })),
+        }),
       })
       setSent(true)
     } catch {
@@ -828,7 +861,7 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)' }} />
-      <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: 36, width: '100%', maxWidth: 480, boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
+      <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: 36, width: '100%', maxWidth: 480, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
         <button onClick={onClose} style={{ ...BTN, position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 20, color: '#9ca3af' }}>✕</button>
 
         {sent ? (
@@ -847,65 +880,49 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
               {mariee1} & {mariee2}
             </div>
 
-            <div style={{ marginBottom: 16 }}>
+            <div style={{ marginBottom: 20 }}>
               <Label>Prénom et nom</Label>
-              <input value={rsvp.nom} onChange={e => setRsvp(r => ({ ...r, nom: e.target.value }))} placeholder="Marie Dupont" style={S.input} />
+              <input value={nom} onChange={e => setNom(e.target.value)} placeholder="Marie Dupont" style={S.input} />
             </div>
 
             <div style={{ marginBottom: 20 }}>
-              <Label>Votre réponse</Label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                <button type="button" onClick={() => setRsvp(r => ({ ...r, presence: true }))} style={{
-                  ...BTN,
-                  padding: '14px 12px', borderRadius: 12, fontSize: 13, fontWeight: 600,
-                  border: `2px solid ${rsvp.presence === true ? accent : '#fecdd3'}`,
-                  background: rsvp.presence === true ? accent : 'white',
-                  color: rsvp.presence === true ? 'white' : '#4a3728',
-                }}>
-                  Je serai présent(e) ✓
-                </button>
-                <button type="button" onClick={() => setRsvp(r => ({ ...r, presence: false }))} style={{
-                  ...BTN,
-                  padding: '14px 12px', borderRadius: 12, fontSize: 13, fontWeight: 600,
-                  border: `2px solid ${rsvp.presence === false ? '#fb7185' : '#fecdd3'}`,
-                  background: rsvp.presence === false ? '#fb7185' : 'white',
-                  color: rsvp.presence === false ? 'white' : '#4a3728',
-                }}>
-                  Je ne pourrai pas être là ✗
-                </button>
+              <Label>Votre présence aux événements</Label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 8 }}>
+                {evenements.map((ev, i) => (
+                  <div key={i} style={{ border: `1px solid ${ev.present !== null ? (ev.present ? accent : '#fb7185') : '#fecdd3'}`, borderRadius: 12, padding: '14px 16px', transition: 'border-color 0.2s' }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#4a3728', marginBottom: 10 }}>
+                      {ev.nom}
+                      {ceremonies[i]?.date ? <span style={{ fontWeight: 400, color: '#9ca3af', fontSize: 11 }}> — {formatDateFrCap(ceremonies[i].date)}</span> : null}
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                      <button type="button" onClick={() => toggleEvent(i, true)} style={{
+                        ...BTN,
+                        padding: '10px 8px', borderRadius: 9, fontSize: 13, fontWeight: 600,
+                        border: `2px solid ${ev.present === true ? accent : '#fecdd3'}`,
+                        background: ev.present === true ? accent : 'white',
+                        color: ev.present === true ? 'white' : '#4a3728',
+                      }}>Présent ✓</button>
+                      <button type="button" onClick={() => toggleEvent(i, false)} style={{
+                        ...BTN,
+                        padding: '10px 8px', borderRadius: 9, fontSize: 13, fontWeight: 600,
+                        border: `2px solid ${ev.present === false ? '#fb7185' : '#fecdd3'}`,
+                        background: ev.present === false ? '#fb7185' : 'white',
+                        color: ev.present === false ? 'white' : '#4a3728',
+                      }}>Absent ✗</button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
             <div style={{ marginBottom: 16 }}>
               <Label>Combien de personnes vous accompagnent ?</Label>
-              <input type="number" min="0" max="10" value={rsvp.nbPersonnes} onChange={e => setRsvp(r => ({ ...r, nbPersonnes: e.target.value }))} style={S.input} />
+              <input type="number" min="0" max="10" value={nbPersonnes} onChange={e => setNbPersonnes(e.target.value)} style={S.input} />
             </div>
-
-            {ceremonies.length > 1 && (
-              <div style={{ marginBottom: 16 }}>
-                <Label>À quel(s) événement(s) serez-vous présent(e) ?</Label>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
-                  {ceremonies.map((c, i) => {
-                    const label = c.type === 'Autre' ? (c.customName || 'Événement') : c.type
-                    const key = `${label}${c.date ? ' – ' + formatDateFrCap(c.date) : ''}`
-                    const checked = rsvp.evenements.includes(key)
-                    return (
-                      <label key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: 13, color: '#4a3728', padding: '8px 12px', borderRadius: 8, border: `1px solid ${checked ? accent : '#fecdd3'}`, background: checked ? `${accent}11` : 'white' }}>
-                        <input type="checkbox" checked={checked} onChange={() => setRsvp(r => ({
-                          ...r,
-                          evenements: checked ? r.evenements.filter(e => e !== key) : [...r.evenements, key]
-                        }))} style={{ accentColor: accent }} />
-                        <span>{label}{c.date ? <span style={{ color: '#9ca3af', fontSize: 11 }}> – {formatDateFrCap(c.date)}</span> : null}</span>
-                      </label>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
 
             <div style={{ marginBottom: 24 }}>
               <Label>Un petit mot pour les mariés (optionnel)</Label>
-              <textarea value={rsvp.message} onChange={e => setRsvp(r => ({ ...r, message: e.target.value }))} placeholder="Avec toute notre affection..." rows={3} style={{ ...S.input, resize: 'vertical', lineHeight: 1.6 } as React.CSSProperties} />
+              <textarea value={message} onChange={e => setMessage(e.target.value)} placeholder="Avec toute notre affection..." rows={3} style={{ ...S.input, resize: 'vertical', lineHeight: 1.6 } as React.CSSProperties} />
             </div>
 
             <button type="button" onClick={send} disabled={disabled || loading} style={{
@@ -926,7 +943,7 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
   )
 }
 
-function RSVPListModal({ accent, onClose, shareId }: { accent: string; onClose: () => void; shareId: string | null }) {
+function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: string; onClose: () => void; shareId: string | null; ceremonies: Ceremony[] }) {
   const [responses, setResponses] = useState<RSVPResponse[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -939,47 +956,103 @@ function RSVPListModal({ accent, onClose, shareId }: { accent: string; onClose: 
       .finally(() => setLoading(false))
   }, [shareId])
 
-  const totalPresents = responses.filter(r => r.presence === true).reduce((sum, r) => sum + 1 + (parseInt(r.nbPersonnes) || 0), 0)
+  const getCeremonyName = (c: Ceremony) => c.type === 'Autre' ? (c.customName || 'Événement') : c.type
+
+  const downloadExcel = () => {
+    const wb = XLSX.utils.book_new()
+    ceremonies.forEach(c => {
+      const nomEvt = getCeremonyName(c)
+      const rows = responses.map(r => {
+        const evtResponse = r.evenements?.find(e => e.nom === nomEvt)
+        const present = evtResponse ? (evtResponse.present ? 'Présent' : 'Absent') : '—'
+        const nbTotal = evtResponse?.present ? 1 + (parseInt(r.nbPersonnes) || 0) : 0
+        return { 'Nom': r.nom, 'Présent / Absent': present, 'Nb personnes': nbTotal || '', 'Message': r.message || '' }
+      })
+      const totalPresents = rows.filter(r => r['Présent / Absent'] === 'Présent').length
+      const totalPersonnes = rows.filter(r => r['Présent / Absent'] === 'Présent').reduce((s, r) => s + (r['Nb personnes'] as number || 0), 0)
+      rows.push({ 'Nom': 'TOTAL', 'Présent / Absent': `${totalPresents} présent(s)`, 'Nb personnes': totalPersonnes, 'Message': '' })
+      const ws = XLSX.utils.json_to_sheet(rows)
+      XLSX.utils.book_append_sheet(wb, ws, nomEvt.slice(0, 31))
+    })
+    XLSX.writeFile(wb, 'rsvp.xlsx')
+  }
 
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)' }} />
-      <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: 32, width: '100%', maxWidth: 600, maxHeight: '80vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
+      <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: 32, width: '100%', maxWidth: 700, maxHeight: '85vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
         <button onClick={onClose} style={{ ...BTN, position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 20, color: '#9ca3af' }}>✕</button>
-        <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: accent, textAlign: 'center', marginBottom: 24 }}>Réponses RSVP</div>
+        <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: accent, textAlign: 'center', marginBottom: 8 }}>Réponses RSVP</div>
+        {!loading && responses.length > 0 && (
+          <div style={{ textAlign: 'center', marginBottom: 20 }}>
+            <button onClick={downloadExcel} style={{ ...BTN, padding: '10px 24px', borderRadius: 9999, background: '#22c55e', color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: '0 4px 14px rgba(34,197,94,0.35)' }}>
+              📥 Télécharger Excel
+            </button>
+          </div>
+        )}
         <div style={{ overflowY: 'auto', flex: 1 }}>
           {loading ? (
             <div style={{ textAlign: 'center', color: '#9ca3af', padding: 32 }}>Chargement...</div>
           ) : responses.length === 0 ? (
             <div style={{ textAlign: 'center', color: '#9ca3af', padding: 32, fontStyle: 'italic' }}>Aucune réponse pour le moment</div>
           ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
-              <thead>
-                <tr style={{ borderBottom: `2px solid ${accent}33` }}>
-                  <th style={{ padding: '10px 12px', textAlign: 'left', color: accent, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Nom</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'center', color: accent, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Présence</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'center', color: accent, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Accompagnants</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'left', color: accent, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Message</th>
-                </tr>
-              </thead>
-              <tbody>
-                {responses.map((r, i) => (
-                  <tr key={i} style={{ borderBottom: '1px solid #fce7f3', background: i % 2 === 0 ? 'white' : '#fdf8f9' }}>
-                    <td style={{ padding: '12px', color: '#4a3728', fontWeight: 500 }}>{r.nom}</td>
-                    <td style={{ padding: '12px', textAlign: 'center', fontSize: 18 }}>{r.presence === true ? '✓' : r.presence === false ? '✗' : '—'}</td>
-                    <td style={{ padding: '12px', textAlign: 'center', color: '#6a5040' }}>{r.nbPersonnes || '0'}</td>
-                    <td style={{ padding: '12px', color: '#6a5040', fontStyle: 'italic', fontSize: 13 }}>{r.message || '—'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            ceremonies.map((c, ci) => {
+              const nomEvt = getCeremonyName(c)
+              const tableRows = responses.map(r => {
+                const evtResponse = r.evenements?.find(e => e.nom === nomEvt)
+                return { r, present: evtResponse !== undefined ? evtResponse.present : null }
+              })
+              const presentRows = tableRows.filter(x => x.present === true)
+              const totalPresents = presentRows.length
+              const totalPersonnes = presentRows.reduce((s, x) => s + 1 + (parseInt(x.r.nbPersonnes) || 0), 0)
+              return (
+                <div key={ci} style={{ marginBottom: 36 }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 12, paddingBottom: 10, borderBottom: `2px solid ${accent}33` }}>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{nomEvt}</span>
+                    {c.date && <span style={{ fontSize: 12, color: '#9ca3af' }}>{formatDateFrCap(c.date)}</span>}
+                  </div>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+                    <thead>
+                      <tr style={{ borderBottom: `1px solid ${accent}22` }}>
+                        <th style={{ padding: '8px 10px', textAlign: 'left', color: accent, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Nom</th>
+                        <th style={{ padding: '8px 10px', textAlign: 'center', color: accent, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Présence</th>
+                        <th style={{ padding: '8px 10px', textAlign: 'center', color: accent, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Personnes</th>
+                        <th style={{ padding: '8px 10px', textAlign: 'left', color: accent, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Message</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {tableRows.map(({ r, present }, i) => (
+                        <tr key={i} style={{ borderBottom: '1px solid #fce7f3', background: i % 2 === 0 ? 'white' : '#fdf8f9' }}>
+                          <td style={{ padding: '10px', color: '#4a3728', fontWeight: 500 }}>{r.nom}</td>
+                          <td style={{ padding: '10px', textAlign: 'center', fontSize: 16 }}>
+                            {present === true
+                              ? <span style={{ color: '#22c55e', fontWeight: 700 }}>✓</span>
+                              : present === false
+                                ? <span style={{ color: '#fb7185', fontWeight: 700 }}>✗</span>
+                                : <span style={{ color: '#9ca3af' }}>—</span>}
+                          </td>
+                          <td style={{ padding: '10px', textAlign: 'center', color: '#6a5040' }}>
+                            {present === true ? 1 + (parseInt(r.nbPersonnes) || 0) : '—'}
+                          </td>
+                          <td style={{ padding: '10px', color: '#6a5040', fontStyle: 'italic', fontSize: 13 }}>{r.message || '—'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr style={{ borderTop: `2px solid ${accent}33`, background: `${accent}08` }}>
+                        <td colSpan={2} style={{ padding: '10px 10px', color: '#4a3728', fontWeight: 700, fontSize: 13 }}>
+                          Total présents : <span style={{ color: accent, fontSize: 15 }}>{totalPresents}</span>
+                        </td>
+                        <td style={{ padding: '10px', textAlign: 'center', color: accent, fontWeight: 700, fontSize: 15 }}>{totalPersonnes}</td>
+                        <td />
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              )
+            })
           )}
         </div>
-        {!loading && responses.length > 0 && (
-          <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${accent}33`, textAlign: 'right', color: '#4a3728', fontSize: 14 }}>
-            Total présents (avec accompagnants) : <span style={{ color: accent, fontWeight: 700, fontSize: 16 }}>{totalPresents}</span>
-          </div>
-        )}
       </div>
     </div>
   )
@@ -1435,6 +1508,7 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
           accent={theme.accent}
           onClose={() => setRsvpListOpen(false)}
           shareId={lastShareId}
+          ceremonies={sorted}
         />
       )}
     </div>
