@@ -655,7 +655,7 @@ function CardHouppa({ ceremony, data, theme }: CardProps) {
   const hebrewDate = getHebrewDate(ceremony.date)
   const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
   return (
-    <CarouselBackground photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} fond={theme.fond} isOriental={isDark}>
+    <CarouselBackground photos={(() => { const p = data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : []); return p.length ? [p[0]] : [] })()} fond={theme.fond} isOriental={isDark}>
       <div style={{ padding: '60px 48px', position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
@@ -716,7 +716,7 @@ function CardHouppa({ ceremony, data, theme }: CardProps) {
 function CardMairie({ ceremony, data, theme }: CardProps) {
   const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
   return (
-    <CarouselBackground photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} fond={theme.fond} isOriental={isDark}>
+    <CarouselBackground photos={(() => { const p = data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : []); return p.length ? [p[0]] : [] })()} fond={theme.fond} isOriental={isDark}>
       <div style={{ padding: '60px 48px', position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
@@ -760,7 +760,7 @@ function CardMairie({ ceremony, data, theme }: CardProps) {
 function CardHenne({ ceremony, data, theme }: CardProps) {
   const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
   return (
-    <CarouselBackground photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} fond={theme.fond} isOriental={isDark}>
+    <CarouselBackground photos={(() => { const p = data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : []); return p.length ? [p[0]] : [] })()} fond={theme.fond} isOriental={isDark}>
       <div style={{ padding: '60px 48px', position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
@@ -785,7 +785,7 @@ function CardAutre({ ceremony, data, theme }: CardProps) {
   const name = ceremony.type === 'Autre' ? (ceremony.customName || 'Événement') : ceremony.type
   const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
   return (
-    <CarouselBackground photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} fond={theme.fond} isOriental={isDark}>
+    <CarouselBackground photos={(() => { const p = data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : []); return p.length ? [p[0]] : [] })()} fond={theme.fond} isOriental={isDark}>
       <div style={{ padding: '60px 48px', position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
@@ -855,6 +855,7 @@ function ElegantSeparator({ color, initial1, initial2 }: { color: string; initia
 
 function ElegantPage1({ data, theme }: { data: FormData; theme: ThemeObj }) {
   const photos = data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])
+  const firstDate = sortByDate(data.ceremonies)[0]?.date
   const [idx, setIdx] = useState(0)
   const [visible, setVisible] = useState(true)
 
@@ -871,32 +872,46 @@ function ElegantPage1({ data, theme }: { data: FormData; theme: ThemeObj }) {
   }, [photos.length])
 
   return (
-    <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', position: 'relative', height: 560 }}>
+    <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', position: 'relative', height: 600 }}>
       {photos.length > 0 ? (
         /* eslint-disable-next-line @next/next/no-img-element */
         <img src={photos[idx]} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease' }} />
       ) : (
         <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(160deg, ${theme.fond}, ${theme.accent}22)` }} />
       )}
-      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.58) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)' }} />
+      {/* dégradé sombre uniquement en bas pour lisibilité */}
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.18) 45%, transparent 100%)' }} />
       {photos.length > 1 && (
-        <div style={{ position: 'absolute', bottom: 16, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6, zIndex: 10 }}>
+        <div style={{ position: 'absolute', top: 16, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6, zIndex: 10 }}>
           {photos.map((_, i) => (
-            <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: i === idx ? '#C9A84C' : 'rgba(255,255,255,0.6)', transition: 'background 0.3s' }} />
+            <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: i === idx ? '#C9A84C' : 'rgba(255,255,255,0.5)', transition: 'background 0.3s' }} />
           ))}
         </div>
       )}
-      <div style={{ position: 'absolute', bottom: 44, left: 40, right: 40 }}>
-        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(44px, 12vw, 76px)', color: 'white', lineHeight: 1.15, textShadow: '0 2px 24px rgba(0,0,0,0.35)' }}>
+      <div style={{ position: 'absolute', bottom: 40, left: 40, right: 40, zIndex: 2 }}>
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px, 12vw, 80px)', color: 'white', lineHeight: 1.1, textShadow: '0 2px 20px rgba(0,0,0,0.4)' }}>
           {data.marie1Prenom || 'Prénom'}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '4px 0' }}>
-          <div style={{ width: 48, height: '0.5px', background: 'rgba(255,255,255,0.6)' }} />
-          <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: 'rgba(255,255,255,0.85)' }}>&</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '6px 0' }}>
+          <div style={{ width: 36, height: '0.5px', background: 'rgba(255,255,255,0.55)' }} />
+          <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 28, color: 'rgba(255,255,255,0.8)' }}>&</span>
+          <div style={{ width: 36, height: '0.5px', background: 'rgba(255,255,255,0.55)' }} />
         </div>
-        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(44px, 12vw, 76px)', color: 'white', lineHeight: 1.15, textShadow: '0 2px 24px rgba(0,0,0,0.35)' }}>
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px, 12vw, 80px)', color: 'white', lineHeight: 1.1, textShadow: '0 2px 20px rgba(0,0,0,0.4)' }}>
           {data.marie2Prenom || 'Prénom'}
         </div>
+        {firstDate && (
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '14px 0 10px' }}>
+              <div style={{ flex: 1, height: '0.5px', background: `${theme.accent}99` }} />
+              <span style={{ color: theme.accent, fontSize: 10 }}>✦</span>
+              <div style={{ flex: 1, height: '0.5px', background: `${theme.accent}99` }} />
+            </div>
+            <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 12, color: 'rgba(255,255,255,0.85)', letterSpacing: 4, textTransform: 'uppercase' }}>
+              {formatDateFr(firstDate)}
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
