@@ -2,15 +2,23 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 
-type Theme = 'classique-dore' | 'moderne' | 'champetre' | 'oriental'
+type Theme = 'classique-dore' | 'ivoire-or' | 'blanc-argent' | 'bleu-nuit' | 'bleu-ciel' | 'vert-sauge' | 'rose-poudre' | 'champetre' | 'oriental' | 'bordeaux' | 'ardoise' | 'minimaliste'
 type PresentationStyle = 'photo' | 'elegant'
 
-const THEMES = {
-  'classique-dore': { fond: '#fdf0f3', accent: '#C9A84C', texte: '#4a3728', textSecondaire: '#6a5040' },
-  'moderne': { fond: '#f8f8f8', accent: '#888888', texte: '#1a1a1a', textSecondaire: '#555555' },
-  'champetre': { fond: '#f5f0e8', accent: '#8fad6a', texte: '#3d4a2e', textSecondaire: '#5a6040' },
-  'oriental': { fond: '#1a0a00', accent: '#D4A847', texte: '#f5e6c8', textSecondaire: '#d4c0a0' },
-} as const
+const THEMES: Record<Theme, { fond: string; accent: string; texte: string; textSecondaire: string; nom: string }> = {
+  'classique-dore': { fond: '#fdf0f3', accent: '#C9A84C', texte: '#4a3728', textSecondaire: '#6a5040', nom: 'Classique doré' },
+  'ivoire-or':      { fond: '#faf6ef', accent: '#b8860b', texte: '#3d3020', textSecondaire: '#6a5040', nom: 'Ivoire & Or' },
+  'blanc-argent':   { fond: '#ffffff', accent: '#9e9e9e', texte: '#2a2a2a', textSecondaire: '#555555', nom: 'Blanc & Argent' },
+  'bleu-nuit':      { fond: '#0f1a2e', accent: '#c9a84c', texte: '#e8e0d0', textSecondaire: '#b0a890', nom: 'Bleu nuit' },
+  'bleu-ciel':      { fond: '#eef4fb', accent: '#4a90c4', texte: '#1a3a5c', textSecondaire: '#4a6a8a', nom: 'Bleu ciel' },
+  'vert-sauge':     { fond: '#f0f4ee', accent: '#7a9e7e', texte: '#2d4a2d', textSecondaire: '#4a6a4a', nom: 'Vert sauge' },
+  'rose-poudre':    { fond: '#fff0f5', accent: '#d4829a', texte: '#5a2d3a', textSecondaire: '#8a5060', nom: 'Rose poudré' },
+  'champetre':      { fond: '#f5f0e8', accent: '#8fad6a', texte: '#3d4a2e', textSecondaire: '#5a6040', nom: 'Champêtre' },
+  'oriental':       { fond: '#1a0a00', accent: '#D4A847', texte: '#f5e6c8', textSecondaire: '#d4c0a0', nom: 'Oriental' },
+  'bordeaux':       { fond: '#2d0a14', accent: '#e8a0b0', texte: '#f5e0e5', textSecondaire: '#d0b0b8', nom: 'Bordeaux' },
+  'ardoise':        { fond: '#f2f4f5', accent: '#546e7a', texte: '#1a2a30', textSecondaire: '#4a6070', nom: 'Ardoise' },
+  'minimaliste':    { fond: '#f8f8f8', accent: '#333333', texte: '#1a1a1a', textSecondaire: '#555555', nom: 'Minimaliste' },
+}
 
 const CEREMONY_TYPES = ['Mairie', 'Cérémonie religieuse / Houppa', 'Henné', 'Cocktail', 'Soirée', 'Boat Party', 'Autre']
 
@@ -448,20 +456,21 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       </div>
 
       <Label>Style visuel</Label>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
-        {(Object.entries(THEMES) as [Theme, typeof THEMES[Theme]][]).map(([key, t]) => (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 24 }}>
+        {(Object.entries(THEMES) as [Theme, ThemeObj][]).map(([key, t]) => (
           <button key={key} type="button" onClick={() => onChange({ style: key })} style={{
             ...BTN,
-            padding: 16, borderRadius: 12, border: `2px solid ${data.style === key ? t.accent : '#fecdd3'}`,
-            background: t.fond, textAlign: 'left', position: 'relative',
+            padding: 0, borderRadius: 10,
+            border: `2px solid ${data.style === key ? t.accent : 'transparent'}`,
+            background: 'transparent', textAlign: 'center', overflow: 'hidden',
+            boxShadow: data.style === key ? `0 0 0 1px ${t.accent}` : '0 1px 4px rgba(0,0,0,0.10)',
           }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: t.texte, marginBottom: 4 }}>
-              {{ 'classique-dore': 'Classique doré', 'moderne': 'Moderne', 'champetre': 'Champêtre', 'oriental': 'Oriental' }[key]}
+            <div style={{ background: t.fond, height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontFamily: 'Georgia, serif', fontSize: 22, fontWeight: 700, color: t.accent, fontStyle: 'italic' }}>Aa</span>
             </div>
-            <div style={{ fontSize: 11, color: t.accent }}>✦ Accent</div>
-            {data.style === key && (
-              <div style={{ position: 'absolute', top: 8, right: 8, width: 18, height: 18, borderRadius: '50%', background: t.accent, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>✓</div>
-            )}
+            <div style={{ padding: '5px 4px 6px', background: 'white', fontSize: 10, fontWeight: data.style === key ? 700 : 400, color: data.style === key ? t.accent : '#4a3728', lineHeight: 1.2 }}>
+              {t.nom}
+            </div>
           </button>
         ))}
       </div>
@@ -583,48 +592,37 @@ function MairieIllustration({ color }: { color: string }) {
   )
 }
 
-type ThemeObj = { fond: string; accent: string; texte: string; textSecondaire: string }
+type ThemeObj = { fond: string; accent: string; texte: string; textSecondaire: string; nom: string }
 interface CardProps { ceremony: Ceremony; data: FormData; theme: ThemeObj }
 
 function CarouselBackground({ photos, theme }: { photos: string[]; theme: ThemeObj }) {
   const [idx, setIdx] = useState(0)
   const [fading, setFading] = useState(false)
-  const countRef = useRef(photos.length)
-  countRef.current = photos.length
 
-  // Déclenche le fade-out toutes les 5s
   useEffect(() => {
     if (photos.length <= 1) return
-    const interval = setInterval(() => setFading(true), 5000)
+    const interval = setInterval(() => {
+      setFading(true)
+      setTimeout(() => {
+        setIdx(i => (i + 1) % photos.length)
+        setFading(false)
+      }, 600)
+    }, 4000)
     return () => clearInterval(interval)
   }, [photos.length])
 
-  // Quand fading passe à true : change la photo après la transition, puis fade-in
-  useEffect(() => {
-    if (!fading) return
-    const t = setTimeout(() => {
-      setIdx(i => (i + 1) % countRef.current)
-      setFading(false)
-    }, 450)
-    return () => clearTimeout(t)
-  }, [fading])
-
   if (!photos.length) return null
-  const isDark = theme.fond === '#1a0a00'
+  // Thèmes sombres : fond très sombre → overlay sombre, sinon overlay blanc
+  const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
   return (
     <>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={photos[idx]}
         alt=""
-        style={{
-          position: 'absolute', inset: 0, width: '100%', height: '100%',
-          objectFit: 'cover',
-          opacity: fading ? 0 : 1,
-          transition: 'opacity 0.45s ease',
-        }}
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: fading ? 0 : 1, transition: 'opacity 0.6s ease' }}
       />
-      <div style={{ position: 'absolute', inset: 0, background: isDark ? 'rgba(26,10,0,0.85)' : 'rgba(255,255,255,0.88)' }} />
+      <div style={{ position: 'absolute', inset: 0, background: isDark ? 'rgba(0,0,0,0.82)' : 'rgba(255,255,255,0.85)', opacity: fading ? 0 : 1, transition: 'opacity 0.6s ease' }} />
     </>
   )
 }
