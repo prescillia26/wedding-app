@@ -59,6 +59,7 @@ interface FormData {
   photoFond: string
   photosFond: string[]
   logoUrl: string
+  emailMaries: string
 }
 
 const defaultCeremony: Ceremony = {
@@ -75,7 +76,7 @@ const defaultFormData: FormData = {
   famille2PerePrenom: '', famille2PereNom: '', famille2MerePrenom: '', famille2MereNom: '',
   famille2GpPaPrenom: '', famille2GpPaNomdeFamille: '', famille2GpMaPrenom: '', famille2GpMaNomdeFamille: '',
   ceremonies: [{ ...defaultCeremony }],
-  style: 'classique-dore', presentationStyle: 'photo', mariageJuif: false, youtubeUrl: '', musicUrl: '', photoFond: '', photosFond: [], logoUrl: '',
+  style: 'classique-dore', presentationStyle: 'photo', mariageJuif: false, youtubeUrl: '', musicUrl: '', photoFond: '', photosFond: [], logoUrl: '', emailMaries: '',
 }
 
 // Propriétés mobiles partagées pour tous les boutons
@@ -515,6 +516,11 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             }} style={{ display: 'none' }} />
           </label>
         )}
+      </div>
+      <div style={{ marginTop: 20 }}>
+        <Label>Votre email (notifications RSVP)</Label>
+        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Recevez une notification à chaque nouvelle réponse RSVP</p>
+        <input type="email" value={data.emailMaries ?? ''} onChange={e => onChange({ emailMaries: e.target.value })} placeholder="marie@exemple.com" style={S.input} />
       </div>
     </div>
   )
@@ -1437,9 +1443,61 @@ function MusicPlayer({ youtubeUrl, accent }: { youtubeUrl: string; accent: strin
   )
 }
 
+// ── ShareModal ────────────────────────────────────────────────────────────────
+
+function CopyLinkRow({ label, url, accent }: { label: string; url: string; accent: string }) {
+  const [copied, setCopied] = useState(false)
+  const copy = () => {
+    navigator.clipboard.writeText(url).catch(() => {
+      const ta = document.createElement('textarea')
+      ta.value = url
+      ta.style.cssText = 'position:fixed;opacity:0'
+      document.body.appendChild(ta)
+      ta.focus(); ta.select()
+      try { (document as unknown as { execCommand(c: string): void }).execCommand('copy') } catch { /* ignore */ }
+      document.body.removeChild(ta)
+    })
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2500)
+  }
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>{label}</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <input readOnly value={url} onFocus={e => e.target.select()} style={{ flex: 1, fontSize: 11, color: '#4a3728', background: '#fdf8f9', border: `1px solid ${accent}33`, borderRadius: 6, padding: '8px 10px', outline: 'none' }} />
+        <button onClick={copy} style={{ ...BTN, padding: '8px 14px', borderRadius: 6, background: copied ? '#22c55e' : accent, color: 'white', border: 'none', fontSize: 12, whiteSpace: 'nowrap', transition: 'background 0.2s' }}>{copied ? '✓' : 'Copier'}</button>
+      </div>
+    </div>
+  )
+}
+
+function ShareModal({ accent, guestUrl, coupleUrl, onClose }: { accent: string; guestUrl: string; coupleUrl: string; onClose: () => void }) {
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)' }} />
+      <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: 36, width: '100%', maxWidth: 480, boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
+        <button onClick={onClose} style={{ ...BTN, position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 20, color: '#9ca3af' }}>✕</button>
+        <div style={{ fontSize: 28, textAlign: 'center', marginBottom: 8 }}>🎊</div>
+        <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: accent, textAlign: 'center', marginBottom: 24 }}>Votre faire-part est prêt !</div>
+
+        <div style={{ padding: '16px 18px', background: `${accent}0e`, borderRadius: 12, marginBottom: 20 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#4a3728', marginBottom: 12 }}>Partagez à vos invités</div>
+          <CopyLinkRow label="Lien pour les invités" url={guestUrl} accent={accent} />
+        </div>
+
+        <div style={{ padding: '16px 18px', background: '#f0fdf4', borderRadius: 12 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#4a3728', marginBottom: 4 }}>Votre lien mariés</div>
+          <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 12 }}>Gardez précieusement ce lien pour accéder aux RSVP</div>
+          <CopyLinkRow label="Lien couple" url={coupleUrl} accent="#22c55e" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── CardsView ─────────────────────────────────────────────────────────────────
 
-function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit: () => void; onReset: () => void; isShared: boolean }) {
+function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; onEdit: () => void; onReset: () => void; isShared: boolean; role: string | null }) {
   const theme = THEMES[data.style]
   const sorted = sortByDate(data.ceremonies)
   const [splashDone, setSplashDone] = useState(false)
@@ -1454,6 +1512,9 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
   const [editMode, setEditMode] = useState(false)
   const [editHtmls, setEditHtmls] = useState<Record<number, string>>({})
   const [savedHtmls, setSavedHtmls] = useState<Record<number, string>>({})
+  const [shareModalOpen, setShareModalOpen] = useState(false)
+  const [guestUrl, setGuestUrl] = useState<string | null>(null)
+  const [coupleUrl, setCoupleUrl] = useState<string | null>(null)
 
   const startYoutubeMusic = useCallback((videoId: string) => {
     if (ytIframeRef.current) return // déjà démarré
@@ -1538,15 +1599,13 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
       }
       const id = json.id
       setLastShareId(id)
-      const url = window.location.origin + '/faire-part?share=' + id
-      setShareUrl(url)
-      try {
-        await navigator.clipboard.writeText(url)
-        setShareFeedback(true)
-        setTimeout(() => setShareFeedback(false), 3000)
-      } catch {
-        // clipboard échouée — le lien reste affiché dans l'UI
-      }
+      const base = window.location.origin + '/faire-part?share=' + id
+      const guest = base + '&role=guest'
+      const couple = base + '&role=couple'
+      setShareUrl(guest)
+      setGuestUrl(guest)
+      setCoupleUrl(couple)
+      setShareModalOpen(true)
     } catch (err) {
       console.error('handleShare erreur:', err)
       alert('Erreur : ' + (err instanceof Error ? err.message : String(err)))
@@ -1601,8 +1660,8 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
             ))
           )}
 
-          {/* Bouton RSVP doré — visible uniquement en vue partagée */}
-          {isShared && (
+          {/* Vue invité — bouton RSVP uniquement */}
+          {role === 'guest' && (
             <div style={{ maxWidth: 600, margin: '40px auto 0', display: 'flex', justifyContent: 'center' }}>
               <button onClick={() => setRsvpOpen(true)} style={{
                 ...BTN,
@@ -1618,6 +1677,14 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
             </div>
           )}
 
+          {/* Vue couple — RSVP + voir les réponses */}
+          {role === 'couple' && (
+            <div style={{ maxWidth: 600, margin: '40px auto 0', display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '13px 28px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 14, fontWeight: 700, boxShadow: `0 4px 16px ${theme.accent}44` }}>📋 Voir les RSVP</button>
+            </div>
+          )}
+
+          {/* Vue créateur */}
           {!isShared && (
             <div style={{ maxWidth: 600, margin: '40px auto 0' }}>
               {editMode ? (
@@ -1628,40 +1695,12 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
               ) : (
                 <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
                   <button onClick={onEdit} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>Modifier</button>
-                  <button onClick={handleShare} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, background: shareFeedback ? '#22c55e' : theme.accent, color: 'white', border: 'none', fontSize: 14, transition: 'background 0.3s' }}>{shareFeedback ? '✓ Lien copié !' : '🔗 Partager'}</button>
+                  <button onClick={handleShare} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 14 }}>🔗 Partager</button>
                   {lastShareId && (
                     <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>📋 Voir les RSVP</button>
                   )}
                   {!isElegant && <button onClick={enterEditMode} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>✏️ Modifier le texte</button>}
                   <button onClick={onReset} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: '1px solid #fecdd3', background: 'transparent', color: '#fb7185', fontSize: 14 }}>Nouveau</button>
-                </div>
-              )}
-              {shareUrl && (
-                <div style={{ marginTop: 16, padding: '12px 16px', background: `${theme.accent}11`, border: `1px solid ${theme.accent}44`, borderRadius: 10 }}>
-                  <div style={{ fontSize: 11, color: theme.accent, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Lien à envoyer à tes invités</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <input
-                      readOnly
-                      value={shareUrl}
-                      onFocus={e => e.target.select()}
-                      style={{ flex: 1, fontSize: 12, color: theme.texte, background: 'white', border: `1px solid ${theme.accent}33`, borderRadius: 6, padding: '8px 10px', outline: 'none' }}
-                    />
-                    <button onClick={() => {
-                      navigator.clipboard.writeText(shareUrl).catch(() => {
-                        const ta = document.createElement('textarea')
-                        ta.value = shareUrl
-                        ta.style.cssText = 'position:fixed;opacity:0'
-                        document.body.appendChild(ta)
-                        ta.focus(); ta.select()
-                        try { (document as unknown as { execCommand(c: string): void }).execCommand('copy') } catch { /* ignore */ }
-                        document.body.removeChild(ta)
-                      })
-                      setShareFeedback(true)
-                      setTimeout(() => setShareFeedback(false), 3000)
-                    }} style={{ ...BTN, padding: '8px 14px', borderRadius: 6, background: theme.accent, color: 'white', border: 'none', fontSize: 12, whiteSpace: 'nowrap' }}>
-                      {shareFeedback ? '✓' : 'Copier'}
-                    </button>
-                  </div>
                 </div>
               )}
             </div>
@@ -1705,6 +1744,14 @@ function CardsView({ data, onEdit, onReset, isShared }: { data: FormData; onEdit
           ceremonies={sorted}
         />
       )}
+      {shareModalOpen && guestUrl && coupleUrl && (
+        <ShareModal
+          accent={theme.accent}
+          guestUrl={guestUrl}
+          coupleUrl={coupleUrl}
+          onClose={() => setShareModalOpen(false)}
+        />
+      )}
     </div>
   )
 }
@@ -1716,29 +1763,55 @@ export default function FairePartPage() {
   const [formData, setFormData] = useState<FormData>(defaultFormData)
   const [showCards, setShowCards] = useState(false)
   const [isShared, setIsShared] = useState(false)
+  const [role, setRole] = useState<string | null>(null)
   const [loadingShare, setLoadingShare] = useState(false)
+  const [hasDraft, setHasDraft] = useState(false)
   // Prevents double-firing when both onTouchEnd and onClick trigger
   const lastTap = useRef(0)
 
   useEffect(() => {
-    const id = new URLSearchParams(window.location.search).get('share')
+    const params = new URLSearchParams(window.location.search)
+    const id = params.get('share')
+    const r = params.get('role')
     if (id) {
       setIsShared(true)
+      setRole(r)
       setLoadingShare(true)
       fetch(`/api/get-share?id=${id}`)
-        .then(r => r.json())
+        .then(res => res.json())
         .then((d: FormData) => { setFormData(d); setShowCards(true) })
         .catch(() => { setLoadingShare(false) })
         .finally(() => setLoadingShare(false))
+    } else {
+      // Check for local draft
+      try {
+        const draft = localStorage.getItem('wedding-draft')
+        if (draft) setHasDraft(true)
+      } catch { /* ignore */ }
     }
   }, [])
 
   const update = useCallback((u: Partial<FormData>) => setFormData(p => ({ ...p, ...u })), [])
 
+  const resumeDraft = useCallback(() => {
+    try {
+      const draft = localStorage.getItem('wedding-draft')
+      if (draft) {
+        setFormData(JSON.parse(draft) as FormData)
+        setHasDraft(false)
+        setShowCards(true)
+      }
+    } catch { /* ignore */ }
+  }, [])
+
   const next = useCallback(() => {
     if (step < 4) setStep(s => s + 1)
-    else setShowCards(true)
-  }, [step])
+    else {
+      // Save to localStorage on generate
+      try { localStorage.setItem('wedding-draft', JSON.stringify(formData)) } catch { /* ignore */ }
+      setShowCards(true)
+    }
+  }, [step, formData])
 
   const prev = useCallback(() => setStep(s => s - 1), [])
 
@@ -1760,7 +1833,7 @@ export default function FairePartPage() {
     prev()
   }, [prev])
 
-  if (showCards) return <CardsView data={formData} onEdit={() => { setShowCards(false); setStep(4) }} onReset={() => { setFormData(defaultFormData); setShowCards(false); setStep(1) }} isShared={isShared} />
+  if (showCards) return <CardsView data={formData} onEdit={() => { try { localStorage.setItem('wedding-draft', JSON.stringify(formData)) } catch { /* ignore */ } setShowCards(false); setStep(4) }} onReset={() => { setFormData(defaultFormData); setShowCards(false); setStep(1); try { localStorage.removeItem('wedding-draft') } catch { /* ignore */ } }} isShared={isShared} role={role} />
 
   if (loadingShare) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fdf0f3 0%, #fff5f7 50%, #fdf0f3 100%)' }}>
@@ -1776,6 +1849,11 @@ export default function FairePartPage() {
       <div style={{ textAlign: 'center', marginBottom: 36 }}>
         <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(201,168,76,0.65)', fontWeight: 600, marginBottom: 10 }}>Invitation de mariage</p>
         <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '2.2rem', fontWeight: 300, color: 'rgba(74,55,40,0.7)', letterSpacing: '0.06em', margin: '0 0 12px' }}>Votre faire-part</h1>
+        {hasDraft && (
+          <button onClick={resumeDraft} style={{ ...BTN, marginTop: 16, padding: '12px 28px', borderRadius: 9999, background: 'linear-gradient(135deg, #C9A84C, #e8c96a)', color: 'white', border: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 4px 16px rgba(201,168,76,0.35)' }}>
+            Reprendre mon faire-part →
+          </button>
+        )}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
           <div style={{ width: 40, height: 1, background: 'rgba(201,168,76,0.3)' }} />
           <span style={{ color: 'rgba(201,168,76,0.4)' }}>✦</span>

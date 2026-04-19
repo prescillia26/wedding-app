@@ -26,6 +26,10 @@ export async function POST(request: Request) {
     }
 
     await redis.set(id, toStore)
+    // Sauvegarder l'email des mariés séparément pour les notifications RSVP
+    if (data.emailMaries) {
+      await redis.set(`email:${id}`, data.emailMaries)
+    }
     return Response.json({ id, photosStripped: toStore._photosStripped ?? false })
   } catch (err) {
     console.error('save-share error:', err)
