@@ -1282,10 +1282,15 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
                 <div style={{ fontSize: 12, color: '#6a5040', marginTop: 2 }}>Personne{totalPersonnes > 1 ? 's' : ''} présente{totalPersonnes > 1 ? 's' : ''}</div>
               </div>
             </div>
-            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 20 }}>
               <button onClick={downloadCSV} style={{ ...BTN, padding: '10px 24px', borderRadius: 9999, background: '#22c55e', color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: '0 4px 14px rgba(34,197,94,0.35)' }}>
                 Télécharger CSV
               </button>
+              {shareId && (
+                <a href={`/plan-table?shareId=${shareId}`} style={{ ...BTN, padding: '10px 24px', borderRadius: 9999, background: `linear-gradient(135deg,#C9A84C,#e8c96a)`, color: 'white', border: 'none', fontSize: 13, fontWeight: 600, textDecoration: 'none', display: 'inline-block' }}>
+                  🪑 Créer le plan de table
+                </a>
+              )}
             </div>
           </>
         )}
