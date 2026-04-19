@@ -810,24 +810,22 @@ function renderCard(ceremony: Ceremony, data: FormData, theme: ThemeObj, photoId
 function LogoOrMonogram({ data, theme }: { data: FormData; theme: ThemeObj }) {
   const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
   const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
-  const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
+  const isDark = (['oriental', 'bleu-nuit', 'bordeaux'] as Theme[]).includes(data.style)
   if (data.logoUrl) {
     return (
-      <div style={{ marginBottom: 20 }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={data.logoUrl}
-          alt=""
-          style={{
-            display: 'block',
-            margin: '0 auto',
-            maxHeight: 80,
-            width: 'auto',
-            objectFit: 'contain',
-            mixBlendMode: isDark ? 'screen' : 'multiply',
-          }}
-        />
-      </div>
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={data.logoUrl}
+        alt=""
+        style={{
+          display: 'block',
+          margin: '0 auto 20px',
+          maxHeight: 90,
+          width: 'auto',
+          mixBlendMode: isDark ? 'screen' : 'multiply',
+          filter: 'contrast(1.1)',
+        }}
+      />
     )
   }
   return (
