@@ -1203,6 +1203,7 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
 function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: string; onClose: () => void; shareId: string | null; ceremonies: Ceremony[] }) {
   const [entries, setEntries] = useState<RSVPEntry[]>([])
   const [loading, setLoading] = useState(true)
+  const [views, setViews] = useState<{ timestamp: string; pays: string }[]>([])
 
   useEffect(() => {
     if (!shareId) { setLoading(false); return }
@@ -1211,6 +1212,10 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
       .then((d: RSVPEntry[]) => setEntries(Array.isArray(d) ? d : []))
       .catch(() => setEntries([]))
       .finally(() => setLoading(false))
+    fetch(`/api/get-views?shareId=${shareId}`)
+      .then(r => r.json())
+      .then((d: { timestamp: string; pays: string }[]) => setViews(Array.isArray(d) ? d : []))
+      .catch(() => {})
   }, [shareId])
 
   const getCeremonyName = (c: Ceremony) => c.type === 'Autre' ? (c.customName || 'Événement') : c.type
@@ -1246,7 +1251,23 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
       <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)' }} />
       <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: 32, width: '100%', maxWidth: 700, maxHeight: '85vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
         <button onClick={onClose} style={{ ...BTN, position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 20, color: '#9ca3af' }}>✕</button>
-        <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: accent, textAlign: 'center', marginBottom: 20 }}>Réponses RSVP</div>
+        <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: accent, textAlign: 'center', marginBottom: 16 }}>Réponses RSVP</div>
+
+        {views.length > 0 && (
+          <div style={{ background: '#f0f9ff', borderRadius: 10, padding: '12px 16px', marginBottom: 16 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#0369a1', marginBottom: 8 }}>
+              👁 {views.length} personne{views.length > 1 ? 's' : ''} ont ouvert votre faire-part
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {views.slice(-10).reverse().map((v, i) => (
+                <span key={i} style={{ fontSize: 11, background: 'white', border: '1px solid #bae6fd', borderRadius: 6, padding: '3px 8px', color: '#0369a1' }}>
+                  {v.pays.split('-')[0].toUpperCase()} · {new Date(v.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              ))}
+              {views.length > 10 && <span style={{ fontSize: 11, color: '#9ca3af' }}>+ {views.length - 10} autres</span>}
+            </div>
+          </div>
+        )}
 
         {!loading && entries.length > 0 && (
           <>
@@ -1711,6 +1732,60 @@ function TextEditModal({ ceremonies, textOverrides, onApply, onClose, theme }: {
   )
 }
 
+// ── Countdown ─────────────────────────────────────────────────────────────────
+
+function Countdown({ targetDate, accent }: { targetDate: string; accent: string }) {
+  const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, past: false })
+
+  useEffect(() => {
+    const calc = () => {
+      const diff = new Date(targetDate).getTime() - Date.now()
+      if (diff <= 0) { setTime({ days: 0, hours: 0, minutes: 0, seconds: 0, past: true }); return }
+      setTime({
+        days: Math.floor(diff / 86400000),
+        hours: Math.floor((diff % 86400000) / 3600000),
+        minutes: Math.floor((diff % 3600000) / 60000),
+        seconds: Math.floor((diff % 60000) / 1000),
+        past: false,
+      })
+    }
+    calc()
+    const id = setInterval(calc, 1000)
+    return () => clearInterval(id)
+  }, [targetDate])
+
+  if (time.past) return (
+    <div style={{ textAlign: 'center', padding: '20px 0', fontFamily: 'var(--font-great-vibes)', fontSize: 38, color: accent }}>
+      Mazel Tov ! 🎉
+    </div>
+  )
+
+  const Unit = ({ n, label, flash }: { n: number; label: string; flash?: boolean }) => (
+    <div style={{ textAlign: 'center', minWidth: 52 }}>
+      <style>{`@keyframes cdFade { from { opacity: 0.2; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+      <div key={flash ? `${label}-${n}` : label}
+        style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 28, color: accent, fontWeight: 700, lineHeight: 1, animation: flash ? 'cdFade 0.25s ease' : 'none' }}>
+        {String(n).padStart(2, '0')}
+      </div>
+      <div style={{ fontSize: 10, color: accent, textTransform: 'uppercase', letterSpacing: 2, opacity: 0.7, marginTop: 5 }}>{label}</div>
+    </div>
+  )
+  const Sep = () => <span style={{ color: accent, opacity: 0.4, fontSize: 22, lineHeight: '28px', alignSelf: 'flex-start', marginTop: 2 }}>:</span>
+
+  return (
+    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', justifyContent: 'center',
+      padding: '16px 24px', borderRadius: 12, border: `1px solid ${accent}44`, background: `${accent}0d` }}>
+      <Unit n={time.days} label="jours" />
+      <Sep />
+      <Unit n={time.hours} label="heures" />
+      <Sep />
+      <Unit n={time.minutes} label="min" />
+      <Sep />
+      <Unit n={time.seconds} label="sec" flash />
+    </div>
+  )
+}
+
 // ── CardsView ─────────────────────────────────────────────────────────────────
 
 function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; onEdit: () => void; onReset: () => void; isShared: boolean; role: string | null }) {
@@ -1755,7 +1830,14 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
   useEffect(() => {
     if (isShared) {
       const id = new URLSearchParams(window.location.search).get('share')
-      if (id) setLastShareId(id)
+      if (id) {
+        setLastShareId(id)
+        fetch('/api/track-view', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ shareId: id, timestamp: new Date().toISOString(), userAgent: navigator.userAgent, country: navigator.language }),
+        }).catch(() => {})
+      }
     }
   }, [isShared])
 
@@ -1838,6 +1920,16 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
                 )}
               </div>
             ))
+          )}
+
+          {/* Compte à rebours — vue partagée uniquement */}
+          {isShared && sorted[0]?.date && (
+            <div style={{ maxWidth: 600, margin: '40px auto 0', textAlign: 'center' }}>
+              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: theme.textSecondaire, marginBottom: 14, letterSpacing: 1 }}>
+                Plus que…
+              </div>
+              <Countdown targetDate={sorted[0].date} accent={theme.accent} />
+            </div>
           )}
 
           {/* Vue invité — bouton RSVP uniquement */}
