@@ -1359,29 +1359,73 @@ function AudioPlayer({ musicUrl, accent }: { musicUrl: string; accent: string })
 
 function SplashScreen({ data, theme, onDone, isShared, onStartMusic }: { data: FormData; theme: ThemeObj; onDone: () => void; isShared: boolean; onStartMusic?: () => void }) {
   const [out, setOut] = useState(false)
+  const [vis, setVis] = useState(0)
   const firstDate = sortByDate(data.ceremonies)[0]?.date
   const done = useCallback(() => { setOut(true); setTimeout(onDone, 600) }, [onDone])
-  useEffect(() => { if (!isShared) { const t = setTimeout(done, 2200); return () => clearTimeout(t) } }, [isShared, done])
+
+  useEffect(() => {
+    if (!isShared) { const t = setTimeout(done, 2200); return () => clearTimeout(t) }
+    // Animation en cascade pour la vue partagée
+    const timers = [
+      setTimeout(() => setVis(1), 150),
+      setTimeout(() => setVis(2), 700),
+      setTimeout(() => setVis(3), 1200),
+      setTimeout(() => setVis(4), 1700),
+    ]
+    return () => timers.forEach(clearTimeout)
+  }, [isShared, done])
 
   const handleDiscover = useCallback(() => {
     onStartMusic?.()
     done()
   }, [onStartMusic, done])
 
+  const fade = (n: number): React.CSSProperties => ({
+    opacity: vis >= n ? 1 : 0,
+    transform: vis >= n ? 'translateY(0)' : 'translateY(18px)',
+    transition: 'opacity 0.75s ease, transform 0.75s ease',
+  })
+
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 100, backgroundColor: theme.fond, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: out ? 0 : 1, transition: 'opacity 0.6s ease', pointerEvents: out ? 'none' : 'auto' }}>
-      <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px, 12vw, 96px)', color: theme.accent, textAlign: 'center', lineHeight: 1.2 }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 100, backgroundColor: theme.fond, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 24px', opacity: out ? 0 : 1, transition: 'opacity 0.6s ease', pointerEvents: out ? 'none' : 'auto' }}>
+
+      {/* Prénoms */}
+      <div style={{ ...fade(1), fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px, 12vw, 96px)', color: theme.accent, textAlign: 'center', lineHeight: 1.2 }}>
         {data.marie1Prenom || 'Prénom'}<br />&amp;<br />{data.marie2Prenom || 'Prénom'}
       </div>
-      {firstDate && <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 14, color: theme.textSecondaire, letterSpacing: 3, marginTop: 24, textTransform: 'uppercase' }}>{formatDateFr(firstDate)}</div>}
+
+      {/* Phrase touchante — vue partagée uniquement */}
       {isShared && (
-        <button
-          onClick={handleDiscover}
-          onTouchEnd={e => { e.preventDefault(); handleDiscover() }}
-          style={{ ...BTN, marginTop: 48, padding: '16px 40px', border: `1px solid ${theme.accent}`, borderRadius: 9999, background: 'transparent', color: theme.accent, fontSize: 16, fontFamily: 'var(--font-playfair-display)' }}
-        >
-          Découvrir votre faire-part
-        </button>
+        <div style={{ ...fade(2), fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: theme.accent, textAlign: 'center', marginTop: 20, letterSpacing: '0.02em' }}>
+          vous invitent à partager leur bonheur
+        </div>
+      )}
+
+      {/* Séparateur + date */}
+      {firstDate && (
+        <div style={{ ...fade(isShared ? 3 : 1), textAlign: 'center', marginTop: isShared ? 20 : 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 8 }}>
+            <div style={{ width: 32, height: 1, background: theme.accent, opacity: 0.4 }} />
+            <span style={{ color: theme.accent, opacity: 0.6, fontSize: 10 }}>✦</span>
+            <div style={{ width: 32, height: 1, background: theme.accent, opacity: 0.4 }} />
+          </div>
+          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 13, color: theme.textSecondaire, letterSpacing: 3, textTransform: 'uppercase' }}>
+            {formatDateFr(firstDate)}
+          </div>
+        </div>
+      )}
+
+      {/* Bouton */}
+      {isShared && (
+        <div style={{ ...fade(4), marginTop: 44 }}>
+          <button
+            onClick={handleDiscover}
+            onTouchEnd={e => { e.preventDefault(); handleDiscover() }}
+            style={{ ...BTN, padding: '16px 44px', border: `1px solid ${theme.accent}`, borderRadius: 9999, background: 'transparent', color: theme.accent, fontSize: 16, fontFamily: 'var(--font-playfair-display)', letterSpacing: '0.06em' }}
+          >
+            Ouvrir mon invitation ✦
+          </button>
+        </div>
       )}
     </div>
   )
