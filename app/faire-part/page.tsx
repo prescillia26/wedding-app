@@ -541,21 +541,42 @@ interface CardProps { ceremony: Ceremony; data: FormData; theme: ThemeObj }
 
 function CarouselBackground({ photos, theme }: { photos: string[]; theme: ThemeObj }) {
   const [idx, setIdx] = useState(0)
-  const [visible, setVisible] = useState(true)
+  const [fading, setFading] = useState(false)
+  const countRef = useRef(photos.length)
+  countRef.current = photos.length
+
+  // Déclenche le fade-out toutes les 5s
   useEffect(() => {
     if (photos.length <= 1) return
-    const t = setInterval(() => {
-      setVisible(false)
-      setTimeout(() => { setIdx(i => (i + 1) % photos.length); setVisible(true) }, 450)
-    }, 5000)
-    return () => clearInterval(t)
+    const interval = setInterval(() => setFading(true), 5000)
+    return () => clearInterval(interval)
   }, [photos.length])
+
+  // Quand fading passe à true : change la photo après la transition, puis fade-in
+  useEffect(() => {
+    if (!fading) return
+    const t = setTimeout(() => {
+      setIdx(i => (i + 1) % countRef.current)
+      setFading(false)
+    }, 450)
+    return () => clearTimeout(t)
+  }, [fading])
+
   if (!photos.length) return null
   const isDark = theme.fond === '#1a0a00'
   return (
     <>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={photos[idx]} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: visible ? 1 : 0, transition: 'opacity 0.45s ease' }} />
+      <img
+        src={photos[idx]}
+        alt=""
+        style={{
+          position: 'absolute', inset: 0, width: '100%', height: '100%',
+          objectFit: 'cover',
+          opacity: fading ? 0 : 1,
+          transition: 'opacity 0.45s ease',
+        }}
+      />
       <div style={{ position: 'absolute', inset: 0, background: isDark ? 'rgba(26,10,0,0.85)' : 'rgba(255,255,255,0.88)' }} />
     </>
   )
