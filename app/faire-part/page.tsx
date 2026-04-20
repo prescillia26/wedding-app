@@ -100,6 +100,8 @@ interface FormData {
   monogrammeColor?: string
   musicName?: string
   ornementUrl?: string
+  marie1PrenomHebreu?: string
+  marie2PrenomHebreu?: string
 }
 
 const defaultCeremony: Ceremony = {
@@ -121,6 +123,8 @@ const defaultFormData: FormData = {
   style: 'floral-bleu', presentationStyle: 'elegant', mariageJuif: false, youtubeUrl: '', musicUrl: '', musicName: '', photoFond: '', photosFond: [], emailMaries: '', textOverrides: {},
   monogrammeStyle: 'cercle', monogrammeColor: '',
   ornementUrl: '',
+  marie1PrenomHebreu: '',
+  marie2PrenomHebreu: '',
 }
 
 // Propriétés mobiles partagées pour tous les boutons
@@ -299,6 +303,7 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           <Field label="Nom" value={data.marie1Nom} onChange={v => onChange({ marie1Nom: v })} placeholder="Martin" />
         </div>
         <Field label="2ème prénom (optionnel)" value={data.marie1Prenom2} onChange={v => onChange({ marie1Prenom2: v })} placeholder="Marie" />
+        <Field label="Prénom hébreu (optionnel)" value={data.marie1PrenomHebreu ?? ''} onChange={v => onChange({ marie1PrenomHebreu: v })} placeholder="שרה" />
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '16px 0' }}>
         <div style={{ flex: 1, height: 1, background: '#fecdd3' }} />
@@ -312,6 +317,7 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           <Field label="Nom" value={data.marie2Nom} onChange={v => onChange({ marie2Nom: v })} placeholder="Dupont" />
         </div>
         <Field label="2ème prénom (optionnel)" value={data.marie2Prenom2} onChange={v => onChange({ marie2Prenom2: v })} placeholder="David" />
+        <Field label="Prénom hébreu (optionnel)" value={data.marie2PrenomHebreu ?? ''} onChange={v => onChange({ marie2PrenomHebreu: v })} placeholder="דוד" />
       </div>
     </div>
   )
@@ -2419,12 +2425,26 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
             <LineSep />
           </AnimSection>
           <AnimSection delay={150}>
-            <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 8 }}>
-              {data.marie1Prenom || 'Prénom'}
+            <div className="scroll-animate" style={{ ...scrollStyle, position: 'relative', textAlign: 'center', marginBottom: 8 }}>
+              {data.marie1PrenomHebreu && (
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'serif', fontSize: 'clamp(44px,11vw,70px)', color: G, direction: 'rtl', opacity: 0.12, zIndex: 0, pointerEvents: 'none', userSelect: 'none' }}>
+                  {data.marie1PrenomHebreu}
+                </div>
+              )}
+              <div style={{ fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, lineHeight: 1.1, position: 'relative', zIndex: 1 }}>
+                {data.marie1Prenom || 'Prénom'}
+              </div>
             </div>
             <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FC, fontStyle: 'italic', fontSize: 24, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.7 }}>&</div>
-            <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 24 }}>
-              {data.marie2Prenom || 'Prénom'}
+            <div className="scroll-animate" style={{ ...scrollStyle, position: 'relative', textAlign: 'center', marginBottom: 24 }}>
+              {data.marie2PrenomHebreu && (
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'serif', fontSize: 'clamp(44px,11vw,70px)', color: G, direction: 'rtl', opacity: 0.12, zIndex: 0, pointerEvents: 'none', userSelect: 'none' }}>
+                  {data.marie2PrenomHebreu}
+                </div>
+              )}
+              <div style={{ fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, lineHeight: 1.1, position: 'relative', zIndex: 1 }}>
+                {data.marie2Prenom || 'Prénom'}
+              </div>
             </div>
             {data.mariageJuif && (data.marie1Prenom2 || data.marie2Prenom2) && (
               <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 16 }}>
@@ -2646,8 +2666,6 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
 function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; onEdit: () => void; onReset: () => void; isShared: boolean; role: string | null }) {
   const theme = THEMES[data.style]
   const sorted = sortByDate(data.ceremonies)
-  const [splashDone, setSplashDone] = useState(false)
-  const [active, setActive] = useState(0)
   const [rsvpOpen, setRsvpOpen] = useState(false)
   const [rsvpListOpen, setRsvpListOpen] = useState(false)
   const [lastShareId, setLastShareId] = useState<string | null>(null)
@@ -2679,9 +2697,6 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
     setYtMuted(m => !m)
   }, [ytMuted])
 
-  const refs = useRef<(HTMLDivElement | null)[]>([])
-  const isElegant = data.presentationStyle === 'elegant'
-
   useEffect(() => {
     if (isShared) {
       const id = new URLSearchParams(window.location.search).get('share')
@@ -2695,17 +2710,6 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
       }
     }
   }, [isShared])
-
-  useEffect(() => {
-    if (!splashDone) return
-    const obs = refs.current.map((r, i) => {
-      if (!r) return null
-      const o = new IntersectionObserver(e => { if (e[0].isIntersecting) setActive(i) }, { threshold: 0.4 })
-      o.observe(r)
-      return o
-    })
-    return () => obs.forEach(o => o?.disconnect())
-  }, [splashDone, sorted.length])
 
   const handleShare = async () => {
     try {
@@ -2785,104 +2789,31 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
   }
 
   return (
-    <div style={{ backgroundColor: theme.pageFond, minHeight: '100vh', color: theme.texte }}>
-      {!splashDone && <SplashScreen data={data} theme={theme} onDone={() => setSplashDone(true)} isShared={false} onStartMusic={undefined} />}
-      {splashDone && <>
-        {!isElegant && (
-          <div style={{ position: 'fixed', left: 16, top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', gap: 10, zIndex: 40 }}>
-            {sorted.map((_, i) => (
-              <button key={i} onClick={() => refs.current[i]?.scrollIntoView({ behavior: 'smooth' })} style={{ ...BTN, width: 10, height: 10, borderRadius: '50%', border: `1.5px solid ${theme.accent}`, background: active === i ? theme.accent : 'transparent', padding: 0 }} />
-            ))}
-          </div>
+    <div style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
+      <SharedPageContent
+        data={{ ...data, textOverrides: { ...data.textOverrides, ...textOverrides } }}
+        theme={theme}
+        sorted={sorted}
+        role={null}
+        lastShareId={lastShareId}
+        onRsvpOpen={() => setRsvpOpen(true)}
+        onRsvpListOpen={() => setRsvpListOpen(true)}
+        onStartYoutube={data.youtubeUrl ? () => { const vid = getYouTubeId(data.youtubeUrl); if (vid) startYoutubeMusic(vid) } : undefined}
+        ytIframeRef={ytIframeRef}
+        ytMuted={ytMuted}
+        onToggleYtMute={toggleYtMute}
+      />
+
+      {/* Barre fixe bas — actions créateur */}
+      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+        <button onClick={onEdit} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>Modifier</button>
+        <button onClick={handleShare} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44` }}>🔗 Partager</button>
+        {lastShareId && (
+          <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>📋 RSVP</button>
         )}
-        <div style={{ padding: '40px 20px 80px' }}>
-          {isElegant ? (
-            <ElegantCardsContent data={{ ...data, textOverrides }} theme={theme} isShared={isShared} />
-          ) : (
-            sorted.map((ceremony, i) => (
-              <div key={i}>
-                <div ref={el => { refs.current[i] = el }} style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden', border: theme.carteBordure }}>
-                  {renderCard(ceremony, { ...data, textOverrides }, theme, i, isShared)}
-                </div>
-                {i < sorted.length - 1 && (
-                  <div style={{ maxWidth: 600, margin: '32px auto', display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ flex: 1, height: 1, background: theme.accent, opacity: 0.3 }} />
-                    <span style={{ color: theme.accent }}>✦</span>
-                    <div style={{ flex: 1, height: 1, background: theme.accent, opacity: 0.3 }} />
-                  </div>
-                )}
-              </div>
-            ))
-          )}
-
-          {/* Compte à rebours — vue partagée uniquement */}
-          {isShared && sorted[0]?.date && (
-            <div style={{ maxWidth: 600, margin: '40px auto 0', textAlign: 'center' }}>
-              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: theme.textSecondaire, marginBottom: 14, letterSpacing: 1 }}>
-                Plus que…
-              </div>
-              <Countdown targetDate={sorted[0].date} accent={theme.accent} />
-            </div>
-          )}
-
-          {/* Vue invité — bouton RSVP uniquement */}
-          {role === 'guest' && (
-            <div style={{ maxWidth: 600, margin: '40px auto 0', display: 'flex', justifyContent: 'center' }}>
-              <button onClick={() => setRsvpOpen(true)} style={{
-                ...BTN,
-                padding: '15px 48px', borderRadius: 9999,
-                background: 'linear-gradient(135deg, #C9A84C, #e8c96a)',
-                color: 'white', border: 'none',
-                fontSize: 16, fontWeight: 700, letterSpacing: '0.12em',
-                boxShadow: '0 6px 28px rgba(201,168,76,0.45)',
-                fontFamily: 'var(--font-playfair-display)',
-              }}>
-                RSVP
-              </button>
-            </div>
-          )}
-
-          {/* Vue couple — RSVP + voir les réponses */}
-          {role === 'couple' && (
-            <div style={{ maxWidth: 600, margin: '40px auto 0', display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '13px 28px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 14, fontWeight: 700, boxShadow: `0 4px 16px ${theme.accent}44` }}>📋 Voir les RSVP</button>
-            </div>
-          )}
-
-          {/* Vue créateur */}
-          {!isShared && (
-            <div style={{ maxWidth: 600, margin: '40px auto 0' }}>
-              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-                <button onClick={onEdit} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>Modifier</button>
-                <button onClick={handleShare} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 14 }}>🔗 Partager</button>
-                {lastShareId && (
-                  <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>📋 Voir les RSVP</button>
-                )}
-                <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 14 }}>✏️ Modifier le texte</button>
-                <button onClick={onReset} style={{ ...BTN, padding: '12px 28px', borderRadius: 9999, border: '1px solid #fecdd3', background: 'transparent', color: '#fb7185', fontSize: 14 }}>Nouveau</button>
-              </div>
-            </div>
-          )}
-        </div>
-        {data.musicUrl
-          ? <AudioPlayer musicUrl={data.musicUrl} accent={theme.accent} />
-          : data.youtubeUrl && (
-            isShared
-              ? /* Vue partagée : iframe créée au clic sur splash, on affiche juste le bouton mute */
-                ytIframeRef.current && (
-                  <button
-                    onClick={toggleYtMute}
-                    onTouchEnd={e => { e.preventDefault(); toggleYtMute() }}
-                    style={{ ...BTN, position: 'fixed', bottom: 24, right: 24, zIndex: 50, width: 44, height: 44, borderRadius: '50%', background: theme.accent, color: 'white', border: 'none', fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }}
-                  >
-                    {ytMuted ? '🔇' : '🔊'}
-                  </button>
-                )
-              : /* Vue créateur : MusicPlayer classique */
-                <MusicPlayer youtubeUrl={data.youtubeUrl} accent={theme.accent} />
-          )
-        }
-      </>}
+        <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>✏️ Texte</button>
+        <button onClick={onReset} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: '1.5px solid #fecdd3', background: 'transparent', color: '#fb7185', fontSize: 13, fontWeight: 600 }}>Nouveau</button>
+      </div>
 
       {rsvpOpen && (
         <RSVPModal
