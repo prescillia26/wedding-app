@@ -2189,9 +2189,12 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
   const GOLD = '#C9A84C'
   const [codeInput, setCodeInput] = useState('')
   const [promoInput, setPromoInput] = useState('')
+  const [promoEmail, setPromoEmail] = useState('')
   const [checking, setChecking] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showPromo, setShowPromo] = useState(false)
+
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 14px', borderRadius: 8, border: `1.5px solid ${GOLD}33`, fontSize: 15, fontFamily: 'var(--font-cormorant-garamond)', outline: 'none', background: '#fdf8f9', boxSizing: 'border-box' }
 
   const checkCode = async (code: string) => {
     setChecking(true); setError(null)
@@ -2209,20 +2212,20 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
   }
 
   const checkPromo = async () => {
-    if (!promoInput.trim()) return
+    if (!promoInput.trim() || !promoEmail.trim()) { setError('Veuillez renseigner votre code promo et votre email.'); return }
     setChecking(true); setError(null)
     try {
       const res = await fetch('/api/check-promo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: promoInput }),
+        body: JSON.stringify({ code: promoInput, email: promoEmail }),
       })
       const d = await res.json()
       if (d.valid && d.accessCode) {
         try { sessionStorage.setItem('lovit_access_code', d.accessCode) } catch { /* ignore */ }
         onGranted()
       } else {
-        setError('Code promo invalide ou expiré.')
+        setError(d.reason || 'Code promo invalide ou expiré.')
       }
     } catch { setError('Erreur réseau. Réessayez.') }
     finally { setChecking(false) }
@@ -2266,20 +2269,31 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
             J&apos;ai un code promo
           </button>
         ) : (
-          <div style={{ background: 'white', borderRadius: 16, padding: '20px 24px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: `1px solid ${GOLD}22` }}>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 15, color: '#6a5040', marginBottom: 10 }}>Code promo</div>
-            <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ background: 'white', borderRadius: 16, padding: '20px 24px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: `1px solid ${GOLD}22`, textAlign: 'left' }}>
+            <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 16, color: '#2d1f14', marginBottom: 16 }}>Code promo</div>
+            <div style={{ marginBottom: 10 }}>
+              <label style={{ display: 'block', fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Votre code promo</label>
               <input
                 value={promoInput}
                 onChange={e => setPromoInput(e.target.value.toUpperCase())}
-                onKeyDown={e => e.key === 'Enter' && checkPromo()}
                 placeholder="MONCODE"
-                style={{ flex: 1, padding: '10px 14px', borderRadius: 8, border: `1.5px solid ${GOLD}33`, fontSize: 15, fontFamily: 'var(--font-playfair-display)', outline: 'none', background: '#fdf8f9' }}
+                style={{ ...inputStyle, fontFamily: 'var(--font-playfair-display)', letterSpacing: '0.1em', fontWeight: 600 }}
               />
-              <button onClick={checkPromo} disabled={checking} style={{ padding: '10px 18px', borderRadius: 8, border: 'none', cursor: 'pointer', background: GOLD, color: 'white', fontFamily: 'var(--font-playfair-display)', fontSize: 14, fontWeight: 600 }}>
-                {checking ? '…' : 'OK'}
-              </button>
             </div>
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ display: 'block', fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Votre email</label>
+              <input
+                value={promoEmail}
+                onChange={e => setPromoEmail(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && checkPromo()}
+                type="email"
+                placeholder="marie@exemple.com"
+                style={inputStyle}
+              />
+            </div>
+            <button onClick={checkPromo} disabled={checking} style={{ width: '100%', padding: '11px', borderRadius: 8, border: 'none', cursor: checking ? 'not-allowed' : 'pointer', background: GOLD, color: 'white', fontFamily: 'var(--font-playfair-display)', fontSize: 14, fontWeight: 600 }}>
+              {checking ? 'Vérification…' : 'Utiliser ce code promo'}
+            </button>
           </div>
         )}
 
