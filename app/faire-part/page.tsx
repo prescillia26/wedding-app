@@ -2322,15 +2322,20 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   const ornUrl = data.ornementUrl || ORNEMENTS_THEMES[data.style]?.[0] || ''
   const isDarkTheme = data.style === 'oriental-nuit'
   const blendMode: React.CSSProperties['mixBlendMode'] = isDarkTheme ? 'screen' : 'multiply'
-  const OrnImg = ({ topRight, bottomLeft }: { topRight?: boolean; bottomLeft?: boolean }) => {
+  const OrnImg = ({ topRight, bottomLeft, topLeft }: { topRight?: boolean; bottomLeft?: boolean; topLeft?: boolean }) => {
     if (!ornUrl && data.style !== 'or-dentelle') return null
     if (!ornUrl && data.style === 'or-dentelle') return (
-      <div style={{ position: 'absolute', ...(topRight ? { top: -20, right: -20 } : { bottom: -20, left: -20, transform: 'rotate(180deg)' }), pointerEvents: 'none', zIndex: 0 }}>
+      <div style={{ position: 'absolute', ...(topRight ? { top: -20, right: -20 } : topLeft ? { top: -20, left: -20 } : { bottom: -20, left: -20, transform: 'rotate(180deg)' }), pointerEvents: 'none', zIndex: 10 }}>
         <OrnementDentelleDore />
       </div>
     )
+    const pos = topRight
+      ? { top: -60, right: -60 }
+      : topLeft
+        ? { top: -60, left: -60 }
+        : { bottom: -60, left: -60, transform: 'rotate(180deg)' }
     return (
-      <img src={ornUrl} alt="" style={{ position: 'absolute', ...(topRight ? { top: -30, right: -30 } : { bottom: -30, left: -30, transform: 'rotate(180deg)' }), width: 220, height: 220, objectFit: 'contain', mixBlendMode: blendMode, opacity: 0.9, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+      <img src={ornUrl} alt="" style={{ position: 'absolute', ...pos, width: 300, height: 300, objectFit: 'contain', mixBlendMode: blendMode, opacity: 0.9, pointerEvents: 'none', zIndex: 10 } as React.CSSProperties} />
     )
   }
 
@@ -2403,8 +2408,9 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
       <div ref={contentRef} style={{ maxWidth: 480, margin: '0 auto', padding: '0 28px 80px' }}>
 
         {/* SECTION 2 : Intro */}
-        <section style={{ paddingTop: 72, paddingBottom: 48, position: 'relative', borderBottom: `1px solid ${G}1a` }}>
+        <section style={{ paddingTop: 72, paddingBottom: 48, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: 'hidden' }}>
           <OrnImg topRight />
+          <OrnImg bottomLeft />
           <AnimSection>
             {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 14, color: G, direction: 'rtl', textAlign: 'right', marginBottom: 16 }}>בס״ד</div>}
             <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: G, textAlign: 'center', letterSpacing: 1, marginBottom: 14 }}>
@@ -2460,7 +2466,6 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
 
         {/* SECTION 4 : Cérémonies */}
         {sorted.map((ceremony, i) => {
-          const isLeft = i % 2 === 0
           const typeTitle: Record<string, string> = {
             'Mairie': 'LA MAIRIE', 'Cérémonie religieuse / Houppa': data.mariageJuif ? 'LA HOUPPA' : 'LA CÉRÉMONIE',
             'Shabbat Hatan': 'SHABBAT HATAN', 'Henné': 'LE HENNÉ', 'Cocktail': 'LE COCKTAIL',
@@ -2469,8 +2474,9 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
           const title = typeTitle[ceremony.type] || (ceremony.customName?.toUpperCase() || ceremony.type.toUpperCase())
           const hebrewDate = getHebrewDate(ceremony.date)
           return (
-            <section key={i} style={{ paddingTop: 60, paddingBottom: 52, position: 'relative', borderBottom: `1px solid ${G}1a` }}>
-              {isLeft ? <OrnImg topRight /> : <OrnImg bottomLeft />}
+            <section key={i} style={{ paddingTop: 60, paddingBottom: 52, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: 'hidden' }}>
+              <OrnImg topRight />
+              <OrnImg bottomLeft />
               <AnimSection>
                 <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>{title}</div>
                 <OrnSep />
@@ -2610,7 +2616,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
       <footer style={{ padding: '48px 28px 64px', textAlign: 'center', background: `${G}08`, maxWidth: 480, margin: '0 auto' }}>
         <AnimSection>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
-            {ornUrl && <img src={ornUrl} alt="" style={{ width: 120, height: 120, objectFit: 'contain', mixBlendMode: blendMode, opacity: 0.7 } as React.CSSProperties} />}
+            {ornUrl && <img src={ornUrl} alt="" style={{ width: 160, height: 160, objectFit: 'contain', mixBlendMode: blendMode, opacity: 0.65 } as React.CSSProperties} />}
             {!ornUrl && data.style === 'or-dentelle' && <div style={{ opacity: 0.5, transform: 'scale(0.5)', transformOrigin: 'center' }}><OrnementDentelleDore /></div>}
           </div>
           <div style={{ fontFamily: FS, fontSize: 40, color: G, marginBottom: 12, lineHeight: 1.2 }}>
