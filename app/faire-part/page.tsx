@@ -2187,29 +2187,14 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
 
 function AccessGate({ onGranted }: { onGranted: () => void }) {
   const GOLD = '#C9A84C'
-  const [codeInput, setCodeInput] = useState('')
   const [promoInput, setPromoInput] = useState('')
   const [promoEmail, setPromoEmail] = useState('')
+  const [codeInput, setCodeInput] = useState('')
   const [checking, setChecking] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [showPromo, setShowPromo] = useState(false)
+  const [showAccessCode, setShowAccessCode] = useState(false)
 
-  const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 14px', borderRadius: 8, border: `1.5px solid ${GOLD}33`, fontSize: 15, fontFamily: 'var(--font-cormorant-garamond)', outline: 'none', background: '#fdf8f9', boxSizing: 'border-box' }
-
-  const checkCode = async (code: string) => {
-    setChecking(true); setError(null)
-    try {
-      const res = await fetch(`/api/check-access?code=${encodeURIComponent(code.toUpperCase().trim())}`)
-      const d = await res.json()
-      if (d.valid) {
-        try { sessionStorage.setItem('lovit_access_code', code.toUpperCase().trim()) } catch { /* ignore */ }
-        onGranted()
-      } else {
-        setError('Code invalide. Vérifiez votre email ou achetez un accès.')
-      }
-    } catch { setError('Erreur réseau. Réessayez.') }
-    finally { setChecking(false) }
-  }
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '11px 14px', borderRadius: 8, border: `1.5px solid ${GOLD}33`, fontSize: 15, fontFamily: 'var(--font-cormorant-garamond)', outline: 'none', background: '#fdf8f9', boxSizing: 'border-box' }
 
   const checkPromo = async () => {
     if (!promoInput.trim() || !promoEmail.trim()) { setError('Veuillez renseigner votre code promo et votre email.'); return }
@@ -2231,69 +2216,87 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
     finally { setChecking(false) }
   }
 
+  const checkCode = async (code: string) => {
+    setChecking(true); setError(null)
+    try {
+      const res = await fetch(`/api/check-access?code=${encodeURIComponent(code.toUpperCase().trim())}`)
+      const d = await res.json()
+      if (d.valid) {
+        try { sessionStorage.setItem('lovit_access_code', code.toUpperCase().trim()) } catch { /* ignore */ }
+        onGranted()
+      } else {
+        setError('Code invalide. Vérifiez votre email ou achetez un accès.')
+      }
+    } catch { setError('Erreur réseau. Réessayez.') }
+    finally { setChecking(false) }
+  }
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fdf0f3 0%, #fff5f7 50%, #fdf0f3 100%)', padding: 24 }}>
       <div style={{ textAlign: 'center', maxWidth: 440, width: '100%' }}>
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: GOLD, marginBottom: 4 }}>Lov&apos;it</div>
         <div style={{ width: 50, height: 1, background: GOLD, opacity: 0.3, margin: '0 auto 32px' }} />
 
-        <div style={{ background: 'white', borderRadius: 20, padding: '36px 32px', boxShadow: '0 12px 48px rgba(201,168,76,0.12)', border: `1px solid ${GOLD}22`, marginBottom: 20 }}>
-          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 20, color: '#2d1f14', marginBottom: 8 }}>Entrez votre code d&apos;accès</div>
-          <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: '#6a5040', marginBottom: 24 }}>
-            Reçu par email après votre achat
+        {/* Formulaire principal : code promo + email */}
+        <div style={{ background: 'white', borderRadius: 20, padding: '36px 32px', boxShadow: '0 12px 48px rgba(201,168,76,0.12)', border: `1px solid ${GOLD}22`, marginBottom: 20, textAlign: 'left' }}>
+          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 20, color: '#2d1f14', marginBottom: 6, textAlign: 'center' }}>Accéder à mon faire-part</div>
+          <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#6a5040', marginBottom: 24, textAlign: 'center' }}>
+            Entrez votre code promo et votre email
           </p>
 
-          <input
-            value={codeInput}
-            onChange={e => setCodeInput(e.target.value.toUpperCase())}
-            onKeyDown={e => e.key === 'Enter' && checkCode(codeInput)}
-            placeholder="XXXXXX"
-            maxLength={6}
-            style={{ width: '100%', padding: '14px 18px', borderRadius: 10, border: `1.5px solid ${GOLD}44`, fontSize: 22, fontFamily: 'var(--font-playfair-display)', fontWeight: 700, color: '#2d1f14', textAlign: 'center', letterSpacing: '0.3em', outline: 'none', boxSizing: 'border-box', marginBottom: 16, background: '#fdf8f9' }}
-          />
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ display: 'block', fontFamily: 'var(--font-cormorant-garamond)', fontSize: 12, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Code promo</label>
+            <input
+              value={promoInput}
+              onChange={e => setPromoInput(e.target.value.toUpperCase())}
+              placeholder="MONCODE"
+              style={{ ...inputStyle, fontFamily: 'var(--font-playfair-display)', letterSpacing: '0.12em', fontWeight: 700, fontSize: 16 }}
+            />
+          </div>
+          <div style={{ marginBottom: 20 }}>
+            <label style={{ display: 'block', fontFamily: 'var(--font-cormorant-garamond)', fontSize: 12, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Votre email</label>
+            <input
+              value={promoEmail}
+              onChange={e => setPromoEmail(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && checkPromo()}
+              type="email"
+              placeholder="marie@exemple.com"
+              style={inputStyle}
+            />
+          </div>
 
           <button
-            onClick={() => checkCode(codeInput)}
-            disabled={checking || codeInput.length < 4}
-            style={{ width: '100%', padding: '14px', borderRadius: 9999, border: 'none', cursor: checking || codeInput.length < 4 ? 'not-allowed' : 'pointer', background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`, color: 'white', fontFamily: 'var(--font-playfair-display)', fontSize: 15, fontWeight: 700, letterSpacing: '0.05em', boxShadow: `0 6px 24px ${GOLD}44`, opacity: codeInput.length < 4 ? 0.6 : 1 }}
+            onClick={checkPromo}
+            disabled={checking}
+            style={{ width: '100%', padding: '14px', borderRadius: 9999, border: 'none', cursor: checking ? 'not-allowed' : 'pointer', background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`, color: 'white', fontFamily: 'var(--font-playfair-display)', fontSize: 15, fontWeight: 700, letterSpacing: '0.05em', boxShadow: `0 6px 24px ${GOLD}44` }}
           >
             {checking ? 'Vérification…' : 'Accéder à mon faire-part'}
           </button>
 
-          {error && <p style={{ marginTop: 14, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 15, color: '#ef4444' }}>{error}</p>}
+          {error && <p style={{ marginTop: 14, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 15, color: '#ef4444', textAlign: 'center' }}>{error}</p>}
         </div>
 
-        {/* Code promo */}
-        {!showPromo ? (
-          <button onClick={() => setShowPromo(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: GOLD, textDecoration: 'underline' }}>
-            J&apos;ai un code promo
+        {/* Accès avec code Stripe (secondaire) */}
+        {!showAccessCode ? (
+          <button onClick={() => { setShowAccessCode(true); setError(null) }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: GOLD, textDecoration: 'underline' }}>
+            J&apos;ai un code d&apos;accès (reçu après paiement)
           </button>
         ) : (
-          <div style={{ background: 'white', borderRadius: 16, padding: '20px 24px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: `1px solid ${GOLD}22`, textAlign: 'left' }}>
-            <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 16, color: '#2d1f14', marginBottom: 16 }}>Code promo</div>
-            <div style={{ marginBottom: 10 }}>
-              <label style={{ display: 'block', fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Votre code promo</label>
+          <div style={{ background: 'white', borderRadius: 16, padding: '20px 24px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: `1px solid ${GOLD}22` }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: '#9ca3af', marginBottom: 10 }}>Code d&apos;accès (6 caractères)</div>
+            <div style={{ display: 'flex', gap: 8 }}>
               <input
-                value={promoInput}
-                onChange={e => setPromoInput(e.target.value.toUpperCase())}
-                placeholder="MONCODE"
-                style={{ ...inputStyle, fontFamily: 'var(--font-playfair-display)', letterSpacing: '0.1em', fontWeight: 600 }}
+                value={codeInput}
+                onChange={e => setCodeInput(e.target.value.toUpperCase())}
+                onKeyDown={e => e.key === 'Enter' && checkCode(codeInput)}
+                placeholder="XXXXXX"
+                maxLength={6}
+                style={{ ...inputStyle, fontFamily: 'var(--font-playfair-display)', fontWeight: 700, letterSpacing: '0.2em', textAlign: 'center', fontSize: 18, flex: 1 }}
               />
+              <button onClick={() => checkCode(codeInput)} disabled={checking || codeInput.length < 4} style={{ padding: '10px 18px', borderRadius: 8, border: 'none', cursor: 'pointer', background: GOLD, color: 'white', fontFamily: 'var(--font-playfair-display)', fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap' }}>
+                {checking ? '…' : 'OK'}
+              </button>
             </div>
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: 'block', fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Votre email</label>
-              <input
-                value={promoEmail}
-                onChange={e => setPromoEmail(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && checkPromo()}
-                type="email"
-                placeholder="marie@exemple.com"
-                style={inputStyle}
-              />
-            </div>
-            <button onClick={checkPromo} disabled={checking} style={{ width: '100%', padding: '11px', borderRadius: 8, border: 'none', cursor: checking ? 'not-allowed' : 'pointer', background: GOLD, color: 'white', fontFamily: 'var(--font-playfair-display)', fontSize: 14, fontWeight: 600 }}>
-              {checking ? 'Vérification…' : 'Utiliser ce code promo'}
-            </button>
           </div>
         )}
 
