@@ -409,8 +409,8 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
               </label>
               {c.suiviDAutre && (
                 <div style={{ marginTop: 10 }}>
-                  <Field label="Nom de l'événement suivant" value={c.evenementSuivantNom} onChange={v => update(i, { evenementSuivantNom: v })} placeholder="Soirée Henné" />
-                  <Field label="Adresse de l'événement suivant" value={c.evenementSuivantAdresse} onChange={v => update(i, { evenementSuivantAdresse: v })} placeholder="Salle Michkenot Israël, 6 rue Jean Nohain Paris 75019" />
+                  <Field label="After Mairie" value={c.evenementSuivantNom} onChange={v => update(i, { evenementSuivantNom: v })} placeholder="ex: Cocktail, Vin d'honneur..." />
+                  <Field label="Adresse (optionnel)" value={c.evenementSuivantAdresse} onChange={v => update(i, { evenementSuivantAdresse: v })} />
                 </div>
               )}
             </div>
