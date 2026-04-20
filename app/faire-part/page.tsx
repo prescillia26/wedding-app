@@ -94,7 +94,7 @@ const defaultFormData: FormData = {
   famille2GpPaPerePrenom: '', famille2GpPaPereNom: '', famille2GpPaMerePrenom: '', famille2GpPaMereNom: '',
   famille2GpMaPerePrenom: '', famille2GpMaPereNom: '', famille2GpMaMerePrenom: '', famille2GpMaMereNom: '',
   ceremonies: [{ ...defaultCeremony }],
-  style: 'elegant', presentationStyle: 'photo', mariageJuif: false, youtubeUrl: '', musicUrl: '', photoFond: '', photosFond: [], emailMaries: '', textOverrides: {},
+  style: 'elegant', presentationStyle: 'elegant', mariageJuif: false, youtubeUrl: '', musicUrl: '', photoFond: '', photosFond: [], emailMaries: '', textOverrides: {},
 }
 
 // Propriétés mobiles partagées pour tous les boutons
@@ -436,8 +436,8 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         <Label>Présentation</Label>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           {([
-            { key: 'photo' as PresentationStyle, label: '📷 Style photo en fond', desc: 'Votre photo en arrière-plan' },
             { key: 'elegant' as PresentationStyle, label: '✨ Style élégant', desc: 'Monogramme & calligraphie' },
+            { key: 'photo' as PresentationStyle, label: '📷 Style photo en fond', desc: 'Votre photo en arrière-plan' },
           ]).map(opt => (
             <button key={opt.key} type="button" onClick={() => onChange({ presentationStyle: opt.key })} style={{
               ...BTN,
