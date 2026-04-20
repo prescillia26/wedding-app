@@ -554,9 +554,20 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       </label>
       <div style={{ marginBottom: 20 }}>
         <Label>Musique de fond — Fichier MP3</Label>
-        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>
-          Téléchargez votre chanson en MP3 sur <strong style={{ color: '#C9A84C' }}>cobalt.tools</strong> puis uploadez-la ici
-        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+          <p style={{ fontSize: 11, color: '#9ca3af', margin: 0, flex: 1 }}>Convertissez votre chanson en MP3, puis uploadez-la ici</p>
+          <a href="https://cobalt.tools" target="_blank" rel="noopener noreferrer" style={{
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+            padding: '7px 14px', borderRadius: 9999,
+            background: 'linear-gradient(135deg, #C9A84C, #e8c96a)',
+            color: 'white', fontSize: 12, fontWeight: 600,
+            textDecoration: 'none', whiteSpace: 'nowrap',
+            boxShadow: '0 2px 10px #C9A84C44',
+            fontFamily: 'var(--font-playfair-display)',
+          }}>
+            🎵 Télécharger en MP3
+          </a>
+        </div>
         <MusicUploader musicUrl={data.musicUrl ?? ''} musicName={data.musicName} onChange={(url, name) => onChange({ musicUrl: url, musicName: name ?? '' })} />
       </div>
       <div>
