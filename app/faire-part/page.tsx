@@ -556,7 +556,7 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         <Label>Musique de fond — Fichier MP3</Label>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
           <p style={{ fontSize: 11, color: '#9ca3af', margin: 0, flex: 1 }}>Convertissez votre chanson en MP3, puis uploadez-la ici</p>
-          <a href="https://cobalt.tools" target="_blank" rel="noopener noreferrer" style={{
+          <a href="https://yt2mp3.gs" target="_blank" rel="noopener noreferrer" style={{
             display: 'inline-flex', alignItems: 'center', gap: 5,
             padding: '7px 14px', borderRadius: 9999,
             background: 'linear-gradient(135deg, #C9A84C, #e8c96a)',
