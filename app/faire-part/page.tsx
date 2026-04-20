@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 
 type Theme = 'floral-bleu' | 'rose-fleuri' | 'or-dentelle' | 'oriental-nuit' | 'champetre'
 type PresentationStyle = 'photo' | 'elegant'
@@ -13,33 +13,32 @@ const THEMES: Record<Theme, ThemeObj> = {
   'champetre':     { fond: '#f4f7f0',  pageFond: '#e5ede0', accent: '#7a9e6e', texte: '#2a3520', textSecondaire: '#4a6040', nom: 'Champêtre' },
 }
 
-const ORNEMENTS_THEMES: Record<string, string[]> = {
-  'rose-fleuri': [
-    'https://res.cloudinary.com/dau96mui2/image/upload/v1776717218/20171005_019_vdhnev.jpg',
-    'https://res.cloudinary.com/dau96mui2/image/upload/v1776717246/66409_puhith.jpg',
-    'https://res.cloudinary.com/dau96mui2/image/upload/v1776717314/anuj31may_1_j0pavz.jpg',
-    'https://res.cloudinary.com/dau96mui2/image/upload/v1776717363/1200f225-a3cc-4f16-9e1f-1506fe39d391_rq7wsv.jpg',
-    'https://res.cloudinary.com/dau96mui2/image/upload/v1776717404/9580620_dq9fdq.png',
-  ],
-  'floral-bleu': [
-    'https://res.cloudinary.com/dau96mui2/image/upload/v1776718390/16_sep_14_bzf6dr.jpg',
-    'https://res.cloudinary.com/dau96mui2/image/upload/v1776719196/19195_y8izaq.jpg',
-    'https://res.cloudinary.com/dau96mui2/image/upload/v1776719185/16_sep_14_apqwtk.jpg',
-    'https://res.cloudinary.com/dau96mui2/image/upload/v1776719178/OP0ITX0_kymmwl.jpg',
-    'https://res.cloudinary.com/dau96mui2/image/upload/v1776719150/82080d7a-d487-4894-8f10-397c8cb49537_fyhmi9.jpg',
-    'https://res.cloudinary.com/dau96mui2/image/upload/v1776718431/3018234_fzcxop.jpg',
-  ],
-  'champetre': [
-    'https://res.cloudinary.com/dau96mui2/image/upload/v1776718577/pdproject20batch45-01-a_ta7kvb.jpg',
-    'https://res.cloudinary.com/dau96mui2/image/upload/v1776718564/5669340_vewejg.jpg',
-    'https://res.cloudinary.com/dau96mui2/image/upload/v1776718554/beautiful-leaf-watercolor-background-brown-autumn-season_kfslxw.jpg',
-  ],
-  'or-dentelle': [
-    'https://res.cloudinary.com/dau96mui2/image/upload/v1776719304/OM8PMY0_qiwjoc.jpg',
-    'https://res.cloudinary.com/dau96mui2/image/upload/v1776719294/5381953_fog6nb.jpg',
-    'https://res.cloudinary.com/dau96mui2/image/upload/v1776719304/OM8PMY0_qiwjoc.jpg',
-  ],
-}
+const ORNAMENTS: { id: string; label: string; url: string; type: 'corner' | 'divider' }[] = [
+  {
+    id: 'roses-diagonales',
+    label: '🌹 Roses Diagonales',
+    url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776723714/anuj31may_1-removebg-preview_dn3i8z.png',
+    type: 'corner',
+  },
+  {
+    id: 'roses-coin',
+    label: '🌸 Roses en Cascade',
+    url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776723708/20171005_019-removebg-preview_lszrbt.png',
+    type: 'corner',
+  },
+  {
+    id: 'bouquet-roses',
+    label: '💐 Bouquet de Roses',
+    url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776723702/66409-removebg-preview_nacact.png',
+    type: 'corner',
+  },
+  {
+    id: 'bandeau-fleurs',
+    label: '🌺 Bandeau Fleuri',
+    url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776723697/1200f225-a3cc-4f16-9e1f-1506fe39d391-removebg-preview_j61xmn.png',
+    type: 'divider',
+  },
+]
 
 const THEME_CARD_BG: Record<string, string> = {
   'rose-fleuri':   '#fff9f6',
@@ -108,7 +107,7 @@ interface FormData {
   monogrammeStyle?: string
   monogrammeColor?: string
   musicName?: string
-  ornementUrl?: string
+  ornamentId?: string
   marie1PrenomHebreu?: string
   marie2PrenomHebreu?: string
 }
@@ -131,7 +130,7 @@ const defaultFormData: FormData = {
   ceremonies: [{ ...defaultCeremony }],
   style: 'floral-bleu', presentationStyle: 'elegant', mariageJuif: false, youtubeUrl: '', musicUrl: '', musicName: '', photoFond: '', photosFond: [], emailMaries: '', textOverrides: {},
   monogrammeStyle: 'cercle', monogrammeColor: '',
-  ornementUrl: '',
+  ornamentId: 'roses-diagonales',
   marie1PrenomHebreu: '',
   marie2PrenomHebreu: '',
 }
@@ -507,18 +506,15 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 16 }}>
         {(Object.entries(THEMES) as [Theme, ThemeObj][]).map(([key, t]) => {
           const sel = data.style === key
-          const firstImg = ORNEMENTS_THEMES[key]?.[0]
           return (
-            <button key={key} type="button" onClick={() => onChange({ style: key, ornementUrl: ORNEMENTS_THEMES[key]?.[0] ?? '' })} style={{
+            <button key={key} type="button" onClick={() => onChange({ style: key })} style={{
               ...BTN, padding: 0, borderRadius: 10,
               border: `3px solid ${sel ? t.accent : 'transparent'}`,
               background: 'transparent', textAlign: 'center', overflow: 'hidden',
               boxShadow: sel ? `0 0 0 1px ${t.accent}` : '0 1px 4px rgba(0,0,0,0.10)',
             }}>
-              <div style={{ background: t.fond, width: '100%', height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
-                {firstImg && <img src={firstImg} alt="" style={{ position: 'absolute', right: -15, top: -10, width: 90, height: 90, objectFit: 'cover', opacity: 0.55, borderRadius: 4 }} />}
-                {!firstImg && key === 'or-dentelle' && <div style={{ position: 'absolute', right: -20, top: -15, opacity: 0.4 }}><OrnementDentelleDore /></div>}
-                <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 24, color: t.accent, position: 'relative', zIndex: 1 }}>Aa</span>
+              <div style={{ background: t.fond, width: '100%', height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 24, color: t.accent }}>Aa</span>
               </div>
               <div style={{ padding: '6px 4px 7px', background: 'white', fontSize: 10, fontWeight: sel ? 700 : 400, color: sel ? t.accent : '#4a3728', lineHeight: 1.2 }}>
                 {t.nom}
@@ -529,26 +525,28 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       </div>
 
       {/* ── Choix de l'ornement ── */}
-      {ORNEMENTS_THEMES[data.style] && (
-        <div style={{ marginBottom: 24 }}>
-          <Label>Choisir votre ornement</Label>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-            {ORNEMENTS_THEMES[data.style].map((url, i) => {
-              const accent = THEMES[data.style].accent
-              const sel = (data.ornementUrl || ORNEMENTS_THEMES[data.style][0]) === url
-              return (
-                <button key={i} type="button" onClick={() => onChange({ ornementUrl: url })} style={{
-                  ...BTN, padding: 0, borderRadius: 8, border: `3px solid ${sel ? accent : 'transparent'}`,
-                  overflow: 'hidden', background: 'transparent',
-                  boxShadow: sel ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.10)',
-                }}>
-                  <img src={url} alt="" style={{ width: '100%', height: 80, objectFit: 'cover', display: 'block' }} />
-                </button>
-              )
-            })}
-          </div>
+      <div style={{ marginBottom: 24 }}>
+        <Label>Choisissez votre ornement</Label>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
+          {ORNAMENTS.map(orn => {
+            const accent = THEMES[data.style].accent
+            const sel = (data.ornamentId ?? 'roses-diagonales') === orn.id
+            return (
+              <button key={orn.id} type="button" onClick={() => onChange({ ornamentId: orn.id })} style={{
+                ...BTN, padding: 8, borderRadius: 10,
+                border: `2.5px solid ${sel ? accent : '#f0e0d0'}`,
+                background: sel ? `${accent}10` : 'white',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                boxShadow: sel ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.08)',
+              }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={orn.url} alt={orn.label} style={{ width: 64, height: 64, objectFit: 'contain', background: '#f8f4f0', borderRadius: 8 }} />
+                <span style={{ fontSize: 10, fontWeight: sel ? 700 : 400, color: sel ? accent : '#4a3728', textAlign: 'center', lineHeight: 1.3 }}>{orn.label}</span>
+              </button>
+            )
+          })}
         </div>
-      )}
+      </div>
 
       {/* ── Monogramme ── */}
       <div style={{ marginBottom: 24 }}>
@@ -710,35 +708,24 @@ function MairieIllustration({ color }: { color: string }) {
 type ThemeObj = { fond: string; pageFond: string; accent: string; texte: string; textSecondaire: string; nom: string; carteBordure?: string }
 interface CardProps { ceremony: Ceremony; data: FormData; theme: ThemeObj; isShared?: boolean; cardIdx?: number }
 
-function CardCornerOrnaments({ themeStyle }: { themeStyle: string }) {
-  const imgs = ORNEMENTS_THEMES[themeStyle]
-  if (!imgs || themeStyle === 'oriental-nuit') return null
+function CardCornerOrnaments({ ornamentId }: { ornamentId: string }) {
+  const orn = ORNAMENTS.find(o => o.id === ornamentId)
+  if (!orn || orn.type !== 'corner') return null
   return (
     <>
       {/* Coin haut-droite */}
-      <div style={{ position: 'absolute', top: 0, right: 0, width: 220, height: 220, overflow: 'hidden', pointerEvents: 'none', zIndex: 2 }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={imgs[0]} alt="" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center center', mixBlendMode: 'multiply', opacity: 0.9 } as React.CSSProperties} />
-      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={orn.url} alt="" style={{ position: 'absolute', top: -30, right: -30, width: 280, height: 280, objectFit: 'contain', mixBlendMode: 'screen', opacity: 0.92, pointerEvents: 'none', zIndex: 2 } as React.CSSProperties} />
       {/* Coin bas-gauche */}
-      <div style={{ position: 'absolute', bottom: 0, left: 0, width: 220, height: 220, overflow: 'hidden', pointerEvents: 'none', zIndex: 2 }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={imgs[1] ?? imgs[0]} alt="" style={{ position: 'absolute', top: 0, right: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center center', mixBlendMode: 'multiply', opacity: 0.9, transform: 'rotate(180deg)' } as React.CSSProperties} />
-      </div>
-      {/* Coin haut-gauche (plus petit) */}
-      {imgs[2] && (
-        <div style={{ position: 'absolute', top: 0, left: 0, width: 140, height: 140, overflow: 'hidden', pointerEvents: 'none', zIndex: 2 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imgs[2]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: 0.7, transform: 'scaleX(-1)' } as React.CSSProperties} />
-        </div>
-      )}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={orn.url} alt="" style={{ position: 'absolute', bottom: -30, left: -30, width: 220, height: 220, objectFit: 'contain', mixBlendMode: 'screen', opacity: 0.75, pointerEvents: 'none', zIndex: 2, transform: 'rotate(180deg)' } as React.CSSProperties} />
     </>
   )
 }
 
-function FloralDivider({ themeStyle, themeAccent }: { themeStyle: string; themeAccent: string }) {
-  const imgs = ORNEMENTS_THEMES[themeStyle]
-  if (!imgs || themeStyle === 'oriental-nuit') {
+function FloralDivider({ ornamentId, themeAccent }: { ornamentId: string; themeAccent: string }) {
+  const orn = ORNAMENTS.find(o => o.id === ornamentId)
+  if (!orn || orn.type !== 'divider') {
     return (
       <div style={{ maxWidth: 600, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 12, padding: '20px 24px' }}>
         <div style={{ flex: 1, height: 1, background: themeAccent, opacity: 0.3 }} />
@@ -747,12 +734,10 @@ function FloralDivider({ themeStyle, themeAccent }: { themeStyle: string; themeA
       </div>
     )
   }
-  const src = imgs[3] ?? imgs[0]
   return (
-    <div style={{ maxWidth: 600, margin: '16px auto', height: 55, position: 'relative', overflow: 'hidden' }}>
+    <div style={{ maxWidth: 600, margin: '12px auto', textAlign: 'center' }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt="" style={{ width: '100%', height: 180, objectFit: 'cover', objectPosition: 'center 20%', mixBlendMode: 'multiply', opacity: 0.55, position: 'absolute', top: '50%', transform: 'translateY(-50%)' } as React.CSSProperties} />
-      <div style={{ position: 'absolute', top: '50%', left: '10%', right: '10%', height: 1, background: themeAccent, opacity: 0.25, transform: 'translateY(-50%)' }} />
+      <img src={orn.url} alt="" style={{ width: '100%', height: 70, objectFit: 'cover', objectPosition: 'center center', mixBlendMode: 'screen', opacity: 0.85, display: 'block' } as React.CSSProperties} />
     </div>
   )
 }
@@ -853,7 +838,7 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   return (
     <CarouselBackground photos={[]} fond={THEME_CARD_BG[data.style] ?? theme.fond} isOriental={isDark}>
       <div style={{ position: 'relative' }}>
-        <CardCornerOrnaments themeStyle={data.style} />
+        <CardCornerOrnaments ornamentId={data.ornamentId ?? 'roses-diagonales'} />
         <div style={{ padding: '60px 48px', position: 'relative', zIndex: 10 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
@@ -940,7 +925,7 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   return (
     <CarouselBackground photos={[]} fond={THEME_CARD_BG[data.style] ?? theme.fond} isOriental={isDark}>
       <div style={{ position: 'relative' }}>
-        <CardCornerOrnaments themeStyle={data.style} />
+        <CardCornerOrnaments ornamentId={data.ornamentId ?? 'roses-diagonales'} />
         <div style={{ padding: '60px 48px', position: 'relative', zIndex: 10 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
@@ -1002,7 +987,7 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   return (
     <CarouselBackground photos={[]} fond={THEME_CARD_BG[data.style] ?? theme.fond} isOriental={isDark}>
       <div style={{ position: 'relative' }}>
-        <CardCornerOrnaments themeStyle={data.style} />
+        <CardCornerOrnaments ornamentId={data.ornamentId ?? 'roses-diagonales'} />
         <div style={{ padding: '60px 48px', position: 'relative', zIndex: 10 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
@@ -1054,7 +1039,7 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   return (
     <CarouselBackground photos={[]} fond={THEME_CARD_BG[data.style] ?? theme.fond} isOriental={isDark}>
       <div style={{ position: 'relative' }}>
-        <CardCornerOrnaments themeStyle={data.style} />
+        <CardCornerOrnaments ornamentId={data.ornamentId ?? 'roses-diagonales'} />
         <div style={{ padding: '60px 48px', position: 'relative', zIndex: 10 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
@@ -1102,7 +1087,7 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
   return (
     <CarouselBackground photos={[]} fond={THEME_CARD_BG[data.style] ?? theme.fond} isOriental={isDark}>
       <div style={{ position: 'relative' }}>
-        <CardCornerOrnaments themeStyle={data.style} />
+        <CardCornerOrnaments ornamentId={data.ornamentId ?? 'roses-diagonales'} />
         <div style={{ padding: '60px 48px', position: 'relative', zIndex: 10 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
@@ -1393,7 +1378,7 @@ function ElegantCardsContent({ data, theme, isShared }: { data: FormData; theme:
           <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden' }}>
             {renderCard(ceremony, data, theme, i, isShared)}
           </div>
-          {i < sorted.length - 1 && <FloralDivider themeStyle={data.style} themeAccent={theme.accent} />}
+          {i < sorted.length - 1 && <FloralDivider ornamentId={data.ornamentId ?? 'roses-diagonales'} themeAccent={theme.accent} />}
         </div>
       ))}
     </>
@@ -2396,23 +2381,17 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   const hasGp = [data.famille1GpPaPerePrenom, data.famille1GpMaPerePrenom, data.famille2GpPaPerePrenom, data.famille2GpMaPerePrenom].some(Boolean)
   const firstDate = sorted[0]?.date
 
-  const ornUrl = data.ornementUrl || ORNEMENTS_THEMES[data.style]?.[0] || ''
-  const isDarkTheme = data.style === 'oriental-nuit'
-  const blendMode: React.CSSProperties['mixBlendMode'] = isDarkTheme ? 'screen' : 'multiply'
-  const OrnImg = ({ topRight, topLeft }: { topRight?: boolean; bottomLeft?: boolean; topLeft?: boolean }) => {
-    if (!ornUrl && data.style !== 'or-dentelle') return null
-    if (!ornUrl && data.style === 'or-dentelle') return (
-      <div style={{ position: 'absolute', ...(topRight ? { top: -20, right: -20 } : topLeft ? { top: -20, left: -20 } : { bottom: -20, left: -20, transform: 'rotate(180deg)' }), pointerEvents: 'none', zIndex: 10 }}>
-        <OrnementDentelleDore />
-      </div>
-    )
-    const pos = topRight
-      ? { top: -60, right: -60 }
-      : topLeft
-        ? { top: -60, left: -60 }
-        : { bottom: -60, left: -60, transform: 'rotate(180deg)' }
+  const ornamentId = data.ornamentId ?? 'roses-diagonales'
+  const activeOrn = ORNAMENTS.find(o => o.id === ornamentId)
+  const isCornerOrn = activeOrn?.type === 'corner'
+  const OrnImg = ({ topRight }: { topRight?: boolean; bottomLeft?: boolean; topLeft?: boolean }) => {
+    if (!activeOrn || !isCornerOrn) return null
+    const pos: React.CSSProperties = topRight
+      ? { top: -30, right: -30, width: 280, height: 280, opacity: 0.92 }
+      : { bottom: -30, left: -30, width: 220, height: 220, opacity: 0.75, transform: 'rotate(180deg)' }
     return (
-      <img src={ornUrl} alt="" style={{ position: 'absolute', ...pos, width: 300, height: 300, objectFit: 'contain', mixBlendMode: blendMode, opacity: 0.9, pointerEvents: 'none', zIndex: 10 } as React.CSSProperties} />
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={activeOrn.url} alt="" style={{ position: 'absolute', objectFit: 'contain', mixBlendMode: 'screen', pointerEvents: 'none', zIndex: 10, ...pos } as React.CSSProperties} />
     )
   }
 
@@ -2565,7 +2544,8 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
           const title = typeTitle[ceremony.type] || (ceremony.customName?.toUpperCase() || ceremony.type.toUpperCase())
           const hebrewDate = getHebrewDate(ceremony.date)
           return (
-            <section key={i} style={{ paddingTop: 60, paddingBottom: 52, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: 'hidden' }}>
+            <React.Fragment key={i}>
+            <section style={{ paddingTop: 60, paddingBottom: 52, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: 'hidden' }}>
               <OrnImg topRight />
               <OrnImg bottomLeft />
               <AnimSection>
@@ -2641,6 +2621,8 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                 )}
               </AnimSection>
             </section>
+            {!isCornerOrn && i < sorted.length - 1 && <FloralDivider ornamentId={ornamentId} themeAccent={G} />}
+            </React.Fragment>
           )
         })}
 
@@ -2707,8 +2689,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
       <footer style={{ padding: '48px 28px 64px', textAlign: 'center', background: `${G}08`, maxWidth: 480, margin: '0 auto' }}>
         <AnimSection>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
-            {ornUrl && <img src={ornUrl} alt="" style={{ width: 160, height: 160, objectFit: 'contain', mixBlendMode: blendMode, opacity: 0.65 } as React.CSSProperties} />}
-            {!ornUrl && data.style === 'or-dentelle' && <div style={{ opacity: 0.5, transform: 'scale(0.5)', transformOrigin: 'center' }}><OrnementDentelleDore /></div>}
+            {activeOrn && <img src={activeOrn.url} alt="" style={{ width: 160, height: 160, objectFit: 'contain', mixBlendMode: 'screen', opacity: 0.65 } as React.CSSProperties} />}
           </div>
           <div style={{ fontFamily: FS, fontSize: 40, color: G, marginBottom: 12, lineHeight: 1.2 }}>
             {data.marie1Prenom} & {data.marie2Prenom}
