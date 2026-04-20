@@ -37,7 +37,16 @@ const ORNEMENTS_THEMES: Record<string, string[]> = {
   'or-dentelle': [
     'https://res.cloudinary.com/dau96mui2/image/upload/v1776719304/OM8PMY0_qiwjoc.jpg',
     'https://res.cloudinary.com/dau96mui2/image/upload/v1776719294/5381953_fog6nb.jpg',
+    'https://res.cloudinary.com/dau96mui2/image/upload/v1776719304/OM8PMY0_qiwjoc.jpg',
   ],
+}
+
+const THEME_CARD_BG: Record<string, string> = {
+  'rose-fleuri':   '#fff9f6',
+  'floral-bleu':   '#f8faff',
+  'or-dentelle':   '#fffdf5',
+  'champetre':     '#f8fdf6',
+  'oriental-nuit': '#0f0a1e',
 }
 
 const CEREMONY_TYPES = ['Mairie', 'Cérémonie religieuse / Houppa', 'Shabbat Hatan', 'Henné', 'Cocktail', 'Soirée', 'Boat Party', 'Autre']
@@ -701,6 +710,53 @@ function MairieIllustration({ color }: { color: string }) {
 type ThemeObj = { fond: string; pageFond: string; accent: string; texte: string; textSecondaire: string; nom: string; carteBordure?: string }
 interface CardProps { ceremony: Ceremony; data: FormData; theme: ThemeObj; isShared?: boolean; cardIdx?: number }
 
+function CardCornerOrnaments({ themeStyle }: { themeStyle: string }) {
+  const imgs = ORNEMENTS_THEMES[themeStyle]
+  if (!imgs || themeStyle === 'oriental-nuit') return null
+  return (
+    <>
+      {/* Coin haut-droite */}
+      <div style={{ position: 'absolute', top: 0, right: 0, width: 220, height: 220, overflow: 'hidden', pointerEvents: 'none', zIndex: 2 }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={imgs[0]} alt="" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center center', mixBlendMode: 'multiply', opacity: 0.9 } as React.CSSProperties} />
+      </div>
+      {/* Coin bas-gauche */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, width: 220, height: 220, overflow: 'hidden', pointerEvents: 'none', zIndex: 2 }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={imgs[1] ?? imgs[0]} alt="" style={{ position: 'absolute', top: 0, right: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center center', mixBlendMode: 'multiply', opacity: 0.9, transform: 'rotate(180deg)' } as React.CSSProperties} />
+      </div>
+      {/* Coin haut-gauche (plus petit) */}
+      {imgs[2] && (
+        <div style={{ position: 'absolute', top: 0, left: 0, width: 140, height: 140, overflow: 'hidden', pointerEvents: 'none', zIndex: 2 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={imgs[2]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: 0.7, transform: 'scaleX(-1)' } as React.CSSProperties} />
+        </div>
+      )}
+    </>
+  )
+}
+
+function FloralDivider({ themeStyle, themeAccent }: { themeStyle: string; themeAccent: string }) {
+  const imgs = ORNEMENTS_THEMES[themeStyle]
+  if (!imgs || themeStyle === 'oriental-nuit') {
+    return (
+      <div style={{ maxWidth: 600, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 12, padding: '20px 24px' }}>
+        <div style={{ flex: 1, height: 1, background: themeAccent, opacity: 0.3 }} />
+        <span style={{ color: themeAccent }}>✦</span>
+        <div style={{ flex: 1, height: 1, background: themeAccent, opacity: 0.3 }} />
+      </div>
+    )
+  }
+  const src = imgs[3] ?? imgs[0]
+  return (
+    <div style={{ maxWidth: 600, margin: '16px auto', height: 55, position: 'relative', overflow: 'hidden' }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt="" style={{ width: '100%', height: 180, objectFit: 'cover', objectPosition: 'center 20%', mixBlendMode: 'multiply', opacity: 0.55, position: 'absolute', top: '50%', transform: 'translateY(-50%)' } as React.CSSProperties} />
+      <div style={{ position: 'absolute', top: '50%', left: '10%', right: '10%', height: 1, background: themeAccent, opacity: 0.25, transform: 'translateY(-50%)' }} />
+    </div>
+  )
+}
+
 function CarouselBackground({ photos, fond, isOriental, children }: {
   photos: string[],
   fond: string,
@@ -795,8 +851,10 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const honore = ov[`ceremony_${ci}_honore`] || 'et seront honorés de votre présence à la cérémonie religieuse qui sera célébrée le'
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CarouselBackground photos={[]} fond={theme.fond} isOriental={isDark}>
-      <div style={{ padding: '60px 48px', position: 'relative' }}>
+    <CarouselBackground photos={[]} fond={THEME_CARD_BG[data.style] ?? theme.fond} isOriental={isDark}>
+      <div style={{ position: 'relative' }}>
+        <CardCornerOrnaments themeStyle={data.style} />
+        <div style={{ padding: '60px 48px', position: 'relative', zIndex: 10 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 42, color: theme.accent, textAlign: 'center', marginBottom: 20, lineHeight: 1.2 }}>
@@ -868,6 +926,7 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
             </a>
           </div>
         )}
+        </div>
       </div>
     </CarouselBackground>
   )
@@ -879,8 +938,10 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const ci = cardIdx ?? 0
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CarouselBackground photos={[]} fond={theme.fond} isOriental={isDark}>
-      <div style={{ padding: '60px 48px', position: 'relative' }}>
+    <CarouselBackground photos={[]} fond={THEME_CARD_BG[data.style] ?? theme.fond} isOriental={isDark}>
+      <div style={{ position: 'relative' }}>
+        <CardCornerOrnaments themeStyle={data.style} />
+        <div style={{ padding: '60px 48px', position: 'relative', zIndex: 10 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: theme.accent, textAlign: 'center', marginBottom: 20 }}>Mairie</div>
@@ -927,6 +988,7 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
             </a>
           </div>
         )}
+        </div>
       </div>
     </CarouselBackground>
   )
@@ -938,8 +1000,10 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const ci = cardIdx ?? 0
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CarouselBackground photos={[]} fond={theme.fond} isOriental={isDark}>
-      <div style={{ padding: '60px 48px', position: 'relative' }}>
+    <CarouselBackground photos={[]} fond={THEME_CARD_BG[data.style] ?? theme.fond} isOriental={isDark}>
+      <div style={{ position: 'relative' }}>
+        <CardCornerOrnaments themeStyle={data.style} />
+        <div style={{ padding: '60px 48px', position: 'relative', zIndex: 10 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, textAlign: 'center', marginBottom: 16 }}>Soirée Henné</div>
@@ -974,6 +1038,7 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
             </a>
           </div>
         )}
+        </div>
       </div>
     </CarouselBackground>
   )
@@ -987,8 +1052,10 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const titreDisplay = ov[`ceremony_${ci}_titre`] || name
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CarouselBackground photos={[]} fond={theme.fond} isOriental={isDark}>
-      <div style={{ padding: '60px 48px', position: 'relative' }}>
+    <CarouselBackground photos={[]} fond={THEME_CARD_BG[data.style] ?? theme.fond} isOriental={isDark}>
+      <div style={{ position: 'relative' }}>
+        <CardCornerOrnaments themeStyle={data.style} />
+        <div style={{ padding: '60px 48px', position: 'relative', zIndex: 10 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, textAlign: 'center', marginBottom: 20 }}>{titreDisplay}</div>
@@ -1021,6 +1088,7 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
             </a>
           </div>
         )}
+        </div>
       </div>
     </CarouselBackground>
   )
@@ -1032,8 +1100,10 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
   const ov = data.textOverrides ?? {}
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CarouselBackground photos={[]} fond={theme.fond} isOriental={isDark}>
-      <div style={{ padding: '60px 48px', position: 'relative' }}>
+    <CarouselBackground photos={[]} fond={THEME_CARD_BG[data.style] ?? theme.fond} isOriental={isDark}>
+      <div style={{ position: 'relative' }}>
+        <CardCornerOrnaments themeStyle={data.style} />
+        <div style={{ padding: '60px 48px', position: 'relative', zIndex: 10 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, textAlign: 'center', marginBottom: 16 }}>Shabbat Hatan</div>
@@ -1068,6 +1138,7 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
             </a>
           </div>
         )}
+        </div>
       </div>
     </CarouselBackground>
   )
@@ -1322,7 +1393,7 @@ function ElegantCardsContent({ data, theme, isShared }: { data: FormData; theme:
           <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden' }}>
             {renderCard(ceremony, data, theme, i, isShared)}
           </div>
-          {i < sorted.length - 1 && <ElegantSeparator color={theme.accent} initial1={i1} initial2={i2} />}
+          {i < sorted.length - 1 && <FloralDivider themeStyle={data.style} themeAccent={theme.accent} />}
         </div>
       ))}
     </>
@@ -2328,7 +2399,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   const ornUrl = data.ornementUrl || ORNEMENTS_THEMES[data.style]?.[0] || ''
   const isDarkTheme = data.style === 'oriental-nuit'
   const blendMode: React.CSSProperties['mixBlendMode'] = isDarkTheme ? 'screen' : 'multiply'
-  const OrnImg = ({ topRight, bottomLeft, topLeft }: { topRight?: boolean; bottomLeft?: boolean; topLeft?: boolean }) => {
+  const OrnImg = ({ topRight, topLeft }: { topRight?: boolean; bottomLeft?: boolean; topLeft?: boolean }) => {
     if (!ornUrl && data.style !== 'or-dentelle') return null
     if (!ornUrl && data.style === 'or-dentelle') return (
       <div style={{ position: 'absolute', ...(topRight ? { top: -20, right: -20 } : topLeft ? { top: -20, left: -20 } : { bottom: -20, left: -20, transform: 'rotate(180deg)' }), pointerEvents: 'none', zIndex: 10 }}>
