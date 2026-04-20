@@ -77,6 +77,9 @@ interface FormData {
   photosFond: string[]
   emailMaries: string
   textOverrides?: Record<string, string>
+  monogrammeStyle?: string
+  monogrammeColor?: string
+  musicName?: string
 }
 
 const defaultCeremony: Ceremony = {
@@ -95,7 +98,8 @@ const defaultFormData: FormData = {
   famille2GpPaPerePrenom: '', famille2GpPaPereNom: '', famille2GpPaMerePrenom: '', famille2GpPaMereNom: '',
   famille2GpMaPerePrenom: '', famille2GpMaPereNom: '', famille2GpMaMerePrenom: '', famille2GpMaMereNom: '',
   ceremonies: [{ ...defaultCeremony }],
-  style: 'elegant', presentationStyle: 'elegant', mariageJuif: false, youtubeUrl: '', musicUrl: '', photoFond: '', photosFond: [], emailMaries: '', textOverrides: {},
+  style: 'elegant', presentationStyle: 'elegant', mariageJuif: false, youtubeUrl: '', musicUrl: '', musicName: '', photoFond: '', photosFond: [], emailMaries: '', textOverrides: {},
+  monogrammeStyle: 'cercle', monogrammeColor: '',
 }
 
 // Propriétés mobiles partagées pour tous les boutons
@@ -482,13 +486,71 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           </button>
         ))}
       </div>
+      {/* ── Monogramme ── */}
+      <div style={{ marginBottom: 24 }}>
+        <Label>Style du monogramme</Label>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 12 }}>
+          {([
+            { key: 'cercle', label: 'Cercle' },
+            { key: 'enlace', label: 'Enlacé' },
+            { key: 'couronne', label: 'Couronne' },
+            { key: 'branches', label: 'Branches' },
+            { key: 'losange', label: 'Losange' },
+            { key: 'minimaliste', label: 'Minimaliste' },
+          ] as { key: string; label: string }[]).map(opt => {
+            const sel = (data.monogrammeStyle || 'cercle') === opt.key
+            const previewColor = data.monogrammeColor || '#C9A84C'
+            return (
+              <button key={opt.key} type="button" onClick={() => onChange({ monogrammeStyle: opt.key })} style={{
+                ...BTN,
+                padding: '10px 6px 6px',
+                borderRadius: 10,
+                border: `2px solid ${sel ? '#C9A84C' : '#fecdd3'}`,
+                background: sel ? '#fdf5e4' : 'white',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+              }}>
+                <MonogramByStyle initial1="A" initial2="B" color={previewColor} size={52} style={opt.key} />
+                <span style={{ fontSize: 10, color: sel ? '#C9A84C' : '#4a3728', fontWeight: sel ? 700 : 400 }}>{opt.label}</span>
+              </button>
+            )
+          })}
+        </div>
+        <Label>Couleur du monogramme</Label>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          {([
+            { value: '', label: 'Thème' },
+            { value: '#C9A84C', label: 'Doré' },
+            { value: '#b8860b', label: 'Vieil or' },
+            { value: '#9e9e9e', label: 'Argenté' },
+            { value: '#d4829a', label: 'Rosé' },
+            { value: '#4a3728', label: 'Chocolat' },
+          ] as { value: string; label: string }[]).map(opt => {
+            const sel = (data.monogrammeColor ?? '') === opt.value
+            const swatch = opt.value || '#C9A84C'
+            return (
+              <button key={opt.label} type="button" onClick={() => onChange({ monogrammeColor: opt.value })} style={{
+                ...BTN,
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                padding: '6px 10px', borderRadius: 8,
+                border: `2px solid ${sel ? swatch : 'transparent'}`,
+                background: sel ? `${swatch}18` : 'transparent',
+              }}>
+                <div style={{ width: 22, height: 22, borderRadius: '50%', background: swatch, border: `1px solid ${swatch}66` }} />
+                <span style={{ fontSize: 10, color: '#4a3728' }}>{opt.label}</span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
       <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 14, border: '1px solid #fecdd3', borderRadius: 10, cursor: 'pointer', marginBottom: 20, fontSize: 14, color: '#4a3728' }}>
         <input type="checkbox" checked={data.mariageJuif} onChange={e => onChange({ mariageJuif: e.target.checked })} />
         Mariage juif ✡
       </label>
       <div style={{ marginBottom: 20 }}>
         <Label>Musique de fond — Fichier MP3</Label>
-        <MusicUploader musicUrl={data.musicUrl ?? ''} onChange={url => onChange({ musicUrl: url })} />
+        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Téléchargez votre chanson sur <strong>ytmp3.cc</strong> puis uploadez-la ici</p>
+        <MusicUploader musicUrl={data.musicUrl ?? ''} musicName={data.musicName} onChange={(url, name) => onChange({ musicUrl: url, musicName: name ?? '' })} />
         {!data.musicUrl && (
           <>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 0' }}>
@@ -736,6 +798,13 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, textAlign: 'center', color: theme.texte }}>{ceremony.note}</div>
           </div>
         )}
+        {isShared && (
+          <div style={{ marginTop: 28, textAlign: 'center' }}>
+            <a href="https://lovit.fr" target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: theme.accent, textDecoration: 'none', opacity: 0.45, letterSpacing: 0.5 }}>
+              Créé avec ❤️ par Lov&apos;it
+            </a>
+          </div>
+        )}
       </div>
     </CarouselBackground>
   )
@@ -788,6 +857,13 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, textAlign: 'center', color: theme.texte }}>{ceremony.note}</div>
           </div>
         )}
+        {isShared && (
+          <div style={{ marginTop: 28, textAlign: 'center' }}>
+            <a href="https://lovit.fr" target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: theme.accent, textDecoration: 'none', opacity: 0.45, letterSpacing: 0.5 }}>
+              Créé avec ❤️ par Lov&apos;it
+            </a>
+          </div>
+        )}
       </div>
     </CarouselBackground>
   )
@@ -826,6 +902,13 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
         {ceremony.note && (
           <div style={{ marginTop: 20, paddingTop: 14, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, textAlign: 'center', color: theme.texte }}>{ceremony.note}</div>
+          </div>
+        )}
+        {isShared && (
+          <div style={{ marginTop: 28, textAlign: 'center' }}>
+            <a href="https://lovit.fr" target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: theme.accent, textDecoration: 'none', opacity: 0.45, letterSpacing: 0.5 }}>
+              Créé avec ❤️ par Lov&apos;it
+            </a>
           </div>
         )}
       </div>
@@ -868,6 +951,13 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, textAlign: 'center', color: theme.texte }}>{ceremony.note}</div>
           </div>
         )}
+        {isShared && (
+          <div style={{ marginTop: 28, textAlign: 'center' }}>
+            <a href="https://lovit.fr" target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: theme.accent, textDecoration: 'none', opacity: 0.45, letterSpacing: 0.5 }}>
+              Créé avec ❤️ par Lov&apos;it
+            </a>
+          </div>
+        )}
       </div>
     </CarouselBackground>
   )
@@ -908,6 +998,13 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, textAlign: 'center', color: theme.texte }}>{ceremony.note}</div>
           </div>
         )}
+        {isShared && (
+          <div style={{ marginTop: 28, textAlign: 'center' }}>
+            <a href="https://lovit.fr" target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: theme.accent, textDecoration: 'none', opacity: 0.45, letterSpacing: 0.5 }}>
+              Créé avec ❤️ par Lov&apos;it
+            </a>
+          </div>
+        )}
       </div>
     </CarouselBackground>
   )
@@ -929,25 +1026,70 @@ function renderCard(ceremony: Ceremony, data: FormData, theme: ThemeObj, photoId
 function LogoOrMonogram({ data, theme }: { data: FormData; theme: ThemeObj }) {
   const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
   const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
+  const color = data.monogrammeColor || theme.accent
   return (
     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
-      <MonogramSVG initial1={i1} initial2={i2} color={theme.accent} size={110} />
+      <MonogramByStyle initial1={i1} initial2={i2} color={color} size={110} style={data.monogrammeStyle || 'cercle'} />
     </div>
   )
 }
 
-function MonogramSVG({ initial1, initial2, color, size = 220 }: { initial1: string; initial2: string; color: string; size?: number }) {
+function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercle' }: { initial1: string; initial2: string; color: string; size?: number; style?: string }) {
+  const a = initial1 || 'A'
+  const b = initial2 || 'B'
+  if (style === 'enlace') return (
+    <svg viewBox="0 0 220 220" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="95" cy="110" rx="70" ry="88" fill="none" stroke={color} strokeWidth="0.7" opacity="0.3" />
+      <ellipse cx="125" cy="110" rx="70" ry="88" fill="none" stroke={color} strokeWidth="0.7" opacity="0.3" />
+      <text x="85" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="100" fill={color} fillOpacity="0.9" textAnchor="middle">{a}</text>
+      <text x="135" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="100" fill={color} fillOpacity="0.9" textAnchor="middle">{b}</text>
+    </svg>
+  )
+  if (style === 'couronne') return (
+    <svg viewBox="0 0 220 220" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
+      <path d="M 50 80 L 50 55 L 75 68 L 110 45 L 145 68 L 170 55 L 170 80 Z" fill="none" stroke={color} strokeWidth="1" opacity="0.55" strokeLinejoin="round" />
+      <path d="M 50 80 L 170 80" fill="none" stroke={color} strokeWidth="0.6" opacity="0.4" />
+      <text x="78" y="160" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{a}</text>
+      <text x="142" y="160" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{b}</text>
+    </svg>
+  )
+  if (style === 'branches') return (
+    <svg viewBox="0 0 220 220" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
+      <path d="M 18 110 Q 30 90 18 70 M 18 110 Q 38 100 28 78 M 18 110 Q 40 112 32 90" fill="none" stroke={color} strokeWidth="1" opacity="0.45" strokeLinecap="round" />
+      <path d="M 202 110 Q 190 90 202 70 M 202 110 Q 182 100 192 78 M 202 110 Q 180 112 188 90" fill="none" stroke={color} strokeWidth="1" opacity="0.45" strokeLinecap="round" />
+      <text x="78" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{a}</text>
+      <text x="142" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{b}</text>
+      <path d="M 38 172 Q 110 165 182 172" fill="none" stroke={color} strokeWidth="0.6" opacity="0.4" />
+    </svg>
+  )
+  if (style === 'losange') return (
+    <svg viewBox="0 0 220 220" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
+      <path d="M 110 14 L 200 110 L 110 206 L 20 110 Z" fill="none" stroke={color} strokeWidth="0.8" opacity="0.3" />
+      <path d="M 110 28 L 188 110 L 110 192 L 32 110 Z" fill="none" stroke={color} strokeWidth="0.4" opacity="0.18" />
+      <text x="78" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{a}</text>
+      <text x="142" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{b}</text>
+    </svg>
+  )
+  if (style === 'minimaliste') return (
+    <svg viewBox="0 0 220 220" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
+      <text x="78" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{a}</text>
+      <text x="142" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{b}</text>
+      <line x1="35" y1="175" x2="185" y2="175" stroke={color} strokeWidth="0.8" opacity="0.4" />
+    </svg>
+  )
+  // default: cercle
   return (
     <svg viewBox="0 0 220 220" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
       <circle cx="110" cy="110" r="100" fill="none" stroke={color} strokeWidth="0.8" opacity="0.35" />
       <circle cx="110" cy="110" r="93" fill="none" stroke={color} strokeWidth="0.4" opacity="0.2" />
-      <text x="78" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{initial1 || 'A'}</text>
-      <text x="142" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{initial2 || 'B'}</text>
+      <text x="78" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{a}</text>
+      <text x="142" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{b}</text>
       <path d="M 28 170 Q 110 163 192 170" fill="none" stroke={color} strokeWidth="0.6" opacity="0.5" />
       <path d="M 38 176 Q 110 169 182 176" fill="none" stroke={color} strokeWidth="0.3" opacity="0.3" />
     </svg>
   )
 }
+
 
 function ElegantSeparator({ color, initial1, initial2 }: { color: string; initial1: string; initial2: string }) {
   return (
@@ -1034,7 +1176,7 @@ function ElegantPage2({ data, theme }: { data: FormData; theme: ThemeObj }) {
   return (
     <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', backgroundColor: theme.fond, padding: '56px 48px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
       {data.mariageJuif && <div style={{ fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl', marginBottom: 20 }}>בס״ד</div>}
-      <MonogramSVG initial1={i1} initial2={i2} color={theme.accent} size={200} />
+      <MonogramByStyle initial1={i1} initial2={i2} color={data.monogrammeColor || theme.accent} size={200} style={data.monogrammeStyle || 'cercle'} />
       <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, marginTop: 20, textAlign: 'center', lineHeight: 1.2 }}>
         {data.marie1Prenom} & {data.marie2Prenom}
       </div>
@@ -1432,7 +1574,7 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
 
 // ── Music Upload (Cloudinary) ──────────────────────────────────────────────────
 
-function MusicUploader({ musicUrl, onChange }: { musicUrl: string; onChange: (url: string) => void }) {
+function MusicUploader({ musicUrl, musicName, onChange }: { musicUrl: string; musicName?: string; onChange: (url: string, name?: string) => void }) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
 
@@ -1446,7 +1588,7 @@ function MusicUploader({ musicUrl, onChange }: { musicUrl: string; onChange: (ur
       const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
       const json = await res.json()
       if (json.secure_url) {
-        onChange(json.secure_url)
+        onChange(json.secure_url, file.name)
       } else {
         setError("Erreur upload : " + (json.error?.message ?? 'inconnu'))
       }
@@ -1461,7 +1603,7 @@ function MusicUploader({ musicUrl, onChange }: { musicUrl: string; onChange: (ur
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', border: '1px solid #C9A84C44', borderRadius: 10, background: '#fdf5e4' }}>
         <span style={{ fontSize: 18 }}>🎵</span>
-        <span style={{ flex: 1, fontSize: 12, color: '#4a3728', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Musique uploadée</span>
+        <span style={{ flex: 1, fontSize: 12, color: '#4a3728', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{musicName || 'Musique uploadée'}</span>
         <button type="button" onClick={() => onChange('')} style={{ ...BTN, background: 'none', border: 'none', color: '#fb7185', fontSize: 13 }}>✕ Supprimer</button>
       </div>
     )
