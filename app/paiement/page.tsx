@@ -64,6 +64,8 @@ function CheckIcon({ color }: { color: string }) {
 export default function PaiementPage() {
   const [loading, setLoading] = useState<Pack | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [waitlistEmail, setWaitlistEmail] = useState('')
+  const [waitlistSent, setWaitlistSent] = useState(false)
 
   const startCheckout = async (pack: Pack) => {
     setLoading(pack)
@@ -104,6 +106,73 @@ export default function PaiementPage() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, maxWidth: 960, margin: '0 auto 48px' }}>
         {PACKS.map(pack => {
           const isPremium = pack.key === 'premium'
+          const isLuxe = pack.key === 'luxe'
+
+          // ── Carte Luxe grisée ──────────────────────────────────────────────
+          if (isLuxe) return (
+            <div key={pack.key} style={{
+              position: 'relative', background: '#f9f9f9', borderRadius: 20,
+              padding: '36px 32px 32px', border: '1px solid #e5e5e5',
+              display: 'flex', flexDirection: 'column', opacity: 0.85,
+            }}>
+              {/* Badge bientôt dispo */}
+              <div style={{
+                position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)',
+                background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`,
+                color: 'white', padding: '5px 18px', borderRadius: 9999,
+                fontFamily: 'var(--font-playfair-display)', fontSize: 12, fontWeight: 700,
+                whiteSpace: 'nowrap', boxShadow: `0 4px 16px ${GOLD}44`,
+              }}>
+                Bientôt disponible
+              </div>
+
+              {/* Titre & Prix barré */}
+              <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 36, color: '#aaa', marginBottom: 4 }}>{pack.titre}</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 24 }}>
+                <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 42, fontWeight: 700, color: '#bbb', textDecoration: 'line-through' }}>{pack.prix}€</span>
+                <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: '#ccc' }}>une seule fois</span>
+              </div>
+
+              <div style={{ height: 1, background: '#e5e5e5', marginBottom: 24 }} />
+
+              {/* Features grisées */}
+              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', flex: 1 }}>
+                {pack.features.map(f => (
+                  <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 12, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 16, color: '#bbb', lineHeight: 1.5 }}>
+                    <CheckIcon color="#ccc" />{f}
+                  </li>
+                ))}
+              </ul>
+
+              {/* Liste d'attente */}
+              <div style={{ borderTop: '1px solid #e5e5e5', paddingTop: 20 }}>
+                <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', marginBottom: 10, textAlign: 'center' }}>
+                  Rejoignez la liste d&apos;attente
+                </div>
+                {waitlistSent ? (
+                  <div style={{ textAlign: 'center', color: '#16a34a', fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, fontWeight: 600 }}>✓ Nous vous contacterons dès l&apos;ouverture !</div>
+                ) : (
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input
+                      type="email"
+                      value={waitlistEmail}
+                      onChange={e => setWaitlistEmail(e.target.value)}
+                      placeholder="votre@email.com"
+                      style={{ flex: 1, padding: '9px 12px', borderRadius: 8, border: '1.5px solid #e5e5e5', fontSize: 13, outline: 'none', background: 'white', color: DARK }}
+                    />
+                    <button
+                      onClick={() => { if (waitlistEmail.trim()) setWaitlistSent(true) }}
+                      style={{ padding: '9px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', background: GOLD, color: 'white', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap' }}
+                    >
+                      OK
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+
+          // ── Cartes normales ────────────────────────────────────────────────
           return (
             <div key={pack.key} style={{
               position: 'relative',
@@ -115,7 +184,6 @@ export default function PaiementPage() {
               display: 'flex',
               flexDirection: 'column',
             }}>
-              {/* Badge populaire */}
               {pack.badge && (
                 <div style={{
                   position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)',
@@ -127,18 +195,12 @@ export default function PaiementPage() {
                   {pack.badge}
                 </div>
               )}
-
-              {/* Titre & Prix */}
               <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 36, color: GOLD, marginBottom: 4 }}>{pack.titre}</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 24 }}>
                 <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 42, fontWeight: 700, color: DARK }}>{pack.prix}€</span>
                 <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: TEXT }}>une seule fois</span>
               </div>
-
-              {/* Séparateur */}
               <div style={{ height: 1, background: `${GOLD}22`, marginBottom: 24 }} />
-
-              {/* Features */}
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 32px', flex: 1 }}>
                 {pack.features.map(f => (
                   <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 12, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 16, color: TEXT, lineHeight: 1.5 }}>
@@ -146,8 +208,6 @@ export default function PaiementPage() {
                   </li>
                 ))}
               </ul>
-
-              {/* CTA */}
               <button
                 onClick={() => startCheckout(pack.key)}
                 disabled={loading !== null}

@@ -33,6 +33,7 @@ interface Ceremony {
   suiviDAutre: boolean
   evenementSuivantNom: string
   evenementSuivantAdresse: string
+  note: string
 }
 
 interface FormData {
@@ -75,14 +76,13 @@ interface FormData {
   photoFond: string
   photosFond: string[]
   emailMaries: string
-  notePersonnelle?: string
   textOverrides?: Record<string, string>
 }
 
 const defaultCeremony: Ceremony = {
   type: 'Cérémonie religieuse / Houppa',
   customName: '', lieu: '', adresse: '', date: '', heure: '',
-  suiviDAutre: false, evenementSuivantNom: '', evenementSuivantAdresse: '',
+  suiviDAutre: false, evenementSuivantNom: '', evenementSuivantAdresse: '', note: '',
 }
 
 const defaultFormData: FormData = {
@@ -95,7 +95,7 @@ const defaultFormData: FormData = {
   famille2GpPaPerePrenom: '', famille2GpPaPereNom: '', famille2GpPaMerePrenom: '', famille2GpPaMereNom: '',
   famille2GpMaPerePrenom: '', famille2GpMaPereNom: '', famille2GpMaMerePrenom: '', famille2GpMaMereNom: '',
   ceremonies: [{ ...defaultCeremony }],
-  style: 'elegant', presentationStyle: 'elegant', mariageJuif: false, youtubeUrl: '', musicUrl: '', photoFond: '', photosFond: [], emailMaries: '', notePersonnelle: '', textOverrides: {},
+  style: 'elegant', presentationStyle: 'elegant', mariageJuif: false, youtubeUrl: '', musicUrl: '', photoFond: '', photosFond: [], emailMaries: '', textOverrides: {},
 }
 
 // Propriétés mobiles partagées pour tous les boutons
@@ -415,6 +415,12 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
               )}
             </div>
           )}
+          <div style={{ marginTop: 4 }}>
+            <Label>Note pour cet événement (optionnel)</Label>
+            <textarea value={c.note} onChange={e => update(i, { note: e.target.value })}
+              placeholder="ex: Tenue de soirée exigée / Parking disponible / Entrée par la rue de..."
+              rows={2} style={{ ...S.input, resize: 'vertical', minHeight: 56, fontFamily: 'inherit', fontSize: 13 }} />
+          </div>
         </div>
       ))}
       {data.ceremonies.length < 6 && (
@@ -546,12 +552,6 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         <Label>Votre email (notifications RSVP)</Label>
         <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Recevez une notification à chaque nouvelle réponse RSVP</p>
         <input type="email" value={data.emailMaries ?? ''} onChange={e => onChange({ emailMaries: e.target.value })} placeholder="marie@exemple.com" style={S.input} />
-      </div>
-      <div style={{ marginTop: 20 }}>
-        <Label>Note personnelle (optionnel)</Label>
-        <textarea value={data.notePersonnelle ?? ''} onChange={e => onChange({ notePersonnelle: e.target.value })}
-          placeholder="ex: Nous avons une tendre pensée pour... / Tenue de soirée exigée / Parking disponible..."
-          rows={3} style={{ ...S.input, resize: 'vertical', minHeight: 72, fontFamily: 'inherit' }} />
       </div>
     </div>
   )
@@ -731,9 +731,9 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
             </a>
           </div>
         )}
-        {data.notePersonnelle && (
-          <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textAlign: 'center', color: theme.texte }}>{data.notePersonnelle}</div>
+        {ceremony.note && (
+          <div style={{ marginTop: 20, paddingTop: 14, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, textAlign: 'center', color: theme.texte }}>{ceremony.note}</div>
           </div>
         )}
       </div>
@@ -783,9 +783,9 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
             )}
           </div>
         )}
-        {data.notePersonnelle && (
-          <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textAlign: 'center', color: theme.texte }}>{data.notePersonnelle}</div>
+        {ceremony.note && (
+          <div style={{ marginTop: 20, paddingTop: 14, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, textAlign: 'center', color: theme.texte }}>{ceremony.note}</div>
           </div>
         )}
       </div>
@@ -823,9 +823,9 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
             </a>
           </div>
         )}
-        {data.notePersonnelle && (
-          <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textAlign: 'center', color: theme.texte }}>{data.notePersonnelle}</div>
+        {ceremony.note && (
+          <div style={{ marginTop: 20, paddingTop: 14, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, textAlign: 'center', color: theme.texte }}>{ceremony.note}</div>
           </div>
         )}
       </div>
@@ -863,9 +863,9 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
             </a>
           </div>
         )}
-        {data.notePersonnelle && (
-          <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textAlign: 'center', color: theme.texte }}>{data.notePersonnelle}</div>
+        {ceremony.note && (
+          <div style={{ marginTop: 20, paddingTop: 14, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, textAlign: 'center', color: theme.texte }}>{ceremony.note}</div>
           </div>
         )}
       </div>
@@ -903,9 +903,9 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
             </a>
           </div>
         )}
-        {data.notePersonnelle && (
-          <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textAlign: 'center', color: theme.texte }}>{data.notePersonnelle}</div>
+        {ceremony.note && (
+          <div style={{ marginTop: 20, paddingTop: 14, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, textAlign: 'center', color: theme.texte }}>{ceremony.note}</div>
           </div>
         )}
       </div>
