@@ -489,53 +489,58 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       {/* ── Monogramme ── */}
       <div style={{ marginBottom: 24 }}>
         <Label>Style du monogramme</Label>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 12 }}>
+        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>Aperçu avec vos initiales en temps réel</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 14 }}>
           {([
-            { key: 'cercle', label: 'Cercle' },
-            { key: 'enlace', label: 'Enlacé' },
-            { key: 'couronne', label: 'Couronne' },
-            { key: 'branches', label: 'Branches' },
-            { key: 'losange', label: 'Losange' },
-            { key: 'minimaliste', label: 'Minimaliste' },
+            { key: 'cercle',      label: 'Entrelacé Luxe' },
+            { key: 'enlace',      label: 'Calligraphie Pure' },
+            { key: 'couronne',    label: 'Cercle Élégant' },
+            { key: 'branches',    label: 'Vertical Luxe' },
+            { key: 'losange',     label: 'Minimaliste Chic' },
+            { key: 'minimaliste', label: 'Baroque' },
           ] as { key: string; label: string }[]).map(opt => {
             const sel = (data.monogrammeStyle || 'cercle') === opt.key
             const previewColor = data.monogrammeColor || '#C9A84C'
+            const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
+            const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
             return (
               <button key={opt.key} type="button" onClick={() => onChange({ monogrammeStyle: opt.key })} style={{
                 ...BTN,
-                padding: '10px 6px 6px',
+                padding: '12px 6px 8px',
                 borderRadius: 10,
                 border: `2px solid ${sel ? '#C9A84C' : '#fecdd3'}`,
                 background: sel ? '#fdf5e4' : 'white',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', gap: 6,
+                minHeight: 110, overflow: 'hidden',
               }}>
-                <MonogramByStyle initial1="A" initial2="B" color={previewColor} size={52} style={opt.key} />
-                <span style={{ fontSize: 10, color: sel ? '#C9A84C' : '#4a3728', fontWeight: sel ? 700 : 400 }}>{opt.label}</span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, minHeight: 80 }}>
+                  <MonogramByStyle initial1={i1} initial2={i2} color={previewColor} size={80} style={opt.key} />
+                </div>
+                <span style={{ fontSize: 9, color: sel ? '#C9A84C' : '#6a5040', fontWeight: sel ? 700 : 400, textAlign: 'center', lineHeight: 1.3 }}>{opt.label}</span>
               </button>
             )
           })}
         </div>
         <Label>Couleur du monogramme</Label>
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
           {([
-            { value: '', label: 'Thème' },
-            { value: '#C9A84C', label: 'Doré' },
-            { value: '#b8860b', label: 'Vieil or' },
-            { value: '#9e9e9e', label: 'Argenté' },
-            { value: '#d4829a', label: 'Rosé' },
-            { value: '#4a3728', label: 'Chocolat' },
-          ] as { value: string; label: string }[]).map(opt => {
+            { value: '',        label: 'Thème',    swatch: '#C9A84C' },
+            { value: '#C9A84C', label: 'Doré',     swatch: '#C9A84C' },
+            { value: '#9e9e9e', label: 'Argent',   swatch: '#9e9e9e' },
+            { value: '#d4829a', label: 'Rose',     swatch: '#d4829a' },
+            { value: '#8b0000', label: 'Bordeaux', swatch: '#8b0000' },
+            { value: '#1a1a1a', label: 'Noir',     swatch: '#1a1a1a' },
+          ] as { value: string; label: string; swatch: string }[]).map(opt => {
             const sel = (data.monogrammeColor ?? '') === opt.value
-            const swatch = opt.value || '#C9A84C'
             return (
               <button key={opt.label} type="button" onClick={() => onChange({ monogrammeColor: opt.value })} style={{
                 ...BTN,
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
                 padding: '6px 10px', borderRadius: 8,
-                border: `2px solid ${sel ? swatch : 'transparent'}`,
-                background: sel ? `${swatch}18` : 'transparent',
+                border: `2px solid ${sel ? opt.swatch : 'transparent'}`,
+                background: sel ? `${opt.swatch}18` : 'transparent',
               }}>
-                <div style={{ width: 22, height: 22, borderRadius: '50%', background: swatch, border: `1px solid ${swatch}66` }} />
+                <div style={{ width: 22, height: 22, borderRadius: '50%', background: opt.swatch, border: `1px solid ${opt.swatch}66`, boxShadow: sel ? `0 0 0 2px white, 0 0 0 3px ${opt.swatch}` : 'none' }} />
                 <span style={{ fontSize: 10, color: '#4a3728' }}>{opt.label}</span>
               </button>
             )
@@ -549,18 +554,10 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       </label>
       <div style={{ marginBottom: 20 }}>
         <Label>Musique de fond — Fichier MP3</Label>
-        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Téléchargez votre chanson sur <strong>ytmp3.cc</strong> puis uploadez-la ici</p>
+        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>
+          Téléchargez votre chanson en MP3 sur <strong style={{ color: '#C9A84C' }}>cobalt.tools</strong> puis uploadez-la ici
+        </p>
         <MusicUploader musicUrl={data.musicUrl ?? ''} musicName={data.musicName} onChange={(url, name) => onChange({ musicUrl: url, musicName: name ?? '' })} />
-        {!data.musicUrl && (
-          <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 0' }}>
-              <div style={{ flex: 1, height: 1, background: '#fecdd3' }} />
-              <span style={{ fontSize: 11, color: '#9ca3af' }}>ou lien YouTube</span>
-              <div style={{ flex: 1, height: 1, background: '#fecdd3' }} />
-            </div>
-            <input type="url" value={data.youtubeUrl} onChange={e => onChange({ youtubeUrl: e.target.value })} placeholder="https://www.youtube.com/watch?v=..." style={S.input} />
-          </>
-        )}
       </div>
       <div>
         <Label>Photos de fond (optionnel — max 5)</Label>
@@ -1037,56 +1034,103 @@ function LogoOrMonogram({ data, theme }: { data: FormData; theme: ThemeObj }) {
 function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercle' }: { initial1: string; initial2: string; color: string; size?: number; style?: string }) {
   const a = initial1 || 'A'
   const b = initial2 || 'B'
+  const fs = Math.round(size * 0.52)
+
+  // ── Style 1 : Entrelacé Luxe ──────────────────────────────────────────────
+  // Lettre A normale (z-index 2), lettre B en position absolute décalée (z-index 1)
+  if (style === 'cercle') {
+    const w = Math.round(fs * 1.55)
+    const h = Math.round(fs * 1.2)
+    const bX = Math.round(fs * 0.52)   // décalage horizontal : B commence à mi-A
+    const bY = Math.round(fs * 0.14)   // décalage vertical : B légèrement en bas
+    return (
+      <div style={{ position: 'relative', display: 'inline-block', width: w, height: h }}>
+        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: fs, color, lineHeight: 1, position: 'absolute', top: 0, left: 0, zIndex: 2 }}>{a}</span>
+        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: fs, color, lineHeight: 1, position: 'absolute', top: 0, left: 0, transform: `translateX(${bX}px) translateY(${bY}px)`, opacity: 0.72, zIndex: 1 }}>{b}</span>
+      </div>
+    )
+  }
+
+  // ── Style 2 : Calligraphie Pure ───────────────────────────────────────────
+  // A & B côte à côte, kerning négatif, & en Cormorant 45%
   if (style === 'enlace') return (
-    <svg viewBox="0 0 220 220" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="95" cy="110" rx="70" ry="88" fill="none" stroke={color} strokeWidth="0.7" opacity="0.3" />
-      <ellipse cx="125" cy="110" rx="70" ry="88" fill="none" stroke={color} strokeWidth="0.7" opacity="0.3" />
-      <text x="85" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="100" fill={color} fillOpacity="0.9" textAnchor="middle">{a}</text>
-      <text x="135" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="100" fill={color} fillOpacity="0.9" textAnchor="middle">{b}</text>
-    </svg>
+    <div style={{ display: 'inline-flex', alignItems: 'baseline' }}>
+      <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: fs, color, lineHeight: 1, letterSpacing: -Math.round(fs * 0.04) }}>{a}</span>
+      <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: Math.round(fs * 0.45), color, opacity: 0.55, lineHeight: 1, margin: `0 ${Math.round(fs * 0.06)}px` }}>&</span>
+      <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: fs, color, lineHeight: 1, letterSpacing: -Math.round(fs * 0.04) }}>{b}</span>
+    </div>
   )
-  if (style === 'couronne') return (
-    <svg viewBox="0 0 220 220" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
-      <path d="M 50 80 L 50 55 L 75 68 L 110 45 L 145 68 L 170 55 L 170 80 Z" fill="none" stroke={color} strokeWidth="1" opacity="0.55" strokeLinejoin="round" />
-      <path d="M 50 80 L 170 80" fill="none" stroke={color} strokeWidth="0.6" opacity="0.4" />
-      <text x="78" y="160" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{a}</text>
-      <text x="142" y="160" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{b}</text>
-    </svg>
-  )
-  if (style === 'branches') return (
-    <svg viewBox="0 0 220 220" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
-      <path d="M 18 110 Q 30 90 18 70 M 18 110 Q 38 100 28 78 M 18 110 Q 40 112 32 90" fill="none" stroke={color} strokeWidth="1" opacity="0.45" strokeLinecap="round" />
-      <path d="M 202 110 Q 190 90 202 70 M 202 110 Q 182 100 192 78 M 202 110 Q 180 112 188 90" fill="none" stroke={color} strokeWidth="1" opacity="0.45" strokeLinecap="round" />
-      <text x="78" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{a}</text>
-      <text x="142" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{b}</text>
-      <path d="M 38 172 Q 110 165 182 172" fill="none" stroke={color} strokeWidth="0.6" opacity="0.4" />
-    </svg>
-  )
+
+  // ── Style 3 : Cercle Élégant ──────────────────────────────────────────────
+  // SVG cercle fin autour des initiales entrelacées
+  if (style === 'couronne') {
+    const d = size
+    const cx = d / 2, cy = d / 2
+    const r1 = d / 2 - 2, r2 = d / 2 - Math.round(d * 0.07)
+    const sw1 = Math.max(0.5, d * 0.005), sw2 = Math.max(0.3, d * 0.003)
+    return (
+      <div style={{ position: 'relative', display: 'inline-flex', width: d, height: d, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <svg style={{ position: 'absolute', top: 0, left: 0 }} width={d} height={d} viewBox={`0 0 ${d} ${d}`} xmlns="http://www.w3.org/2000/svg">
+          <circle cx={cx} cy={cy} r={r1} fill="none" stroke={color} strokeWidth={sw1} opacity="0.35" />
+          <circle cx={cx} cy={cy} r={r2} fill="none" stroke={color} strokeWidth={sw2} opacity="0.2" />
+        </svg>
+        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: Math.round(fs * 0.84), color, lineHeight: 1, position: 'relative', zIndex: 2 }}>{a}</span>
+        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: Math.round(fs * 0.84), color, lineHeight: 1, marginLeft: -Math.round(fs * 0.08), opacity: 0.72, transform: 'translateY(8%)', display: 'inline-block', position: 'relative', zIndex: 1 }}>{b}</span>
+      </div>
+    )
+  }
+
+  // ── Style 4 : Vertical Luxe ───────────────────────────────────────────────
+  // A en haut, B en bas, se chevauchent au centre avec fine ligne dorée
+  if (style === 'branches') {
+    const letterFs = Math.round(fs * 0.9)
+    const overlap = Math.round(letterFs * 0.28)
+    return (
+      <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
+        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: letterFs, color, lineHeight: 1, position: 'relative', zIndex: 2 }}>{a}</span>
+        <div style={{ width: 1, height: Math.max(6, Math.round(size * 0.05)), background: color, opacity: 0.45, marginTop: -overlap, marginBottom: -overlap, position: 'relative', zIndex: 3 }} />
+        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: letterFs, color, lineHeight: 1, opacity: 0.78, position: 'relative', zIndex: 1 }}>{b}</span>
+      </div>
+    )
+  }
+
+  // ── Style 5 : Minimaliste Chic ────────────────────────────────────────────
+  // Cormorant Garamond 300, très espacé, ultra-luxe
   if (style === 'losange') return (
-    <svg viewBox="0 0 220 220" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
-      <path d="M 110 14 L 200 110 L 110 206 L 20 110 Z" fill="none" stroke={color} strokeWidth="0.8" opacity="0.3" />
-      <path d="M 110 28 L 188 110 L 110 192 L 32 110 Z" fill="none" stroke={color} strokeWidth="0.4" opacity="0.18" />
-      <text x="78" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{a}</text>
-      <text x="142" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{b}</text>
-    </svg>
+    <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: Math.round(size * 0.04) }}>
+      <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: Math.round(fs * 0.22) }}>
+        <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: Math.round(fs * 0.96), color, fontStyle: 'italic', lineHeight: 1, fontWeight: 300, letterSpacing: Math.round(fs * 0.04) }}>{a}</span>
+        <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: Math.round(fs * 0.96), color, fontStyle: 'italic', lineHeight: 1, fontWeight: 300, letterSpacing: Math.round(fs * 0.04) }}>{b}</span>
+      </div>
+      <div style={{ width: Math.round(size * 0.72), height: 0.5, background: color, opacity: 0.35 }} />
+    </div>
   )
-  if (style === 'minimaliste') return (
-    <svg viewBox="0 0 220 220" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
-      <text x="78" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{a}</text>
-      <text x="142" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{b}</text>
-      <line x1="35" y1="175" x2="185" y2="175" stroke={color} strokeWidth="0.8" opacity="0.4" />
-    </svg>
-  )
-  // default: cercle
+
+  // ── Style 6 : Baroque ────────────────────────────────────────────────────
+  // Ornements SVG courbe (fleurs/étoiles) au-dessus et en-dessous des initiales
+  const ornW = Math.round(size * 0.9)
+  const ornH = Math.round(size * 0.14)
+  const rDot = Math.max(1.5, size * 0.016)
+  const bX6 = Math.round(fs * 0.5), bY6 = Math.round(fs * 0.13)
   return (
-    <svg viewBox="0 0 220 220" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
-      <circle cx="110" cy="110" r="100" fill="none" stroke={color} strokeWidth="0.8" opacity="0.35" />
-      <circle cx="110" cy="110" r="93" fill="none" stroke={color} strokeWidth="0.4" opacity="0.2" />
-      <text x="78" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{a}</text>
-      <text x="142" y="148" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic" fontSize="105" fill={color} fillOpacity="0.9" textAnchor="middle">{b}</text>
-      <path d="M 28 170 Q 110 163 192 170" fill="none" stroke={color} strokeWidth="0.6" opacity="0.5" />
-      <path d="M 38 176 Q 110 169 182 176" fill="none" stroke={color} strokeWidth="0.3" opacity="0.3" />
-    </svg>
+    <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}>
+      <svg width={ornW} height={ornH} viewBox={`0 0 ${ornW} ${ornH}`} xmlns="http://www.w3.org/2000/svg">
+        <path d={`M${ornW*0.04},${ornH*0.82} Q${ornW*0.25},${ornH*0.06} ${ornW*0.5},${ornH*0.58} Q${ornW*0.75},${ornH*0.06} ${ornW*0.96},${ornH*0.82}`} fill="none" stroke={color} strokeWidth="0.9" opacity="0.5" strokeLinecap="round"/>
+        <circle cx={ornW*0.04} cy={ornH*0.82} r={rDot} fill={color} opacity="0.45"/>
+        <circle cx={ornW*0.5} cy={ornH*0.58} r={rDot} fill={color} opacity="0.45"/>
+        <circle cx={ornW*0.96} cy={ornH*0.82} r={rDot} fill={color} opacity="0.45"/>
+      </svg>
+      <div style={{ position: 'relative', display: 'inline-block', width: Math.round(fs * 1.55), height: Math.round(fs * 1.2) }}>
+        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: fs, color, lineHeight: 1, position: 'absolute', top: 0, left: 0, zIndex: 2 }}>{a}</span>
+        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: fs, color, lineHeight: 1, position: 'absolute', top: 0, left: 0, transform: `translateX(${bX6}px) translateY(${bY6}px)`, opacity: 0.72, zIndex: 1 }}>{b}</span>
+      </div>
+      <svg width={ornW} height={ornH} viewBox={`0 0 ${ornW} ${ornH}`} xmlns="http://www.w3.org/2000/svg">
+        <path d={`M${ornW*0.04},${ornH*0.18} Q${ornW*0.25},${ornH*0.94} ${ornW*0.5},${ornH*0.42} Q${ornW*0.75},${ornH*0.94} ${ornW*0.96},${ornH*0.18}`} fill="none" stroke={color} strokeWidth="0.9" opacity="0.5" strokeLinecap="round"/>
+        <circle cx={ornW*0.04} cy={ornH*0.18} r={rDot} fill={color} opacity="0.45"/>
+        <circle cx={ornW*0.5} cy={ornH*0.42} r={rDot} fill={color} opacity="0.45"/>
+        <circle cx={ornW*0.96} cy={ornH*0.18} r={rDot} fill={color} opacity="0.45"/>
+      </svg>
+    </div>
   )
 }
 
