@@ -2320,6 +2320,8 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   const firstDate = sorted[0]?.date
 
   const ornUrl = data.ornementUrl || ORNEMENTS_THEMES[data.style]?.[0] || ''
+  const isDarkTheme = data.style === 'oriental-nuit'
+  const blendMode: React.CSSProperties['mixBlendMode'] = isDarkTheme ? 'screen' : 'multiply'
   const OrnImg = ({ topRight, bottomLeft }: { topRight?: boolean; bottomLeft?: boolean }) => {
     if (!ornUrl && data.style !== 'or-dentelle') return null
     if (!ornUrl && data.style === 'or-dentelle') return (
@@ -2328,7 +2330,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
       </div>
     )
     return (
-      <img src={ornUrl} alt="" style={{ position: 'absolute', ...(topRight ? { top: -30, right: -30 } : { bottom: -30, left: -30, transform: 'rotate(180deg)' }), width: 200, height: 200, objectFit: 'cover', opacity: 0.85, pointerEvents: 'none', zIndex: 0, borderRadius: 8 }} />
+      <img src={ornUrl} alt="" style={{ position: 'absolute', ...(topRight ? { top: -30, right: -30 } : { bottom: -30, left: -30, transform: 'rotate(180deg)' }), width: 220, height: 220, objectFit: 'contain', mixBlendMode: blendMode, opacity: 0.9, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
     )
   }
 
@@ -2608,7 +2610,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
       <footer style={{ padding: '48px 28px 64px', textAlign: 'center', background: `${G}08`, maxWidth: 480, margin: '0 auto' }}>
         <AnimSection>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
-            {ornUrl && <img src={ornUrl} alt="" style={{ width: 120, height: 120, objectFit: 'cover', opacity: 0.55, borderRadius: 8 }} />}
+            {ornUrl && <img src={ornUrl} alt="" style={{ width: 120, height: 120, objectFit: 'contain', mixBlendMode: blendMode, opacity: 0.7 } as React.CSSProperties} />}
             {!ornUrl && data.style === 'or-dentelle' && <div style={{ opacity: 0.5, transform: 'scale(0.5)', transformOrigin: 'center' }}><OrnementDentelleDore /></div>}
           </div>
           <div style={{ fontFamily: FS, fontSize: 40, color: G, marginBottom: 12, lineHeight: 1.2 }}>
