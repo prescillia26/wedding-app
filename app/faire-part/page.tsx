@@ -740,7 +740,7 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const honore = ov[`ceremony_${ci}_honore`] || 'et seront honorés de votre présence à la cérémonie religieuse qui sera célébrée le'
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CarouselBackground photos={(() => { const p = data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : []); return p.length ? [p[0]] : [] })()} fond={theme.fond} isOriental={isDark}>
+    <CarouselBackground photos={[]} fond={theme.fond} isOriental={isDark}>
       <div style={{ padding: '60px 48px', position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
@@ -824,7 +824,7 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const ci = cardIdx ?? 0
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CarouselBackground photos={(() => { const p = data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : []); return p.length ? [p[0]] : [] })()} fond={theme.fond} isOriental={isDark}>
+    <CarouselBackground photos={[]} fond={theme.fond} isOriental={isDark}>
       <div style={{ padding: '60px 48px', position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
@@ -883,7 +883,7 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const ci = cardIdx ?? 0
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CarouselBackground photos={(() => { const p = data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : []); return p.length ? [p[0]] : [] })()} fond={theme.fond} isOriental={isDark}>
+    <CarouselBackground photos={[]} fond={theme.fond} isOriental={isDark}>
       <div style={{ padding: '60px 48px', position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
@@ -932,7 +932,7 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const titreDisplay = ov[`ceremony_${ci}_titre`] || name
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CarouselBackground photos={(() => { const p = data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : []); return p.length ? [p[0]] : [] })()} fond={theme.fond} isOriental={isDark}>
+    <CarouselBackground photos={[]} fond={theme.fond} isOriental={isDark}>
       <div style={{ padding: '60px 48px', position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
@@ -977,7 +977,7 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
   const ov = data.textOverrides ?? {}
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CarouselBackground photos={(() => { const p = data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : []); return p.length ? [p[0]] : [] })()} fond={theme.fond} isOriental={isDark}>
+    <CarouselBackground photos={[]} fond={theme.fond} isOriental={isDark}>
       <div style={{ padding: '60px 48px', position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
