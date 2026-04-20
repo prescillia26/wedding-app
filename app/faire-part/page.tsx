@@ -2378,7 +2378,11 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   const monoColor = data.monogrammeColor || G
   const parents1 = fmtParentsLines(data.famille1PerePrenom, data.famille1PereNom, data.famille1MerePrenom, data.famille1MereNom)
   const parents2 = fmtParentsLines(data.famille2PerePrenom, data.famille2PereNom, data.famille2MerePrenom, data.famille2MereNom)
-  const hasGp = [data.famille1GpPaPerePrenom, data.famille1GpMaPerePrenom, data.famille2GpPaPerePrenom, data.famille2GpMaPerePrenom].some(Boolean)
+  const gpPa1 = fmtGpCouple(data.famille1GpPaPerePrenom, data.famille1GpPaPereNom, data.famille1GpPaMerePrenom, data.famille1GpPaMereNom)
+  const gpMa1 = fmtGpCouple(data.famille1GpMaPerePrenom, data.famille1GpMaPereNom, data.famille1GpMaMerePrenom, data.famille1GpMaMereNom)
+  const gpPa2 = fmtGpCouple(data.famille2GpPaPerePrenom, data.famille2GpPaPereNom, data.famille2GpPaMerePrenom, data.famille2GpPaMereNom)
+  const gpMa2 = fmtGpCouple(data.famille2GpMaPerePrenom, data.famille2GpMaPereNom, data.famille2GpMaMerePrenom, data.famille2GpMaMereNom)
+  const hasGp = !!(gpPa1 || gpMa1 || gpPa2 || gpMa2)
   const firstDate = sorted[0]?.date
 
   const ornamentId = data.ornamentId ?? 'roses-diagonales'
@@ -2507,8 +2511,16 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
             <AnimSection delay={300}>
               <OrnSep />
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 16, textAlign: 'center' }}>
-                <div>{parents1.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}</div>
-                <div>{parents2.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}</div>
+                <div>
+                  {parents1.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}
+                  {gpPa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpPa1}</div>}
+                  {gpMa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpMa1}</div>}
+                </div>
+                <div>
+                  {parents2.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}
+                  {gpPa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpPa2}</div>}
+                  {gpMa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpMa2}</div>}
+                </div>
               </div>
               <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, textAlign: 'center', lineHeight: 1.9, opacity: 0.85 }}>
                 {hasGp ? 'ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'ont la joie de vous faire part du mariage de leurs enfants'}
@@ -2554,14 +2566,22 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
               </AnimSection>
               {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
                 <AnimSection delay={100}>
-                  <div style={{ fontFamily: 'serif', fontSize: 20, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 22, opacity: 0.8 }}>קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה</div>
+                  <div style={{ fontFamily: 'serif', fontSize: 20, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 22, opacity: 0.8 }}>קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה</div>
                 </AnimSection>
               )}
               {(parents1.length > 0 || parents2.length > 0) && (
                 <AnimSection delay={150}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 12, textAlign: 'center' }}>
-                    <div>{parents1.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}</div>
-                    <div>{parents2.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}</div>
+                    <div>
+                      {parents1.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}
+                      {gpPa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 11, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpPa1}</div>}
+                      {gpMa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 11, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpMa1}</div>}
+                    </div>
+                    <div>
+                      {parents2.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}
+                      {gpPa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 11, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpPa2}</div>}
+                      {gpMa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 11, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpMa2}</div>}
+                    </div>
                   </div>
                   <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 24, lineHeight: 1.9, opacity: 0.82 }}>
                     {hasGp ? 'ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'ont la joie de vous faire part du mariage de leurs enfants'}
