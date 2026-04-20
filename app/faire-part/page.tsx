@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 
-type Theme = 'classique-dore' | 'ivoire-or' | 'blanc-argent' | 'bleu-nuit' | 'bleu-ciel' | 'vert-sauge' | 'rose-poudre' | 'champetre' | 'oriental' | 'bordeaux' | 'ardoise' | 'minimaliste'
+type Theme = 'elegant' | 'classique-dore' | 'ivoire-or' | 'blanc-argent' | 'bleu-nuit' | 'bleu-ciel' | 'vert-sauge' | 'rose-poudre' | 'champetre' | 'oriental' | 'bordeaux' | 'ardoise' | 'minimaliste'
 type PresentationStyle = 'photo' | 'elegant'
 
 const THEMES: Record<Theme, ThemeObj> = {
+  'elegant':        { fond: '#fdf0f3', pageFond: '#f0e8ec', accent: '#C9A84C', texte: '#4a3728', textSecondaire: '#6a5040', nom: 'Élégant' },
   'classique-dore': { fond: '#fdf0f3', pageFond: '#f0e8ec', accent: '#C9A84C', texte: '#4a3728', textSecondaire: '#6a5040', nom: 'Classique doré' },
   'ivoire-or':      { fond: '#faf6ef', pageFond: '#ede8df', accent: '#b8860b', texte: '#3d3020', textSecondaire: '#6a5040', nom: 'Ivoire & Or' },
   'blanc-argent':   { fond: '#ffffff', pageFond: '#e8e8e8', accent: '#9e9e9e', texte: '#2a2a2a', textSecondaire: '#555555', nom: 'Blanc & Argent' },
@@ -93,7 +94,7 @@ const defaultFormData: FormData = {
   famille2GpPaPerePrenom: '', famille2GpPaPereNom: '', famille2GpPaMerePrenom: '', famille2GpPaMereNom: '',
   famille2GpMaPerePrenom: '', famille2GpMaPereNom: '', famille2GpMaMerePrenom: '', famille2GpMaMereNom: '',
   ceremonies: [{ ...defaultCeremony }],
-  style: 'classique-dore', presentationStyle: 'photo', mariageJuif: false, youtubeUrl: '', musicUrl: '', photoFond: '', photosFond: [], emailMaries: '', textOverrides: {},
+  style: 'elegant', presentationStyle: 'photo', mariageJuif: false, youtubeUrl: '', musicUrl: '', photoFond: '', photosFond: [], emailMaries: '', textOverrides: {},
 }
 
 // Propriétés mobiles partagées pour tous les boutons
@@ -393,7 +394,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             ))}
           </div>
           {c.type === 'Autre' && <Field label="Nom de l'événement" value={c.customName} onChange={v => update(i, { customName: v })} />}
-          <Field label="Lieu / Salle" value={c.lieu} onChange={v => update(i, { lieu: v })} placeholder="Salons Kahi Resort" />
+          <Field label="Lieu / Salle" value={c.lieu} onChange={v => update(i, { lieu: v })} placeholder="Château de Vincennes" />
           <Field label="Adresse (optionnel)" value={c.adresse} onChange={v => update(i, { adresse: v })} />
           <div style={{ display: 'flex', gap: 12 }}>
             <Field label="Date" value={c.date} onChange={v => update(i, { date: v })} type="date" />
