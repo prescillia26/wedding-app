@@ -438,7 +438,7 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           {([
             { key: 'elegant' as PresentationStyle, label: '✨ Style élégant', desc: 'Monogramme & calligraphie' },
-            { key: 'photo' as PresentationStyle, label: '📷 Style photo en fond', desc: 'Votre photo en arrière-plan' },
+            { key: 'photo' as PresentationStyle, label: '🌿 Classique', desc: 'Mise en page épurée' },
           ]).map(opt => (
             <button key={opt.key} type="button" onClick={() => onChange({ presentationStyle: opt.key })} style={{
               ...BTN,
@@ -517,7 +517,7 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                   done++
                   if (done === toAdd.length) {
                     const updated = [...current, ...results].slice(0, 5)
-                    onChange({ photosFond: updated, photoFond: updated[0] ?? '' })
+                    onChange({ photosFond: updated, photoFond: updated[0] ?? '', presentationStyle: 'elegant' })
                   }
                 }
                 r.readAsDataURL(f)
@@ -535,7 +535,7 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                 <div style={{ position: 'absolute', bottom: 2, left: 2, background: 'rgba(0,0,0,0.55)', color: 'white', fontSize: 9, borderRadius: 4, padding: '1px 4px' }}>Photo {idx + 1}</div>
                 <button type="button" onClick={() => {
                   const updated = (data.photosFond ?? []).filter((_, i) => i !== idx)
-                  onChange({ photosFond: updated, photoFond: updated[0] ?? '' })
+                  onChange({ photosFond: updated, photoFond: updated[0] ?? '', ...(updated.length === 0 ? { presentationStyle: 'photo' } : {}) })
                 }} style={{ ...BTN, position: 'absolute', top: 2, right: 2, background: 'white', border: 'none', borderRadius: '50%', width: 18, height: 18, fontSize: 10, color: '#fb7185', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
               </div>
             ))}
