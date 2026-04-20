@@ -1731,24 +1731,100 @@ function CopyLinkRow({ label, url, accent }: { label: string; url: string; accen
   )
 }
 
-function ShareModal({ accent, guestUrl, coupleUrl, onClose }: { accent: string; guestUrl: string; coupleUrl: string; onClose: () => void }) {
+function shortDateFr(dateStr: string): string {
+  if (!dateStr) return ''
+  const d = new Date(dateStr + 'T12:00:00')
+  const day = d.getDate()
+  const month = new Intl.DateTimeFormat('fr-FR', { month: 'long' }).format(d)
+  const year = d.getFullYear()
+  return `${day === 1 ? '1er' : day} ${month} ${year}`
+}
+
+function buildWhatsAppMessage(data: FormData, guestUrl: string): string {
+  const sorted = sortByDate(data.ceremonies).filter(c => c.date)
+  let datesStr = ''
+  if (sorted.length === 0) {
+    datesStr = 'prochainement'
+  } else if (sorted.length === 1) {
+    datesStr = `le ${shortDateFr(sorted[0].date)}`
+  } else {
+    const parts = sorted.map(c => shortDateFr(c.date))
+    datesStr = `les ${parts.slice(0, -1).join(', ')} et ${parts[parts.length - 1]}`
+  }
+  const firstLieu = sorted[0]?.lieu || data.ceremonies[0]?.lieu || ''
+  const ville = firstLieu.trim().split(/\s+/).pop() || ''
+  const firstDate = sorted[0]?.date || ''
+  let dateLimite = '…'
+  if (firstDate) {
+    const d = new Date(firstDate + 'T12:00:00')
+    d.setDate(d.getDate() - 30)
+    dateLimite = shortDateFr(d.toISOString().split('T')[0])
+  }
+  const p1 = data.marie1Prenom || 'Prénom 1'
+  const p2 = data.marie2Prenom || 'Prénom 2'
+  return `Chères Familles, Chers Amis,\n\nNous sommes heureux de vous convier à notre mariage qui se tiendra ${datesStr}${ville ? ` à ${ville}` : ''}.\n\nNous serions ravis de vous compter parmi nous pour célébrer cet événement si précieux de notre vie.\n\nVous trouverez l'ensemble des informations et les RSVP sur notre faire-part digital :\n${guestUrl}\n\nNous vous serions reconnaissants de bien vouloir nous faire part de votre réponse avant le ${dateLimite}.\n\nNous avons hâte de partager ce moment si spécial à vos côtés.\n\nÀ très bientôt,\n${p1} & ${p2} 💍`
+}
+
+function CopyTextRow({ text, accent }: { text: string; accent: string }) {
+  const [copied, setCopied] = useState(false)
+  const copy = () => {
+    navigator.clipboard.writeText(text).catch(() => {
+      const ta = document.createElement('textarea'); ta.value = text; ta.style.cssText = 'position:fixed;opacity:0'
+      document.body.appendChild(ta); ta.focus(); ta.select()
+      try { (document as unknown as { execCommand(c: string): void }).execCommand('copy') } catch { /* ignore */ }
+      document.body.removeChild(ta)
+    })
+    setCopied(true); setTimeout(() => setCopied(false), 2500)
+  }
+  return (
+    <button onClick={copy} style={{ ...BTN, padding: '10px 20px', borderRadius: 8, background: copied ? '#22c55e' : accent, color: 'white', border: 'none', fontSize: 13, fontWeight: 600 }}>
+      {copied ? '✓ Copié' : 'Copier le message'}
+    </button>
+  )
+}
+
+function ShareModal({ accent, guestUrl, coupleUrl, onClose, data }: { accent: string; guestUrl: string; coupleUrl: string; onClose: () => void; data: FormData }) {
+  const [message, setMessage] = useState(() => buildWhatsAppMessage(data, guestUrl))
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)' }} />
-      <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: 36, width: '100%', maxWidth: 480, boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
-        <button onClick={onClose} style={{ ...BTN, position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 20, color: '#9ca3af' }}>✕</button>
-        <div style={{ fontSize: 28, textAlign: 'center', marginBottom: 8 }}>🎊</div>
-        <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: accent, textAlign: 'center', marginBottom: 24 }}>Votre faire-part est prêt !</div>
+      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)' }} />
+      <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: 40, width: '100%', maxWidth: 520, boxShadow: '0 24px 64px rgba(0,0,0,0.25)', maxHeight: '90vh', overflowY: 'auto' }}>
+        <button onClick={onClose} style={{ ...BTN, position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 22, color: '#9ca3af', lineHeight: 1 }}>✕</button>
 
-        <div style={{ padding: '16px 18px', background: `${accent}0e`, borderRadius: 12, marginBottom: 20 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#4a3728', marginBottom: 12 }}>Partagez à vos invités</div>
-          <CopyLinkRow label="Lien pour les invités" url={guestUrl} accent={accent} />
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: accent, textAlign: 'center', marginBottom: 28 }}>Votre faire-part est prêt ! ✨</div>
+
+        {/* Section 1 — Lien invités */}
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Lien à partager à vos invités</div>
+          <CopyLinkRow label="" url={guestUrl} accent={accent} />
+          <a href={`https://wa.me/?text=${encodeURIComponent(guestUrl)}`} target="_blank" rel="noopener noreferrer"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '11px 20px', borderRadius: 9, background: '#25D366', color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 600, marginTop: 4 }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.855L0 24l6.335-1.51A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.37l-.36-.213-3.727.888.925-3.63-.234-.374A9.778 9.778 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182c5.42 0 9.818 4.398 9.818 9.818 0 5.42-4.398 9.818-9.818 9.818z"/></svg>
+            Partager sur WhatsApp
+          </a>
         </div>
 
+        {/* Section 2 — Message pré-écrit */}
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Message pré-écrit</div>
+          <textarea value={message} onChange={e => setMessage(e.target.value)} rows={12}
+            style={{ width: '100%', padding: '12px 14px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 13, color: '#374151', lineHeight: 1.7, resize: 'vertical', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+          <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 12 }}>Vous pouvez personnaliser ce message</div>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <CopyTextRow text={message} accent={accent} />
+            <a href={`https://wa.me/?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer"
+              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', borderRadius: 8, background: '#25D366', color: 'white', textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.855L0 24l6.335-1.51A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.37l-.36-.213-3.727.888.925-3.63-.234-.374A9.778 9.778 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182c5.42 0 9.818 4.398 9.818 9.818 0 5.42-4.398 9.818-9.818 9.818z"/></svg>
+              Envoyer sur WhatsApp
+            </a>
+          </div>
+        </div>
+
+        {/* Section 3 — Lien mariés */}
         <div style={{ padding: '16px 18px', background: '#f0fdf4', borderRadius: 12 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#4a3728', marginBottom: 4 }}>Votre lien mariés</div>
-          <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 12 }}>Gardez précieusement ce lien pour accéder aux RSVP</div>
-          <CopyLinkRow label="Lien couple" url={coupleUrl} accent="#22c55e" />
+          <div style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Votre lien personnel</div>
+          <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 12 }}>Gardez ce lien pour accéder à vos RSVP</div>
+          <CopyLinkRow label="" url={coupleUrl} accent="#22c55e" />
         </div>
       </div>
     </div>
@@ -2098,6 +2174,7 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
           guestUrl={guestUrl}
           coupleUrl={coupleUrl}
           onClose={() => setShareModalOpen(false)}
+          data={data}
         />
       )}
     </div>
