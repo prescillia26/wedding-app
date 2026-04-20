@@ -2183,6 +2183,116 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
 
 // ── Page principale ────────────────────────────────────────────────────────────
 
+// ── Gate d'accès ──────────────────────────────────────────────────────────────
+
+function AccessGate({ onGranted }: { onGranted: () => void }) {
+  const GOLD = '#C9A84C'
+  const [codeInput, setCodeInput] = useState('')
+  const [promoInput, setPromoInput] = useState('')
+  const [checking, setChecking] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [showPromo, setShowPromo] = useState(false)
+
+  const checkCode = async (code: string) => {
+    setChecking(true); setError(null)
+    try {
+      const res = await fetch(`/api/check-access?code=${encodeURIComponent(code.toUpperCase().trim())}`)
+      const d = await res.json()
+      if (d.valid) {
+        try { sessionStorage.setItem('lovit_access_code', code.toUpperCase().trim()) } catch { /* ignore */ }
+        onGranted()
+      } else {
+        setError('Code invalide. Vérifiez votre email ou achetez un accès.')
+      }
+    } catch { setError('Erreur réseau. Réessayez.') }
+    finally { setChecking(false) }
+  }
+
+  const checkPromo = async () => {
+    if (!promoInput.trim()) return
+    setChecking(true); setError(null)
+    try {
+      const res = await fetch('/api/check-promo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: promoInput }),
+      })
+      const d = await res.json()
+      if (d.valid && d.accessCode) {
+        try { sessionStorage.setItem('lovit_access_code', d.accessCode) } catch { /* ignore */ }
+        onGranted()
+      } else {
+        setError('Code promo invalide ou expiré.')
+      }
+    } catch { setError('Erreur réseau. Réessayez.') }
+    finally { setChecking(false) }
+  }
+
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fdf0f3 0%, #fff5f7 50%, #fdf0f3 100%)', padding: 24 }}>
+      <div style={{ textAlign: 'center', maxWidth: 440, width: '100%' }}>
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: GOLD, marginBottom: 4 }}>Lov&apos;it</div>
+        <div style={{ width: 50, height: 1, background: GOLD, opacity: 0.3, margin: '0 auto 32px' }} />
+
+        <div style={{ background: 'white', borderRadius: 20, padding: '36px 32px', boxShadow: '0 12px 48px rgba(201,168,76,0.12)', border: `1px solid ${GOLD}22`, marginBottom: 20 }}>
+          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 20, color: '#2d1f14', marginBottom: 8 }}>Entrez votre code d&apos;accès</div>
+          <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: '#6a5040', marginBottom: 24 }}>
+            Reçu par email après votre achat
+          </p>
+
+          <input
+            value={codeInput}
+            onChange={e => setCodeInput(e.target.value.toUpperCase())}
+            onKeyDown={e => e.key === 'Enter' && checkCode(codeInput)}
+            placeholder="XXXXXX"
+            maxLength={6}
+            style={{ width: '100%', padding: '14px 18px', borderRadius: 10, border: `1.5px solid ${GOLD}44`, fontSize: 22, fontFamily: 'var(--font-playfair-display)', fontWeight: 700, color: '#2d1f14', textAlign: 'center', letterSpacing: '0.3em', outline: 'none', boxSizing: 'border-box', marginBottom: 16, background: '#fdf8f9' }}
+          />
+
+          <button
+            onClick={() => checkCode(codeInput)}
+            disabled={checking || codeInput.length < 4}
+            style={{ width: '100%', padding: '14px', borderRadius: 9999, border: 'none', cursor: checking || codeInput.length < 4 ? 'not-allowed' : 'pointer', background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`, color: 'white', fontFamily: 'var(--font-playfair-display)', fontSize: 15, fontWeight: 700, letterSpacing: '0.05em', boxShadow: `0 6px 24px ${GOLD}44`, opacity: codeInput.length < 4 ? 0.6 : 1 }}
+          >
+            {checking ? 'Vérification…' : 'Accéder à mon faire-part'}
+          </button>
+
+          {error && <p style={{ marginTop: 14, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 15, color: '#ef4444' }}>{error}</p>}
+        </div>
+
+        {/* Code promo */}
+        {!showPromo ? (
+          <button onClick={() => setShowPromo(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: GOLD, textDecoration: 'underline' }}>
+            J&apos;ai un code promo
+          </button>
+        ) : (
+          <div style={{ background: 'white', borderRadius: 16, padding: '20px 24px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: `1px solid ${GOLD}22` }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 15, color: '#6a5040', marginBottom: 10 }}>Code promo</div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input
+                value={promoInput}
+                onChange={e => setPromoInput(e.target.value.toUpperCase())}
+                onKeyDown={e => e.key === 'Enter' && checkPromo()}
+                placeholder="MONCODE"
+                style={{ flex: 1, padding: '10px 14px', borderRadius: 8, border: `1.5px solid ${GOLD}33`, fontSize: 15, fontFamily: 'var(--font-playfair-display)', outline: 'none', background: '#fdf8f9' }}
+              />
+              <button onClick={checkPromo} disabled={checking} style={{ padding: '10px 18px', borderRadius: 8, border: 'none', cursor: 'pointer', background: GOLD, color: 'white', fontFamily: 'var(--font-playfair-display)', fontSize: 14, fontWeight: 600 }}>
+                {checking ? '…' : 'OK'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div style={{ marginTop: 28 }}>
+          <a href="/paiement" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: GOLD, textDecoration: 'underline' }}>
+            Pas encore de code ? Acheter un accès →
+          </a>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function FairePartPage() {
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState<FormData>(defaultFormData)
@@ -2191,6 +2301,8 @@ export default function FairePartPage() {
   const [role, setRole] = useState<string | null>(null)
   const [loadingShare, setLoadingShare] = useState(false)
   const [hasDraft, setHasDraft] = useState(false)
+  const [accessGranted, setAccessGranted] = useState(false)
+  const [checkingAccess, setCheckingAccess] = useState(true)
   // Prevents double-firing when both onTouchEnd and onClick trigger
   const lastTap = useRef(0)
 
@@ -2198,22 +2310,51 @@ export default function FairePartPage() {
     const params = new URLSearchParams(window.location.search)
     const id = params.get('share')
     const r = params.get('role')
+    const urlCode = params.get('code')
+
     if (id) {
+      // Vue partagée — pas de protection
       setIsShared(true)
       setRole(r)
+      setAccessGranted(true)
+      setCheckingAccess(false)
       setLoadingShare(true)
       fetch(`/api/get-share?id=${id}`)
         .then(res => res.json())
         .then((d: FormData) => { setFormData(d); setShowCards(true) })
         .catch(() => { setLoadingShare(false) })
         .finally(() => setLoadingShare(false))
-    } else {
-      // Check for local draft
-      try {
-        const draft = localStorage.getItem('wedding-draft')
-        if (draft) setHasDraft(true)
-      } catch { /* ignore */ }
+      return
     }
+
+    // Vérifier code d'accès
+    const checkAccess = async (code: string) => {
+      try {
+        const res = await fetch(`/api/check-access?code=${encodeURIComponent(code)}`)
+        const d = await res.json()
+        if (d.valid) {
+          setAccessGranted(true)
+          try { sessionStorage.setItem('lovit_access_code', code) } catch { /* ignore */ }
+        }
+      } catch { /* ignore */ }
+      setCheckingAccess(false)
+    }
+
+    if (urlCode) {
+      checkAccess(urlCode.toUpperCase().trim())
+    } else {
+      try {
+        const saved = sessionStorage.getItem('lovit_access_code')
+        if (saved) { checkAccess(saved); return }
+      } catch { /* ignore */ }
+      setCheckingAccess(false)
+    }
+
+    // Check for local draft
+    try {
+      const draft = localStorage.getItem('wedding-draft')
+      if (draft) setHasDraft(true)
+    } catch { /* ignore */ }
   }, [])
 
   const update = useCallback((u: Partial<FormData>) => setFormData(p => ({ ...p, ...u })), [])
@@ -2257,6 +2398,16 @@ export default function FairePartPage() {
     lastTap.current = now
     prev()
   }, [prev])
+
+  // Vérification en cours
+  if (checkingAccess) return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fdf0f3 0%, #fff5f7 50%, #fdf0f3 100%)' }}>
+      <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: '#C9A84C' }}>Chargement…</div>
+    </div>
+  )
+
+  // Gate d'accès
+  if (!accessGranted && !isShared) return <AccessGate onGranted={() => { setAccessGranted(true); try { const draft = localStorage.getItem('wedding-draft'); if (draft) setHasDraft(true) } catch { /* ignore */ } }} />
 
   if (showCards) return <CardsView data={formData} onEdit={() => { try { localStorage.setItem('wedding-draft', JSON.stringify(formData)) } catch { /* ignore */ } setShowCards(false); setStep(4) }} onReset={() => { setFormData(defaultFormData); setShowCards(false); setStep(1); try { localStorage.removeItem('wedding-draft') } catch { /* ignore */ } }} isShared={isShared} role={role} />
 

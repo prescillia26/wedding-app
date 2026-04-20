@@ -98,7 +98,7 @@ export default function Home() {
           Créez en 5 minutes, partagez par WhatsApp, recevez les RSVP en temps réel.
         </p>
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 64 }}>
-          <a href="/faire-part" style={S.btnPrimary}>Créer mon faire-part</a>
+          <a href="/paiement" style={S.btnPrimary}>Créer mon faire-part</a>
         </div>
         {/* Aperçu carte */}
         <div style={{ maxWidth: 420, margin: '0 auto', transform: 'rotate(-1.5deg)', boxShadow: '0 24px 80px rgba(0,0,0,0.14)', borderRadius: 16, overflow: 'hidden' }}>

@@ -35,4 +35,4 @@ L'email doit être élégant avec :
 
 Pour Resend : utilise process.env.RESEND_API_KEY. Je créerai le compte Resend après.
 
-Faire git add -A && git commit -m "Lien mariés vs invités + sauvegarde locale" && git push
+Faire git add -A && git commit -m "Lien mariés vs invités + sauvegarde locale" && git push\
