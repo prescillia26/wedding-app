@@ -2133,6 +2133,404 @@ function Countdown({ targetDate, accent }: { targetDate: string; accent: string 
   )
 }
 
+// ── Ornements SVG thématiques ──────────────────────────────────────────────────
+
+function OrnamentFloral({ size = 160, opacity = 0.8 }: { size?: number; opacity?: number }) {
+  return (
+    <svg width={size} height={Math.round(size * 1.1)} viewBox="0 0 160 176" xmlns="http://www.w3.org/2000/svg" style={{ opacity, display: 'block' }}>
+      {/* Rose principale */}
+      <g transform="translate(80,72)">
+        {[0,60,120,180,240,300].map(a => <ellipse key={a} cx={Math.round(Math.cos(a*Math.PI/180)*17)} cy={Math.round(Math.sin(a*Math.PI/180)*17)} rx="10" ry="16" transform={`rotate(${a})`} fill="#e8a0b8" opacity="0.82"/>)}
+        <circle cx="0" cy="0" r="10" fill="#c4729a"/>
+        <circle cx="0" cy="0" r="4.5" fill="#d4a840" opacity="0.75"/>
+      </g>
+      {/* Rose secondaire */}
+      <g transform="translate(36,130)">
+        {[0,72,144,216,288].map(a => <ellipse key={a} cx={Math.round(Math.cos(a*Math.PI/180)*12)} cy={Math.round(Math.sin(a*Math.PI/180)*12)} rx="7" ry="11" transform={`rotate(${a})`} fill="#c4729a" opacity="0.68"/>)}
+        <circle cx="0" cy="0" r="6" fill="#e8a0b8"/>
+      </g>
+      {/* Petite rose */}
+      <g transform="translate(132,100)">
+        {[0,72,144,216,288].map(a => <ellipse key={a} cx={Math.round(Math.cos(a*Math.PI/180)*9)} cy={Math.round(Math.sin(a*Math.PI/180)*9)} rx="5" ry="8" transform={`rotate(${a})`} fill="#e8a0b8" opacity="0.72"/>)}
+        <circle cx="0" cy="0" r="4" fill="#c4729a"/>
+      </g>
+      {/* Feuilles */}
+      <ellipse cx="52" cy="44" rx="11" ry="20" transform="rotate(-30 52 44)" fill="#a8c890" opacity="0.65"/>
+      <ellipse cx="124" cy="52" rx="9" ry="17" transform="rotate(22 124 52)" fill="#a8c890" opacity="0.58"/>
+      <ellipse cx="28" cy="104" rx="8" ry="15" transform="rotate(-48 28 104)" fill="#a8c890" opacity="0.62"/>
+      <ellipse cx="146" cy="142" rx="8" ry="15" transform="rotate(38 146 142)" fill="#a8c890" opacity="0.55"/>
+      {/* Petites fleurs */}
+      <g transform="translate(108,36)">{[0,90,180,270].map(a=><circle key={a} cx={Math.round(Math.cos(a*Math.PI/180)*6)} cy={Math.round(Math.sin(a*Math.PI/180)*6)} r="3.5" fill="#e8a0b8" opacity="0.58"/>)}<circle cx="0" cy="0" r="3.5" fill="#d4a840" opacity="0.68"/></g>
+      <g transform="translate(56,162)">{[0,90,180,270].map(a=><circle key={a} cx={Math.round(Math.cos(a*Math.PI/180)*5)} cy={Math.round(Math.sin(a*Math.PI/180)*5)} r="3" fill="#c4729a" opacity="0.48"/>)}<circle cx="0" cy="0" r="3" fill="#d4a840" opacity="0.65"/></g>
+      {/* Touches dorées */}
+      {[[90,18],[28,74],[150,74],[118,162]].map(([x,y],i)=><circle key={i} cx={x} cy={y} r="2" fill="#d4a840" opacity="0.55"/>)}
+      {/* Tiges */}
+      <path d="M80 90 Q62 112 44 136" fill="none" stroke="#a8c890" strokeWidth="1.4" opacity="0.55" strokeLinecap="round"/>
+      <path d="M80 90 Q92 48 108 30" fill="none" stroke="#a8c890" strokeWidth="1.1" opacity="0.48" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
+function OrnamentDentelle({ size = 160, color = '#C9A84C', opacity = 0.75 }: { size?: number; color?: string; opacity?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" style={{ opacity, display: 'block' }}>
+      <circle cx="80" cy="80" r="52" fill="none" stroke={color} strokeWidth="0.7" opacity="0.28"/>
+      <circle cx="80" cy="80" r="40" fill="none" stroke={color} strokeWidth="0.4" opacity="0.18"/>
+      {[0,45,90,135,180,225,270,315].map(a=><line key={a} x1={80+Math.cos(a*Math.PI/180)*40} y1={80+Math.sin(a*Math.PI/180)*40} x2={80+Math.cos(a*Math.PI/180)*62} y2={80+Math.sin(a*Math.PI/180)*62} stroke={color} strokeWidth="0.5" opacity="0.28"/>)}
+      {[0,90,180,270].map(a=><ellipse key={a} cx={80+Math.cos(a*Math.PI/180)*70} cy={80+Math.sin(a*Math.PI/180)*70} rx="9" ry="20" transform={`rotate(${a+90} ${80+Math.cos(a*Math.PI/180)*70} ${80+Math.sin(a*Math.PI/180)*70})`} fill={color} opacity="0.18"/>)}
+      {[0,45,90,135,180,225,270,315].map(a=><circle key={a} cx={80+Math.cos(a*Math.PI/180)*56} cy={80+Math.sin(a*Math.PI/180)*56} r="1.5" fill={color} opacity="0.32"/>)}
+      {[[12,12],[148,12],[12,148],[148,148]].map(([x,y],i)=><g key={i} transform={`translate(${x},${y})`}><path d={i===0?"M0,18Q0,0,18,0":i===1?"M0,18Q0,0,-18,0":i===2?"M0,-18Q0,0,18,0":"M0,-18Q0,0,-18,0"} fill="none" stroke={color} strokeWidth="0.8" opacity="0.3"/><circle cx="0" cy="0" r="2" fill={color} opacity="0.35"/></g>)}
+    </svg>
+  )
+}
+
+function OrnamentOriental({ size = 160, color = '#D4A847', opacity = 0.7 }: { size?: number; color?: string; opacity?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" style={{ opacity, display: 'block' }}>
+      <g transform="translate(80,80)">
+        {[0,22.5,45,67.5,90,112.5,135,157.5].map(a=><line key={a} x1={Math.cos(a*Math.PI/180)*22} y1={Math.sin(a*Math.PI/180)*22} x2={Math.cos(a*Math.PI/180)*48} y2={Math.sin(a*Math.PI/180)*48} stroke={color} strokeWidth="0.6" opacity="0.32"/>)}
+        <polygon points="0,-16 5,-5 16,0 5,5 0,16 -5,5 -16,0 -5,-5" fill="none" stroke={color} strokeWidth="0.6" opacity="0.28"/>
+        <circle cx="0" cy="0" r="7" fill="none" stroke={color} strokeWidth="0.5" opacity="0.22"/>
+      </g>
+      <path d="M12 12 Q32 12 32 32 Q32 52 52 52" fill="none" stroke={color} strokeWidth="0.9" opacity="0.28" strokeLinecap="round"/>
+      <path d="M148 12 Q128 12 128 32 Q128 52 108 52" fill="none" stroke={color} strokeWidth="0.9" opacity="0.28" strokeLinecap="round"/>
+      <path d="M12 148 Q32 148 32 128 Q32 108 52 108" fill="none" stroke={color} strokeWidth="0.9" opacity="0.28" strokeLinecap="round"/>
+      <path d="M148 148 Q128 148 128 128 Q128 108 108 108" fill="none" stroke={color} strokeWidth="0.9" opacity="0.28" strokeLinecap="round"/>
+      {[[30,30],[130,30],[30,130],[130,130]].map(([x,y],i)=><polygon key={i} points={`${x},${y-7} ${x+7},${y} ${x},${y+7} ${x-7},${y}`} fill={color} opacity="0.14"/>)}
+      {[0,45,90,135,180,225,270,315].map(a=><circle key={a} cx={80+Math.cos(a*Math.PI/180)*58} cy={80+Math.sin(a*Math.PI/180)*58} r="1.5" fill={color} opacity="0.28"/>)}
+    </svg>
+  )
+}
+
+function OrnamentChampetre({ size = 160, color = '#7a9e6e', opacity = 0.72 }: { size?: number; color?: string; opacity?: number }) {
+  return (
+    <svg width={size} height={Math.round(size*1.1)} viewBox="0 0 160 176" xmlns="http://www.w3.org/2000/svg" style={{ opacity, display: 'block' }}>
+      <path d="M80 176 Q76 138 72 100 Q68 62 80 18" fill="none" stroke={color} strokeWidth="1.6" opacity="0.48" strokeLinecap="round"/>
+      {[[68,156,-22],[58,126,-36],[54,96,-26],[64,68,-32],[70,42,-20]].map(([x,y,rot],i)=><ellipse key={`l${i}`} cx={x} cy={y} rx="7" ry="16" transform={`rotate(${rot} ${x} ${y})`} fill={color} opacity="0.42"/>)}
+      {[[86,150,22],[92,120,36],[86,92,26],[80,65,30],[78,40,18]].map(([x,y,rot],i)=><ellipse key={`r${i}`} cx={x} cy={y} rx="7" ry="16" transform={`rotate(${rot} ${x} ${y})`} fill={color} opacity="0.38"/>)}
+      {[[54,142],[46,112],[50,82],[62,52],[73,28]].map(([x,y],i)=><circle key={`b${i}`} cx={x} cy={y} r="2.5" fill={color} opacity="0.32"/>)}
+      {[[90,136],[96,106],[89,77],[83,50]].map(([x,y],i)=><circle key={`g${i}`} cx={x} cy={y} r="1.8" fill="#d4a840" opacity="0.38"/>)}
+    </svg>
+  )
+}
+
+function SharedOrnament({ themeKey, size = 150, accent }: { themeKey: Theme; size?: number; accent: string }) {
+  if (['rose-poudre'].includes(themeKey)) return <OrnamentFloral size={size} />
+  if (['bleu-nuit', 'oriental', 'bordeaux'].includes(themeKey)) return <OrnamentOriental size={size} color={accent} />
+  if (['champetre', 'vert-sauge', 'bleu-ciel', 'ardoise', 'minimaliste'].includes(themeKey)) return <OrnamentChampetre size={size} color={accent} />
+  return <OrnamentDentelle size={size} color={accent} />
+}
+
+// ── AnimSection : fade-in au scroll ───────────────────────────────────────────
+
+function AnimSection({ children, delay = 0, style }: { children: React.ReactNode; delay?: number; style?: React.CSSProperties }) {
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const obs = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; obs.disconnect() }
+    }, { threshold: 0.12 })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+  return (
+    <div ref={ref} style={{ opacity: 0, transform: 'translateY(40px)', transition: `opacity 0.9s ease ${delay}ms, transform 0.9s ease ${delay}ms`, ...style }}>
+      {children}
+    </div>
+  )
+}
+
+// ── SharedPageContent : vue partagée page unique luxe ─────────────────────────
+
+interface SharedPageContentProps {
+  data: FormData; theme: ThemeObj; sorted: Ceremony[]; role: string | null; lastShareId: string | null
+  onRsvpOpen: () => void; onRsvpListOpen: () => void
+  onStartYoutube?: () => void
+  ytIframeRef: React.RefObject<HTMLIFrameElement | null>
+  ytMuted: boolean; onToggleYtMute: () => void
+}
+
+function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute }: SharedPageContentProps) {
+  const contentRef = useRef<HTMLDivElement>(null)
+  const G = theme.accent
+  const TEXT = theme.texte
+  const FS = 'var(--font-great-vibes)'
+  const FP = 'var(--font-playfair-display)'
+  const FC = 'var(--font-cormorant-garamond)'
+  const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
+  const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
+  const monoColor = data.monogrammeColor || G
+  const parents1 = fmtParentsLines(data.famille1PerePrenom, data.famille1PereNom, data.famille1MerePrenom, data.famille1MereNom)
+  const parents2 = fmtParentsLines(data.famille2PerePrenom, data.famille2PereNom, data.famille2MerePrenom, data.famille2MereNom)
+  const hasGp = [data.famille1GpPaPerePrenom, data.famille1GpMaPerePrenom, data.famille2GpPaPerePrenom, data.famille2GpMaPerePrenom].some(Boolean)
+  const firstDate = sorted[0]?.date
+
+  const OrnSep = () => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', margin: '0 auto 24px', maxWidth: 160 }}>
+      <div style={{ flex: 1, height: 0.5, background: G, opacity: 0.3 }} />
+      <span style={{ color: G, fontSize: 10, opacity: 0.7 }}>◆</span>
+      <div style={{ flex: 1, height: 0.5, background: G, opacity: 0.3 }} />
+    </div>
+  )
+  const LineSep = () => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', margin: '20px auto' }}>
+      <div style={{ width: 40, height: 0.5, background: G, opacity: 0.3 }} />
+      <span style={{ color: G, fontSize: 9, opacity: 0.5 }}>✦</span>
+      <div style={{ width: 40, height: 0.5, background: G, opacity: 0.3 }} />
+    </div>
+  )
+
+  const handleDiscover = () => {
+    onStartYoutube?.()
+    setTimeout(() => contentRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
+  }
+
+  return (
+    <div style={{ backgroundColor: theme.fond, color: TEXT, minHeight: '100vh' }}>
+      <style>{`@keyframes sharedFadeIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}`}</style>
+
+      {/* ── SECTION 1 : Écran d'accueil ────────────────────────────────────── */}
+      <div style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: -8, right: -8, pointerEvents: 'none', zIndex: 0, opacity: 0.65 }}>
+          <SharedOrnament themeKey={data.style} size={160} accent={G} />
+        </div>
+        <div style={{ position: 'absolute', bottom: -8, left: -8, pointerEvents: 'none', zIndex: 0, opacity: 0.45, transform: 'scale(-1,-1)' }}>
+          <SharedOrnament themeKey={data.style} size={130} accent={G} />
+        </div>
+        <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '0 32px', maxWidth: 480, width: '100%', margin: '0 auto' }}>
+          {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 16, color: G, direction: 'rtl', marginBottom: 20, animation: 'sharedFadeIn 0.9s ease forwards' }}>בס״ד</div>}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
+            <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={140} style={data.monogrammeStyle || 'cercle'} />
+          </div>
+          <LineSep />
+          <div style={{ fontFamily: FS, fontSize: 'clamp(30px,8vw,46px)', color: G, marginBottom: 32, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.2 }}>
+            {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
+          </div>
+          <button onClick={handleDiscover} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '14px 40px', fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', boxShadow: `0 4px 20px ${G}44`, animation: 'sharedFadeIn 1s 0.7s ease forwards', opacity: 0 } as React.CSSProperties}>
+            {data.mariageJuif ? 'גלה ✦ DÉCOUVRIR' : 'DÉCOUVRIR'}
+          </button>
+        </div>
+      </div>
+
+      {/* ── CONTENU PRINCIPAL ──────────────────────────────────────────────── */}
+      <div ref={contentRef} style={{ maxWidth: 480, margin: '0 auto', padding: '0 28px 80px' }}>
+
+        {/* SECTION 2 : Intro */}
+        <section style={{ paddingTop: 72, paddingBottom: 48, position: 'relative', borderBottom: `1px solid ${G}1a` }}>
+          <div style={{ position: 'absolute', top: 20, right: -28, pointerEvents: 'none', opacity: 0.35 }}>
+            <SharedOrnament themeKey={data.style} size={90} accent={G} />
+          </div>
+          <AnimSection>
+            {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 14, color: G, direction: 'rtl', textAlign: 'right', marginBottom: 16 }}>בס״ד</div>}
+            <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: G, textAlign: 'center', letterSpacing: 1, marginBottom: 14 }}>
+              Le Mariage de
+            </div>
+            <LineSep />
+          </AnimSection>
+          <AnimSection delay={150}>
+            <div style={{ fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 8 }}>
+              {data.marie1Prenom || 'Prénom'}
+            </div>
+            <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 24, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.7 }}>&</div>
+            <div style={{ fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 24 }}>
+              {data.marie2Prenom || 'Prénom'}
+            </div>
+            {data.mariageJuif && (data.marie1Prenom2 || data.marie2Prenom2) && (
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 16 }}>
+                {data.marie1Prenom2 && <div style={{ fontFamily: 'serif', fontSize: 22, color: G, direction: 'rtl' }}>{data.marie1Prenom2}</div>}
+                {data.marie2Prenom2 && <div style={{ fontFamily: 'serif', fontSize: 22, color: G, direction: 'rtl' }}>{data.marie2Prenom2}</div>}
+              </div>
+            )}
+          </AnimSection>
+          {(parents1.length > 0 || parents2.length > 0) && (
+            <AnimSection delay={300}>
+              <OrnSep />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 16, textAlign: 'center' }}>
+                <div>{parents1.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}</div>
+                <div>{parents2.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}</div>
+              </div>
+              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, textAlign: 'center', lineHeight: 1.9, opacity: 0.85 }}>
+                {hasGp ? 'ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'ont la joie de vous faire part du mariage de leurs enfants'}
+              </div>
+            </AnimSection>
+          )}
+        </section>
+
+        {/* SECTION 3 : Compte à rebours */}
+        {firstDate && (
+          <section style={{ paddingTop: 56, paddingBottom: 48, textAlign: 'center', borderBottom: `1px solid ${G}1a`, position: 'relative' }}>
+            <AnimSection>
+              <div style={{ fontFamily: FP, fontSize: 11, letterSpacing: 4, textTransform: 'uppercase', color: G, marginBottom: 6 }}>PRÉPAREZ-VOUS !</div>
+              <div style={{ fontSize: 22, marginBottom: 24 }}>💍</div>
+            </AnimSection>
+            <AnimSection delay={150}>
+              <Countdown targetDate={firstDate} accent={G} />
+            </AnimSection>
+            <AnimSection delay={300}>
+              <div style={{ marginTop: 28, fontSize: 18, color: G, opacity: 0.45, animation: 'sharedBounce 1.5s infinite ease-in-out' }}>↓</div>
+              <style>{`@keyframes sharedBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}`}</style>
+            </AnimSection>
+          </section>
+        )}
+
+        {/* SECTION 4 : Cérémonies */}
+        {sorted.map((ceremony, i) => {
+          const isLeft = i % 2 === 0
+          const typeTitle: Record<string, string> = {
+            'Mairie': 'LA MAIRIE', 'Cérémonie religieuse / Houppa': data.mariageJuif ? 'LA HOUPPA' : 'LA CÉRÉMONIE',
+            'Shabbat Hatan': 'SHABBAT HATAN', 'Henné': 'LE HENNÉ', 'Cocktail': 'LE COCKTAIL',
+            'Soirée': 'LA SOIRÉE', 'Boat Party': 'BOAT PARTY',
+          }
+          const title = typeTitle[ceremony.type] || (ceremony.customName?.toUpperCase() || ceremony.type.toUpperCase())
+          const hebrewDate = getHebrewDate(ceremony.date)
+          return (
+            <section key={i} style={{ paddingTop: 60, paddingBottom: 52, position: 'relative', borderBottom: `1px solid ${G}1a` }}>
+              <div style={{ position: 'absolute', [isLeft ? 'right' : 'left']: -28, top: 30, pointerEvents: 'none', opacity: 0.28 }}>
+                <SharedOrnament themeKey={data.style} size={88} accent={G} />
+              </div>
+              <AnimSection>
+                <div style={{ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>{title}</div>
+                <OrnSep />
+              </AnimSection>
+              {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
+                <AnimSection delay={100}>
+                  <div style={{ fontFamily: 'serif', fontSize: 20, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 22, opacity: 0.8 }}>קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה</div>
+                </AnimSection>
+              )}
+              {(parents1.length > 0 || parents2.length > 0) && (
+                <AnimSection delay={150}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 12, textAlign: 'center' }}>
+                    <div>{parents1.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}</div>
+                    <div>{parents2.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}</div>
+                  </div>
+                  <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 24, lineHeight: 1.9, opacity: 0.82 }}>
+                    {hasGp ? 'ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'ont la joie de vous faire part du mariage de leurs enfants'}
+                  </div>
+                </AnimSection>
+              )}
+              <AnimSection delay={250}>
+                <div style={{ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 6 }}>{data.marie1Prenom}</div>
+                <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 20, color: TEXT, textAlign: 'center', marginBottom: 6, opacity: 0.65 }}>&</div>
+                <div style={{ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 18 }}>{data.marie2Prenom}</div>
+                <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginBottom: 28, opacity: 0.78 }}>Et seraient honorés de votre présence</div>
+              </AnimSection>
+              <AnimSection delay={380}>
+                <LineSep />
+                {ceremony.date && <div style={{ fontFamily: FC, fontStyle: 'italic', fontWeight: 700, fontSize: 19, color: TEXT, textAlign: 'center', marginBottom: 6 }}>Le {formatDateFrCap(ceremony.date)}</div>}
+                {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 15, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 8, opacity: 0.8 }}>{hebrewDate}</div>}
+                {ceremony.heure && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 17, color: TEXT, textAlign: 'center', marginBottom: 18, opacity: 0.82 }}>À {formatHeure(ceremony.heure)} précises</div>}
+                {ceremony.lieu && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', lineHeight: 1.6, marginBottom: 4 }}>{formatLieu(ceremony.lieu)}</div>}
+                {ceremony.adresse && <div style={{ fontFamily: FC, fontSize: 13, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.6, marginBottom: 20 }}>{ceremony.adresse}</div>}
+                {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
+                  <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, textAlign: 'center', marginBottom: 16, borderTop: `1px solid ${G}22`, paddingTop: 14 }}>
+                    <div style={{ fontWeight: 700 }}>La cérémonie sera suivie de {ceremony.evenementSuivantNom}</div>
+                    {ceremony.evenementSuivantAdresse && <div style={{ fontSize: 12, opacity: 0.75, marginTop: 4 }}>{ceremony.evenementSuivantAdresse}</div>}
+                  </div>
+                )}
+                {ceremony.note && (
+                  <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: theme.textSecondaire, textAlign: 'center', marginBottom: 16, padding: '12px 0', borderTop: `1px solid ${G}18` }}>{ceremony.note}</div>
+                )}
+                {ceremony.adresse && (
+                  <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+                    <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ceremony.adresse)}`} target="_blank" rel="noopener noreferrer"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '10px 22px', border: `1px solid ${G}`, color: G, fontFamily: FC, fontStyle: 'italic', fontSize: 14, textDecoration: 'none', borderRadius: 2, letterSpacing: 0.3 }}>
+                      📍 Itinéraire {ceremony.type === 'Cérémonie religieuse / Houppa' ? 'de la Houppa' : ceremony.type === 'Mairie' ? 'de la Mairie' : ''} →
+                    </a>
+                  </div>
+                )}
+              </AnimSection>
+            </section>
+          )
+        })}
+
+        {/* SECTION 5 : RSVP (vue invité) */}
+        {role === 'guest' && (
+          <section style={{ paddingTop: 60, paddingBottom: 52, borderBottom: `1px solid ${G}1a` }}>
+            <AnimSection>
+              <div style={{ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>VOTRE RÉPONSE</div>
+              <OrnSep />
+              <div style={{ border: `1px solid ${G}33`, borderRadius: 4, padding: '32px 24px', textAlign: 'center' }}>
+                <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, marginBottom: 28, lineHeight: 1.8, opacity: 0.85 }}>
+                  Nous vous serions reconnaissants de bien vouloir nous faire part de votre réponse
+                </div>
+                <button onClick={onRsvpOpen} style={{ ...BTN, background: `linear-gradient(135deg,${G},${G}cc)`, color: 'white', border: 'none', borderRadius: 2, padding: '14px 48px', fontFamily: FP, fontSize: 12, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase' as const, boxShadow: `0 4px 20px ${G}44` }}>
+                  RSVP
+                </button>
+              </div>
+            </AnimSection>
+          </section>
+        )}
+
+        {/* SECTION 5b : Voir les RSVP (vue couple) */}
+        {role === 'couple' && (
+          <section style={{ paddingTop: 52, paddingBottom: 40, borderBottom: `1px solid ${G}1a`, textAlign: 'center' }}>
+            <AnimSection>
+              <button onClick={onRsvpListOpen} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '13px 28px', fontFamily: FP, fontSize: 12, fontWeight: 700, letterSpacing: 2, boxShadow: `0 4px 16px ${G}44` }}>
+                📋 Voir les RSVP
+              </button>
+            </AnimSection>
+          </section>
+        )}
+
+        {/* SECTION 6 : Localisation */}
+        {sorted.some(c => c.adresse) && (
+          <section style={{ paddingTop: 60, paddingBottom: 52, borderBottom: `1px solid ${G}1a` }}>
+            <AnimSection>
+              <div style={{ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>LOCALISATION</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 32 }}>
+                <div style={{ flex: 1, height: 0.5, background: G, opacity: 0.3 }} />
+                <span style={{ color: G, fontSize: 10, opacity: 0.7 }}>◈</span>
+                <div style={{ flex: 1, height: 0.5, background: G, opacity: 0.3 }} />
+              </div>
+            </AnimSection>
+            {sorted.filter(c => c.adresse).map((ceremony, i) => (
+              <AnimSection key={i} delay={i * 120}>
+                <div style={{ marginBottom: 24 }}>
+                  <div style={{ fontFamily: FP, fontSize: 10, letterSpacing: 3, textTransform: 'uppercase' as const, color: G, marginBottom: 8, opacity: 0.8 }}>
+                    {ceremony.type === 'Autre' ? (ceremony.customName || 'Événement') : ceremony.type}
+                  </div>
+                  <iframe
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent(ceremony.adresse)}&output=embed`}
+                    width="100%" height="200"
+                    style={{ border: 'none', borderRadius: 4, display: 'block' }}
+                    loading="lazy" title={ceremony.type}
+                  />
+                </div>
+              </AnimSection>
+            ))}
+          </section>
+        )}
+      </div>
+
+      {/* SECTION 7 : Footer */}
+      <footer style={{ padding: '48px 28px 64px', textAlign: 'center', background: `${G}08`, maxWidth: 480, margin: '0 auto' }}>
+        <AnimSection>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20, opacity: 0.55 }}>
+            <SharedOrnament themeKey={data.style} size={72} accent={G} />
+          </div>
+          <div style={{ fontFamily: FS, fontSize: 40, color: G, marginBottom: 12, lineHeight: 1.2 }}>
+            {data.marie1Prenom} & {data.marie2Prenom}
+          </div>
+          <div style={{ color: G, fontSize: 12, marginBottom: 18, opacity: 0.45 }}>✦</div>
+          <a href="https://lovit.fr" target="_blank" rel="noopener noreferrer" style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: G, textDecoration: 'none', opacity: 0.45 }}>
+            Créé avec ❤️ par Lov&apos;it
+          </a>
+        </AnimSection>
+      </footer>
+
+      {/* Musique */}
+      {data.musicUrl && <AudioPlayer musicUrl={data.musicUrl} accent={G} />}
+      {!data.musicUrl && ytIframeRef.current && (
+        <button onClick={onToggleYtMute} onTouchEnd={e=>{e.preventDefault();onToggleYtMute()}}
+          style={{ ...BTN, position: 'fixed', bottom: 24, right: 24, zIndex: 50, width: 44, height: 44, borderRadius: '50%', background: G, color: 'white', border: 'none', fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }}>
+          {ytMuted ? '🔇' : '🔊'}
+        </button>
+      )}
+    </div>
+  )
+}
+
 // ── CardsView ─────────────────────────────────────────────────────────────────
 
 function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; onEdit: () => void; onReset: () => void; isShared: boolean; role: string | null }) {
@@ -2238,9 +2636,47 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
     }
   }
 
+  if (isShared) {
+    return (
+      <div style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
+        <SharedPageContent
+          data={data}
+          theme={theme}
+          sorted={sorted}
+          role={role}
+          lastShareId={lastShareId}
+          onRsvpOpen={() => setRsvpOpen(true)}
+          onRsvpListOpen={() => setRsvpListOpen(true)}
+          onStartYoutube={data.youtubeUrl ? () => { const vid = getYouTubeId(data.youtubeUrl); if (vid) startYoutubeMusic(vid) } : undefined}
+          ytIframeRef={ytIframeRef}
+          ytMuted={ytMuted}
+          onToggleYtMute={toggleYtMute}
+        />
+        {rsvpOpen && (
+          <RSVPModal
+            accent={theme.accent}
+            onClose={() => setRsvpOpen(false)}
+            mariee1={data.marie1Prenom}
+            mariee2={data.marie2Prenom}
+            shareId={lastShareId}
+            ceremonies={sorted}
+          />
+        )}
+        {rsvpListOpen && (
+          <RSVPListModal
+            accent={theme.accent}
+            onClose={() => setRsvpListOpen(false)}
+            shareId={lastShareId}
+            ceremonies={sorted}
+          />
+        )}
+      </div>
+    )
+  }
+
   return (
     <div style={{ backgroundColor: theme.pageFond, minHeight: '100vh', color: theme.texte }}>
-      {!splashDone && <SplashScreen data={data} theme={theme} onDone={() => setSplashDone(true)} isShared={isShared} onStartMusic={isShared && data.youtubeUrl ? () => { const vid = getYouTubeId(data.youtubeUrl); if (vid) startYoutubeMusic(vid) } : undefined} />}
+      {!splashDone && <SplashScreen data={data} theme={theme} onDone={() => setSplashDone(true)} isShared={false} onStartMusic={undefined} />}
       {splashDone && <>
         {!isElegant && (
           <div style={{ position: 'fixed', left: 16, top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', gap: 10, zIndex: 40 }}>
