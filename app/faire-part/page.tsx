@@ -21,7 +21,7 @@ const THEMES: Record<Theme, ThemeObj> = {
   'minimaliste':    { fond: '#f8f8f8', pageFond: '#e5e5e5', accent: '#333333', texte: '#1a1a1a', textSecondaire: '#555555', nom: 'Minimaliste' },
 }
 
-const CEREMONY_TYPES = ['Mairie', 'Cérémonie religieuse / Houppa', 'Henné', 'Cocktail', 'Soirée', 'Boat Party', 'Autre']
+const CEREMONY_TYPES = ['Mairie', 'Cérémonie religieuse / Houppa', 'Shabbat Hatan', 'Henné', 'Cocktail', 'Soirée', 'Boat Party', 'Autre']
 
 interface Ceremony {
   type: string
@@ -75,6 +75,7 @@ interface FormData {
   photoFond: string
   photosFond: string[]
   emailMaries: string
+  notePersonnelle?: string
   textOverrides?: Record<string, string>
 }
 
@@ -94,7 +95,7 @@ const defaultFormData: FormData = {
   famille2GpPaPerePrenom: '', famille2GpPaPereNom: '', famille2GpPaMerePrenom: '', famille2GpPaMereNom: '',
   famille2GpMaPerePrenom: '', famille2GpMaPereNom: '', famille2GpMaMerePrenom: '', famille2GpMaMereNom: '',
   ceremonies: [{ ...defaultCeremony }],
-  style: 'elegant', presentationStyle: 'elegant', mariageJuif: false, youtubeUrl: '', musicUrl: '', photoFond: '', photosFond: [], emailMaries: '', textOverrides: {},
+  style: 'elegant', presentationStyle: 'elegant', mariageJuif: false, youtubeUrl: '', musicUrl: '', photoFond: '', photosFond: [], emailMaries: '', notePersonnelle: '', textOverrides: {},
 }
 
 // Propriétés mobiles partagées pour tous les boutons
@@ -546,6 +547,12 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Recevez une notification à chaque nouvelle réponse RSVP</p>
         <input type="email" value={data.emailMaries ?? ''} onChange={e => onChange({ emailMaries: e.target.value })} placeholder="marie@exemple.com" style={S.input} />
       </div>
+      <div style={{ marginTop: 20 }}>
+        <Label>Note personnelle (optionnel)</Label>
+        <textarea value={data.notePersonnelle ?? ''} onChange={e => onChange({ notePersonnelle: e.target.value })}
+          placeholder="ex: Nous avons une tendre pensée pour... / Tenue de soirée exigée / Parking disponible..."
+          rows={3} style={{ ...S.input, resize: 'vertical', minHeight: 72, fontFamily: 'inherit' }} />
+      </div>
     </div>
   )
 }
@@ -724,6 +731,11 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
             </a>
           </div>
         )}
+        {data.notePersonnelle && (
+          <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textAlign: 'center', color: theme.texte }}>{data.notePersonnelle}</div>
+          </div>
+        )}
       </div>
     </CarouselBackground>
   )
@@ -771,6 +783,11 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
             )}
           </div>
         )}
+        {data.notePersonnelle && (
+          <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textAlign: 'center', color: theme.texte }}>{data.notePersonnelle}</div>
+          </div>
+        )}
       </div>
     </CarouselBackground>
   )
@@ -804,6 +821,11 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
               style={{ padding: '10px 24px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textDecoration: 'none' }}>
               📍 Itinéraire
             </a>
+          </div>
+        )}
+        {data.notePersonnelle && (
+          <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textAlign: 'center', color: theme.texte }}>{data.notePersonnelle}</div>
           </div>
         )}
       </div>
@@ -841,6 +863,51 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
             </a>
           </div>
         )}
+        {data.notePersonnelle && (
+          <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textAlign: 'center', color: theme.texte }}>{data.notePersonnelle}</div>
+          </div>
+        )}
+      </div>
+    </CarouselBackground>
+  )
+}
+
+function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
+  const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
+  const ci = cardIdx ?? 0
+  const ov = data.textOverrides ?? {}
+  const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
+  return (
+    <CarouselBackground photos={(() => { const p = data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : []); return p.length ? [p[0]] : [] })()} fond={theme.fond} isOriental={isDark}>
+      <div style={{ padding: '60px 48px', position: 'relative' }}>
+        {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
+        <LogoOrMonogram data={data} theme={theme} />
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, textAlign: 'center', marginBottom: 16 }}>Shabbat Hatan</div>
+        <div style={{ textAlign: 'center', fontSize: 22, letterSpacing: '0.4em', color: theme.accent, marginBottom: 24 }}>✡ ✦ ✡</div>
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte, lineHeight: 1.7, marginBottom: 28 }}>
+          Vous êtes chaleureusement invités à célébrer le Shabbat Hatan de<br />
+          <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 36, color: theme.accent }}>{data.marie1Prenom} & {data.marie2Prenom}</span>
+        </div>
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, color: theme.accent, textAlign: 'center', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 12 }}>{formatDateFr(ceremony.date)}</div>
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 24, color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{formatHeure(ceremony.heure)}</div>
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte }}>
+          {lieuDisplay && <div>{formatLieu(lieuDisplay)}</div>}
+          {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
+        </div>
+        {isShared && ceremony.adresse && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20, paddingBottom: 8 }}>
+            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ceremony.adresse)}`} target="_blank" rel="noopener noreferrer"
+              style={{ padding: '10px 24px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textDecoration: 'none' }}>
+              📍 Itinéraire
+            </a>
+          </div>
+        )}
+        {data.notePersonnelle && (
+          <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textAlign: 'center', color: theme.texte }}>{data.notePersonnelle}</div>
+          </div>
+        )}
       </div>
     </CarouselBackground>
   )
@@ -852,6 +919,7 @@ function renderCard(ceremony: Ceremony, data: FormData, theme: ThemeObj, photoId
   const props = { ceremony, data: { ...data, photoFond }, theme, isShared, cardIdx: photoIdx }
   if (ceremony.type === 'Mairie') return <CardMairie {...props} />
   if (ceremony.type === 'Cérémonie religieuse / Houppa') return <CardHouppa {...props} />
+  if (ceremony.type === 'Shabbat Hatan') return <CarteShabbatHatan {...props} />
   if (ceremony.type === 'Henné') return <CardHenne {...props} />
   return <CardAutre {...props} />
 }
