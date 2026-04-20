@@ -2,23 +2,15 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 
-type Theme = 'elegant' | 'classique-dore' | 'ivoire-or' | 'blanc-argent' | 'bleu-nuit' | 'bleu-ciel' | 'vert-sauge' | 'rose-poudre' | 'champetre' | 'oriental' | 'bordeaux' | 'ardoise' | 'minimaliste'
+type Theme = 'floral-bleu' | 'rose-fleuri' | 'or-dentelle' | 'oriental-nuit' | 'champetre'
 type PresentationStyle = 'photo' | 'elegant'
 
 const THEMES: Record<Theme, ThemeObj> = {
-  'elegant':        { fond: '#fdf0f3', pageFond: '#f0e8ec', accent: '#C9A84C', texte: '#4a3728', textSecondaire: '#6a5040', nom: 'Élégant' },
-  'classique-dore': { fond: '#fdf0f3', pageFond: '#f0e8ec', accent: '#C9A84C', texte: '#4a3728', textSecondaire: '#6a5040', nom: 'Classique doré' },
-  'ivoire-or':      { fond: '#faf6ef', pageFond: '#ede8df', accent: '#b8860b', texte: '#3d3020', textSecondaire: '#6a5040', nom: 'Ivoire & Or' },
-  'blanc-argent':   { fond: '#ffffff', pageFond: '#e8e8e8', accent: '#9e9e9e', texte: '#2a2a2a', textSecondaire: '#555555', nom: 'Blanc & Argent' },
-  'bleu-nuit':      { fond: '#0f1a2e', pageFond: '#060e1a', accent: '#c9a84c', texte: '#e8e0d0', textSecondaire: '#b0a890', nom: 'Bleu nuit',  carteBordure: '1px solid rgba(201,168,76,0.4)' },
-  'bleu-ciel':      { fond: '#eef4fb', pageFond: '#dce8f5', accent: '#4a90c4', texte: '#1a3a5c', textSecondaire: '#4a6a8a', nom: 'Bleu ciel' },
-  'vert-sauge':     { fond: '#f0f4ee', pageFond: '#dde5db', accent: '#7a9e7e', texte: '#2d4a2d', textSecondaire: '#4a6a4a', nom: 'Vert sauge' },
-  'rose-poudre':    { fond: '#fff0f5', pageFond: '#f0d8e5', accent: '#d4829a', texte: '#5a2d3a', textSecondaire: '#8a5060', nom: 'Rose poudré' },
-  'champetre':      { fond: '#f5f0e8', pageFond: '#e5dfd0', accent: '#8fad6a', texte: '#3d4a2e', textSecondaire: '#5a6040', nom: 'Champêtre' },
-  'oriental':       { fond: '#1a0a00', pageFond: '#000000', accent: '#D4A847', texte: '#f5e6c8', textSecondaire: '#d4c0a0', nom: 'Oriental',   carteBordure: '1px solid rgba(212,168,71,0.4)' },
-  'bordeaux':       { fond: '#2d0a14', pageFond: '#1a0008', accent: '#e8a0b0', texte: '#f5e0e5', textSecondaire: '#d0b0b8', nom: 'Bordeaux',   carteBordure: '1px solid rgba(232,160,176,0.4)' },
-  'ardoise':        { fond: '#f2f4f5', pageFond: '#dde2e5', accent: '#546e7a', texte: '#1a2a30', textSecondaire: '#4a6070', nom: 'Ardoise' },
-  'minimaliste':    { fond: '#f8f8f8', pageFond: '#e5e5e5', accent: '#333333', texte: '#1a1a1a', textSecondaire: '#555555', nom: 'Minimaliste' },
+  'floral-bleu':   { fond: '#ffffff',  pageFond: '#f0f4fa', accent: '#2c4a7c', texte: '#1a2a4a', textSecondaire: '#4a6080', nom: 'Floral Bleu' },
+  'rose-fleuri':   { fond: '#faf6f4',  pageFond: '#f0e8ec', accent: '#c4829a', texte: '#4a2a3a', textSecondaire: '#8a5060', nom: 'Rose Fleuri' },
+  'or-dentelle':   { fond: '#fdf8f0',  pageFond: '#ede8df', accent: '#C9A84C', texte: '#2d2014', textSecondaire: '#6a5040', nom: 'Or & Dentelle' },
+  'oriental-nuit': { fond: '#0f0a1e',  pageFond: '#060410', accent: '#D4A847', texte: '#f0e6d0', textSecondaire: '#d4c0a0', nom: 'Oriental Nuit', carteBordure: '1px solid rgba(212,168,71,0.4)' },
+  'champetre':     { fond: '#f4f7f0',  pageFond: '#e5ede0', accent: '#7a9e6e', texte: '#2a3520', textSecondaire: '#4a6040', nom: 'Champêtre' },
 }
 
 const CEREMONY_TYPES = ['Mairie', 'Cérémonie religieuse / Houppa', 'Shabbat Hatan', 'Henné', 'Cocktail', 'Soirée', 'Boat Party', 'Autre']
@@ -98,7 +90,7 @@ const defaultFormData: FormData = {
   famille2GpPaPerePrenom: '', famille2GpPaPereNom: '', famille2GpPaMerePrenom: '', famille2GpPaMereNom: '',
   famille2GpMaPerePrenom: '', famille2GpMaPereNom: '', famille2GpMaMerePrenom: '', famille2GpMaMereNom: '',
   ceremonies: [{ ...defaultCeremony }],
-  style: 'elegant', presentationStyle: 'elegant', mariageJuif: false, youtubeUrl: '', musicUrl: '', musicName: '', photoFond: '', photosFond: [], emailMaries: '', textOverrides: {},
+  style: 'floral-bleu', presentationStyle: 'elegant', mariageJuif: false, youtubeUrl: '', musicUrl: '', musicName: '', photoFond: '', photosFond: [], emailMaries: '', textOverrides: {},
   monogrammeStyle: 'cercle', monogrammeColor: '',
 }
 
@@ -468,23 +460,29 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       </div>
 
       <Label>Style visuel</Label>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 24 }}>
-        {(Object.entries(THEMES) as [Theme, ThemeObj][]).map(([key, t]) => (
-          <button key={key} type="button" onClick={() => onChange({ style: key })} style={{
-            ...BTN,
-            padding: 0, borderRadius: 10,
-            border: `2px solid ${data.style === key ? t.accent : 'transparent'}`,
-            background: 'transparent', textAlign: 'center', overflow: 'hidden',
-            boxShadow: data.style === key ? `0 0 0 1px ${t.accent}` : '0 1px 4px rgba(0,0,0,0.10)',
-          }}>
-            <div style={{ background: t.fond, height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontFamily: 'Georgia, serif', fontSize: 22, fontWeight: 700, color: t.accent, fontStyle: 'italic' }}>Aa</span>
-            </div>
-            <div style={{ padding: '5px 4px 6px', background: 'white', fontSize: 10, fontWeight: data.style === key ? 700 : 400, color: data.style === key ? t.accent : '#4a3728', lineHeight: 1.2 }}>
-              {t.nom}
-            </div>
-          </button>
-        ))}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 24 }}>
+        {(Object.entries(THEMES) as [Theme, ThemeObj][]).map(([key, t]) => {
+          const sel = data.style === key
+          const OrnPreview = key === 'floral-bleu' ? OrnementFloralBleu : key === 'rose-fleuri' ? OrnementFloralRose : key === 'or-dentelle' ? OrnementDore : key === 'oriental-nuit' ? OrnementArabesque : OrnementChampetre
+          return (
+            <button key={key} type="button" onClick={() => onChange({ style: key })} style={{
+              ...BTN, padding: 0, borderRadius: 10,
+              border: `3px solid ${sel ? t.accent : 'transparent'}`,
+              background: 'transparent', textAlign: 'center', overflow: 'hidden',
+              boxShadow: sel ? `0 0 0 1px ${t.accent}` : '0 1px 4px rgba(0,0,0,0.10)',
+            }}>
+              <div style={{ background: t.fond, width: '100%', height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', right: -10, top: -10, opacity: 0.7 }}>
+                  <OrnPreview style={{ width: 90, height: 100 }} />
+                </div>
+                <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 24, color: t.accent, position: 'relative', zIndex: 1 }}>Aa</span>
+              </div>
+              <div style={{ padding: '6px 4px 7px', background: 'white', fontSize: 10, fontWeight: sel ? 700 : 400, color: sel ? t.accent : '#4a3728', lineHeight: 1.2 }}>
+                {t.nom}
+              </div>
+            </button>
+          )
+        })}
       </div>
       {/* ── Monogramme ── */}
       <div style={{ marginBottom: 24 }}>
@@ -2135,90 +2133,146 @@ function Countdown({ targetDate, accent }: { targetDate: string; accent: string 
 
 // ── Ornements SVG thématiques ──────────────────────────────────────────────────
 
-function OrnamentFloral({ size = 160, opacity = 0.8 }: { size?: number; opacity?: number }) {
-  return (
-    <svg width={size} height={Math.round(size * 1.1)} viewBox="0 0 160 176" xmlns="http://www.w3.org/2000/svg" style={{ opacity, display: 'block' }}>
-      {/* Rose principale */}
-      <g transform="translate(80,72)">
-        {[0,60,120,180,240,300].map(a => <ellipse key={a} cx={Math.round(Math.cos(a*Math.PI/180)*17)} cy={Math.round(Math.sin(a*Math.PI/180)*17)} rx="10" ry="16" transform={`rotate(${a})`} fill="#e8a0b8" opacity="0.82"/>)}
-        <circle cx="0" cy="0" r="10" fill="#c4729a"/>
-        <circle cx="0" cy="0" r="4.5" fill="#d4a840" opacity="0.75"/>
-      </g>
-      {/* Rose secondaire */}
-      <g transform="translate(36,130)">
-        {[0,72,144,216,288].map(a => <ellipse key={a} cx={Math.round(Math.cos(a*Math.PI/180)*12)} cy={Math.round(Math.sin(a*Math.PI/180)*12)} rx="7" ry="11" transform={`rotate(${a})`} fill="#c4729a" opacity="0.68"/>)}
-        <circle cx="0" cy="0" r="6" fill="#e8a0b8"/>
-      </g>
-      {/* Petite rose */}
-      <g transform="translate(132,100)">
-        {[0,72,144,216,288].map(a => <ellipse key={a} cx={Math.round(Math.cos(a*Math.PI/180)*9)} cy={Math.round(Math.sin(a*Math.PI/180)*9)} rx="5" ry="8" transform={`rotate(${a})`} fill="#e8a0b8" opacity="0.72"/>)}
-        <circle cx="0" cy="0" r="4" fill="#c4729a"/>
-      </g>
-      {/* Feuilles */}
-      <ellipse cx="52" cy="44" rx="11" ry="20" transform="rotate(-30 52 44)" fill="#a8c890" opacity="0.65"/>
-      <ellipse cx="124" cy="52" rx="9" ry="17" transform="rotate(22 124 52)" fill="#a8c890" opacity="0.58"/>
-      <ellipse cx="28" cy="104" rx="8" ry="15" transform="rotate(-48 28 104)" fill="#a8c890" opacity="0.62"/>
-      <ellipse cx="146" cy="142" rx="8" ry="15" transform="rotate(38 146 142)" fill="#a8c890" opacity="0.55"/>
-      {/* Petites fleurs */}
-      <g transform="translate(108,36)">{[0,90,180,270].map(a=><circle key={a} cx={Math.round(Math.cos(a*Math.PI/180)*6)} cy={Math.round(Math.sin(a*Math.PI/180)*6)} r="3.5" fill="#e8a0b8" opacity="0.58"/>)}<circle cx="0" cy="0" r="3.5" fill="#d4a840" opacity="0.68"/></g>
-      <g transform="translate(56,162)">{[0,90,180,270].map(a=><circle key={a} cx={Math.round(Math.cos(a*Math.PI/180)*5)} cy={Math.round(Math.sin(a*Math.PI/180)*5)} r="3" fill="#c4729a" opacity="0.48"/>)}<circle cx="0" cy="0" r="3" fill="#d4a840" opacity="0.65"/></g>
-      {/* Touches dorées */}
-      {[[90,18],[28,74],[150,74],[118,162]].map(([x,y],i)=><circle key={i} cx={x} cy={y} r="2" fill="#d4a840" opacity="0.55"/>)}
-      {/* Tiges */}
-      <path d="M80 90 Q62 112 44 136" fill="none" stroke="#a8c890" strokeWidth="1.4" opacity="0.55" strokeLinecap="round"/>
-      <path d="M80 90 Q92 48 108 30" fill="none" stroke="#a8c890" strokeWidth="1.1" opacity="0.48" strokeLinecap="round"/>
-    </svg>
-  )
-}
+const OrnementFloralBleu = ({ style = {} }: { style?: React.CSSProperties }) => (
+  <svg viewBox="0 0 200 220" width="180" height="200" style={{ ...style, pointerEvents: 'none' }}>
+    <ellipse cx="100" cy="80" rx="40" ry="35" fill="#4a7ab5" opacity="0.75" transform="rotate(-20 100 80)"/>
+    <ellipse cx="100" cy="80" rx="32" ry="27" fill="#6b9fd4" opacity="0.65" transform="rotate(40 100 80)"/>
+    <ellipse cx="100" cy="80" rx="24" ry="20" fill="#8bbde8" opacity="0.55" transform="rotate(90 100 80)"/>
+    <circle cx="100" cy="80" r="10" fill="#1a3a6a" opacity="0.85"/>
+    <circle cx="100" cy="80" r="6" fill="#2c5490" opacity="0.95"/>
+    <circle cx="95" cy="75" r="2" fill="white" opacity="0.6"/>
+    <circle cx="105" cy="75" r="1.5" fill="white" opacity="0.5"/>
+    <ellipse cx="155" cy="110" rx="30" ry="26" fill="#1e3a6a" opacity="0.8" transform="rotate(20 155 110)"/>
+    <ellipse cx="155" cy="110" rx="23" ry="19" fill="#2d5490" opacity="0.7" transform="rotate(70 155 110)"/>
+    <ellipse cx="155" cy="110" rx="16" ry="13" fill="#4a7ab5" opacity="0.6" transform="rotate(-30 155 110)"/>
+    <circle cx="155" cy="110" r="7" fill="#0a1f40" opacity="0.9"/>
+    <ellipse cx="55" cy="150" rx="20" ry="17" fill="#6b9fd4" opacity="0.6" transform="rotate(-40 55 150)"/>
+    <ellipse cx="55" cy="150" rx="14" ry="11" fill="#8bbde8" opacity="0.5" transform="rotate(20 55 150)"/>
+    <circle cx="55" cy="150" r="5" fill="#2c5490" opacity="0.8"/>
+    <path d="M 20 210 Q 60 170 95 140 Q 120 120 140 100" stroke="#3a6a4a" strokeWidth="2.5" fill="none" opacity="0.5"/>
+    <path d="M 30 200 Q 50 160 80 130" stroke="#4a7a5a" strokeWidth="2" fill="none" opacity="0.4"/>
+    <ellipse cx="45" cy="185" rx="22" ry="11" fill="#4a7a5a" opacity="0.55" transform="rotate(-45 45 185)"/>
+    <ellipse cx="65" cy="165" rx="18" ry="9" fill="#5a8a6a" opacity="0.5" transform="rotate(-55 65 165)"/>
+    <ellipse cx="88" cy="145" rx="16" ry="8" fill="#4a7a5a" opacity="0.5" transform="rotate(15 88 145)"/>
+    <ellipse cx="115" cy="125" rx="14" ry="7" fill="#6a9a7a" opacity="0.45" transform="rotate(-20 115 125)"/>
+    <ellipse cx="170" cy="55" rx="14" ry="7" fill="#6b9fd4" opacity="0.45" transform="rotate(50 170 55)"/>
+    <ellipse cx="180" cy="75" rx="11" ry="5.5" fill="#8bbde8" opacity="0.4" transform="rotate(-15 180 75)"/>
+    <ellipse cx="165" cy="85" rx="16" ry="7" fill="#4a7ab5" opacity="0.4" transform="rotate(70 165 85)"/>
+    <ellipse cx="30" cy="100" rx="12" ry="6" fill="#6b9fd4" opacity="0.35" transform="rotate(30 30 100)"/>
+    <circle cx="130" cy="60" r="5" fill="#2c4a7c" opacity="0.65"/>
+    <circle cx="140" cy="52" r="4" fill="#2c4a7c" opacity="0.55"/>
+    <circle cx="148" cy="60" r="4.5" fill="#1e3a6a" opacity="0.6"/>
+    <circle cx="138" cy="68" r="3.5" fill="#2c4a7c" opacity="0.5"/>
+    <path d="M 130 60 Q 135 55 140 52" stroke="#3a5a8a" strokeWidth="1.5" fill="none" opacity="0.4"/>
+    <path d="M 140 52 Q 145 56 148 60" stroke="#3a5a8a" strokeWidth="1.5" fill="none" opacity="0.4"/>
+  </svg>
+)
 
-function OrnamentDentelle({ size = 160, color = '#C9A84C', opacity = 0.75 }: { size?: number; color?: string; opacity?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" style={{ opacity, display: 'block' }}>
-      <circle cx="80" cy="80" r="52" fill="none" stroke={color} strokeWidth="0.7" opacity="0.28"/>
-      <circle cx="80" cy="80" r="40" fill="none" stroke={color} strokeWidth="0.4" opacity="0.18"/>
-      {[0,45,90,135,180,225,270,315].map(a=><line key={a} x1={80+Math.cos(a*Math.PI/180)*40} y1={80+Math.sin(a*Math.PI/180)*40} x2={80+Math.cos(a*Math.PI/180)*62} y2={80+Math.sin(a*Math.PI/180)*62} stroke={color} strokeWidth="0.5" opacity="0.28"/>)}
-      {[0,90,180,270].map(a=><ellipse key={a} cx={80+Math.cos(a*Math.PI/180)*70} cy={80+Math.sin(a*Math.PI/180)*70} rx="9" ry="20" transform={`rotate(${a+90} ${80+Math.cos(a*Math.PI/180)*70} ${80+Math.sin(a*Math.PI/180)*70})`} fill={color} opacity="0.18"/>)}
-      {[0,45,90,135,180,225,270,315].map(a=><circle key={a} cx={80+Math.cos(a*Math.PI/180)*56} cy={80+Math.sin(a*Math.PI/180)*56} r="1.5" fill={color} opacity="0.32"/>)}
-      {[[12,12],[148,12],[12,148],[148,148]].map(([x,y],i)=><g key={i} transform={`translate(${x},${y})`}><path d={i===0?"M0,18Q0,0,18,0":i===1?"M0,18Q0,0,-18,0":i===2?"M0,-18Q0,0,18,0":"M0,-18Q0,0,-18,0"} fill="none" stroke={color} strokeWidth="0.8" opacity="0.3"/><circle cx="0" cy="0" r="2" fill={color} opacity="0.35"/></g>)}
-    </svg>
-  )
-}
+const OrnementFloralRose = ({ style = {} }: { style?: React.CSSProperties }) => (
+  <svg viewBox="0 0 200 220" width="180" height="200" style={{ ...style, pointerEvents: 'none' }}>
+    <ellipse cx="100" cy="80" rx="38" ry="33" fill="#e8a0b8" opacity="0.75" transform="rotate(-20 100 80)"/>
+    <ellipse cx="100" cy="80" rx="30" ry="25" fill="#d4829a" opacity="0.65" transform="rotate(40 100 80)"/>
+    <ellipse cx="100" cy="80" rx="22" ry="18" fill="#f0c0d0" opacity="0.55" transform="rotate(90 100 80)"/>
+    <circle cx="100" cy="80" r="9" fill="#8b3a5a" opacity="0.85"/>
+    <circle cx="100" cy="80" r="5" fill="#a0506a" opacity="0.95"/>
+    <circle cx="95" cy="75" r="2" fill="white" opacity="0.6"/>
+    <ellipse cx="155" cy="110" rx="28" ry="24" fill="#c4729a" opacity="0.75" transform="rotate(20 155 110)"/>
+    <ellipse cx="155" cy="110" rx="20" ry="16" fill="#e8a0b8" opacity="0.65" transform="rotate(70 155 110)"/>
+    <circle cx="155" cy="110" r="6" fill="#7a2a4a" opacity="0.9"/>
+    <ellipse cx="55" cy="150" rx="18" ry="15" fill="#e8a0b8" opacity="0.6" transform="rotate(-40 55 150)"/>
+    <circle cx="55" cy="150" r="5" fill="#c4729a" opacity="0.8"/>
+    <path d="M 20 210 Q 60 170 95 140 Q 120 120 140 100" stroke="#6a8a5a" strokeWidth="2.5" fill="none" opacity="0.5"/>
+    <ellipse cx="45" cy="185" rx="20" ry="10" fill="#6a8a5a" opacity="0.55" transform="rotate(-45 45 185)"/>
+    <ellipse cx="65" cy="165" rx="17" ry="8.5" fill="#7a9a6a" opacity="0.5" transform="rotate(-55 65 165)"/>
+    <ellipse cx="88" cy="145" rx="15" ry="7.5" fill="#6a8a5a" opacity="0.5" transform="rotate(15 88 145)"/>
+    <ellipse cx="170" cy="55" rx="13" ry="6.5" fill="#e8a0b8" opacity="0.45" transform="rotate(50 170 55)"/>
+    <ellipse cx="180" cy="75" rx="10" ry="5" fill="#f0c0d0" opacity="0.4" transform="rotate(-15 180 75)"/>
+    <circle cx="130" cy="60" r="4.5" fill="#c4729a" opacity="0.65"/>
+    <circle cx="140" cy="52" r="3.5" fill="#d4829a" opacity="0.55"/>
+    <circle cx="148" cy="60" r="4" fill="#c4729a" opacity="0.6"/>
+    <path d="M 130 60 Q 135 55 140 52 Q 145 56 148 60" stroke="#c4829a" strokeWidth="1.5" fill="none" opacity="0.4"/>
+  </svg>
+)
 
-function OrnamentOriental({ size = 160, color = '#D4A847', opacity = 0.7 }: { size?: number; color?: string; opacity?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" style={{ opacity, display: 'block' }}>
-      <g transform="translate(80,80)">
-        {[0,22.5,45,67.5,90,112.5,135,157.5].map(a=><line key={a} x1={Math.cos(a*Math.PI/180)*22} y1={Math.sin(a*Math.PI/180)*22} x2={Math.cos(a*Math.PI/180)*48} y2={Math.sin(a*Math.PI/180)*48} stroke={color} strokeWidth="0.6" opacity="0.32"/>)}
-        <polygon points="0,-16 5,-5 16,0 5,5 0,16 -5,5 -16,0 -5,-5" fill="none" stroke={color} strokeWidth="0.6" opacity="0.28"/>
-        <circle cx="0" cy="0" r="7" fill="none" stroke={color} strokeWidth="0.5" opacity="0.22"/>
-      </g>
-      <path d="M12 12 Q32 12 32 32 Q32 52 52 52" fill="none" stroke={color} strokeWidth="0.9" opacity="0.28" strokeLinecap="round"/>
-      <path d="M148 12 Q128 12 128 32 Q128 52 108 52" fill="none" stroke={color} strokeWidth="0.9" opacity="0.28" strokeLinecap="round"/>
-      <path d="M12 148 Q32 148 32 128 Q32 108 52 108" fill="none" stroke={color} strokeWidth="0.9" opacity="0.28" strokeLinecap="round"/>
-      <path d="M148 148 Q128 148 128 128 Q128 108 108 108" fill="none" stroke={color} strokeWidth="0.9" opacity="0.28" strokeLinecap="round"/>
-      {[[30,30],[130,30],[30,130],[130,130]].map(([x,y],i)=><polygon key={i} points={`${x},${y-7} ${x+7},${y} ${x},${y+7} ${x-7},${y}`} fill={color} opacity="0.14"/>)}
-      {[0,45,90,135,180,225,270,315].map(a=><circle key={a} cx={80+Math.cos(a*Math.PI/180)*58} cy={80+Math.sin(a*Math.PI/180)*58} r="1.5" fill={color} opacity="0.28"/>)}
-    </svg>
-  )
-}
+const OrnementDore = ({ style = {} }: { style?: React.CSSProperties }) => (
+  <svg viewBox="0 0 200 220" width="180" height="200" style={{ ...style, pointerEvents: 'none' }}>
+    <path d="M 100 40 Q 130 20 160 40 Q 180 60 160 80 Q 140 100 120 90 Q 100 80 110 60 Q 120 40 140 50" stroke="#C9A84C" strokeWidth="2" fill="none" opacity="0.8"/>
+    <path d="M 100 40 Q 70 20 40 40 Q 20 60 40 80 Q 60 100 80 90 Q 100 80 90 60 Q 80 40 60 50" stroke="#C9A84C" strokeWidth="2" fill="none" opacity="0.8"/>
+    <ellipse cx="150" cy="100" rx="20" ry="10" fill="#C9A84C" opacity="0.6" transform="rotate(30 150 100)"/>
+    <ellipse cx="50" cy="100" rx="20" ry="10" fill="#C9A84C" opacity="0.6" transform="rotate(-30 50 100)"/>
+    <ellipse cx="100" cy="140" rx="25" ry="12" fill="#D4A847" opacity="0.55" transform="rotate(0 100 140)"/>
+    <ellipse cx="70" cy="160" rx="18" ry="9" fill="#C9A84C" opacity="0.5" transform="rotate(40 70 160)"/>
+    <ellipse cx="130" cy="160" rx="18" ry="9" fill="#C9A84C" opacity="0.5" transform="rotate(-40 130 160)"/>
+    <circle cx="100" cy="80" r="12" fill="#D4A847" opacity="0.7"/>
+    <circle cx="100" cy="80" r="7" fill="#b8860b" opacity="0.8"/>
+    <circle cx="100" cy="80" r="3" fill="#fff8e0" opacity="0.9"/>
+    <circle cx="160" cy="50" r="4" fill="#C9A84C" opacity="0.7"/>
+    <circle cx="170" cy="65" r="3" fill="#D4A847" opacity="0.6"/>
+    <circle cx="40" cy="50" r="4" fill="#C9A84C" opacity="0.7"/>
+    <circle cx="30" cy="65" r="3" fill="#D4A847" opacity="0.6"/>
+    <path d="M 100 100 Q 100 140 100 180" stroke="#C9A84C" strokeWidth="2" fill="none" opacity="0.6"/>
+    <path d="M 100 120 Q 80 130 70 150" stroke="#C9A84C" strokeWidth="1.5" fill="none" opacity="0.5"/>
+    <path d="M 100 120 Q 120 130 130 150" stroke="#C9A84C" strokeWidth="1.5" fill="none" opacity="0.5"/>
+    <path d="M 100 150 Q 75 155 65 170" stroke="#C9A84C" strokeWidth="1.5" fill="none" opacity="0.5"/>
+    <path d="M 100 150 Q 125 155 135 170" stroke="#C9A84C" strokeWidth="1.5" fill="none" opacity="0.5"/>
+  </svg>
+)
 
-function OrnamentChampetre({ size = 160, color = '#7a9e6e', opacity = 0.72 }: { size?: number; color?: string; opacity?: number }) {
-  return (
-    <svg width={size} height={Math.round(size*1.1)} viewBox="0 0 160 176" xmlns="http://www.w3.org/2000/svg" style={{ opacity, display: 'block' }}>
-      <path d="M80 176 Q76 138 72 100 Q68 62 80 18" fill="none" stroke={color} strokeWidth="1.6" opacity="0.48" strokeLinecap="round"/>
-      {[[68,156,-22],[58,126,-36],[54,96,-26],[64,68,-32],[70,42,-20]].map(([x,y,rot],i)=><ellipse key={`l${i}`} cx={x} cy={y} rx="7" ry="16" transform={`rotate(${rot} ${x} ${y})`} fill={color} opacity="0.42"/>)}
-      {[[86,150,22],[92,120,36],[86,92,26],[80,65,30],[78,40,18]].map(([x,y,rot],i)=><ellipse key={`r${i}`} cx={x} cy={y} rx="7" ry="16" transform={`rotate(${rot} ${x} ${y})`} fill={color} opacity="0.38"/>)}
-      {[[54,142],[46,112],[50,82],[62,52],[73,28]].map(([x,y],i)=><circle key={`b${i}`} cx={x} cy={y} r="2.5" fill={color} opacity="0.32"/>)}
-      {[[90,136],[96,106],[89,77],[83,50]].map(([x,y],i)=><circle key={`g${i}`} cx={x} cy={y} r="1.8" fill="#d4a840" opacity="0.38"/>)}
-    </svg>
-  )
-}
+const OrnementArabesque = ({ style = {} }: { style?: React.CSSProperties }) => (
+  <svg viewBox="0 0 200 220" width="180" height="200" style={{ ...style, pointerEvents: 'none' }}>
+    <path d="M 100 10 L 120 50 L 165 50 L 130 75 L 145 120 L 100 95 L 55 120 L 70 75 L 35 50 L 80 50 Z" fill="none" stroke="#D4A847" strokeWidth="1.5" opacity="0.7"/>
+    <path d="M 100 30 L 115 58 L 148 58 L 122 76 L 132 108 L 100 88 L 68 108 L 78 76 L 52 58 L 85 58 Z" fill="#D4A847" opacity="0.15"/>
+    <circle cx="100" cy="70" r="15" fill="none" stroke="#D4A847" strokeWidth="1.5" opacity="0.7"/>
+    <circle cx="100" cy="70" r="8" fill="#D4A847" opacity="0.5"/>
+    <path d="M 20 140 Q 60 110 100 130 Q 140 150 180 120" stroke="#D4A847" strokeWidth="2" fill="none" opacity="0.6"/>
+    <path d="M 20 160 Q 60 130 100 150 Q 140 170 180 140" stroke="#D4A847" strokeWidth="1.5" fill="none" opacity="0.5"/>
+    <path d="M 20 180 Q 60 150 100 170 Q 140 190 180 160" stroke="#D4A847" strokeWidth="1" fill="none" opacity="0.4"/>
+    <circle cx="40" cy="145" r="5" fill="#D4A847" opacity="0.6"/>
+    <circle cx="160" cy="125" r="5" fill="#D4A847" opacity="0.6"/>
+    <circle cx="100" cy="135" r="4" fill="#D4A847" opacity="0.7"/>
+    <path d="M 60 200 Q 100 185 140 200" stroke="#D4A847" strokeWidth="1.5" fill="none" opacity="0.5"/>
+  </svg>
+)
 
-function SharedOrnament({ themeKey, size = 150, accent }: { themeKey: Theme; size?: number; accent: string }) {
-  if (['rose-poudre'].includes(themeKey)) return <OrnamentFloral size={size} />
-  if (['bleu-nuit', 'oriental', 'bordeaux'].includes(themeKey)) return <OrnamentOriental size={size} color={accent} />
-  if (['champetre', 'vert-sauge', 'bleu-ciel', 'ardoise', 'minimaliste'].includes(themeKey)) return <OrnamentChampetre size={size} color={accent} />
-  return <OrnamentDentelle size={size} color={accent} />
+const OrnementChampetre = ({ style = {} }: { style?: React.CSSProperties }) => (
+  <svg viewBox="0 0 200 220" width="180" height="200" style={{ ...style, pointerEvents: 'none' }}>
+    <path d="M 30 200 Q 80 160 120 120 Q 150 90 170 60" stroke="#5a7a4a" strokeWidth="3" fill="none" opacity="0.6"/>
+    <path d="M 20 180 Q 60 150 90 120" stroke="#6a8a5a" strokeWidth="2" fill="none" opacity="0.5"/>
+    {([
+      [55, 175, -50], [75, 158, -45], [95, 140, -40],
+      [110, 128, 20], [125, 114, -35], [140, 100, 25],
+      [152, 88, -30], [162, 75, 20]
+    ] as [number, number, number][]).map(([cx, cy, rotate], i) => (
+      <ellipse key={i} cx={cx} cy={cy} rx="14" ry="6" fill="#6a9a5a" opacity="0.6" transform={`rotate(${rotate} ${cx} ${cy})`}/>
+    ))}
+    <circle cx="85" cy="145" r="4" fill="#3a5a2a" opacity="0.6"/>
+    <circle cx="115" cy="120" r="3.5" fill="#3a5a2a" opacity="0.55"/>
+    <circle cx="145" cy="95" r="4" fill="#3a5a2a" opacity="0.6"/>
+    <path d="M 90 140 Q 50 120 30 90" stroke="#5a7a4a" strokeWidth="2" fill="none" opacity="0.5"/>
+    {([
+      [70, 128, 30], [55, 115, 40], [42, 103, 35]
+    ] as [number, number, number][]).map(([cx, cy, rotate], i) => (
+      <ellipse key={i} cx={cx} cy={cy} rx="13" ry="6" fill="#7aaa6a" opacity="0.55" transform={`rotate(${rotate} ${cx} ${cy})`}/>
+    ))}
+    <circle cx="130" cy="65" r="6" fill="#f0f8e8" opacity="0.8"/>
+    <circle cx="130" cy="65" r="3" fill="#C9A84C" opacity="0.7"/>
+    <circle cx="170" cy="45" r="5" fill="#f0f8e8" opacity="0.75"/>
+    <circle cx="170" cy="45" r="2.5" fill="#C9A84C" opacity="0.7"/>
+    <circle cx="40" cy="80" r="5" fill="#f0f8e8" opacity="0.75"/>
+    <circle cx="40" cy="80" r="2.5" fill="#C9A84C" opacity="0.7"/>
+  </svg>
+)
+
+function getOrnement(theme: string, style: React.CSSProperties = {}) {
+  const props = { style: { position: 'absolute' as const, zIndex: 0, ...style } }
+  switch (theme) {
+    case 'floral-bleu':   return <OrnementFloralBleu {...props} />
+    case 'rose-fleuri':   return <OrnementFloralRose {...props} />
+    case 'or-dentelle':   return <OrnementDore {...props} />
+    case 'oriental-nuit': return <OrnementArabesque {...props} />
+    case 'champetre':     return <OrnementChampetre {...props} />
+    default:              return <OrnementFloralBleu {...props} />
+  }
 }
 
 // ── AnimSection : fade-in au scroll ───────────────────────────────────────────
@@ -2281,6 +2335,28 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
     </div>
   )
 
+  const scrollStyle: React.CSSProperties = {
+    opacity: 0,
+    transform: 'translateY(40px)',
+    transition: 'opacity 0.9s ease, transform 0.9s ease',
+  }
+
+  useEffect(() => {
+    const elements = document.querySelectorAll('.scroll-animate')
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            (entry.target as HTMLElement).style.opacity = '1';
+            (entry.target as HTMLElement).style.transform = 'translateY(0)'
+          }, index * 100)
+        }
+      })
+    }, { threshold: 0.1 })
+    elements.forEach(el => observer.observe(el))
+    return () => observer.disconnect()
+  }, [])
+
   const handleDiscover = () => {
     onStartYoutube?.()
     setTimeout(() => contentRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
@@ -2293,10 +2369,10 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
       {/* ── SECTION 1 : Écran d'accueil ────────────────────────────────────── */}
       <div style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: -8, right: -8, pointerEvents: 'none', zIndex: 0, opacity: 0.65 }}>
-          <SharedOrnament themeKey={data.style} size={160} accent={G} />
+          {getOrnement(data.style, { position: 'relative' })}
         </div>
         <div style={{ position: 'absolute', bottom: -8, left: -8, pointerEvents: 'none', zIndex: 0, opacity: 0.45, transform: 'scale(-1,-1)' }}>
-          <SharedOrnament themeKey={data.style} size={130} accent={G} />
+          {getOrnement(data.style, { position: 'relative' })}
         </div>
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '0 32px', maxWidth: 480, width: '100%', margin: '0 auto' }}>
           {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 16, color: G, direction: 'rtl', marginBottom: 20, animation: 'sharedFadeIn 0.9s ease forwards' }}>בס״ד</div>}
@@ -2318,22 +2394,20 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
 
         {/* SECTION 2 : Intro */}
         <section style={{ paddingTop: 72, paddingBottom: 48, position: 'relative', borderBottom: `1px solid ${G}1a` }}>
-          <div style={{ position: 'absolute', top: 20, right: -28, pointerEvents: 'none', opacity: 0.35 }}>
-            <SharedOrnament themeKey={data.style} size={90} accent={G} />
-          </div>
+          {getOrnement(data.style, { top: 20, right: -28, opacity: 0.35, pointerEvents: 'none' })}
           <AnimSection>
             {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 14, color: G, direction: 'rtl', textAlign: 'right', marginBottom: 16 }}>בס״ד</div>}
-            <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: G, textAlign: 'center', letterSpacing: 1, marginBottom: 14 }}>
+            <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: G, textAlign: 'center', letterSpacing: 1, marginBottom: 14 }}>
               Le Mariage de
             </div>
             <LineSep />
           </AnimSection>
           <AnimSection delay={150}>
-            <div style={{ fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 8 }}>
+            <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 8 }}>
               {data.marie1Prenom || 'Prénom'}
             </div>
-            <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 24, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.7 }}>&</div>
-            <div style={{ fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 24 }}>
+            <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FC, fontStyle: 'italic', fontSize: 24, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.7 }}>&</div>
+            <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 24 }}>
               {data.marie2Prenom || 'Prénom'}
             </div>
             {data.mariageJuif && (data.marie1Prenom2 || data.marie2Prenom2) && (
@@ -2386,11 +2460,9 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
           const hebrewDate = getHebrewDate(ceremony.date)
           return (
             <section key={i} style={{ paddingTop: 60, paddingBottom: 52, position: 'relative', borderBottom: `1px solid ${G}1a` }}>
-              <div style={{ position: 'absolute', [isLeft ? 'right' : 'left']: -28, top: 30, pointerEvents: 'none', opacity: 0.28 }}>
-                <SharedOrnament themeKey={data.style} size={88} accent={G} />
-              </div>
+              {getOrnement(data.style, { [isLeft ? 'right' : 'left']: -28, top: 30, pointerEvents: 'none', opacity: 0.28 })}
               <AnimSection>
-                <div style={{ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>{title}</div>
+                <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>{title}</div>
                 <OrnSep />
               </AnimSection>
               {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
@@ -2417,7 +2489,28 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
               </AnimSection>
               <AnimSection delay={380}>
                 <LineSep />
-                {ceremony.date && <div style={{ fontFamily: FC, fontStyle: 'italic', fontWeight: 700, fontSize: 19, color: TEXT, textAlign: 'center', marginBottom: 6 }}>Le {formatDateFrCap(ceremony.date)}</div>}
+                {ceremony.date && (() => {
+                  const d = new Date(ceremony.date + 'T12:00:00')
+                  const parts = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).formatToParts(d)
+                  const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+                  const jourSemaine = cap(parts.find(p => p.type === 'weekday')?.value || '')
+                  const jour = parts.find(p => p.type === 'day')?.value || ''
+                  const mois = cap(parts.find(p => p.type === 'month')?.value || '')
+                  const annee = parts.find(p => p.type === 'year')?.value || ''
+                  return (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, margin: '24px 0' }}>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ borderBottom: `1px solid ${G}`, paddingBottom: 4, marginBottom: 4, letterSpacing: 3, fontSize: 11, color: G }}>{jourSemaine.toUpperCase()}</div>
+                        <div style={{ fontSize: 11, color: TEXT, letterSpacing: 2 }}>{annee}</div>
+                      </div>
+                      <div style={{ border: `1.5px solid ${G}`, borderRadius: 4, padding: '8px 16px', fontSize: 36, fontFamily: FP, color: G, fontWeight: 600, minWidth: 60, textAlign: 'center' }}>{jour}</div>
+                      <div style={{ textAlign: 'left' }}>
+                        <div style={{ borderBottom: `1px solid ${G}`, paddingBottom: 4, marginBottom: 4, letterSpacing: 3, fontSize: 11, color: G }}>{mois.toUpperCase()}</div>
+                        <div style={{ fontSize: 11, color: TEXT, letterSpacing: 2 }}>{annee}</div>
+                      </div>
+                    </div>
+                  )
+                })()}
                 {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 15, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 8, opacity: 0.8 }}>{hebrewDate}</div>}
                 {ceremony.heure && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 17, color: TEXT, textAlign: 'center', marginBottom: 18, opacity: 0.82 }}>À {formatHeure(ceremony.heure)} précises</div>}
                 {ceremony.lieu && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', lineHeight: 1.6, marginBottom: 4 }}>{formatLieu(ceremony.lieu)}</div>}
@@ -2506,8 +2599,8 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
       {/* SECTION 7 : Footer */}
       <footer style={{ padding: '48px 28px 64px', textAlign: 'center', background: `${G}08`, maxWidth: 480, margin: '0 auto' }}>
         <AnimSection>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20, opacity: 0.55 }}>
-            <SharedOrnament themeKey={data.style} size={72} accent={G} />
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20, opacity: 0.55, position: 'relative' }}>
+            {getOrnement(data.style, { position: 'relative' })}
           </div>
           <div style={{ fontFamily: FS, fontSize: 40, color: G, marginBottom: 12, lineHeight: 1.2 }}>
             {data.marie1Prenom} & {data.marie2Prenom}

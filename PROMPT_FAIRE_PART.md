@@ -1,191 +1,296 @@
-Refais COMPLÈTEMENT la vue partagée (isShared=true) dans app/faire-part/page.tsx.
+Refais complètement le système de thèmes et les ornements dans app/faire-part/page.tsx.
 
-L'objectif est de créer quelque chose de SUBLIME, comparable à invitationdigitale.fr mais en mieux.
+## PROBLÈME ACTUEL
+Les ornements SVG ne sont pas visibles et les animations ne fonctionnent pas. Il faut tout reconstruire proprement.
 
-## ARCHITECTURE GÉNÉRALE
+## PARTIE 1 — THÈMES VISUELS DANS LE FORMULAIRE
 
-Une seule page HTML qui défile de haut en bas. Pas de cartes séparées — tout est continu et fluide. Largeur max 480px centrée sur desktop, plein écran sur mobile.
+Dans Step4, remplace les 12 thèmes actuels par 5 grands thèmes avec aperçu visuel réel. Chaque thème a un nom, une vignette colorée et un style d'ornement associé.
 
-## THÈMES VISUELS
+Les 5 thèmes :
+- "floral-bleu" → "Floral Bleu" — fond blanc, accent bleu #2c4a7c, ornements fleurs aquarelle bleues
+- "rose-fleuri" → "Rose Fleuri" — fond #faf6f4, accent rose #c4829a, ornements roses aquarelle
+- "or-dentelle" → "Or & Dentelle" — fond #fdf8f0, accent doré #C9A84C, ornements dentelle dorée
+- "oriental-nuit" → "Oriental Nuit" — fond #0f0a1e, accent #D4A847, ornements arabesques dorées
+- "champetre" → "Champêtre" — fond #f4f7f0, accent vert #7a9e6e, ornements branches
 
-Créer 4 thèmes complets, chacun avec ses propres ornements, couleurs et ambiance :
+Afficher les 5 thèmes en grille avec pour chaque thème :
+- Rectangle 120px × 80px avec fond du thème + un aperçu de l'ornement SVG dedans
+- Nom du thème
+- Bordure 3px accent si sélectionné
 
-### THÈME 1 — "Rose Fleuri" (défaut)
-- Fond : #faf6f4 (blanc rosé très doux)
-- Accent : #c4829a (rose poudré)
-- Texte : #2d2d2d
-- Ornements : bouquets de roses aquarelle roses en PNG base64 (SVG simulant l'aquarelle avec des formes organiques roses, feuilles vertes pâles, touches dorées)
-- Bordures des sections : 1px solid rgba(196, 130, 154, 0.3)
-- Titres événements : uppercase Playfair Display, letter-spacing 4px
+## PARTIE 2 — ORNEMENTS SVG VISIBLES ET BEAUX
 
-### THÈME 2 — "Or & Dentelle" (luxe)
-- Fond : #fdf8f0 (crème chaud)
-- Accent : #C9A84C (doré)
-- Texte : #2d2014
-- Ornements : dentelle et feuilles dorées SVG dans les coins (comme les captures beige & or)
-- Bordures : 1px solid rgba(201, 168, 76, 0.4)
+Créer une fonction getOrnement(theme, position) qui retourne un SVG visible et élégant.
 
-### THÈME 3 — "Oriental Nuit"
-- Fond : #0f0a1e (nuit profonde)
-- Accent : #D4A847 (or brillant)
-- Texte : #f0e6d0
-- Ornements : arabesques et motifs géométriques dorés SVG
-- Effet : étoiles subtiles en background
+ORNEMENT FLORAL BLEU — à coller directement dans le JSX, taille 180px × 200px :
 
-### THÈME 4 — "Champêtre Vert"
-- Fond : #f4f7f0 (blanc verdâtre)
-- Accent : #7a9e6e (vert sauge)
-- Texte : #2a3520
-- Ornements : branches d'olivier et eucalyptus SVG vert et doré
+Pour le thème "floral-bleu", l'ornement est ce SVG exact (copie-le tel quel) :
 
-## ORNEMENTS SVG
-
-Pour chaque thème, créer des ornements SVG complexes et beaux :
-
-ORNEMENT FLORAL ROSE (thème 1) :
-```svg
-Un bouquet de roses stylisées avec :
-- 3-4 roses de tailles différentes (cercles avec pétales SVG)
-- Des feuilles organiques
-- Des petites fleurs
-- Des touches dorées
-- Couleurs : rose #e8a0b8, rose foncé #c4729a, vert #a8c890, or #d4a840
-- Taille : 180px × 200px
+```jsx
+const OrnementFloralBleu = ({ style = {} }) => (
+  <svg viewBox="0 0 200 220" width="180" height="200" style={{ ...style, pointerEvents: 'none' }}>
+    {/* Grande fleur bleue principale */}
+    <ellipse cx="100" cy="80" rx="40" ry="35" fill="#4a7ab5" opacity="0.75" transform="rotate(-20 100 80)"/>
+    <ellipse cx="100" cy="80" rx="32" ry="27" fill="#6b9fd4" opacity="0.65" transform="rotate(40 100 80)"/>
+    <ellipse cx="100" cy="80" rx="24" ry="20" fill="#8bbde8" opacity="0.55" transform="rotate(90 100 80)"/>
+    <circle cx="100" cy="80" r="10" fill="#1a3a6a" opacity="0.85"/>
+    <circle cx="100" cy="80" r="6" fill="#2c5490" opacity="0.95"/>
+    {/* Petits points au centre */}
+    <circle cx="95" cy="75" r="2" fill="white" opacity="0.6"/>
+    <circle cx="105" cy="75" r="1.5" fill="white" opacity="0.5"/>
+    
+    {/* 2ème fleur bleue foncée */}
+    <ellipse cx="155" cy="110" rx="30" ry="26" fill="#1e3a6a" opacity="0.8" transform="rotate(20 155 110)"/>
+    <ellipse cx="155" cy="110" rx="23" ry="19" fill="#2d5490" opacity="0.7" transform="rotate(70 155 110)"/>
+    <ellipse cx="155" cy="110" rx="16" ry="13" fill="#4a7ab5" opacity="0.6" transform="rotate(-30 155 110)"/>
+    <circle cx="155" cy="110" r="7" fill="#0a1f40" opacity="0.9"/>
+    
+    {/* Petite fleur 3 */}
+    <ellipse cx="55" cy="150" rx="20" ry="17" fill="#6b9fd4" opacity="0.6" transform="rotate(-40 55 150)"/>
+    <ellipse cx="55" cy="150" rx="14" ry="11" fill="#8bbde8" opacity="0.5" transform="rotate(20 55 150)"/>
+    <circle cx="55" cy="150" r="5" fill="#2c5490" opacity="0.8"/>
+    
+    {/* Branches et tiges */}
+    <path d="M 20 210 Q 60 170 95 140 Q 120 120 140 100" stroke="#3a6a4a" strokeWidth="2.5" fill="none" opacity="0.5"/>
+    <path d="M 30 200 Q 50 160 80 130" stroke="#4a7a5a" strokeWidth="2" fill="none" opacity="0.4"/>
+    
+    {/* Feuilles */}
+    <ellipse cx="45" cy="185" rx="22" ry="11" fill="#4a7a5a" opacity="0.55" transform="rotate(-45 45 185)"/>
+    <ellipse cx="65" cy="165" rx="18" ry="9" fill="#5a8a6a" opacity="0.5" transform="rotate(-55 65 165)"/>
+    <ellipse cx="88" cy="145" rx="16" ry="8" fill="#4a7a5a" opacity="0.5" transform="rotate(15 88 145)"/>
+    <ellipse cx="115" cy="125" rx="14" ry="7" fill="#6a9a7a" opacity="0.45" transform="rotate(-20 115 125)"/>
+    
+    {/* Petites feuilles bleues aquarelle */}
+    <ellipse cx="170" cy="55" rx="14" ry="7" fill="#6b9fd4" opacity="0.45" transform="rotate(50 170 55)"/>
+    <ellipse cx="180" cy="75" rx="11" ry="5.5" fill="#8bbde8" opacity="0.4" transform="rotate(-15 180 75)"/>
+    <ellipse cx="165" cy="85" rx="16" ry="7" fill="#4a7ab5" opacity="0.4" transform="rotate(70 165 85)"/>
+    <ellipse cx="30" cy="100" rx="12" ry="6" fill="#6b9fd4" opacity="0.35" transform="rotate(30 30 100)"/>
+    
+    {/* Petites baies */}
+    <circle cx="130" cy="60" r="5" fill="#2c4a7c" opacity="0.65"/>
+    <circle cx="140" cy="52" r="4" fill="#2c4a7c" opacity="0.55"/>
+    <circle cx="148" cy="60" r="4.5" fill="#1e3a6a" opacity="0.6"/>
+    <circle cx="138" cy="68" r="3.5" fill="#2c4a7c" opacity="0.5"/>
+    <path d="M 130 60 Q 135 55 140 52" stroke="#3a5a8a" strokeWidth="1.5" fill="none" opacity="0.4"/>
+    <path d="M 140 52 Q 145 56 148 60" stroke="#3a5a8a" strokeWidth="1.5" fill="none" opacity="0.4"/>
+  </svg>
+)
 ```
 
-Placer ces ornements :
-- En haut à droite de la page
-- En bas à gauche après la section parents
-- En haut à droite de chaque section cérémonie (alternance)
-- Position absolute, pointer-events: none, z-index: 0
+ORNEMENT FLORAL ROSE — même structure mais couleurs roses :
+```jsx
+const OrnementFloralRose = ({ style = {} }) => (
+  <svg viewBox="0 0 200 220" width="180" height="200" style={{ ...style, pointerEvents: 'none' }}>
+    <ellipse cx="100" cy="80" rx="38" ry="33" fill="#e8a0b8" opacity="0.75" transform="rotate(-20 100 80)"/>
+    <ellipse cx="100" cy="80" rx="30" ry="25" fill="#d4829a" opacity="0.65" transform="rotate(40 100 80)"/>
+    <ellipse cx="100" cy="80" rx="22" ry="18" fill="#f0c0d0" opacity="0.55" transform="rotate(90 100 80)"/>
+    <circle cx="100" cy="80" r="9" fill="#8b3a5a" opacity="0.85"/>
+    <circle cx="100" cy="80" r="5" fill="#a0506a" opacity="0.95"/>
+    <circle cx="95" cy="75" r="2" fill="white" opacity="0.6"/>
+    <ellipse cx="155" cy="110" rx="28" ry="24" fill="#c4729a" opacity="0.75" transform="rotate(20 155 110)"/>
+    <ellipse cx="155" cy="110" rx="20" ry="16" fill="#e8a0b8" opacity="0.65" transform="rotate(70 155 110)"/>
+    <circle cx="155" cy="110" r="6" fill="#7a2a4a" opacity="0.9"/>
+    <ellipse cx="55" cy="150" rx="18" ry="15" fill="#e8a0b8" opacity="0.6" transform="rotate(-40 55 150)"/>
+    <circle cx="55" cy="150" r="5" fill="#c4729a" opacity="0.8"/>
+    <path d="M 20 210 Q 60 170 95 140 Q 120 120 140 100" stroke="#6a8a5a" strokeWidth="2.5" fill="none" opacity="0.5"/>
+    <ellipse cx="45" cy="185" rx="20" ry="10" fill="#6a8a5a" opacity="0.55" transform="rotate(-45 45 185)"/>
+    <ellipse cx="65" cy="165" rx="17" ry="8.5" fill="#7a9a6a" opacity="0.5" transform="rotate(-55 65 165)"/>
+    <ellipse cx="88" cy="145" rx="15" ry="7.5" fill="#6a8a5a" opacity="0.5" transform="rotate(15 88 145)"/>
+    <ellipse cx="170" cy="55" rx="13" ry="6.5" fill="#e8a0b8" opacity="0.45" transform="rotate(50 170 55)"/>
+    <ellipse cx="180" cy="75" rx="10" ry="5" fill="#f0c0d0" opacity="0.4" transform="rotate(-15 180 75)"/>
+    <circle cx="130" cy="60" r="4.5" fill="#c4729a" opacity="0.65"/>
+    <circle cx="140" cy="52" r="3.5" fill="#d4829a" opacity="0.55"/>
+    <circle cx="148" cy="60" r="4" fill="#c4729a" opacity="0.6"/>
+    <path d="M 130 60 Q 135 55 140 52 Q 145 56 148 60" stroke="#c4829a" strokeWidth="1.5" fill="none" opacity="0.4"/>
+  </svg>
+)
+```
 
-## STRUCTURE DE LA PAGE (dans l'ordre du scroll)
+ORNEMENT DORÉ — dentelle et feuilles :
+```jsx
+const OrnementDore = ({ style = {} }) => (
+  <svg viewBox="0 0 200 220" width="180" height="200" style={{ ...style, pointerEvents: 'none' }}>
+    {/* Volutes principales */}
+    <path d="M 100 40 Q 130 20 160 40 Q 180 60 160 80 Q 140 100 120 90 Q 100 80 110 60 Q 120 40 140 50" stroke="#C9A84C" strokeWidth="2" fill="none" opacity="0.8"/>
+    <path d="M 100 40 Q 70 20 40 40 Q 20 60 40 80 Q 60 100 80 90 Q 100 80 90 60 Q 80 40 60 50" stroke="#C9A84C" strokeWidth="2" fill="none" opacity="0.8"/>
+    {/* Feuilles dorées */}
+    <ellipse cx="150" cy="100" rx="20" ry="10" fill="#C9A84C" opacity="0.6" transform="rotate(30 150 100)"/>
+    <ellipse cx="50" cy="100" rx="20" ry="10" fill="#C9A84C" opacity="0.6" transform="rotate(-30 50 100)"/>
+    <ellipse cx="100" cy="140" rx="25" ry="12" fill="#D4A847" opacity="0.55" transform="rotate(0 100 140)"/>
+    <ellipse cx="70" cy="160" rx="18" ry="9" fill="#C9A84C" opacity="0.5" transform="rotate(40 70 160)"/>
+    <ellipse cx="130" cy="160" rx="18" ry="9" fill="#C9A84C" opacity="0.5" transform="rotate(-40 130 160)"/>
+    {/* Petites fleurs */}
+    <circle cx="100" cy="80" r="12" fill="#D4A847" opacity="0.7"/>
+    <circle cx="100" cy="80" r="7" fill="#b8860b" opacity="0.8"/>
+    <circle cx="100" cy="80" r="3" fill="#fff8e0" opacity="0.9"/>
+    {/* Petites perles */}
+    <circle cx="160" cy="50" r="4" fill="#C9A84C" opacity="0.7"/>
+    <circle cx="170" cy="65" r="3" fill="#D4A847" opacity="0.6"/>
+    <circle cx="40" cy="50" r="4" fill="#C9A84C" opacity="0.7"/>
+    <circle cx="30" cy="65" r="3" fill="#D4A847" opacity="0.6"/>
+    {/* Tige centrale avec ornements */}
+    <path d="M 100 100 Q 100 140 100 180" stroke="#C9A84C" strokeWidth="2" fill="none" opacity="0.6"/>
+    <path d="M 100 120 Q 80 130 70 150" stroke="#C9A84C" strokeWidth="1.5" fill="none" opacity="0.5"/>
+    <path d="M 100 120 Q 120 130 130 150" stroke="#C9A84C" strokeWidth="1.5" fill="none" opacity="0.5"/>
+    <path d="M 100 150 Q 75 155 65 170" stroke="#C9A84C" strokeWidth="1.5" fill="none" opacity="0.5"/>
+    <path d="M 100 150 Q 125 155 135 170" stroke="#C9A84C" strokeWidth="1.5" fill="none" opacity="0.5"/>
+  </svg>
+)
+```
 
-### 1. ÉCRAN D'ACCUEIL (100vh)
-- Fond plein thème
-- Ornement floral en haut à droite
-- Ornement floral en bas à gauche
-- Centre :
-  * Monogramme calligraphique (initiales entrelacées en Great Vibes 80px dans un cercle fin)
-  * Bouton "DÉCOUVRIR" ou "פתח" en uppercase, fond accent, lettres blanches, border-radius 2px, padding 14px 40px
-- Animation : monogramme apparaît en fadeIn 1s, bouton en fadeIn 1.5s
+ORNEMENT ARABESQUE (Oriental) :
+```jsx
+const OrnementArabesque = ({ style = {} }) => (
+  <svg viewBox="0 0 200 220" width="180" height="200" style={{ ...style, pointerEvents: 'none' }}>
+    <path d="M 100 10 L 120 50 L 165 50 L 130 75 L 145 120 L 100 95 L 55 120 L 70 75 L 35 50 L 80 50 Z" fill="none" stroke="#D4A847" strokeWidth="1.5" opacity="0.7"/>
+    <path d="M 100 30 L 115 58 L 148 58 L 122 76 L 132 108 L 100 88 L 68 108 L 78 76 L 52 58 L 85 58 Z" fill="#D4A847" opacity="0.15"/>
+    <circle cx="100" cy="70" r="15" fill="none" stroke="#D4A847" strokeWidth="1.5" opacity="0.7"/>
+    <circle cx="100" cy="70" r="8" fill="#D4A847" opacity="0.5"/>
+    <path d="M 20 140 Q 60 110 100 130 Q 140 150 180 120" stroke="#D4A847" strokeWidth="2" fill="none" opacity="0.6"/>
+    <path d="M 20 160 Q 60 130 100 150 Q 140 170 180 140" stroke="#D4A847" strokeWidth="1.5" fill="none" opacity="0.5"/>
+    <path d="M 20 180 Q 60 150 100 170 Q 140 190 180 160" stroke="#D4A847" strokeWidth="1" fill="none" opacity="0.4"/>
+    <circle cx="40" cy="145" r="5" fill="#D4A847" opacity="0.6"/>
+    <circle cx="160" cy="125" r="5" fill="#D4A847" opacity="0.6"/>
+    <circle cx="100" cy="135" r="4" fill="#D4A847" opacity="0.7"/>
+    <path d="M 60 200 Q 100 185 140 200" stroke="#D4A847" strokeWidth="1.5" fill="none" opacity="0.5"/>
+  </svg>
+)
+```
 
-### 2. SECTION INTRO (après clic sur Découvrir)
-- Ornement en haut à droite
-- בס״ד en doré en haut à droite si mariage juif
-- "The Wedding Of" ou "Le Mariage de" en Cormorant Garamond italic 16px, couleur accent, centré
-- Séparateur : ——— ✦ ———
-- Prénoms en Great Vibes 64px, couleur accent, centré
-- Si mariage juif : prénoms hébreux en 28px en dessous, couleur accent
-- Noms des familles en Cormorant Garamond 14px, deux colonnes
-- "ont la joie de vous faire part du mariage de leurs petits-enfants et enfants"
-- Séparateur ornementé
+ORNEMENT CHAMPÊTRE — branches olivier :
+```jsx
+const OrnementChampetre = ({ style = {} }) => (
+  <svg viewBox="0 0 200 220" width="180" height="200" style={{ ...style, pointerEvents: 'none' }}>
+    <path d="M 30 200 Q 80 160 120 120 Q 150 90 170 60" stroke="#5a7a4a" strokeWidth="3" fill="none" opacity="0.6"/>
+    <path d="M 20 180 Q 60 150 90 120" stroke="#6a8a5a" strokeWidth="2" fill="none" opacity="0.5"/>
+    {/* Feuilles d'olivier sur la branche principale */}
+    {[
+      [55, 175, -50], [75, 158, -45], [95, 140, -40],
+      [110, 128, 20], [125, 114, -35], [140, 100, 25],
+      [152, 88, -30], [162, 75, 20]
+    ].map(([cx, cy, rotate], i) => (
+      <ellipse key={i} cx={cx} cy={cy} rx="14" ry="6" fill="#6a9a5a" opacity="0.6" transform={`rotate(${rotate} ${cx} ${cy})`}/>
+    ))}
+    {/* Petites olives */}
+    <circle cx="85" cy="145" r="4" fill="#3a5a2a" opacity="0.6"/>
+    <circle cx="115" cy="120" r="3.5" fill="#3a5a2a" opacity="0.55"/>
+    <circle cx="145" cy="95" r="4" fill="#3a5a2a" opacity="0.6"/>
+    {/* Branche secondaire */}
+    <path d="M 90 140 Q 50 120 30 90" stroke="#5a7a4a" strokeWidth="2" fill="none" opacity="0.5"/>
+    {[
+      [70, 128, 30], [55, 115, 40], [42, 103, 35]
+    ].map(([cx, cy, rotate], i) => (
+      <ellipse key={i} cx={cx} cy={cy} rx="13" ry="6" fill="#7aaa6a" opacity="0.55" transform={`rotate(${rotate} ${cx} ${cy})`}/>
+    ))}
+    {/* Petites fleurs blanches */}
+    <circle cx="130" cy="65" r="6" fill="#f0f8e8" opacity="0.8"/>
+    <circle cx="130" cy="65" r="3" fill="#C9A84C" opacity="0.7"/>
+    <circle cx="170" cy="45" r="5" fill="#f0f8e8" opacity="0.75"/>
+    <circle cx="170" cy="45" r="2.5" fill="#C9A84C" opacity="0.7"/>
+    <circle cx="40" cy="80" r="5" fill="#f0f8e8" opacity="0.75"/>
+    <circle cx="40" cy="80" r="2.5" fill="#C9A84C" opacity="0.7"/>
+  </svg>
+)
+```
 
-### 3. COMPTE À REBOURS
-- "PRÉPAREZ VOUS !" en Playfair Display uppercase, letter-spacing 4px
-- Emoji alliances 💍
-- 4 cercles (border 2px accent, background transparent) :
-  * Chiffres en Great Vibes 36px, couleur accent
-  * Labels "Jours" "Heures" "Minutes" "Secondes" en 10px uppercase
-  * Mis à jour chaque seconde avec setInterval
-- Flèche animée ↓ qui rebondit doucement
+## PARTIE 3 — PLACEMENT DES ORNEMENTS SUR LA PAGE PARTAGÉE
 
-### 4. POUR CHAQUE CÉRÉMONIE (répété autant de fois que nécessaire)
+Dans la vue partagée, placer les ornements ainsi :
 
-Section avec :
-- Ornement floral qui alterne côté (droite, gauche, droite...)
-- Bordure fine accent autour de toute la section
-- בס״ד en doré en haut à droite si mariage juif
-- Titre en Playfair Display uppercase letterspacing 4px : "LA HOUPPA" / "LA MAIRIE" / "LE HENNÉ"...
-- Séparateur orné : ——— ◆ ———
-- Si Houppa : verset hébreu קוֹל שָׂשׂוֹן en arc de cercle SVG (text on path) ou simplement centré en doré
-- Noms des familles en deux colonnes Cormorant Garamond italic
-- "ont la joie de vous faire part du mariage de leurs enfants"
-- Prénoms mariés en Great Vibes 56px couleur accent (et hébreu si juif)
-- "Et seraient honorés de votre présence"
-- Date en Cormorant Garamond bold italic 22px : "Le Jeudi 11 Septembre 2025"
-- Heure : "À 17h30 Précises"
-- Lieu en italic
-- Adresse complète
-- Si note : "La cérémonie sera suivie d'une réception" en bold italic
-- Si after mairie : "Un after mairie suivra la cérémonie / au [lieu] / [adresse]"
-- Bouton itinéraire doré : "Itinéraire De La Houppa →" (lien Google Maps)
-- Si note personnelle : texte en italic en bas de section
+Pour chaque section, wrapper dans un div avec position: 'relative', overflow: 'hidden' et placer l'ornement approprié en position absolute :
 
-### 5. EN MÉMOIRE (si notePersonnelle contient "mémoire" ou toujours affiché si renseigné)
-- Ornement floral délicat
-- Texte en Cormorant Garamond italic centré
-- Noms des défunts avec ז״ל si mariage juif
+- SECTION INTRO : ornement en haut à droite (top: 0, right: -20px)
+- SECTION PARENTS : ornement en bas à gauche (bottom: -20px, left: -20px)
+- SECTION HOUPPA : ornement en haut à gauche (top: 0, left: -20px)
+- SECTION MAIRIE : ornement en haut à droite (top: 0, right: -20px)
+- SECTION HENNÉ : ornement en bas à gauche (bottom: 0, left: -20px)
+- SECTION RSVP : ornement débordant à gauche (top: 50px, left: -30px)
 
-### 6. VOTRE RÉPONSE (RSVP)
-- "VOTRE RÉPONSE" en Playfair Display uppercase
-- Séparateur orné
-- Encadré avec bordure accent
-- Champs élégants (underline style, pas de border box) :
-  * Nom
-  * Prénom(s) (M. & Mme)
-- Pour chaque cérémonie :
-  * Checkbox "Présent(s) à [nom cérémonie]" / "Ne pourra(ons) pas être présent(s)..."
-  * Dropdown "Nombre de personnes" (0 à 20)
-- Textarea "Un petit mot pour les mariés..."
-- Bouton ENVOYER doré
+La fonction pour obtenir le bon ornement selon le thème :
+```jsx
+function getOrnement(theme: string, style: React.CSSProperties = {}) {
+  const props = { style: { position: 'absolute' as const, zIndex: 0, ...style } }
+  switch(theme) {
+    case 'floral-bleu': return <OrnementFloralBleu {...props} />
+    case 'rose-fleuri': return <OrnementFloralRose {...props} />
+    case 'or-dentelle': return <OrnementDore {...props} />
+    case 'oriental-nuit': return <OrnementArabesque {...props} />
+    case 'champetre': return <OrnementChampetre {...props} />
+    default: return <OrnementFloralBleu {...props} />
+  }
+}
+```
 
-### 7. LOCALISATION
-- "LOCALISATION" en uppercase Playfair Display
-- Séparateur orné ——— ◈ ———
-- Pour chaque cérémonie : carte Google Maps intégrée via iframe
-  * URL : https://maps.google.com/maps?q=[adresse encodée]&output=embed
-  * Hauteur 200px, width 100%, border-radius 8px
-  * Titre de la cérémonie au-dessus
+## PARTIE 4 — ANIMATIONS AU SCROLL
 
-### 8. FOOTER
-- Ornement floral centré petit
-- Prénoms en Great Vibes 40px
-- Séparateur ✦
-- "Créé avec ❤️ par Lov'it" en Cormorant Garamond italic, lien vers landing page
-
-## ANIMATIONS AU SCROLL
-
-Utiliser Intersection Observer pour animer chaque section :
+Ajouter ce useEffect dans le composant de la vue partagée :
 
 ```javascript
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.style.opacity = '1'
-      entry.target.style.transform = 'translateY(0)'
-    }
-  })
-}, { threshold: 0.15 })
+useEffect(() => {
+  const elements = document.querySelectorAll('.scroll-animate')
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, index) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          (entry.target as HTMLElement).style.opacity = '1'
+          ;(entry.target as HTMLElement).style.transform = 'translateY(0)'
+        }, index * 100)
+      }
+    })
+  }, { threshold: 0.1 })
+  
+  elements.forEach(el => observer.observe(el))
+  return () => observer.disconnect()
+}, [])
 ```
 
-Appliquer à tous les éléments avec :
-```css
-initial: { opacity: 0, transform: 'translateY(40px)', transition: 'opacity 0.9s ease, transform 0.9s ease' }
+Ajouter la classe 'scroll-animate' à tous les éléments texte importants avec ces styles initiaux :
+```javascript
+const scrollStyle = {
+  opacity: 0,
+  transform: 'translateY(40px)',
+  transition: 'opacity 0.9s ease, transform 0.9s ease'
+}
 ```
 
-Délais progressifs pour les enfants d'une même section (0ms, 150ms, 300ms, 450ms...)
+## PARTIE 5 — FORMAT DATE ÉLÉGANT
 
-## MUSIQUE
+Dans chaque section cérémonie, remplacer l'affichage de la date par ce format :
 
-Si musicUrl existe :
-- Élément <audio> caché, autoplay, loop
-- Sur mobile : bouton fixe discret en bas à gauche "♪" qui démarre la musique au tap
-- Bouton 🔊/🔇 fixe en bas à droite (rond, fond accent semi-transparent)
+```jsx
+<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, margin: '24px 0' }}>
+  <div style={{ textAlign: 'right' }}>
+    <div style={{ borderBottom: `1px solid ${accent}`, paddingBottom: 4, marginBottom: 4, letterSpacing: 3, fontSize: 11, color: accent }}>
+      {jourSemaine.toUpperCase()}
+    </div>
+    <div style={{ fontSize: 11, color: textColor, letterSpacing: 2 }}>
+      {annee}
+    </div>
+  </div>
+  <div style={{ 
+    border: `1.5px solid ${accent}`, 
+    borderRadius: 4,
+    padding: '8px 16px',
+    fontSize: 36,
+    fontFamily: 'Playfair Display',
+    color: accent,
+    fontWeight: 600,
+    minWidth: 60,
+    textAlign: 'center'
+  }}>
+    {jour}
+  </div>
+  <div style={{ textAlign: 'left' }}>
+    <div style={{ borderBottom: `1px solid ${accent}`, paddingBottom: 4, marginBottom: 4, letterSpacing: 3, fontSize: 11, color: accent }}>
+      {mois.toUpperCase()}
+    </div>
+    <div style={{ fontSize: 11, color: textColor, letterSpacing: 2 }}>
+      {annee}
+    </div>
+  </div>
+</div>
+```
 
-## TYPOGRAPHIE
-
-Importer ces Google Fonts :
-- Great Vibes : prénoms, monogramme, chiffres compte à rebours
-- Playfair Display : titres uppercase
-- Cormorant Garamond : tout le texte courant, dates, adresses
-- Pour l'hébreu : laisser la font système (David CLM ou Arial Hebrew)
-
-## RESPONSIVE
-
-Sur mobile (< 480px) :
-- Réduire Great Vibes de 64px → 52px pour les prénoms
-- Ornements plus petits (70% de la taille desktop)
-- Padding horizontal 24px
-
-Faire git add -A && git commit -m "Refonte totale vue partagée - page unique animée luxury" && git push
+Faire git add -A && git commit -m "Ornements SVG visibles + animations scroll + format date élégant" && git push
