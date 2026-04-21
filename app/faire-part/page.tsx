@@ -463,11 +463,11 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
     else if (cropIdx !== null && cropIdx > idx) setCropIdx(cropIdx - 1)
   }
 
-  const handleCrop = (idx: number, crop: { x: number; y: number; scale: number }) => {
+  const updateCrop = (idx: number, crop: { x: number; y: number; scale: number }, close = false) => {
     const newData = [...photosData]
     newData[idx] = { url: photos[idx], cropX: crop.x, cropY: crop.y, cropScale: crop.scale }
     onChange({ photosData: newData })
-    setCropIdx(null)
+    if (close) setCropIdx(null)
   }
 
   return (
@@ -496,7 +496,7 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
                 <div key={idx}>
                   <div style={{ position: 'relative', width: 80, height: 80, borderRadius: 8, overflow: 'hidden', border: isCropping ? '2px solid #C9A84C' : '2px solid transparent' }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={photo} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transform: crop ? `translate(${crop.cropX}px, ${crop.cropY}px) scale(${crop.cropScale})` : 'none', transformOrigin: 'center center' }} />
+                    <img src={photo} alt="" style={{ position: 'absolute', top: '50%', left: '50%', transform: crop ? `translate(calc(-50% + ${crop.cropX}px), calc(-50% + ${crop.cropY}px)) scale(${crop.cropScale})` : 'translate(-50%, -50%)', transformOrigin: 'center center', minWidth: '100%', minHeight: '100%', width: 'auto', height: 'auto' }} />
                     <div style={{ position: 'absolute', bottom: 2, left: 2, background: 'rgba(0,0,0,0.55)', color: 'white', fontSize: 8, borderRadius: 3, padding: '1px 4px' }}>Photo {idx + 1}</div>
                     <button type="button" onClick={() => handleDelete(idx)} style={{ ...BTN, position: 'absolute', top: 2, right: 2, background: 'white', border: 'none', borderRadius: '50%', width: 16, height: 16, fontSize: 9, color: '#fb7185', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
                   </div>
@@ -512,7 +512,11 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
           {cropIdx !== null && photos[cropIdx] && (
             <div style={{ background: '#fdf8f9', borderRadius: 12, padding: 16, marginBottom: 12, border: '1.5px solid #fecdd3' }}>
               <div style={{ fontSize: 12, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Recadrage — Photo {cropIdx + 1}</div>
-              <ImageCropper src={photos[cropIdx]} onCrop={crop => handleCrop(cropIdx, crop)} />
+              <ImageCropper
+                src={photos[cropIdx]}
+                onPreview={crop => updateCrop(cropIdx, crop)}
+                onCrop={crop => updateCrop(cropIdx, crop, true)}
+              />
             </div>
           )}
         </div>
@@ -523,11 +527,20 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
 
 // ── ImageCropper ───────────────────────────────────────────────────────────────
 
-function ImageCropper({ src, onCrop }: { src: string; onCrop: (position: { x: number; y: number; scale: number }) => void }) {
+function ImageCropper({ src, onCrop, onPreview }: { src: string; onCrop: (position: { x: number; y: number; scale: number }) => void; onPreview?: (position: { x: number; y: number; scale: number }) => void }) {
   const [pos, setPos] = useState({ x: 0, y: 0 })
   const [scale, setScale] = useState(1)
   const [dragging, setDragging] = useState(false)
   const [startPos, setStartPos] = useState({ x: 0, y: 0 })
+
+  const updatePos = (newPos: { x: number; y: number }) => {
+    setPos(newPos)
+    onPreview?.({ x: newPos.x, y: newPos.y, scale })
+  }
+  const updateScale = (newScale: number) => {
+    setScale(newScale)
+    onPreview?.({ x: pos.x, y: pos.y, scale: newScale })
+  }
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setDragging(true)
@@ -535,7 +548,7 @@ function ImageCropper({ src, onCrop }: { src: string; onCrop: (position: { x: nu
   }
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!dragging) return
-    setPos({ x: e.clientX - startPos.x, y: e.clientY - startPos.y })
+    updatePos({ x: e.clientX - startPos.x, y: e.clientY - startPos.y })
   }
   const handleTouchStart = (e: React.TouchEvent) => {
     setDragging(true)
@@ -544,7 +557,7 @@ function ImageCropper({ src, onCrop }: { src: string; onCrop: (position: { x: nu
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!dragging) return
     e.preventDefault()
-    setPos({ x: e.touches[0].clientX - startPos.x, y: e.touches[0].clientY - startPos.y })
+    updatePos({ x: e.touches[0].clientX - startPos.x, y: e.touches[0].clientY - startPos.y })
   }
 
   return (
@@ -556,7 +569,7 @@ function ImageCropper({ src, onCrop }: { src: string; onCrop: (position: { x: nu
         onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={() => setDragging(false)}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} alt="" style={{ position: 'absolute', transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`, transformOrigin: 'center center', maxWidth: 'none', width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none', transition: dragging ? 'none' : 'transform 0.1s ease' }} />
+        <img src={src} alt="" style={{ position: 'absolute', top: '50%', left: '50%', transform: `translate(calc(-50% + ${pos.x}px), calc(-50% + ${pos.y}px)) scale(${scale})`, transformOrigin: 'center center', minWidth: '100%', minHeight: '100%', width: 'auto', height: 'auto', pointerEvents: 'none', transition: dragging ? 'none' : 'transform 0.1s ease' }} />
         {/* Grille des tiers */}
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
           <div style={{ position: 'absolute', left: '33%', top: 0, bottom: 0, borderLeft: '1px solid rgba(255,255,255,0.3)' }} />
@@ -565,14 +578,17 @@ function ImageCropper({ src, onCrop }: { src: string; onCrop: (position: { x: nu
           <div style={{ position: 'absolute', top: '66%', left: 0, right: 0, borderTop: '1px solid rgba(255,255,255,0.3)' }} />
         </div>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, maxWidth: 240, margin: '0 auto 12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, maxWidth: 240, margin: '0 auto 4px' }}>
         <span style={{ fontSize: 11, color: '#9ca3af' }}>🔍</span>
-        <input type="range" min="1" max="3" step="0.05" value={scale} onChange={e => setScale(parseFloat(e.target.value))} style={{ flex: 1 }} />
-        <span style={{ fontSize: 11, color: '#9ca3af' }}>{scale.toFixed(1)}x</span>
+        <input type="range" min="0.3" max="3" step="0.05" value={scale} onChange={e => updateScale(parseFloat(e.target.value))} style={{ flex: 1 }} />
+        <span style={{ fontSize: 11, color: '#9ca3af', minWidth: 28, textAlign: 'right' }}>{scale.toFixed(2)}x</span>
+      </div>
+      <div style={{ fontSize: 10, color: '#c4b5a0', marginBottom: 10 }}>
+        {scale < 0.8 ? 'Dézoom' : scale > 1.2 ? 'Zoom' : 'Normal'}
       </div>
       <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-        <button type="button" onClick={() => { setPos({ x: 0, y: 0 }); setScale(1) }} style={{ ...BTN, padding: '8px 16px', borderRadius: 20, border: '1px solid #C9A84C', background: 'transparent', color: '#C9A84C', fontSize: 12 }}>Réinitialiser</button>
-        <button type="button" onClick={() => onCrop({ x: pos.x, y: pos.y, scale })} style={{ ...BTN, padding: '8px 16px', borderRadius: 20, background: '#C9A84C', color: 'white', border: 'none', fontSize: 12, fontWeight: 500 }}>✓ Valider le cadrage</button>
+        <button type="button" onClick={() => { setPos({ x: 0, y: 0 }); setScale(1); onPreview?.({ x: 0, y: 0, scale: 1 }) }} style={{ ...BTN, padding: '8px 16px', borderRadius: 20, border: '1px solid #C9A84C', background: 'transparent', color: '#C9A84C', fontSize: 12 }}>Réinitialiser</button>
+        <button type="button" onClick={() => onCrop({ x: pos.x, y: pos.y, scale })} style={{ ...BTN, padding: '8px 16px', borderRadius: 20, background: '#C9A84C', color: 'white', border: 'none', fontSize: 12, fontWeight: 500 }}>✓ Valider</button>
       </div>
     </div>
   )
@@ -1485,7 +1501,7 @@ function ElegantPage1({ data, theme }: { data: FormData; theme: ThemeObj }) {
     <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', position: 'relative', height: 600 }}>
       {photos.length > 0 ? (
         /* eslint-disable-next-line @next/next/no-img-element */
-        <img src={photos[idx]} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center center', transform: (() => { const c = data.photosData?.[idx]; return c ? `translate(${c.cropX}px, ${c.cropY}px) scale(${c.cropScale})` : undefined })(), transformOrigin: 'center center', opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease' }} />
+        <img src={photos[idx]} alt="" style={{ position: 'absolute', top: '50%', left: '50%', transform: (() => { const c = data.photosData?.[idx]; return c ? `translate(calc(-50% + ${c.cropX}px), calc(-50% + ${c.cropY}px)) scale(${c.cropScale})` : 'translate(-50%, -50%)' })(), transformOrigin: 'center center', minWidth: '100%', minHeight: '100%', width: 'auto', height: 'auto', opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease' }} />
       ) : (
         <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(160deg, ${theme.fond}, ${theme.accent}22)` }} />
       )}
@@ -2549,12 +2565,14 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
   if (valid.length === 0) return null
 
   const crop = photosData?.[idx]
-  const cropTransform = crop && crop.cropScale !== 1 ? `translate(${crop.cropX}px, ${crop.cropY}px) scale(${crop.cropScale})` : undefined
+  const cropTransform = crop
+    ? `translate(calc(-50% + ${crop.cropX}px), calc(-50% + ${crop.cropY}px)) scale(${crop.cropScale})`
+    : 'translate(-50%, -50%)'
 
   return (
     <>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={valid[idx]} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center center', transform: cropTransform, transformOrigin: 'center center', opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease', zIndex: 0, pointerEvents: 'none' }} />
+      <img src={valid[idx]} alt="" style={{ position: 'absolute', top: '50%', left: '50%', transform: cropTransform, transformOrigin: 'center center', minWidth: '100%', minHeight: '100%', width: 'auto', height: 'auto', opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease', zIndex: 0, pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.12) 55%, rgba(0,0,0,0.0) 100%)', zIndex: 0, pointerEvents: 'none' }} />
       {valid.length > 1 && (
         <div style={{ position: 'absolute', bottom: 80, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6, zIndex: 5, pointerEvents: 'none' }}>
@@ -2621,7 +2639,9 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   const fondCeremonie = data.fondCeremonie ?? 'ornements'
   const firstPhoto = data.photosFond?.[0] ?? data.photoFond ?? ''
   const firstCrop = data.photosData?.[0]
-  const firstCropTransform = firstCrop ? `translate(${firstCrop.cropX}px, ${firstCrop.cropY}px) scale(${firstCrop.cropScale})` : undefined
+  const firstCropTransform = firstCrop
+    ? `translate(calc(-50% + ${firstCrop.cropX}px), calc(-50% + ${firstCrop.cropY}px)) scale(${firstCrop.cropScale})`
+    : 'translate(-50%, -50%)'
 
   const ornamentId = data.ornamentId ?? 'roses-diagonales'
   const activeOrn = ORNAMENTS.find(o => o.id === ornamentId)
@@ -2805,7 +2825,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
               {usePhotoBg ? (
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={firstPhoto} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center center', transform: firstCropTransform, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 }} />
+                  <img src={firstPhoto} alt="" style={{ position: 'absolute', top: '50%', left: '50%', transform: firstCropTransform, transformOrigin: 'center center', minWidth: '100%', minHeight: '100%', width: 'auto', height: 'auto', pointerEvents: 'none', zIndex: 0 }} />
                   <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.82)', pointerEvents: 'none', zIndex: 0 }} />
                 </>
               ) : (
