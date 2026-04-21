@@ -5,48 +5,63 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 export async function POST(request: NextRequest) {
   try {
-    const { frameLabel, contentLines, evenementsCount } = await request.json()
+    const { imageBase64, frameLabel, currentSettings } = await request.json()
+
+    if (!imageBase64) {
+      return NextResponse.json({ framePaddingV: 20, framePaddingH: 16, textBg: 0.5, frameOpacity: 1 })
+    }
 
     const message = await client.messages.create({
       model: 'claude-opus-4-6',
-      max_tokens: 200,
+      max_tokens: 300,
       messages: [
         {
           role: 'user',
-          content: `Tu es un expert en design de faire-part de mariage. Analyse ce faire-part et suggère des valeurs de padding optimales pour que le texte soit bien centré dans le cadre floral, lisible et esthétique.
-
-Cadre utilisé : ${frameLabel}
-Nombre de lignes de texte : ${contentLines}
-Nombre d'événements : ${evenementsCount}
+          content: [
+            {
+              type: 'image',
+              source: { type: 'base64', media_type: 'image/jpeg', data: imageBase64 },
+            },
+            {
+              type: 'text',
+              text: `Tu es expert en design de faire-part de mariage.
+Analyse cette image d'un faire-part et propose des ajustements pour améliorer le rendu visuel.
+Cadre floral utilisé : ${frameLabel ?? 'inconnu'}
+Paramètres actuels : paddingV=${currentSettings?.framePaddingV ?? 20}%, paddingH=${currentSettings?.framePaddingH ?? 16}%, fondBlanc=${Math.round((currentSettings?.textBg ?? 0.5) * 100)}%, opacitéCadre=${Math.round((currentSettings?.frameOpacity ?? 1) * 100)}%
 
 Réponds UNIQUEMENT avec un JSON valide, sans texte autour :
-{"paddingV": <nombre entre 5 et 40>, "paddingH": <nombre entre 5 et 35>}
+{"framePaddingV": <5-40>, "framePaddingH": <5-35>, "textBg": <0-0.95>, "frameOpacity": <0.1-1>}
 
-Règles :
-- paddingV = espace haut/bas en % (plus de texte = moins de padding)
-- paddingH = espace gauche/droite en %
-- Pour un cadre couronne (fleurs en haut/bas) : paddingV entre 20-35
-- Pour un cadre complet (fleurs tout autour) : paddingV entre 15-25, paddingH entre 12-20
-- Moins de contenu = plus de padding pour centrer visuellement`,
+Critères d'analyse :
+- Si le texte est chevauchant les fleurs du cadre → augmenter paddingV et/ou paddingH
+- Si le texte est illisible sur le cadre → augmenter textBg (fond blanc)
+- Si le cadre est trop présent et cache le texte → réduire frameOpacity
+- Si il y a trop d'espace vide autour du texte → réduire les paddings
+- Conserve les valeurs proches des actuelles si le rendu est déjà correct`,
+            },
+          ],
         },
       ],
     })
 
-    const text = message.content[0].type === 'text' ? message.content[0].text : '{}'
-    const result = JSON.parse(text.trim())
-
-    if (
-      typeof result.paddingV !== 'number' ||
-      typeof result.paddingH !== 'number' ||
-      result.paddingV < 5 || result.paddingV > 40 ||
-      result.paddingH < 5 || result.paddingH > 35
-    ) {
-      return NextResponse.json({ paddingV: 18, paddingH: 15 })
+    const text = message.content[0].type === 'text' ? message.content[0].text : ''
+    const jsonMatch = text.match(/\{[^}]+\}/)
+    if (!jsonMatch) {
+      return NextResponse.json(currentSettings ?? { framePaddingV: 20, framePaddingH: 16, textBg: 0.5, frameOpacity: 1 })
     }
 
-    return NextResponse.json(result)
+    const result = JSON.parse(jsonMatch[0])
+
+    const safe = {
+      framePaddingV: typeof result.framePaddingV === 'number' ? Math.min(40, Math.max(5, result.framePaddingV)) : (currentSettings?.framePaddingV ?? 20),
+      framePaddingH: typeof result.framePaddingH === 'number' ? Math.min(35, Math.max(5, result.framePaddingH)) : (currentSettings?.framePaddingH ?? 16),
+      textBg: typeof result.textBg === 'number' ? Math.min(0.95, Math.max(0, result.textBg)) : (currentSettings?.textBg ?? 0.5),
+      frameOpacity: typeof result.frameOpacity === 'number' ? Math.min(1, Math.max(0.1, result.frameOpacity)) : (currentSettings?.frameOpacity ?? 1),
+    }
+
+    return NextResponse.json(safe)
   } catch (error) {
     console.error('Analyze frame error:', error)
-    return NextResponse.json({ paddingV: 18, paddingH: 15 })
+    return NextResponse.json({ framePaddingV: 20, framePaddingH: 16, textBg: 0.5, frameOpacity: 1 })
   }
 }

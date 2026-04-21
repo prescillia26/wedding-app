@@ -693,37 +693,6 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
 }
 
 function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
-  const [analyzing, setAnalyzing] = useState(false)
-
-  async function analyzeAndAdjust() {
-    setAnalyzing(true)
-    try {
-      const frame = FRAMES.find(f => f.id === data.frameId)
-      const contentLines = [
-        data.marie1Prenom, data.marie2Prenom,
-        data.marie1Nom, data.marie2Nom,
-      ].filter(Boolean).length
-      const evenementsCount = (data.ceremonies ?? []).length
-      const res = await fetch('/api/analyze-frame', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          frameLabel: frame?.label ?? '',
-          contentLines,
-          evenementsCount,
-        }),
-      })
-      if (res.ok) {
-        const { paddingV, paddingH } = await res.json()
-        onChange({ framePaddingV: paddingV, framePaddingH: paddingH })
-      }
-    } catch {
-      // silently ignore
-    } finally {
-      setAnalyzing(false)
-    }
-  }
-
   return (
     <div>
       <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#4a3728', marginBottom: 24 }}>Style & options</h2>
@@ -866,9 +835,6 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                 </div>
               )
             })}
-            <button type="button" onClick={analyzeAndAdjust} disabled={analyzing} style={{ ...BTN, width: '100%', marginTop: 6, padding: '9px 0', borderRadius: 8, background: analyzing ? '#e8d8c8' : '#4a3728', color: '#fff', fontSize: 13, fontWeight: 600, letterSpacing: 0.3 }}>
-              {analyzing ? '⏳ Analyse en cours…' : '✨ Optimiser automatiquement'}
-            </button>
           </div>
           <div style={{ background: '#faf8f6', borderRadius: 10, padding: '14px 16px' }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: '#6b5040', marginBottom: 14, letterSpacing: 0.5 }}>✍️ Texte</div>
@@ -3154,7 +3120,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
 
 // ── CardsView ─────────────────────────────────────────────────────────────────
 
-function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; onEdit: () => void; onReset: () => void; isShared: boolean; role: string | null }) {
+function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: FormData; onEdit: () => void; onReset: () => void; isShared: boolean; role: string | null; onUpdate?: (d: Partial<FormData>) => void }) {
   const theme = THEMES[data.style]
   const sorted = sortByDate(data.ceremonies)
   const [rsvpOpen, setRsvpOpen] = useState(false)
@@ -3170,6 +3136,56 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
   const [coupleUrl, setCoupleUrl] = useState<string | null>(null)
   const [sharing, setSharing] = useState(false)
   const [sharingStatus, setSharingStatus] = useState('')
+  const [aiOptimizing, setAiOptimizing] = useState(false)
+  const [aiDone, setAiDone] = useState(false)
+
+  const optimizeWithAI = async () => {
+    if (!onUpdate || aiOptimizing) return
+    setAiOptimizing(true)
+    setAiDone(false)
+    try {
+      const el = document.getElementById('faire-part-preview-target')
+      if (!el) return
+      const html2canvas = (await import('html2canvas')).default
+      const canvas = await html2canvas(el, {
+        useCORS: true,
+        allowTaint: false,
+        scale: 0.35,
+        height: Math.min(el.scrollHeight, 700),
+        windowHeight: Math.min(el.scrollHeight, 700),
+      })
+      const imageBase64 = canvas.toDataURL('image/jpeg', 0.75).split(',')[1]
+      const frame = FRAMES.find(f => f.id === data.frameId)
+      const res = await fetch('/api/analyze-frame', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imageBase64,
+          frameLabel: frame?.label ?? '',
+          currentSettings: {
+            framePaddingV: data.framePaddingV ?? 35,
+            framePaddingH: data.framePaddingH ?? 16,
+            textBg: data.textBg ?? 0.5,
+            frameOpacity: data.frameOpacity ?? 1,
+          },
+        }),
+      })
+      if (res.ok) {
+        const result = await res.json()
+        const updates: Partial<FormData> = {}
+        if (typeof result.framePaddingV === 'number') updates.framePaddingV = result.framePaddingV
+        if (typeof result.framePaddingH === 'number') updates.framePaddingH = result.framePaddingH
+        if (typeof result.textBg === 'number') updates.textBg = result.textBg
+        if (typeof result.frameOpacity === 'number') updates.frameOpacity = result.frameOpacity
+        if (Object.keys(updates).length > 0) {
+          onUpdate(updates)
+          setAiDone(true)
+          setTimeout(() => setAiDone(false), 3000)
+        }
+      }
+    } catch { /* ignore */ }
+    finally { setAiOptimizing(false) }
+  }
 
   const startYoutubeMusic = useCallback((videoId: string) => {
     if (ytIframeRef.current) return // déjà démarré
@@ -3296,7 +3312,7 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
   }
 
   return (
-    <div style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
+    <div id="faire-part-preview-target" style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
       <SharedPageContent
         data={{ ...data, textOverrides: { ...data.textOverrides, ...textOverrides } }}
         theme={theme}
@@ -3315,6 +3331,11 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
         <button onClick={onEdit} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>Modifier</button>
         <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{sharing ? (sharingStatus || 'Chargement...') : '🔗 Partager'}</button>
+        {onUpdate && (data.frameId && data.frameId !== 'none') && (
+          <button onClick={optimizeWithAI} disabled={aiOptimizing} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: 'none', background: aiDone ? '#22c55e' : aiOptimizing ? '#e8d8c8' : '#4a3728', color: 'white', fontSize: 13, fontWeight: 600, minWidth: 120 }}>
+            {aiDone ? '✓ Appliqué !' : aiOptimizing ? '⏳ Analyse…' : '✨ IA'}
+          </button>
+        )}
         {lastShareId && (
           <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>📋 RSVP</button>
         )}
@@ -3628,7 +3649,7 @@ export default function FairePartPage() {
   // Gate d'accès
   if (!accessGranted && !isShared) return <AccessGate onGranted={() => { setAccessGranted(true); try { const draft = localStorage.getItem('wedding-draft'); if (draft) setHasDraft(true) } catch { /* ignore */ } }} />
 
-  if (showCards) return <CardsView data={formData} onEdit={() => { try { localStorage.setItem('wedding-draft', JSON.stringify(formData)) } catch { /* ignore */ } setShowCards(false); setStep(4) }} onReset={() => { setFormData(defaultFormData); setShowCards(false); setStep(1); try { localStorage.removeItem('wedding-draft') } catch { /* ignore */ } }} isShared={isShared} role={role} />
+  if (showCards) return <CardsView data={formData} onEdit={() => { try { localStorage.setItem('wedding-draft', JSON.stringify(formData)) } catch { /* ignore */ } setShowCards(false); setStep(4) }} onReset={() => { setFormData(defaultFormData); setShowCards(false); setStep(1); try { localStorage.removeItem('wedding-draft') } catch { /* ignore */ } }} isShared={isShared} role={role} onUpdate={update} />
 
   if (loadingShare) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fdf0f3 0%, #fff5f7 50%, #fdf0f3 100%)' }}>
