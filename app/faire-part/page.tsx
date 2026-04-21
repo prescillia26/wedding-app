@@ -41,7 +41,6 @@ const FRAMES: { id: string; label: string; url: string | null }[] = [
   { id: 'frame-05', label: '💙 Fleurs Aquarelle Bleues', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785418/48_t9qh5k.png' },
   { id: 'frame-06', label: '🌹 Cadre Géométrique Roses', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785416/50_iq0a5c.png' },
   { id: 'frame-07', label: '🌷 Fleurs Rose Aquarelle', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785416/49_ewrr8v.png' },
-  { id: 'frame-08', label: '🌿 Cadre Vert Floral', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785416/47_vtloby.png' },
   { id: 'frame-09', label: '🌻 Cadre Champêtre', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785415/46_g1yqw8.png' },
   { id: 'frame-10', label: '🌸 Fleurs Roses Coins', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785414/45_roarfa.png' },
   { id: 'frame-20', label: '🌻 Floral 29', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778866/29_sv2l8b.png' },
@@ -56,8 +55,6 @@ const FRAMES: { id: string; label: string; url: string | null }[] = [
   { id: 'frame-32', label: '🌷 Floral 16', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778821/16_cibjrt.png' },
   { id: 'frame-33', label: '🌼 Floral 15', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778818/15_xb7jgp.png' },
   { id: 'frame-34', label: '🌻 Floral 14', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778816/14_bzmmdm.png' },
-  { id: 'frame-35', label: '🌸 Floral 13', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778814/13_jzp3qy.png' },
-  { id: 'frame-36', label: '🌺 Floral 12', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778811/12_zfigae.png' },
   { id: 'none', label: '⬜ Sans cadre', url: null },
 ]
 
@@ -1134,7 +1131,7 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
         {data.mariageJuif && (
           <div style={{ marginBottom: 24 }}>
             <div style={{ height: 1, background: theme.accent, opacity: 0.35, marginBottom: 12 }} />
-            <div style={{ fontFamily: 'serif', fontSize: 16, color: theme.accent, direction: 'rtl', textAlign: 'center', lineHeight: 1.9 }}>
+            <div style={{ fontFamily: 'serif', fontSize: 'clamp(10px, 3.5vw, 16px)', color: theme.accent, direction: 'rtl', textAlign: 'center', lineHeight: 1.9, whiteSpace: 'nowrap' }}>
               קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה, קוֹל חָתָן וְקוֹל כַּלָּה
             </div>
             <div style={{ height: 1, background: theme.accent, opacity: 0.35, marginTop: 12 }} />
@@ -2973,7 +2970,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
               </AnimSection>
               {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
                 <AnimSection delay={100}>
-                  <div style={{ fontFamily: 'serif', fontSize: 20, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 22, opacity: 0.8 }}>קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה</div>
+                  <div style={{ fontFamily: 'serif', fontSize: 'clamp(11px, 4vw, 20px)', color: G, direction: 'rtl', textAlign: 'center', marginBottom: 22, opacity: 0.8, whiteSpace: 'nowrap' }}>קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה</div>
                 </AnimSection>
               )}
               {(parents1.length > 0 || parents2.length > 0) && (
