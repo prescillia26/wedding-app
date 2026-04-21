@@ -184,11 +184,11 @@ function fmtParentsLines(pPrenom: string, pNom: string, mPrenom: string, mNom: s
   return []
 }
 
-function compressBase64(base64: string, maxDim = 1200, quality = 0.72): Promise<string> {
+function compressImage(base64: string, maxWidth = 800, quality = 0.7): Promise<string> {
   return new Promise(resolve => {
     const img = new Image()
     img.onload = () => {
-      const scale = Math.min(1, maxDim / Math.max(img.width || 1, img.height || 1))
+      const scale = Math.min(1, maxWidth / (img.width || 1))
       const w = Math.round(img.width * scale)
       const h = Math.round(img.height * scale)
       const canvas = document.createElement('canvas')
@@ -3023,6 +3023,8 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
   const [shareModalOpen, setShareModalOpen] = useState(false)
   const [guestUrl, setGuestUrl] = useState<string | null>(null)
   const [coupleUrl, setCoupleUrl] = useState<string | null>(null)
+  const [sharing, setSharing] = useState(false)
+  const [sharingStatus, setSharingStatus] = useState('')
 
   const startYoutubeMusic = useCallback((videoId: string) => {
     if (ytIframeRef.current) return // déjà démarré
@@ -3058,41 +3060,43 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
   }, [isShared])
 
   const handleShare = async () => {
+    if (sharing) return
+    setSharing(true)
     try {
-      // Compresser les photos avant envoi pour rester sous la limite Upstash (1MB)
       const originalPhotos = data.photosFond ?? []
-      const compressedPhotos = originalPhotos.length > 0
-        ? await Promise.all(originalPhotos.map(p => compressBase64(p)))
-        : []
-      const dataToSend = { ...data, photosFond: compressedPhotos, photoFond: compressedPhotos[0] ?? '' }
-
-      // Vérification taille côté client
-      const sizeKB = Math.round(new TextEncoder().encode(JSON.stringify(dataToSend)).length / 1024)
-      if (sizeKB > 900) {
-        const ok = window.confirm(`Les photos sont volumineuses (${sizeKB} Ko). Le lien sera partagé sans photos de fond. Continuer ?`)
-        if (!ok) return
-        dataToSend.photosFond = []
-        dataToSend.photoFond = ''
+      let compressedPhotos: string[] = originalPhotos
+      if (originalPhotos.length > 0) {
+        setSharingStatus('Compression des photos...')
+        compressedPhotos = await Promise.all(originalPhotos.map(p => compressImage(p, 800, 0.7)))
+        // Passe 2 si encore trop grand
+        const size1 = new TextEncoder().encode(JSON.stringify(compressedPhotos)).length
+        if (size1 > 700_000) {
+          compressedPhotos = await Promise.all(compressedPhotos.map(p => compressImage(p, 600, 0.5)))
+        }
+        // Passe 3
+        const size2 = new TextEncoder().encode(JSON.stringify(compressedPhotos)).length
+        if (size2 > 700_000) {
+          compressedPhotos = await Promise.all(compressedPhotos.map(p => compressImage(p, 400, 0.3)))
+        }
       }
+      setSharingStatus('Envoi...')
+      const dataToSend = { ...data, photosFond: compressedPhotos, photoFond: compressedPhotos[0] ?? '' }
 
       const res = await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataToSend) })
       const json = await res.json()
-      console.log('save-share response:', json)
       if (!json.id) throw new Error('Pas d\'id retourné : ' + JSON.stringify(json))
-      if (json.photosStripped) {
-        console.warn('Photos retirées côté serveur car trop volumineuses')
-      }
       const id = json.id
       setLastShareId(id)
       const base = window.location.origin + '/faire-part?share=' + id
-      const guest = base + '&role=guest'
-      const couple = base + '&role=couple'
-      setGuestUrl(guest)
-      setCoupleUrl(couple)
+      setGuestUrl(base + '&role=guest')
+      setCoupleUrl(base + '&role=couple')
       setShareModalOpen(true)
     } catch (err) {
       console.error('handleShare erreur:', err)
       alert('Erreur : ' + (err instanceof Error ? err.message : String(err)))
+    } finally {
+      setSharing(false)
+      setSharingStatus('')
     }
   }
 
@@ -3153,7 +3157,7 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
       {/* Barre fixe bas — actions créateur */}
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
         <button onClick={onEdit} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>Modifier</button>
-        <button onClick={handleShare} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44` }}>🔗 Partager</button>
+        <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{sharing ? (sharingStatus || 'Chargement...') : '🔗 Partager'}</button>
         {lastShareId && (
           <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>📋 RSVP</button>
         )}

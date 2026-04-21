@@ -14,23 +14,15 @@ export async function POST(request: Request) {
     const id = randomUUID()
 
     const size = new TextEncoder().encode(JSON.stringify(data)).length
-    let toStore = data
-
     if (size > MAX_BYTES) {
-      // Retirer les photos base64 pour passer sous la limite
-      toStore = { ...data, photosFond: [], photoFond: '', _photosStripped: true }
-      const sizeStripped = new TextEncoder().encode(JSON.stringify(toStore)).length
-      if (sizeStripped > MAX_BYTES) {
-        return Response.json({ error: 'Données trop volumineuses même sans photos' }, { status: 413 })
-      }
+      return Response.json({ error: 'Données trop volumineuses. Veuillez réduire la taille des photos.' }, { status: 413 })
     }
 
-    await redis.set(id, toStore)
-    // Sauvegarder l'email des mariés séparément pour les notifications RSVP
+    await redis.set(id, data, { ex: 31536000 }) // 365 jours
     if (data.emailMaries) {
-      await redis.set(`email:${id}`, data.emailMaries)
+      await redis.set(`email:${id}`, data.emailMaries, { ex: 31536000 })
     }
-    return Response.json({ id, photosStripped: toStore._photosStripped ?? false })
+    return Response.json({ id })
   } catch (err) {
     console.error('save-share error:', err)
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
