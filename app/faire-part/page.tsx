@@ -795,33 +795,6 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         </div>
       </div>
 
-      {/* ── Choix de l'ornement ── */}
-      <div style={{ marginBottom: 24 }}>
-        <Label>Choisissez vos ornements</Label>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-          {ORNEMENTS_LIBRARY.map(orn => {
-            const accent = THEMES[data.style].accent
-            const sel = (data.ornamentId ?? 'none') === orn.id
-            return (
-              <button key={orn.id} type="button" onClick={() => onChange({ ornamentId: orn.id })} style={{
-                ...BTN, padding: 8, borderRadius: 10,
-                border: `2px solid ${sel ? accent : '#f0e0d0'}`,
-                background: sel ? `${accent}10` : 'white',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-                boxShadow: sel ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.08)',
-              }}>
-                {orn.url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={orn.url} alt={orn.nom} style={{ width: 80, height: 80, objectFit: 'contain', borderRadius: 8 }} />
-                ) : (
-                  <div style={{ width: 80, height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, opacity: 0.4 }}>✕</div>
-                )}
-                <span style={{ fontSize: 10, fontWeight: sel ? 700 : 400, color: sel ? accent : '#4a3728', textAlign: 'center', lineHeight: 1.3 }}>{orn.nom}</span>
-              </button>
-            )
-          })}
-        </div>
-      </div>
 
 
       {/* ── Monogramme ── */}
@@ -973,7 +946,7 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, children }: {
     <div style={{ position: 'relative', overflow: 'hidden', background: hasFrame ? '#ffffff' : themeCardBg, minHeight: 500 }}>
       {hasFrame && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'screen', opacity: 1, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: 1, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
       )}
       <OrnementCorner url={ornUrl} corner="top-right" size={130} />
       <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
@@ -2793,7 +2766,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
         <section style={{ paddingTop: hasFrame ? frame.padding.top * frameSc : 96, paddingBottom: hasFrame ? frame.padding.bottom * frameSc : 96, paddingLeft: hasFrame ? frame.padding.left * frameSc : undefined, paddingRight: hasFrame ? frame.padding.right * frameSc : undefined, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: hasFrame ? 'hidden' : 'visible', background: hasFrame ? '#ffffff' : undefined }}>
           {hasFrame ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'screen', opacity: 1, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+            <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: 1, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
           ) : (<><OrnTL /><OrnBR /></>)}
           <div style={{ position: 'relative', zIndex: 1 }}>
           <AnimSection>
@@ -2890,7 +2863,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
             <section style={{ paddingTop: hasFrame ? frame.padding.top * frameSc : 96, paddingBottom: hasFrame ? frame.padding.bottom * frameSc : 96, paddingLeft: hasFrame ? frame.padding.left * frameSc : undefined, paddingRight: hasFrame ? frame.padding.right * frameSc : undefined, position: 'relative', overflow: hasFrame ? 'hidden' : 'visible', ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
               {hasFrame ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'screen', opacity: 1, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+                <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: 1, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
               ) : usePhotoBg ? (
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
