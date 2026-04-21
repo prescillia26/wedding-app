@@ -2762,7 +2762,6 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   const ornUrl = ORNEMENTS_LIBRARY.find(o => o.id === (data.ornamentId ?? 'none'))?.url ?? ''
   const frame = FRAMES.find(f => f.id === (data.frameId ?? 'frame-09')) ?? FRAMES[FRAMES.length - 1]
   const hasFrame = !!frame.url
-  const framePadding = useCardPadding(frame.id, containerWidth)
   // Taille 85px : les sections ont paddingTop/Bottom ≥ 96px → ornements dans la zone de padding, jamais sur le texte
   const OrnTR = () => <OrnementCorner url={ornUrl} corner="top-right" size={85} />
   const OrnBL = () => <OrnementCorner url={ornUrl} corner="bottom-left" size={85} />
