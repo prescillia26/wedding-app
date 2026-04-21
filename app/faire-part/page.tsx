@@ -910,6 +910,42 @@ function MairieIllustration({ color }: { color: string }) {
 type ThemeObj = { fond: string; pageFond?: string; accent: string; texte: string; textSecondaire: string; nom: string; carteBordure?: string; dark?: boolean }
 interface CardProps { ceremony: Ceremony; data: FormData; theme: ThemeObj; isShared?: boolean; cardIdx?: number }
 
+const FRAME_BORDER_RATIO: Record<string, { h: number; v: number }> = {
+  'frame-01': { h: 0.12, v: 0.15 },
+  'frame-02': { h: 0.10, v: 0.12 },
+  'frame-03': { h: 0.14, v: 0.18 },
+  'frame-04': { h: 0.08, v: 0.10 },
+  'frame-05': { h: 0.10, v: 0.12 },
+  'frame-06': { h: 0.12, v: 0.16 },
+  'frame-07': { h: 0.10, v: 0.14 },
+  'frame-08': { h: 0.16, v: 0.18 },
+  'frame-09': { h: 0.10, v: 0.12 },
+  'frame-10': { h: 0.18, v: 0.20 },
+  'frame-11': { h: 0.10, v: 0.14 },
+  'frame-12': { h: 0.16, v: 0.18 },
+  'frame-13': { h: 0.20, v: 0.22 },
+  'frame-14': { h: 0.14, v: 0.16 },
+  'frame-15': { h: 0.16, v: 0.18 },
+  'frame-16': { h: 0.10, v: 0.12 },
+  'frame-17': { h: 0.10, v: 0.12 },
+  'frame-18': { h: 0.20, v: 0.22 },
+  'frame-19': { h: 0.16, v: 0.18 },
+  'frame-20': { h: 0.14, v: 0.16 },
+  'frame-21': { h: 0.16, v: 0.18 },
+  'frame-22': { h: 0.10, v: 0.12 },
+  'frame-23': { h: 0.14, v: 0.16 },
+  'frame-24': { h: 0.14, v: 0.16 },
+  'frame-25': { h: 0.12, v: 0.14 },
+  'none':     { h: 0.05, v: 0.05 },
+}
+
+function useCardPadding(frameId: string, containerWidth: number) {
+  const ratio = FRAME_BORDER_RATIO[frameId] ?? { h: 0.12, v: 0.14 }
+  const paddingH = Math.round(containerWidth * ratio.h)
+  const paddingV = Math.round(containerWidth * ratio.v)
+  return { paddingLeft: paddingH, paddingRight: paddingH, paddingTop: paddingV, paddingBottom: paddingV }
+}
+
 function OrnementCorner({ url, corner, size = 130 }: {
   url: string
   corner: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
@@ -933,24 +969,27 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, children }: {
 }) {
   const frame = FRAMES.find(f => f.id === frameId) ?? FRAMES[FRAMES.length - 1]
   const hasFrame = !!frame.url
-  const [isMobile, setIsMobile] = useState(false)
+  const cardRef = useRef<HTMLDivElement>(null)
+  const [containerWidth, setContainerWidth] = useState(320)
   useEffect(() => {
-    const check = () => setIsMobile(typeof window !== 'undefined' && window.innerWidth < 640)
-    check()
-    window.addEventListener('resize', check)
-    return () => window.removeEventListener('resize', check)
+    if (!cardRef.current) return
+    const observer = new ResizeObserver(entries => {
+      for (const entry of entries) setContainerWidth(entry.contentRect.width)
+    })
+    observer.observe(cardRef.current)
+    return () => observer.disconnect()
   }, [])
-  const s = isMobile ? 0.7 : 1
+  const padding = useCardPadding(frameId, containerWidth)
   const ornUrl = hasFrame ? '' : (ORNEMENTS_LIBRARY.find(o => o.id === ornamentId)?.url ?? '')
   return (
-    <div style={{ position: 'relative', width: '100%', background: hasFrame ? '#ffffff' : themeCardBg }}>
+    <div ref={cardRef} style={{ position: 'relative', width: '100%', background: hasFrame ? '#ffffff' : themeCardBg }}>
       {hasFrame && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', mixBlendMode: 'multiply', opacity: 0.45, pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
+        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: 1, pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
       )}
       <OrnementCorner url={ornUrl} corner="top-right" size={130} />
       <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
-      <div style={{ position: 'relative', zIndex: 10, paddingTop: frame.padding.top * s, paddingBottom: frame.padding.bottom * s, paddingLeft: frame.padding.left * s, paddingRight: frame.padding.right * s }}>
+      <div style={{ position: 'relative', zIndex: 10, paddingTop: padding.paddingTop, paddingBottom: padding.paddingBottom, paddingLeft: padding.paddingLeft, paddingRight: padding.paddingRight, textAlign: 'center' }}>
         {children}
       </div>
     </div>
@@ -2641,7 +2680,7 @@ interface SharedPageContentProps {
 function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute }: SharedPageContentProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const [currentCeremonyIdx, setCurrentCeremonyIdx] = useState(0)
-  const [isMobile, setIsMobile] = useState(false)
+  const [containerWidth, setContainerWidth] = useState(360)
   const G = theme.accent
   const TEXT = theme.texte
   const FS = 'var(--font-great-vibes)'
@@ -2671,7 +2710,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   const ornUrl = ORNEMENTS_LIBRARY.find(o => o.id === (data.ornamentId ?? 'none'))?.url ?? ''
   const frame = FRAMES.find(f => f.id === (data.frameId ?? 'frame-09')) ?? FRAMES[FRAMES.length - 1]
   const hasFrame = !!frame.url
-  const frameSc = isMobile ? 0.7 : 1
+  const framePadding = useCardPadding(frame.id, containerWidth)
   // Taille 85px : les sections ont paddingTop/Bottom ≥ 96px → ornements dans la zone de padding, jamais sur le texte
   const OrnTR = () => <OrnementCorner url={ornUrl} corner="top-right" size={85} />
   const OrnBL = () => <OrnementCorner url={ornUrl} corner="bottom-left" size={85} />
@@ -2716,10 +2755,12 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   }, [])
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 640)
-    check()
-    window.addEventListener('resize', check)
-    return () => window.removeEventListener('resize', check)
+    if (!contentRef.current) return
+    const observer = new ResizeObserver(entries => {
+      for (const entry of entries) setContainerWidth(entry.contentRect.width)
+    })
+    observer.observe(contentRef.current)
+    return () => observer.disconnect()
   }, [])
 
   const audioPlayRef = useRef<(() => void) | null>(null)
@@ -2763,10 +2804,10 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
       <div ref={contentRef} style={{ maxWidth: 480, margin: '0 auto', padding: '0 28px 80px' }}>
 
         {/* SECTION 2 : Intro */}
-        <section style={{ paddingTop: hasFrame ? frame.padding.top * frameSc : 96, paddingBottom: hasFrame ? frame.padding.bottom * frameSc : 96, paddingLeft: hasFrame ? frame.padding.left * frameSc : undefined, paddingRight: hasFrame ? frame.padding.right * frameSc : undefined, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: hasFrame ? 'hidden' : 'visible', background: hasFrame ? '#ffffff' : undefined }}>
+        <section style={{ paddingTop: hasFrame ? framePadding.paddingTop : 96, paddingBottom: hasFrame ? framePadding.paddingBottom : 96, paddingLeft: hasFrame ? framePadding.paddingLeft : undefined, paddingRight: hasFrame ? framePadding.paddingRight : undefined, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: hasFrame ? 'hidden' : 'visible', background: hasFrame ? '#ffffff' : undefined }}>
           {hasFrame ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', mixBlendMode: 'multiply', opacity: 0.45, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+            <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: 1, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
           ) : (<><OrnTL /><OrnBR /></>)}
           <div style={{ position: 'relative', zIndex: 1 }}>
           <AnimSection>
@@ -2860,10 +2901,10 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
           return (
             <React.Fragment key={realIdx}>
             <CeremonyCard isCard={isCard} accent={G}>
-            <section style={{ paddingTop: hasFrame ? frame.padding.top * frameSc : 96, paddingBottom: hasFrame ? frame.padding.bottom * frameSc : 96, paddingLeft: hasFrame ? frame.padding.left * frameSc : undefined, paddingRight: hasFrame ? frame.padding.right * frameSc : undefined, position: 'relative', overflow: hasFrame ? 'hidden' : 'visible', ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
+            <section style={{ paddingTop: hasFrame ? framePadding.paddingTop : 96, paddingBottom: hasFrame ? framePadding.paddingBottom : 96, paddingLeft: hasFrame ? framePadding.paddingLeft : undefined, paddingRight: hasFrame ? framePadding.paddingRight : undefined, position: 'relative', overflow: hasFrame ? 'hidden' : 'visible', ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
               {hasFrame ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', mixBlendMode: 'multiply', opacity: 0.45, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+                <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: 1, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
               ) : usePhotoBg ? (
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
