@@ -33,7 +33,7 @@ const ORNEMENTS_LIBRARY: { id: string; url: string; nom: string }[] = [
 ]
 
 const FRAMES: { id: string; label: string; url: string | null; padding: { top: number; bottom: number; left: number; right: number } }[] = [
-  { id: 'frame-01', label: 'Baroque Doré Carré', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778898/40_ppuque.png', padding: { top: 80, bottom: 80, left: 70, right: 70 } },
+  { id: 'frame-01', label: 'Baroque Doré Carré', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778898/40_ppuque.png', padding: { top: 100, bottom: 100, left: 90, right: 90 } },
   { id: 'frame-02', label: 'Cadre Fleuri Violet', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778892/39_jm4xr1.png', padding: { top: 80, bottom: 80, left: 65, right: 65 } },
   { id: 'frame-03', label: 'Blason Floral Doré', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778890/38_oqgl8d.png', padding: { top: 100, bottom: 100, left: 80, right: 80 } },
   { id: 'frame-04', label: 'Arabesques Violettes', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778886/36_avfbex.png', padding: { top: 70, bottom: 70, left: 60, right: 60 } },
@@ -943,14 +943,14 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, children }: {
   const s = isMobile ? 0.7 : 1
   const ornUrl = hasFrame ? '' : (ORNEMENTS_LIBRARY.find(o => o.id === ornamentId)?.url ?? '')
   return (
-    <div style={{ position: 'relative', overflow: 'hidden', background: hasFrame ? '#ffffff' : themeCardBg, minHeight: 500 }}>
+    <div style={{ position: 'relative', width: '100%', background: hasFrame ? '#ffffff' : themeCardBg }}>
       {hasFrame && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: 1, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: 1, pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
       )}
       <OrnementCorner url={ornUrl} corner="top-right" size={130} />
       <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
-      <div style={{ position: 'relative', zIndex: 1, paddingTop: frame.padding.top * s, paddingBottom: frame.padding.bottom * s, paddingLeft: frame.padding.left * s, paddingRight: frame.padding.right * s, display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: 500, boxSizing: 'border-box' }}>
+      <div style={{ position: 'relative', zIndex: 10, paddingTop: frame.padding.top * s, paddingBottom: frame.padding.bottom * s, paddingLeft: frame.padding.left * s, paddingRight: frame.padding.right * s }}>
         {children}
       </div>
     </div>
