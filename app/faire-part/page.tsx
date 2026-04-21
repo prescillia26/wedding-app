@@ -32,6 +32,35 @@ const ORNEMENTS_LIBRARY: { id: string; url: string; nom: string }[] = [
   { id: 'none', url: '', nom: 'Sans ornement' },
 ]
 
+const FRAMES: { id: string; label: string; url: string | null; padding: { top: number; bottom: number; left: number; right: number } }[] = [
+  { id: 'frame-01', label: 'Baroque Doré Carré', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778898/40_ppuque.png', padding: { top: 80, bottom: 80, left: 70, right: 70 } },
+  { id: 'frame-02', label: 'Cadre Fleuri Violet', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778892/39_jm4xr1.png', padding: { top: 80, bottom: 80, left: 65, right: 65 } },
+  { id: 'frame-03', label: 'Blason Floral Doré', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778890/38_oqgl8d.png', padding: { top: 100, bottom: 100, left: 80, right: 80 } },
+  { id: 'frame-04', label: 'Arabesques Violettes', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778886/36_avfbex.png', padding: { top: 70, bottom: 70, left: 60, right: 60 } },
+  { id: 'frame-05', label: 'Cadre Doré Classique', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778883/35_q7ho0k.png', padding: { top: 80, bottom: 80, left: 70, right: 70 } },
+  { id: 'frame-06', label: 'Couronne Florale', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778878/34_patt7q.png', padding: { top: 90, bottom: 90, left: 75, right: 75 } },
+  { id: 'frame-07', label: 'Cadre Rose Doré', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778875/32_c0k1wu.png', padding: { top: 90, bottom: 90, left: 60, right: 60 } },
+  { id: 'frame-08', label: 'Art Nouveau Bleu', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778871/31_wkhd5e.png', padding: { top: 100, bottom: 100, left: 90, right: 90 } },
+  { id: 'frame-09', label: 'Baroque Doré Luxe', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778868/30_inltdl.png', padding: { top: 80, bottom: 80, left: 70, right: 70 } },
+  { id: 'frame-10', label: 'Cercle Fleuri Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778866/29_sv2l8b.png', padding: { top: 110, bottom: 110, left: 85, right: 85 } },
+  { id: 'frame-11', label: 'Cadre Rose Vert', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778861/28_obhp8w.png', padding: { top: 90, bottom: 90, left: 65, right: 65 } },
+  { id: 'frame-12', label: 'Cercle Champêtre', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778858/27_nfg9j1.png', padding: { top: 105, bottom: 105, left: 80, right: 80 } },
+  { id: 'frame-13', label: 'Losange Fleuri', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778856/26_f63vab.png', padding: { top: 120, bottom: 120, left: 90, right: 90 } },
+  { id: 'frame-14', label: 'Couronne Or & Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778851/25_qhmedq.png', padding: { top: 100, bottom: 100, left: 75, right: 75 } },
+  { id: 'frame-15', label: 'Hexagone Floral', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778848/24_lpzfts.png', padding: { top: 110, bottom: 110, left: 85, right: 85 } },
+  { id: 'frame-16', label: 'Cadre Fleuri Violet Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778843/23_r1h7uf.png', padding: { top: 90, bottom: 90, left: 75, right: 75 } },
+  { id: 'frame-17', label: 'Cadre Bleu Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778835/21_pyegeh.png', padding: { top: 85, bottom: 85, left: 70, right: 70 } },
+  { id: 'frame-18', label: 'Losange Cuivré', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778833/20_vgfnr3.png', padding: { top: 120, bottom: 120, left: 95, right: 95 } },
+  { id: 'frame-19', label: 'Cercle Doré Roses', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778827/19_dasahe.png', padding: { top: 110, bottom: 110, left: 85, right: 85 } },
+  { id: 'frame-20', label: 'Blason Doré Royal', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778825/18_ushe4t.png', padding: { top: 100, bottom: 100, left: 85, right: 85 } },
+  { id: 'frame-21', label: 'Cercle Élégant', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778823/17_ftrc0s.png', padding: { top: 110, bottom: 110, left: 85, right: 85 } },
+  { id: 'frame-22', label: 'Cadre Doré Floral', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778821/16_cibjrt.png', padding: { top: 80, bottom: 80, left: 70, right: 70 } },
+  { id: 'frame-23', label: 'Blason Doré Roses', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778818/15_xb7jgp.png', padding: { top: 95, bottom: 95, left: 80, right: 80 } },
+  { id: 'frame-24', label: 'Blason Bleu', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778814/13_jzp3qy.png', padding: { top: 95, bottom: 95, left: 80, right: 80 } },
+  { id: 'frame-25', label: 'Cadre Or Baroque Grand', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778811/12_zfigae.png', padding: { top: 85, bottom: 85, left: 75, right: 75 } },
+  { id: 'none', label: 'Sans cadre', url: null, padding: { top: 40, bottom: 40, left: 40, right: 40 } },
+]
+
 const THEME_CARD_BG: Record<string, string> = {
   'rose-fleuri':   '#fff9f6',
   'ivoire-or':     '#fffdf5',
@@ -112,6 +141,7 @@ interface FormData {
   photosData?: { url: string; cropX: number; cropY: number; cropScale: number }[]
   marie1PrenomHebreu?: string
   marie2PrenomHebreu?: string
+  frameId?: string
 }
 
 const defaultCeremony: Ceremony = {
@@ -138,6 +168,7 @@ const defaultFormData: FormData = {
   photosData: [],
   marie1PrenomHebreu: '',
   marie2PrenomHebreu: '',
+  frameId: 'frame-09',
 }
 
 // Propriétés mobiles partagées pour tous les boutons
@@ -736,6 +767,34 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         })}
       </div>
 
+      {/* ── Choix du cadre ── */}
+      <div style={{ marginBottom: 24 }}>
+        <Label>Choisissez votre cadre</Label>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+          {FRAMES.map(fr => {
+            const accent = THEMES[data.style].accent
+            const sel = (data.frameId ?? 'frame-09') === fr.id
+            return (
+              <button key={fr.id} type="button" onClick={() => onChange({ frameId: fr.id })} style={{
+                ...BTN, padding: 8, borderRadius: 10,
+                border: `2px solid ${sel ? accent : '#f0e0d0'}`,
+                background: sel ? `${accent}10` : 'white',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                boxShadow: sel ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.08)',
+              }}>
+                {fr.url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={fr.url} alt={fr.label} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
+                ) : (
+                  <div style={{ width: 80, height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, opacity: 0.4, background: '#f5f5f5', borderRadius: 6 }}>✕</div>
+                )}
+                <span style={{ fontSize: 9, fontWeight: sel ? 700 : 400, color: sel ? accent : '#4a3728', textAlign: 'center', lineHeight: 1.3 }}>{fr.label}</span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
       {/* ── Choix de l'ornement ── */}
       <div style={{ marginBottom: 24 }}>
         <Label>Choisissez vos ornements</Label>
@@ -896,6 +955,35 @@ function OrnementCorner({ url, corner, size = 130 }: {
   )
 }
 
+function CardFrameWrapper({ frameId, ornamentId, themeCardBg, children }: {
+  frameId: string; ornamentId: string; themeCardBg: string; children: React.ReactNode
+}) {
+  const frame = FRAMES.find(f => f.id === frameId) ?? FRAMES[FRAMES.length - 1]
+  const hasFrame = !!frame.url
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const check = () => setIsMobile(typeof window !== 'undefined' && window.innerWidth < 640)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+  const s = isMobile ? 0.7 : 1
+  const ornUrl = hasFrame ? '' : (ORNEMENTS_LIBRARY.find(o => o.id === ornamentId)?.url ?? '')
+  return (
+    <div style={{ position: 'relative', overflow: 'hidden', background: hasFrame ? '#ffffff' : themeCardBg, minHeight: 500 }}>
+      {hasFrame && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'screen', opacity: 1, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+      )}
+      <OrnementCorner url={ornUrl} corner="top-right" size={130} />
+      <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
+      <div style={{ position: 'relative', zIndex: 1, paddingTop: frame.padding.top * s, paddingBottom: frame.padding.bottom * s, paddingLeft: frame.padding.left * s, paddingRight: frame.padding.right * s, display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: 500, boxSizing: 'border-box' }}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
 function CeremoniesDivider({ themeAccent }: { themeAccent: string }) {
   return (
     <div style={{ maxWidth: 600, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 12, padding: '20px 24px' }}>
@@ -1000,10 +1088,8 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const honore = ov[`ceremony_${ci}_honore`] || 'et seront honorés de votre présence à la cérémonie religieuse qui sera célébrée le'
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CarouselBackground photos={[]} fond={THEME_CARD_BG[data.style] ?? theme.fond} isOriental={isDark}>
+    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'}>
       <div style={{ position: 'relative' }}>
-        {(() => { const u = ORNEMENTS_LIBRARY.find(o => o.id === (data.ornamentId ?? 'none'))?.url ?? ''; return (<><OrnementCorner url={u} corner="top-right" size={130} /><OrnementCorner url={u} corner="bottom-left" size={130} /></>) })()}
-        <div style={{ padding: '60px 48px', position: 'relative', zIndex: 1 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 42, color: theme.accent, textAlign: 'center', marginBottom: 20, lineHeight: 1.2 }}>
@@ -1075,9 +1161,8 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
             </a>
           </div>
         )}
-        </div>
       </div>
-    </CarouselBackground>
+    </CardFrameWrapper>
   )
 }
 
@@ -1087,10 +1172,8 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const ci = cardIdx ?? 0
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CarouselBackground photos={[]} fond={THEME_CARD_BG[data.style] ?? theme.fond} isOriental={isDark}>
+    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'}>
       <div style={{ position: 'relative' }}>
-        {(() => { const u = ORNEMENTS_LIBRARY.find(o => o.id === (data.ornamentId ?? 'none'))?.url ?? ''; return (<><OrnementCorner url={u} corner="top-right" size={130} /><OrnementCorner url={u} corner="bottom-left" size={130} /></>) })()}
-        <div style={{ padding: '60px 48px', position: 'relative', zIndex: 1 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: theme.accent, textAlign: 'center', marginBottom: 20 }}>Mairie</div>
@@ -1137,9 +1220,8 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
             </a>
           </div>
         )}
-        </div>
       </div>
-    </CarouselBackground>
+    </CardFrameWrapper>
   )
 }
 
@@ -1149,10 +1231,8 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const ci = cardIdx ?? 0
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CarouselBackground photos={[]} fond={THEME_CARD_BG[data.style] ?? theme.fond} isOriental={isDark}>
+    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'}>
       <div style={{ position: 'relative' }}>
-        {(() => { const u = ORNEMENTS_LIBRARY.find(o => o.id === (data.ornamentId ?? 'none'))?.url ?? ''; return (<><OrnementCorner url={u} corner="top-right" size={130} /><OrnementCorner url={u} corner="bottom-left" size={130} /></>) })()}
-        <div style={{ padding: '60px 48px', position: 'relative', zIndex: 1 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, textAlign: 'center', marginBottom: 16 }}>Soirée Henné</div>
@@ -1187,9 +1267,8 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
             </a>
           </div>
         )}
-        </div>
       </div>
-    </CarouselBackground>
+    </CardFrameWrapper>
   )
 }
 
@@ -1201,10 +1280,8 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const titreDisplay = ov[`ceremony_${ci}_titre`] || name
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CarouselBackground photos={[]} fond={THEME_CARD_BG[data.style] ?? theme.fond} isOriental={isDark}>
+    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'}>
       <div style={{ position: 'relative' }}>
-        {(() => { const u = ORNEMENTS_LIBRARY.find(o => o.id === (data.ornamentId ?? 'none'))?.url ?? ''; return (<><OrnementCorner url={u} corner="top-right" size={130} /><OrnementCorner url={u} corner="bottom-left" size={130} /></>) })()}
-        <div style={{ padding: '60px 48px', position: 'relative', zIndex: 1 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, textAlign: 'center', marginBottom: 20 }}>{titreDisplay}</div>
@@ -1237,9 +1314,8 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
             </a>
           </div>
         )}
-        </div>
       </div>
-    </CarouselBackground>
+    </CardFrameWrapper>
   )
 }
 
@@ -1249,10 +1325,8 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
   const ov = data.textOverrides ?? {}
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CarouselBackground photos={[]} fond={THEME_CARD_BG[data.style] ?? theme.fond} isOriental={isDark}>
+    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'}>
       <div style={{ position: 'relative' }}>
-        {(() => { const u = ORNEMENTS_LIBRARY.find(o => o.id === (data.ornamentId ?? 'none'))?.url ?? ''; return (<><OrnementCorner url={u} corner="top-right" size={130} /><OrnementCorner url={u} corner="bottom-left" size={130} /></>) })()}
-        <div style={{ padding: '60px 48px', position: 'relative', zIndex: 1 }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, textAlign: 'center', marginBottom: 16 }}>Shabbat Hatan</div>
@@ -1287,9 +1361,8 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
             </a>
           </div>
         )}
-        </div>
       </div>
-    </CarouselBackground>
+    </CardFrameWrapper>
   )
 }
 
@@ -2595,6 +2668,7 @@ interface SharedPageContentProps {
 function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute }: SharedPageContentProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const [currentCeremonyIdx, setCurrentCeremonyIdx] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
   const G = theme.accent
   const TEXT = theme.texte
   const FS = 'var(--font-great-vibes)'
@@ -2622,6 +2696,9 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
     : 'translate(-50%, -50%)'
 
   const ornUrl = ORNEMENTS_LIBRARY.find(o => o.id === (data.ornamentId ?? 'none'))?.url ?? ''
+  const frame = FRAMES.find(f => f.id === (data.frameId ?? 'frame-09')) ?? FRAMES[FRAMES.length - 1]
+  const hasFrame = !!frame.url
+  const frameSc = isMobile ? 0.7 : 1
   // Taille 85px : les sections ont paddingTop/Bottom ≥ 96px → ornements dans la zone de padding, jamais sur le texte
   const OrnTR = () => <OrnementCorner url={ornUrl} corner="top-right" size={85} />
   const OrnBL = () => <OrnementCorner url={ornUrl} corner="bottom-left" size={85} />
@@ -2665,6 +2742,13 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
     return () => observer.disconnect()
   }, [])
 
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
   const audioPlayRef = useRef<(() => void) | null>(null)
 
   const handleDiscover = () => {
@@ -2706,9 +2790,12 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
       <div ref={contentRef} style={{ maxWidth: 480, margin: '0 auto', padding: '0 28px 80px' }}>
 
         {/* SECTION 2 : Intro */}
-        <section style={{ paddingTop: 96, paddingBottom: 96, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: 'visible' }}>
-          <OrnTL />
-          <OrnBR />
+        <section style={{ paddingTop: hasFrame ? frame.padding.top * frameSc : 96, paddingBottom: hasFrame ? frame.padding.bottom * frameSc : 96, paddingLeft: hasFrame ? frame.padding.left * frameSc : undefined, paddingRight: hasFrame ? frame.padding.right * frameSc : undefined, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: hasFrame ? 'hidden' : 'visible', background: hasFrame ? '#ffffff' : undefined }}>
+          {hasFrame ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'screen', opacity: 1, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+          ) : (<><OrnTL /><OrnBR /></>)}
+          <div style={{ position: 'relative', zIndex: 1 }}>
           <AnimSection>
             {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 14, color: G, direction: 'rtl', textAlign: 'right', marginBottom: 16 }}>בס״ד</div>}
             <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: G, textAlign: 'center', letterSpacing: 1, marginBottom: 14 }}>
@@ -2765,6 +2852,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
               </div>
             </AnimSection>
           )}
+          </div>
         </section>
 
         {/* SECTION 3 : Compte à rebours */}
@@ -2799,8 +2887,11 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
           return (
             <React.Fragment key={realIdx}>
             <CeremonyCard isCard={isCard} accent={G}>
-            <section style={{ paddingTop: 96, paddingBottom: 96, position: 'relative', overflow: 'visible', ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: theme.fond }) }}>
-              {usePhotoBg ? (
+            <section style={{ paddingTop: hasFrame ? frame.padding.top * frameSc : 96, paddingBottom: hasFrame ? frame.padding.bottom * frameSc : 96, paddingLeft: hasFrame ? frame.padding.left * frameSc : undefined, paddingRight: hasFrame ? frame.padding.right * frameSc : undefined, position: 'relative', overflow: hasFrame ? 'hidden' : 'visible', ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
+              {hasFrame ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'screen', opacity: 1, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+              ) : usePhotoBg ? (
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={firstPhoto} alt="" style={{ position: 'absolute', top: '50%', left: '50%', transform: firstCropTransform, transformOrigin: 'center center', minWidth: '100%', minHeight: '100%', width: 'auto', height: 'auto', pointerEvents: 'none', zIndex: 0 }} />
@@ -2811,6 +2902,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                   {i % 2 === 0 ? <><OrnTR /><OrnBL /></> : <><OrnTL /><OrnBR /></>}
                 </>
               )}
+              <div style={{ position: 'relative', zIndex: 1 }}>
               <AnimSection>
                 <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>{title}</div>
                 <OrnSep />
@@ -2891,6 +2983,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                   </div>
                 )}
               </AnimSection>
+              </div>
             </section>
             </CeremonyCard>
             {!isCard && i < sorted.length - 1 && <CeremoniesDivider themeAccent={G} />}
