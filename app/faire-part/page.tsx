@@ -3251,6 +3251,15 @@ export default function FairePartPage() {
     const r = params.get('role')
     const urlCode = params.get('code')
 
+    // Mode dev : bypass code d'accès
+    const devParam = params.get('dev')
+    const isDevBypass = devParam === 'lovit2026' || (devParam === 'true' && process.env.NODE_ENV === 'development')
+    if (isDevBypass) {
+      setAccessGranted(true)
+      setCheckingAccess(false)
+      return
+    }
+
     if (id) {
       // Vue partagée — pas de protection
       setIsShared(true)
