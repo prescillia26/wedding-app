@@ -3080,7 +3080,9 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
         }
       }
       setSharingStatus('Envoi...')
-      const dataToSend = { ...data, photosFond: compressedPhotos, photoFond: compressedPhotos[0] ?? '' }
+      // Supprimer les URLs en double dans photosData (déjà dans photosFond)
+      const photosDataToSend = (data.photosData ?? []).map(({ cropX, cropY, cropScale }) => ({ cropX, cropY, cropScale }))
+      const dataToSend = { ...data, photosFond: compressedPhotos, photoFond: compressedPhotos[0] ?? '', photosData: photosDataToSend }
 
       const res = await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataToSend) })
       const json = await res.json()
@@ -3371,7 +3373,13 @@ export default function FairePartPage() {
       setLoadingShare(true)
       fetch(`/api/get-share?id=${id}`)
         .then(res => res.json())
-        .then((d: FormData) => { setFormData(d); setShowCards(true) })
+        .then((d: FormData) => {
+          // Reconstruire photosData.url depuis photosFond (supprimé avant envoi pour économiser de l'espace)
+          if (d.photosFond?.length && d.photosData?.length) {
+            d.photosData = d.photosData.map((c, i) => ({ ...c, url: d.photosFond![i] ?? '' }))
+          }
+          setFormData(d); setShowCards(true)
+        })
         .catch(() => { setLoadingShare(false) })
         .finally(() => setLoadingShare(false))
       return
