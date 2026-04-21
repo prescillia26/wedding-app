@@ -59,6 +59,7 @@ const FRAMES: { id: string; label: string; url: string | null; padding: { top: n
   { id: 'frame-23', label: 'Blason Doré Roses', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778818/15_xb7jgp.png', padding: { top: 95, bottom: 95, left: 80, right: 80 } },
   { id: 'frame-24', label: 'Blason Bleu', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778814/13_jzp3qy.png', padding: { top: 95, bottom: 95, left: 80, right: 80 } },
   { id: 'frame-25', label: 'Cadre Or Baroque Grand', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778811/12_zfigae.png', padding: { top: 85, bottom: 85, left: 75, right: 75 } },
+  { id: 'frame-heart', label: 'Couronne Roses Cœur', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776783658/Design_sans_titre_tzwipm.png', padding: { top: 80, bottom: 80, left: 65, right: 65 } },
   { id: 'none', label: 'Sans cadre', url: null, padding: { top: 40, bottom: 40, left: 40, right: 40 } },
 ]
 
@@ -937,6 +938,7 @@ const FRAME_BORDER_RATIO: Record<string, { h: number; v: number }> = {
   'frame-23': { h: 0.09, v: 0.26 },
   'frame-24': { h: 0.09, v: 0.26 },
   'frame-25': { h: 0.08, v: 0.24 },
+  'frame-heart': { h: 0.18, v: 0.22 },
   'none':     { h: 0.03, v: 0.05 },
 }
 
