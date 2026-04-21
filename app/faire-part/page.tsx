@@ -184,6 +184,9 @@ function fmtParentsLines(pPrenom: string, pNom: string, mPrenom: string, mNom: s
   return []
 }
 
+// Audio pré-démarré pendant le clic "Générer" pour contourner la politique autoplay
+let _pendingAudio: HTMLAudioElement | null = null
+
 function compressImage(base64: string, maxWidth = 800, quality = 0.7): Promise<string> {
   return new Promise(resolve => {
     const img = new Image()
@@ -2001,20 +2004,25 @@ function MusicUploader({ musicUrl, musicName, onChange }: { musicUrl: string; mu
 // ── AudioPlayer HTML5 ──────────────────────────────────────────────────────────
 
 function AudioPlayer({ musicUrl, accent, playRef }: { musicUrl: string; accent: string; playRef?: React.MutableRefObject<(() => void) | null> }) {
-  const audioRef = useRef<HTMLAudioElement>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
   const [muted, setMuted] = useState(false)
   const [started, setStarted] = useState(false)
 
   useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
-    // Expose une fonction play() appelable directement depuis un handler de clic (iOS compatible)
+    // Réutilise l'audio pré-démarré pendant le clic "Générer" si disponible
+    const audio = _pendingAudio ?? new Audio(musicUrl)
+    if (_pendingAudio) _pendingAudio = null
+    audio.loop = true
+    audioRef.current = audio
+
     if (playRef) {
       playRef.current = () => { audio.play().then(() => setStarted(true)).catch(() => {}) }
     }
+
     let cleanupListeners: (() => void) | null = null
+    // play() résout immédiatement si l'audio est déjà en cours (pré-démarré)
     audio.play().then(() => setStarted(true)).catch(() => {
-      // Fallback : démarre au premier clic/touch sur la page
+      // Fallback : démarre au premier clic/touch sur la page (ex: bouton DÉCOUVRIR)
       const tryPlay = () => {
         audio.play().then(() => setStarted(true)).catch(() => {})
         document.removeEventListener('click', tryPlay, true)
@@ -2028,18 +2036,17 @@ function AudioPlayer({ musicUrl, accent, playRef }: { musicUrl: string; accent: 
       }
     })
     return () => { cleanupListeners?.(); if (playRef) playRef.current = null }
-  }, [playRef])
+  }, [musicUrl, playRef])
 
   const toggleMute = () => {
-    if (!audioRef.current) return
-    audioRef.current.muted = !muted
+    const audio = audioRef.current
+    if (!audio) return
+    audio.muted = !muted
     setMuted(m => !m)
   }
 
   return (
     <>
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-      <audio ref={audioRef} src={musicUrl} loop autoPlay style={{ display: 'none' }} />
       {started && (
         <button
           onClick={toggleMute}
@@ -3441,6 +3448,12 @@ export default function FairePartPage() {
     else {
       // Save to localStorage on generate
       try { localStorage.setItem('wedding-draft', JSON.stringify(formData)) } catch { /* ignore */ }
+      // Démarre l'audio PENDANT le clic (contexte interaction utilisateur) pour contourner l'autoplay
+      if (formData.musicUrl) {
+        _pendingAudio = new Audio(formData.musicUrl)
+        _pendingAudio.loop = true
+        _pendingAudio.play().catch(() => {})
+      }
       setShowCards(true)
     }
   }, [step, formData])
