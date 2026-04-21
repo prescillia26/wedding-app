@@ -29,6 +29,7 @@ const ORNEMENTS_LIBRARY: { id: string; url: string; nom: string }[] = [
   { id: 'orn6', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765509/6_bbgeun.png', nom: 'Floral 6' },
   { id: 'orn7', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765511/7_h5mjjm.png', nom: 'Floral 7' },
   { id: 'orn8', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765513/8_grn4zh.png', nom: 'Floral 8' },
+  { id: 'orn9', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776783658/Design_sans_titre_tzwipm.png', nom: 'Floral 9' },
   { id: 'none', url: '', nom: 'Sans ornement' },
 ]
 
