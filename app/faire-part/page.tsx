@@ -108,6 +108,7 @@ interface FormData {
   monogrammeColor?: string
   musicName?: string
   ornamentId?: string
+  fondCeremonie?: 'ornements' | 'photo'
   marie1PrenomHebreu?: string
   marie2PrenomHebreu?: string
 }
@@ -131,6 +132,7 @@ const defaultFormData: FormData = {
   style: 'floral-bleu', presentationStyle: 'elegant', mariageJuif: false, youtubeUrl: '', musicUrl: '', musicName: '', photoFond: '', photosFond: [], emailMaries: '', textOverrides: {},
   monogrammeStyle: 'cercle', monogrammeColor: '',
   ornamentId: 'roses-diagonales',
+  fondCeremonie: 'ornements',
   marie1PrenomHebreu: '',
   marie2PrenomHebreu: '',
 }
@@ -542,6 +544,35 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={orn.url} alt={orn.label} style={{ width: 64, height: 64, objectFit: 'contain', background: '#f8f4f0', borderRadius: 8 }} />
                 <span style={{ fontSize: 10, fontWeight: sel ? 700 : 400, color: sel ? accent : '#4a3728', textAlign: 'center', lineHeight: 1.3 }}>{orn.label}</span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* ── Fond des cérémonies ── */}
+      <div style={{ marginBottom: 24 }}>
+        <Label>Fond des sections cérémonies</Label>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {([
+            { key: 'ornements' as const, label: '🌸 Ornements floraux', desc: 'Fleurs décoratives dans les coins' },
+            { key: 'photo' as const, label: '📷 Photo en fond', desc: 'Votre photo en arrière-plan' },
+          ]).map(opt => {
+            const accent = THEMES[data.style].accent
+            const sel = (data.fondCeremonie ?? 'ornements') === opt.key
+            return (
+              <button key={opt.key} type="button" onClick={() => onChange({ fondCeremonie: opt.key })} style={{
+                ...BTN, padding: 14, borderRadius: 10,
+                border: `2.5px solid ${sel ? accent : '#f0e0d0'}`,
+                background: sel ? `${accent}10` : 'white',
+                textAlign: 'left',
+                boxShadow: sel ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.08)',
+              }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: sel ? accent : '#4a3728', marginBottom: 3 }}>{opt.label}</div>
+                <div style={{ fontSize: 10, color: '#9ca3af', lineHeight: 1.3 }}>{opt.desc}</div>
+                {opt.key === 'photo' && sel && (data.photosFond?.length ?? 0) === 0 && (
+                  <div style={{ fontSize: 10, color: '#f59e0b', marginTop: 4 }}>⚠ Uploadez une photo à l&apos;étape précédente</div>
+                )}
               </button>
             )
           })}
@@ -2336,6 +2367,41 @@ const OrnementDentelleDore = ({ style = {} }: { style?: React.CSSProperties }) =
   </svg>
 )
 
+// ── IntroCarousel : fond photo de la section d'accueil ────────────────────────
+
+function IntroCarousel({ photos, themeAccent }: { photos: string[]; themeAccent: string }) {
+  const valid = photos.filter(p => p && p.length > 0)
+  const [idx, setIdx] = useState(0)
+  const [visible, setVisible] = useState(true)
+
+  useEffect(() => {
+    if (valid.length <= 1) return
+    const t = setInterval(() => {
+      setVisible(false)
+      setTimeout(() => { setIdx(p => (p + 1) % valid.length); setVisible(true) }, 600)
+    }, 4000)
+    return () => clearInterval(t)
+  }, [valid.length])
+
+  if (valid.length === 0) return null
+
+  return (
+    <>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={valid[idx]} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease', zIndex: 0, pointerEvents: 'none' }} />
+      {/* overlay dégradé : transparent en haut, sombre en bas pour lisibilité des noms */}
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.12) 55%, rgba(0,0,0,0.0) 100%)', zIndex: 0, pointerEvents: 'none' }} />
+      {valid.length > 1 && (
+        <div style={{ position: 'absolute', bottom: 80, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6, zIndex: 5, pointerEvents: 'none' }}>
+          {valid.map((_, i) => (
+            <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: i === idx ? themeAccent : 'rgba(255,255,255,0.5)', transition: 'background 0.3s' }} />
+          ))}
+        </div>
+      )}
+    </>
+  )
+}
+
 // ── AnimSection : fade-in au scroll ───────────────────────────────────────────
 
 function AnimSection({ children, delay = 0, style }: { children: React.ReactNode; delay?: number; style?: React.CSSProperties }) {
@@ -2384,6 +2450,11 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   const gpMa2 = fmtGpCouple(data.famille2GpMaPerePrenom, data.famille2GpMaPereNom, data.famille2GpMaMerePrenom, data.famille2GpMaMereNom)
   const hasGp = !!(gpPa1 || gpMa1 || gpPa2 || gpMa2)
   const firstDate = sorted[0]?.date
+
+  const hasIntroPhoto = (data.photosFond?.length ?? 0) > 0 || !!data.photoFond
+  const introTextColor = hasIntroPhoto ? 'rgba(255,255,255,0.95)' : G
+  const fondCeremonie = data.fondCeremonie ?? 'ornements'
+  const firstPhoto = data.photosFond?.[0] ?? data.photoFond ?? ''
 
   const ornamentId = data.ornamentId ?? 'roses-diagonales'
   const activeOrn = ORNAMENTS.find(o => o.id === ornamentId)
@@ -2447,15 +2518,20 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
 
       {/* ── SECTION 1 : Écran d'accueil ────────────────────────────────────── */}
       <div style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+        <IntroCarousel photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} themeAccent={G} />
         <OrnImg topRight />
         <OrnImg bottomLeft />
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '0 32px', maxWidth: 480, width: '100%', margin: '0 auto' }}>
-          {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 16, color: G, direction: 'rtl', marginBottom: 20, animation: 'sharedFadeIn 0.9s ease forwards' }}>בס״ד</div>}
+          {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 16, color: introTextColor, direction: 'rtl', marginBottom: 20, animation: 'sharedFadeIn 0.9s ease forwards' }}>בס״ד</div>}
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
-            <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={140} style={data.monogrammeStyle || 'cercle'} />
+            <MonogramByStyle initial1={i1} initial2={i2} color={hasIntroPhoto ? 'rgba(255,255,255,0.9)' : monoColor} size={140} style={data.monogrammeStyle || 'cercle'} />
           </div>
-          <LineSep />
-          <div style={{ fontFamily: FS, fontSize: 'clamp(30px,8vw,46px)', color: G, marginBottom: 32, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.2 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', margin: '0 auto 16px', maxWidth: 160 }}>
+            <div style={{ flex: 1, height: 0.5, background: introTextColor, opacity: 0.4 }} />
+            <span style={{ color: introTextColor, fontSize: 10, opacity: 0.7 }}>◆</span>
+            <div style={{ flex: 1, height: 0.5, background: introTextColor, opacity: 0.4 }} />
+          </div>
+          <div style={{ fontFamily: FS, fontSize: 'clamp(30px,8vw,46px)', color: introTextColor, marginBottom: 32, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.2, textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.4)' : 'none' }}>
             {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
           </div>
           <button onClick={handleDiscover} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '14px 40px', fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', boxShadow: `0 4px 20px ${G}44`, animation: 'sharedFadeIn 1s 0.7s ease forwards', opacity: 0 } as React.CSSProperties}>
@@ -2555,11 +2631,22 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
           }
           const title = typeTitle[ceremony.type] || (ceremony.customName?.toUpperCase() || ceremony.type.toUpperCase())
           const hebrewDate = getHebrewDate(ceremony.date)
+          const usePhotoBg = fondCeremonie === 'photo' && !!firstPhoto
           return (
             <React.Fragment key={i}>
             <section style={{ paddingTop: 60, paddingBottom: 52, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: 'hidden' }}>
-              <OrnImg topRight />
-              <OrnImg bottomLeft />
+              {usePhotoBg ? (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={firstPhoto} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none', zIndex: 0 }} />
+                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.82)', pointerEvents: 'none', zIndex: 0 }} />
+                </>
+              ) : (
+                <>
+                  <OrnImg topRight />
+                  <OrnImg bottomLeft />
+                </>
+              )}
               <AnimSection>
                 <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>{title}</div>
                 <OrnSep />
