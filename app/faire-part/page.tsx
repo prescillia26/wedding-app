@@ -2970,10 +2970,12 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
               </AnimSection>
               {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
                 <AnimSection delay={100}>
-                  <div style={{ fontFamily: 'serif', fontSize: 'clamp(11px, 4vw, 20px)', color: G, direction: 'rtl', textAlign: 'center', marginBottom: 22, whiteSpace: 'nowrap', background: 'rgba(255,255,255,0.75)', borderRadius: 6, padding: '6px 16px', display: 'inline-block', width: '100%', boxSizing: 'border-box' }}>קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה</div>
+                  <div style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 8, padding: '10px 20px', marginBottom: 22, overflow: 'hidden' }}>
+                    <div style={{ fontFamily: 'serif', fontSize: 'clamp(10px, 3.2vw, 17px)', color: G, direction: 'rtl', textAlign: 'center', whiteSpace: 'nowrap', lineHeight: 1.9 }}>קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה</div>
+                  </div>
                 </AnimSection>
               )}
-              {(parents1.length > 0 || parents2.length > 0) && (
+              {(parents1.length > 0 || parents2.length > 0) && (ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Shabbat Hatan') && (
                 <AnimSection delay={150}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 12, textAlign: 'center' }}>
                     <div>
