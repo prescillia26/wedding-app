@@ -3075,24 +3075,34 @@ function CardsView({ data, onEdit, onReset, isShared, role }: { data: FormData; 
     try {
       const originalPhotos = data.photosFond ?? []
       let compressedPhotos: string[] = originalPhotos
-      if (originalPhotos.length > 0) {
-        setSharingStatus('Compression des photos...')
-        compressedPhotos = await Promise.all(originalPhotos.map(p => compressImage(p, 800, 0.7)))
-        // Passe 2 si encore trop grand
-        const size1 = new TextEncoder().encode(JSON.stringify(compressedPhotos)).length
-        if (size1 > 700_000) {
-          compressedPhotos = await Promise.all(compressedPhotos.map(p => compressImage(p, 600, 0.5)))
-        }
-        // Passe 3
-        const size2 = new TextEncoder().encode(JSON.stringify(compressedPhotos)).length
-        if (size2 > 700_000) {
-          compressedPhotos = await Promise.all(compressedPhotos.map(p => compressImage(p, 400, 0.3)))
-        }
-      }
-      setSharingStatus('Envoi...')
       // Supprimer les URLs en double dans photosData (déjà dans photosFond)
       const photosDataToSend = (data.photosData ?? []).map(({ cropX, cropY, cropScale }) => ({ cropX, cropY, cropScale }))
-      const dataToSend = { ...data, photosFond: compressedPhotos, photoFond: compressedPhotos[0] ?? '', photosData: photosDataToSend }
+      const buildPayload = () => ({ ...data, photosFond: compressedPhotos, photoFond: compressedPhotos[0] ?? '', photosData: photosDataToSend })
+      const payloadSize = () => new TextEncoder().encode(JSON.stringify(buildPayload())).length
+      const LIMIT = 850_000 // marge de sécurité sous la limite Redis 900KB
+
+      if (originalPhotos.length > 0) {
+        // Passes progressives — on compresse jusqu'à ce que le payload TOTAL passe sous la limite
+        const passes = [
+          { maxWidth: 800, quality: 0.7 },
+          { maxWidth: 600, quality: 0.5 },
+          { maxWidth: 400, quality: 0.3 },
+          { maxWidth: 300, quality: 0.2 },
+          { maxWidth: 200, quality: 0.15 },
+        ]
+        for (const { maxWidth, quality } of passes) {
+          setSharingStatus('Compression des photos...')
+          compressedPhotos = await Promise.all(originalPhotos.map(p => compressImage(p, maxWidth, quality)))
+          if (payloadSize() <= LIMIT) break
+        }
+        // Dernier recours : une seule photo au minimum
+        if (payloadSize() > LIMIT && compressedPhotos.length > 1) {
+          compressedPhotos = await Promise.all([originalPhotos[0]].map(p => compressImage(p, 200, 0.15)))
+        }
+      }
+
+      setSharingStatus('Envoi...')
+      const dataToSend = buildPayload()
 
       const res = await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataToSend) })
       const json = await res.json()
