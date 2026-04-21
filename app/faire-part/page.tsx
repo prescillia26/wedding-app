@@ -2003,23 +2003,27 @@ function MusicUploader({ musicUrl, musicName, onChange }: { musicUrl: string; mu
 function AudioPlayer({ musicUrl, accent }: { musicUrl: string; accent: string }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [muted, setMuted] = useState(false)
-  const [needsInteraction, setNeedsInteraction] = useState(false)
   const [started, setStarted] = useState(false)
 
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
+    let cleanupListeners: (() => void) | null = null
     audio.play().then(() => setStarted(true)).catch(() => {
-      setNeedsInteraction(true)
       // Démarre automatiquement au premier clic/touch sur la page (ex: bouton "DÉCOUVRIR")
       const tryPlay = () => {
-        audio.play().then(() => { setStarted(true); setNeedsInteraction(false) }).catch(() => {})
+        audio.play().then(() => setStarted(true)).catch(() => {})
         document.removeEventListener('click', tryPlay, true)
         document.removeEventListener('touchend', tryPlay, true)
       }
       document.addEventListener('click', tryPlay, true)
       document.addEventListener('touchend', tryPlay, true)
+      cleanupListeners = () => {
+        document.removeEventListener('click', tryPlay, true)
+        document.removeEventListener('touchend', tryPlay, true)
+      }
     })
+    return () => cleanupListeners?.()
   }, [])
 
   const toggleMute = () => {
@@ -2028,34 +2032,11 @@ function AudioPlayer({ musicUrl, accent }: { musicUrl: string; accent: string })
     setMuted(m => !m)
   }
 
-  const startMusic = () => {
-    if (!audioRef.current) return
-    audioRef.current.play().then(() => { setStarted(true); setNeedsInteraction(false) }).catch(() => {})
-  }
-
   return (
     <>
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <audio ref={audioRef} src={musicUrl} loop autoPlay style={{ display: 'none' }} />
-
-      {needsInteraction && !started && (
-        <button
-          onClick={startMusic}
-          onTouchEnd={e => { e.preventDefault(); startMusic() }}
-          style={{
-            ...BTN,
-            position: 'fixed', bottom: 24, right: 72, zIndex: 50,
-            background: `${accent}dd`, color: 'white', border: 'none',
-            borderRadius: 9999, padding: '11px 18px',
-            fontSize: 14, fontWeight: 600, letterSpacing: '0.05em',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.22)',
-          }}
-        >
-          ♪ Lancer la musique
-        </button>
-      )}
-
-      {(started || !needsInteraction) && (
+      {started && (
         <button
           onClick={toggleMute}
           onTouchEnd={e => { e.preventDefault(); toggleMute() }}
