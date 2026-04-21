@@ -1115,7 +1115,6 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const parents1 = fmtParentsLines(data.famille1PerePrenom, data.famille1PereNom, data.famille1MerePrenom, data.famille1MereNom)
   const parents2 = fmtParentsLines(data.famille2PerePrenom, data.famille2PereNom, data.famille2MerePrenom, data.famille2MereNom)
   const hebrewDate = getHebrewDate(ceremony.date)
-  const isDark = !!theme.dark
   const ov = data.textOverrides ?? {}
   const ci = cardIdx ?? 0
   const titre = ov[`ceremony_${ci}_titre`] || (data.mariageJuif ? 'Houppa & Soirée' : 'Cérémonie religieuse & Soirée')
@@ -1125,7 +1124,7 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   return (
     <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5}>
       <div style={{ position: 'relative' }}>
-        
+        {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>La Houppa</div>
         <LogoOrMonogram data={data} theme={theme} />
         {data.mariageJuif && (
@@ -1352,7 +1351,6 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
 }
 
 function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
-  const isDark = !!theme.dark
   const ci = cardIdx ?? 0
   const ov = data.textOverrides ?? {}
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
@@ -1367,7 +1365,8 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
   return (
     <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5}>
       <div style={{ position: 'relative' }}>
-        {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}{data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}        <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>Shabbat Hatan</div>
+        {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
+        <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>Shabbat Hatan</div>
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ textAlign: 'center', fontSize: 22, letterSpacing: '0.4em', color: theme.accent, marginBottom: 24 }}>✡ ✦ ✡</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, marginBottom: 24, alignItems: 'start' }}>
