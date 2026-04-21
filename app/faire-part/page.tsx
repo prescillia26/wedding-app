@@ -2622,10 +2622,11 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
     : 'translate(-50%, -50%)'
 
   const ornUrl = ORNEMENTS_LIBRARY.find(o => o.id === (data.ornamentId ?? 'none'))?.url ?? ''
-  const OrnTR = () => <OrnementCorner url={ornUrl} corner="top-right" size={130} />
-  const OrnBL = () => <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
-  const OrnTL = () => <OrnementCorner url={ornUrl} corner="top-left" size={130} />
-  const OrnBR = () => <OrnementCorner url={ornUrl} corner="bottom-right" size={130} />
+  // Taille 85px : les sections ont paddingTop/Bottom ≥ 96px → ornements dans la zone de padding, jamais sur le texte
+  const OrnTR = () => <OrnementCorner url={ornUrl} corner="top-right" size={85} />
+  const OrnBL = () => <OrnementCorner url={ornUrl} corner="bottom-left" size={85} />
+  const OrnTL = () => <OrnementCorner url={ornUrl} corner="top-left" size={85} />
+  const OrnBR = () => <OrnementCorner url={ornUrl} corner="bottom-right" size={85} />
 
   const OrnSep = () => (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', margin: '0 auto 24px', maxWidth: 160 }}>
@@ -2679,8 +2680,6 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
       {/* ── SECTION 1 : Écran d'accueil ────────────────────────────────────── */}
       <div style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
         <IntroCarousel photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} themeAccent={G} photosData={data.photosData} />
-        <OrnTR />
-        <OrnBL />
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '0 32px', maxWidth: 480, width: '100%', margin: '0 auto' }}>
           {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 16, color: introTextColor, direction: 'rtl', marginBottom: 20, animation: 'sharedFadeIn 0.9s ease forwards' }}>בס״ד</div>}
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
@@ -2707,7 +2706,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
       <div ref={contentRef} style={{ maxWidth: 480, margin: '0 auto', padding: '0 28px 80px' }}>
 
         {/* SECTION 2 : Intro */}
-        <section style={{ paddingTop: 72, paddingBottom: 48, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: 'visible' }}>
+        <section style={{ paddingTop: 96, paddingBottom: 96, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: 'visible' }}>
           <OrnTL />
           <OrnBR />
           <AnimSection>
@@ -2800,7 +2799,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
           return (
             <React.Fragment key={realIdx}>
             <CeremonyCard isCard={isCard} accent={G}>
-            <section style={{ paddingTop: 60, paddingBottom: 52, position: 'relative', overflow: 'visible', ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: theme.fond }) }}>
+            <section style={{ paddingTop: 96, paddingBottom: 96, position: 'relative', overflow: 'visible', ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: theme.fond }) }}>
               {usePhotoBg ? (
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
