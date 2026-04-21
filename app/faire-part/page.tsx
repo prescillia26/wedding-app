@@ -2856,12 +2856,9 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
       <div ref={contentRef} style={{ maxWidth: 480, margin: '0 auto', padding: '0 0 80px' }}>
 
         {/* SECTION 2 : Intro */}
-        <section style={{ paddingTop: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingBottom: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingLeft: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: 'visible', background: hasFrame ? '#ffffff' : undefined }}>
-          {hasFrame ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: data.frameOpacity ?? 1, transform: `scale(${(data.frameSize ?? 100) / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
-          ) : (<><OrnTL /><OrnBR /></>)}
-          <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1 }}>
+        <section style={{ paddingTop: 96, paddingBottom: 96, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: 'visible' }}>
+          {!hasFrame && <><OrnTL /><OrnBR /></>}
+          <div style={{ position: 'relative', zIndex: 1 }}>
           <AnimSection>
             {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 14, color: G, direction: 'rtl', textAlign: 'right', marginBottom: 16 }}>בס״ד</div>}
             <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: G, textAlign: 'center', letterSpacing: 1, marginBottom: 14 }}>
