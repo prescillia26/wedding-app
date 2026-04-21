@@ -2009,7 +2009,7 @@ function AudioPlayer({ musicUrl, accent, playRef }: { musicUrl: string; accent: 
   const [started, setStarted] = useState(false)
 
   useEffect(() => {
-    // Réutilise l'audio pré-démarré pendant le clic "Générer" si disponible
+    const wasPreStarted = _pendingAudio !== null
     const audio = _pendingAudio ?? new Audio(musicUrl)
     if (_pendingAudio) _pendingAudio = null
     audio.loop = true
@@ -2019,10 +2019,23 @@ function AudioPlayer({ musicUrl, accent, playRef }: { musicUrl: string; accent: 
       playRef.current = () => { audio.play().then(() => setStarted(true)).catch(() => {}) }
     }
 
+    if (wasPreStarted) {
+      // L'audio a déjà été démarré dans next() — ne pas appeler play() à nouveau
+      // (double appel = le navigateur peut annuler le premier)
+      if (!audio.paused) {
+        setStarted(true)
+      } else {
+        // Toujours en cours de chargement, on attend l'événement playing
+        const onPlaying = () => setStarted(true)
+        audio.addEventListener('playing', onPlaying, { once: true })
+      }
+      return () => { if (playRef) playRef.current = null }
+    }
+
+    // Cas normal (vue invité ou draft) : tenter play()
     let cleanupListeners: (() => void) | null = null
-    // play() résout immédiatement si l'audio est déjà en cours (pré-démarré)
     audio.play().then(() => setStarted(true)).catch(() => {
-      // Fallback : démarre au premier clic/touch sur la page (ex: bouton DÉCOUVRIR)
+      // Fallback : démarre au premier clic/touch (ex: bouton DÉCOUVRIR)
       const tryPlay = () => {
         audio.play().then(() => setStarted(true)).catch(() => {})
         document.removeEventListener('click', tryPlay, true)
