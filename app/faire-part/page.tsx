@@ -124,6 +124,7 @@ interface FormData {
   ornamentId?: string
   fondCeremonie?: 'ornements' | 'photo'
   photoPosition?: 'top' | 'center' | 'bottom' | 'left' | 'right'
+  photosData?: { url: string; cropX: number; cropY: number; cropScale: number }[]
   marie1PrenomHebreu?: string
   marie2PrenomHebreu?: string
 }
@@ -149,6 +150,7 @@ const defaultFormData: FormData = {
   ornamentId: 'roses-diagonales',
   fondCeremonie: 'ornements',
   photoPosition: 'center',
+  photosData: [],
   marie1PrenomHebreu: '',
   marie2PrenomHebreu: '',
 }
@@ -417,6 +419,160 @@ function Step2({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  )
+}
+
+// ── PhotoSection : upload + recadrage interactif ──────────────────────────────
+
+function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
+  const [cropIdx, setCropIdx] = useState<number | null>(null)
+  const photos = data.photosFond ?? []
+  const photosData = data.photosData ?? []
+
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? [])
+    const toAdd = files.slice(0, 5 - photos.length)
+    if (!toAdd.length) return
+    const results: string[] = new Array(toAdd.length)
+    let done = 0
+    toAdd.forEach((f, fi) => {
+      const r = new FileReader()
+      r.onload = ev => {
+        results[fi] = ev.target?.result as string
+        done++
+        if (done === toAdd.length) {
+          const newPhotos = [...photos, ...results].slice(0, 5)
+          const newData = [...photosData, ...results.map(url => ({ url, cropX: 0, cropY: 0, cropScale: 1 }))].slice(0, 5)
+          onChange({ photosFond: newPhotos, photoFond: newPhotos[0] ?? '', photosData: newData, presentationStyle: 'page-unique' })
+          // Auto-ouvrir le cropper sur la première nouvelle photo
+          setCropIdx(photos.length)
+        }
+      }
+      r.readAsDataURL(f)
+    })
+    e.target.value = ''
+  }
+
+  const handleDelete = (idx: number) => {
+    const newPhotos = photos.filter((_, i) => i !== idx)
+    const newData = photosData.filter((_, i) => i !== idx)
+    onChange({ photosFond: newPhotos, photoFond: newPhotos[0] ?? '', photosData: newData })
+    if (cropIdx === idx) setCropIdx(null)
+    else if (cropIdx !== null && cropIdx > idx) setCropIdx(cropIdx - 1)
+  }
+
+  const handleCrop = (idx: number, crop: { x: number; y: number; scale: number }) => {
+    const newData = [...photosData]
+    newData[idx] = { url: photos[idx], cropX: crop.x, cropY: crop.y, cropScale: crop.scale }
+    onChange({ photosData: newData })
+    setCropIdx(null)
+  }
+
+  return (
+    <div>
+      <Label>Photos de fond (optionnel — max 5)</Label>
+      <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Utilisée en fond de la section d&apos;accueil. Recadrez chaque photo individuellement.</p>
+
+      {photos.length < 5 && (
+        <label style={{ display: 'block', cursor: 'pointer', marginBottom: photos.length > 0 ? 12 : 0 }}>
+          <div style={{ border: '2px dashed #fecdd3', borderRadius: 10, padding: 16, textAlign: 'center' }}>
+            <div style={{ fontSize: 22, marginBottom: 4 }}>📷</div>
+            <p style={{ fontSize: 13, color: '#4a3728', margin: 0 }}>Cliquer pour ajouter une photo</p>
+          </div>
+          <input type="file" accept="image/*" multiple onChange={handleUpload} style={{ display: 'none' }} />
+        </label>
+      )}
+
+      {photos.length > 0 && (
+        <div>
+          {/* Miniatures */}
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+            {photos.map((photo, idx) => {
+              const crop = photosData[idx]
+              const isCropping = cropIdx === idx
+              return (
+                <div key={idx}>
+                  <div style={{ position: 'relative', width: 80, height: 80, borderRadius: 8, overflow: 'hidden', border: isCropping ? '2px solid #C9A84C' : '2px solid transparent' }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={photo} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transform: crop ? `translate(${crop.cropX}px, ${crop.cropY}px) scale(${crop.cropScale})` : 'none', transformOrigin: 'center center' }} />
+                    <div style={{ position: 'absolute', bottom: 2, left: 2, background: 'rgba(0,0,0,0.55)', color: 'white', fontSize: 8, borderRadius: 3, padding: '1px 4px' }}>Photo {idx + 1}</div>
+                    <button type="button" onClick={() => handleDelete(idx)} style={{ ...BTN, position: 'absolute', top: 2, right: 2, background: 'white', border: 'none', borderRadius: '50%', width: 16, height: 16, fontSize: 9, color: '#fb7185', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
+                  </div>
+                  <button type="button" onClick={() => setCropIdx(isCropping ? null : idx)} style={{ ...BTN, display: 'block', width: 80, marginTop: 4, padding: '4px 0', borderRadius: 6, border: `1px solid ${isCropping ? '#C9A84C' : '#fecdd3'}`, background: isCropping ? '#fdf5e4' : 'white', color: isCropping ? '#C9A84C' : '#4a3728', fontSize: 9, fontWeight: isCropping ? 700 : 400 }}>
+                    {isCropping ? '▲ Fermer' : '✂ Recadrer'}
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* ImageCropper inline */}
+          {cropIdx !== null && photos[cropIdx] && (
+            <div style={{ background: '#fdf8f9', borderRadius: 12, padding: 16, marginBottom: 12, border: '1.5px solid #fecdd3' }}>
+              <div style={{ fontSize: 12, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Recadrage — Photo {cropIdx + 1}</div>
+              <ImageCropper src={photos[cropIdx]} onCrop={crop => handleCrop(cropIdx, crop)} />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── ImageCropper ───────────────────────────────────────────────────────────────
+
+function ImageCropper({ src, onCrop }: { src: string; onCrop: (position: { x: number; y: number; scale: number }) => void }) {
+  const [pos, setPos] = useState({ x: 0, y: 0 })
+  const [scale, setScale] = useState(1)
+  const [dragging, setDragging] = useState(false)
+  const [startPos, setStartPos] = useState({ x: 0, y: 0 })
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setDragging(true)
+    setStartPos({ x: e.clientX - pos.x, y: e.clientY - pos.y })
+  }
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!dragging) return
+    setPos({ x: e.clientX - startPos.x, y: e.clientY - startPos.y })
+  }
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setDragging(true)
+    setStartPos({ x: e.touches[0].clientX - pos.x, y: e.touches[0].clientY - pos.y })
+  }
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!dragging) return
+    e.preventDefault()
+    setPos({ x: e.touches[0].clientX - startPos.x, y: e.touches[0].clientY - startPos.y })
+  }
+
+  return (
+    <div style={{ textAlign: 'center' }}>
+      <p style={{ fontSize: 12, color: '#9ca3af', marginBottom: 8 }}>🖐️ Glisse la photo pour cadrer, utilise le slider pour zoomer</p>
+      <div style={{ width: 240, height: 320, overflow: 'hidden', border: '2px solid #C9A84C', borderRadius: 8, margin: '0 auto 12px', cursor: dragging ? 'grabbing' : 'grab', position: 'relative', userSelect: 'none' }}
+        onMouseDown={handleMouseDown} onMouseMove={handleMouseMove}
+        onMouseUp={() => setDragging(false)} onMouseLeave={() => setDragging(false)}
+        onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={() => setDragging(false)}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} alt="" style={{ position: 'absolute', transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`, transformOrigin: 'center center', maxWidth: 'none', width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none', transition: dragging ? 'none' : 'transform 0.1s ease' }} />
+        {/* Grille des tiers */}
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+          <div style={{ position: 'absolute', left: '33%', top: 0, bottom: 0, borderLeft: '1px solid rgba(255,255,255,0.3)' }} />
+          <div style={{ position: 'absolute', left: '66%', top: 0, bottom: 0, borderLeft: '1px solid rgba(255,255,255,0.3)' }} />
+          <div style={{ position: 'absolute', top: '33%', left: 0, right: 0, borderTop: '1px solid rgba(255,255,255,0.3)' }} />
+          <div style={{ position: 'absolute', top: '66%', left: 0, right: 0, borderTop: '1px solid rgba(255,255,255,0.3)' }} />
+        </div>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, maxWidth: 240, margin: '0 auto 12px' }}>
+        <span style={{ fontSize: 11, color: '#9ca3af' }}>🔍</span>
+        <input type="range" min="1" max="3" step="0.05" value={scale} onChange={e => setScale(parseFloat(e.target.value))} style={{ flex: 1 }} />
+        <span style={{ fontSize: 11, color: '#9ca3af' }}>{scale.toFixed(1)}x</span>
+      </div>
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+        <button type="button" onClick={() => { setPos({ x: 0, y: 0 }); setScale(1) }} style={{ ...BTN, padding: '8px 16px', borderRadius: 20, border: '1px solid #C9A84C', background: 'transparent', color: '#C9A84C', fontSize: 12 }}>Réinitialiser</button>
+        <button type="button" onClick={() => onCrop({ x: pos.x, y: pos.y, scale })} style={{ ...BTN, padding: '8px 16px', borderRadius: 20, background: '#C9A84C', color: 'white', border: 'none', fontSize: 12, fontWeight: 500 }}>✓ Valider le cadrage</button>
       </div>
     </div>
   )
@@ -715,89 +871,7 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         </div>
         <MusicUploader musicUrl={data.musicUrl ?? ''} musicName={data.musicName} onChange={(url, name) => onChange({ musicUrl: url, musicName: name ?? '' })} />
       </div>
-      <div>
-        <Label>Photos de fond (optionnel — max 5)</Label>
-        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Chaque cérémonie utilisera une photo différente selon son ordre</p>
-        {(data.photosFond ?? []).length < 5 && (
-          <label style={{ display: 'block', cursor: 'pointer' }}>
-            <div style={{ border: '2px dashed #fecdd3', borderRadius: 10, padding: 20, textAlign: 'center' }}>
-              <div style={{ fontSize: 24, marginBottom: 6 }}>📷</div>
-              <p style={{ fontSize: 13, color: '#4a3728' }}>Cliquer pour ajouter une photo</p>
-            </div>
-            <input type="file" accept="image/*" multiple onChange={e => {
-              const files = Array.from(e.target.files ?? [])
-              const current = data.photosFond ?? []
-              const toAdd = files.slice(0, 5 - current.length)
-              if (!toAdd.length) return
-              const results: string[] = new Array(toAdd.length)
-              let done = 0
-              toAdd.forEach((f, fi) => {
-                const r = new FileReader()
-                r.onload = ev => {
-                  results[fi] = ev.target?.result as string
-                  done++
-                  if (done === toAdd.length) {
-                    const updated = [...current, ...results].slice(0, 5)
-                    onChange({ photosFond: updated, photoFond: updated[0] ?? '', presentationStyle: 'page-unique' })
-                  }
-                }
-                r.readAsDataURL(f)
-              })
-              e.target.value = ''
-            }} style={{ display: 'none' }} />
-          </label>
-        )}
-        {(data.photosFond ?? []).length > 0 && (() => {
-          const pos = data.photoPosition ?? 'center'
-          const objPos: Record<string, string> = { top: 'center top', center: 'center center', bottom: 'center bottom', left: 'left center', right: 'right center' }
-          return (
-            <div style={{ marginTop: 12 }}>
-              {/* Miniatures */}
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
-                {(data.photosFond ?? []).map((photo, idx) => (
-                  <div key={idx} style={{ position: 'relative', width: 88, height: 72 }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: objPos[pos], borderRadius: 8 }} />
-                    <div style={{ position: 'absolute', bottom: 2, left: 2, background: 'rgba(0,0,0,0.55)', color: 'white', fontSize: 9, borderRadius: 4, padding: '1px 4px' }}>Photo {idx + 1}</div>
-                    <button type="button" onClick={() => {
-                      const updated = (data.photosFond ?? []).filter((_, i) => i !== idx)
-                      onChange({ photosFond: updated, photoFond: updated[0] ?? '' })
-                    }} style={{ ...BTN, position: 'absolute', top: 2, right: 2, background: 'white', border: 'none', borderRadius: '50%', width: 18, height: 18, fontSize: 10, color: '#fb7185', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
-                  </div>
-                ))}
-              </div>
-              {/* Aperçu recadrage */}
-              <div style={{ marginBottom: 10 }}>
-                <Label>Cadrage de la photo</Label>
-                <div style={{ position: 'relative', width: '100%', height: 130, borderRadius: 10, overflow: 'hidden', marginBottom: 10, border: '1.5px solid #fecdd3' }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={(data.photosFond ?? [])[0]} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: objPos[pos] }} />
-                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%)' }} />
-                  <div style={{ position: 'absolute', bottom: 8, left: 0, right: 0, textAlign: 'center', color: 'white', fontSize: 10, fontWeight: 600, letterSpacing: 1 }}>APERÇU</div>
-                </div>
-                <div style={{ display: 'flex', gap: 6 }}>
-                  {([
-                    { key: 'top',    label: '↑ Haut' },
-                    { key: 'center', label: '⊙ Centre' },
-                    { key: 'bottom', label: '↓ Bas' },
-                    { key: 'left',   label: '← Gauche' },
-                    { key: 'right',  label: '→ Droite' },
-                  ] as { key: FormData['photoPosition']; label: string }[]).map(opt => (
-                    <button key={opt.key} type="button" onClick={() => onChange({ photoPosition: opt.key })} style={{
-                      ...BTN, flex: 1, padding: '7px 4px', borderRadius: 8, fontSize: 10, fontWeight: pos === opt.key ? 700 : 400,
-                      border: `1.5px solid ${pos === opt.key ? '#C9A84C' : '#fecdd3'}`,
-                      background: pos === opt.key ? '#fdf5e4' : 'white',
-                      color: pos === opt.key ? '#C9A84C' : '#6a5040',
-                    }}>
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )
-        })()}
-      </div>
+      <PhotoSection data={data} onChange={onChange} />
       <div style={{ marginTop: 20 }}>
         <Label>Votre email (notifications RSVP)</Label>
         <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Recevez une notification à chaque nouvelle réponse RSVP</p>
@@ -1391,7 +1465,6 @@ function ElegantSeparator({ color, initial1, initial2 }: { color: string; initia
 
 function ElegantPage1({ data, theme }: { data: FormData; theme: ThemeObj }) {
   const photos = data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])
-  const objPos = ({ top: 'center top', center: 'center center', bottom: 'center bottom', left: 'left center', right: 'right center' } as Record<string, string>)[data.photoPosition ?? 'center'] ?? 'center center'
   const firstDate = sortByDate(data.ceremonies)[0]?.date
   const [idx, setIdx] = useState(0)
   const [visible, setVisible] = useState(true)
@@ -1412,7 +1485,7 @@ function ElegantPage1({ data, theme }: { data: FormData; theme: ThemeObj }) {
     <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', position: 'relative', height: 600 }}>
       {photos.length > 0 ? (
         /* eslint-disable-next-line @next/next/no-img-element */
-        <img src={photos[idx]} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: objPos, opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease' }} />
+        <img src={photos[idx]} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center center', transform: (() => { const c = data.photosData?.[idx]; return c ? `translate(${c.cropX}px, ${c.cropY}px) scale(${c.cropScale})` : undefined })(), transformOrigin: 'center center', opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease' }} />
       ) : (
         <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(160deg, ${theme.fond}, ${theme.accent}22)` }} />
       )}
@@ -2457,7 +2530,9 @@ const OrnementDentelleDore = ({ style = {} }: { style?: React.CSSProperties }) =
 
 // ── IntroCarousel : fond photo de la section d'accueil ────────────────────────
 
-function IntroCarousel({ photos, themeAccent, objectPosition = 'center center' }: { photos: string[]; themeAccent: string; objectPosition?: string }) {
+type CropData = { url: string; cropX: number; cropY: number; cropScale: number }
+
+function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; themeAccent: string; photosData?: CropData[] }) {
   const valid = photos.filter(p => p && p.length > 0)
   const [idx, setIdx] = useState(0)
   const [visible, setVisible] = useState(true)
@@ -2473,10 +2548,13 @@ function IntroCarousel({ photos, themeAccent, objectPosition = 'center center' }
 
   if (valid.length === 0) return null
 
+  const crop = photosData?.[idx]
+  const cropTransform = crop && crop.cropScale !== 1 ? `translate(${crop.cropX}px, ${crop.cropY}px) scale(${crop.cropScale})` : undefined
+
   return (
     <>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={valid[idx]} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition, opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease', zIndex: 0, pointerEvents: 'none' }} />
+      <img src={valid[idx]} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center center', transform: cropTransform, transformOrigin: 'center center', opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease', zIndex: 0, pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.12) 55%, rgba(0,0,0,0.0) 100%)', zIndex: 0, pointerEvents: 'none' }} />
       {valid.length > 1 && (
         <div style={{ position: 'absolute', bottom: 80, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6, zIndex: 5, pointerEvents: 'none' }}>
@@ -2542,8 +2620,8 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   const introTextColor = hasIntroPhoto ? 'rgba(255,255,255,0.95)' : G
   const fondCeremonie = data.fondCeremonie ?? 'ornements'
   const firstPhoto = data.photosFond?.[0] ?? data.photoFond ?? ''
-  const PHOTO_POS: Record<string, string> = { top: 'center top', center: 'center center', bottom: 'center bottom', left: 'left center', right: 'right center' }
-  const photoObjPos = PHOTO_POS[data.photoPosition ?? 'center'] ?? 'center center'
+  const firstCrop = data.photosData?.[0]
+  const firstCropTransform = firstCrop ? `translate(${firstCrop.cropX}px, ${firstCrop.cropY}px) scale(${firstCrop.cropScale})` : undefined
 
   const ornamentId = data.ornamentId ?? 'roses-diagonales'
   const activeOrn = ORNAMENTS.find(o => o.id === ornamentId)
@@ -2607,7 +2685,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
 
       {/* ── SECTION 1 : Écran d'accueil ────────────────────────────────────── */}
       <div style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-        <IntroCarousel photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} themeAccent={G} objectPosition={{ top: 'center top', center: 'center center', bottom: 'center bottom', left: 'left center', right: 'right center' }[data.photoPosition ?? 'center'] ?? 'center center'} />
+        <IntroCarousel photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} themeAccent={G} photosData={data.photosData} />
         <OrnImg topRight />
         <OrnImg bottomLeft />
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '0 32px', maxWidth: 480, width: '100%', margin: '0 auto' }}>
@@ -2727,7 +2805,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
               {usePhotoBg ? (
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={firstPhoto} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: photoObjPos, pointerEvents: 'none', zIndex: 0 }} />
+                  <img src={firstPhoto} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center center', transform: firstCropTransform, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 }} />
                   <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.82)', pointerEvents: 'none', zIndex: 0 }} />
                 </>
               ) : (
