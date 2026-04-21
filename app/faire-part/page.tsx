@@ -2009,7 +2009,17 @@ function AudioPlayer({ musicUrl, accent }: { musicUrl: string; accent: string })
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
-    audio.play().then(() => setStarted(true)).catch(() => setNeedsInteraction(true))
+    audio.play().then(() => setStarted(true)).catch(() => {
+      setNeedsInteraction(true)
+      // Démarre automatiquement au premier clic/touch sur la page (ex: bouton "DÉCOUVRIR")
+      const tryPlay = () => {
+        audio.play().then(() => { setStarted(true); setNeedsInteraction(false) }).catch(() => {})
+        document.removeEventListener('click', tryPlay, true)
+        document.removeEventListener('touchend', tryPlay, true)
+      }
+      document.addEventListener('click', tryPlay, true)
+      document.addEventListener('touchend', tryPlay, true)
+    })
   }, [])
 
   const toggleMute = () => {
