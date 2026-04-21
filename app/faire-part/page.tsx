@@ -679,6 +679,37 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
 }
 
 function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
+  const [analyzing, setAnalyzing] = useState(false)
+
+  async function analyzeAndAdjust() {
+    setAnalyzing(true)
+    try {
+      const frame = FRAMES.find(f => f.id === data.frameId)
+      const contentLines = [
+        data.marie1Prenom, data.marie2Prenom,
+        data.marie1Nom, data.marie2Nom,
+      ].filter(Boolean).length
+      const evenementsCount = (data.ceremonies ?? []).length
+      const res = await fetch('/api/analyze-frame', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          frameLabel: frame?.label ?? '',
+          contentLines,
+          evenementsCount,
+        }),
+      })
+      if (res.ok) {
+        const { paddingV, paddingH } = await res.json()
+        onChange({ framePaddingV: paddingV, framePaddingH: paddingH })
+      }
+    } catch {
+      // silently ignore
+    } finally {
+      setAnalyzing(false)
+    }
+  }
+
   return (
     <div>
       <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#4a3728', marginBottom: 24 }}>Style & options</h2>
@@ -821,6 +852,9 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                 </div>
               )
             })}
+            <button type="button" onClick={analyzeAndAdjust} disabled={analyzing} style={{ ...BTN, width: '100%', marginTop: 6, padding: '9px 0', borderRadius: 8, background: analyzing ? '#e8d8c8' : '#4a3728', color: '#fff', fontSize: 13, fontWeight: 600, letterSpacing: 0.3 }}>
+              {analyzing ? '⏳ Analyse en cours…' : '✨ Optimiser automatiquement'}
+            </button>
           </div>
           <div style={{ background: '#faf8f6', borderRadius: 10, padding: '14px 16px' }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: '#6b5040', marginBottom: 14, letterSpacing: 0.5 }}>✍️ Texte</div>
