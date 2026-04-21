@@ -33,34 +33,18 @@ const ORNEMENTS_LIBRARY: { id: string; url: string; nom: string }[] = [
   { id: 'none', url: '', nom: 'Sans ornement' },
 ]
 
-const FRAMES: { id: string; label: string; url: string | null; padding: { top: number; bottom: number; left: number; right: number } }[] = [
-  { id: 'frame-01', label: 'Baroque Doré Carré', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778898/40_ppuque.png', padding: { top: 100, bottom: 100, left: 90, right: 90 } },
-  { id: 'frame-02', label: 'Cadre Fleuri Violet', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778892/39_jm4xr1.png', padding: { top: 80, bottom: 80, left: 65, right: 65 } },
-  { id: 'frame-03', label: 'Blason Floral Doré', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778890/38_oqgl8d.png', padding: { top: 100, bottom: 100, left: 80, right: 80 } },
-  { id: 'frame-04', label: 'Arabesques Violettes', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778886/36_avfbex.png', padding: { top: 70, bottom: 70, left: 60, right: 60 } },
-  { id: 'frame-05', label: 'Cadre Doré Classique', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778883/35_q7ho0k.png', padding: { top: 80, bottom: 80, left: 70, right: 70 } },
-  { id: 'frame-06', label: 'Couronne Florale', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778878/34_patt7q.png', padding: { top: 90, bottom: 90, left: 75, right: 75 } },
-  { id: 'frame-07', label: 'Cadre Rose Doré', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778875/32_c0k1wu.png', padding: { top: 90, bottom: 90, left: 60, right: 60 } },
-  { id: 'frame-08', label: 'Art Nouveau Bleu', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778871/31_wkhd5e.png', padding: { top: 100, bottom: 100, left: 90, right: 90 } },
-  { id: 'frame-09', label: 'Baroque Doré Luxe', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778868/30_inltdl.png', padding: { top: 80, bottom: 80, left: 70, right: 70 } },
-  { id: 'frame-10', label: 'Cercle Fleuri Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778866/29_sv2l8b.png', padding: { top: 110, bottom: 110, left: 85, right: 85 } },
-  { id: 'frame-11', label: 'Cadre Rose Vert', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778861/28_obhp8w.png', padding: { top: 90, bottom: 90, left: 65, right: 65 } },
-  { id: 'frame-12', label: 'Cercle Champêtre', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778858/27_nfg9j1.png', padding: { top: 105, bottom: 105, left: 80, right: 80 } },
-  { id: 'frame-13', label: 'Losange Fleuri', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778856/26_f63vab.png', padding: { top: 120, bottom: 120, left: 90, right: 90 } },
-  { id: 'frame-14', label: 'Couronne Or & Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778851/25_qhmedq.png', padding: { top: 100, bottom: 100, left: 75, right: 75 } },
-  { id: 'frame-15', label: 'Hexagone Floral', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778848/24_lpzfts.png', padding: { top: 110, bottom: 110, left: 85, right: 85 } },
-  { id: 'frame-16', label: 'Cadre Fleuri Violet Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778843/23_r1h7uf.png', padding: { top: 90, bottom: 90, left: 75, right: 75 } },
-  { id: 'frame-17', label: 'Cadre Bleu Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778835/21_pyegeh.png', padding: { top: 85, bottom: 85, left: 70, right: 70 } },
-  { id: 'frame-18', label: 'Losange Cuivré', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778833/20_vgfnr3.png', padding: { top: 120, bottom: 120, left: 95, right: 95 } },
-  { id: 'frame-19', label: 'Cercle Doré Roses', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778827/19_dasahe.png', padding: { top: 110, bottom: 110, left: 85, right: 85 } },
-  { id: 'frame-20', label: 'Blason Doré Royal', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778825/18_ushe4t.png', padding: { top: 100, bottom: 100, left: 85, right: 85 } },
-  { id: 'frame-21', label: 'Cercle Élégant', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778823/17_ftrc0s.png', padding: { top: 110, bottom: 110, left: 85, right: 85 } },
-  { id: 'frame-22', label: 'Cadre Doré Floral', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778821/16_cibjrt.png', padding: { top: 80, bottom: 80, left: 70, right: 70 } },
-  { id: 'frame-23', label: 'Blason Doré Roses', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778818/15_xb7jgp.png', padding: { top: 95, bottom: 95, left: 80, right: 80 } },
-  { id: 'frame-24', label: 'Blason Bleu', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778814/13_jzp3qy.png', padding: { top: 95, bottom: 95, left: 80, right: 80 } },
-  { id: 'frame-25', label: 'Cadre Or Baroque Grand', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778811/12_zfigae.png', padding: { top: 85, bottom: 85, left: 75, right: 75 } },
-  { id: 'frame-heart', label: 'Couronne Roses Cœur', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776783658/Design_sans_titre_tzwipm.png', padding: { top: 80, bottom: 80, left: 65, right: 65 } },
-  { id: 'none', label: 'Sans cadre', url: null, padding: { top: 40, bottom: 40, left: 40, right: 40 } },
+const FRAMES: { id: string; label: string; url: string | null }[] = [
+  { id: 'frame-01', label: '🌸 Couronne Roses Roses', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785422/43_z0bjxm.png' },
+  { id: 'frame-02', label: '🤍 Roses Crème Haut/Bas', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/51_m9vx96.png' },
+  { id: 'frame-03', label: '🌺 Cadre Floral Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/53_ho1gq8.png' },
+  { id: 'frame-04', label: '💜 Cadre Violet Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785418/52_murctu.png' },
+  { id: 'frame-05', label: '💙 Fleurs Aquarelle Bleues', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785418/48_t9qh5k.png' },
+  { id: 'frame-06', label: '🌹 Cadre Géométrique Roses', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785416/50_iq0a5c.png' },
+  { id: 'frame-07', label: '🌷 Fleurs Rose Aquarelle', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785416/49_ewrr8v.png' },
+  { id: 'frame-08', label: '🌿 Cadre Vert Floral', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785416/47_vtloby.png' },
+  { id: 'frame-09', label: '🌻 Cadre Champêtre', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785415/46_g1yqw8.png' },
+  { id: 'frame-10', label: '🌸 Fleurs Roses Coins', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785414/45_roarfa.png' },
+  { id: 'none', label: '⬜ Sans cadre', url: null },
 ]
 
 const THEME_CARD_BG: Record<string, string> = {
@@ -178,8 +162,8 @@ const defaultFormData: FormData = {
   frameId: 'frame-09',
   frameOpacity: 1,
   frameSize: 100,
-  framePaddingV: 22,
-  framePaddingH: 18,
+  framePaddingV: 20,
+  framePaddingH: 16,
   textOpacity: 1,
 }
 
@@ -816,10 +800,9 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           <div style={{ background: '#faf8f6', borderRadius: 10, padding: '14px 16px', marginBottom: 10 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: '#6b5040', marginBottom: 14, letterSpacing: 0.5 }}>🖼️ Cadre</div>
             {([
-              { label: 'Opacité du cadre', key: 'frameOpacity' as const, min: 0, max: 1, step: 0.01, display: (v: number) => `${Math.round(v * 100)}%`, def: 1 },
-              { label: 'Taille du cadre', key: 'frameSize' as const, min: 50, max: 150, step: 1, display: (v: number) => `${v}%`, def: 100 },
-              { label: 'Espace haut / bas', key: 'framePaddingV' as const, min: 5, max: 35, step: 1, display: (v: number) => `${v}%`, def: 22 },
-              { label: 'Espace gauche / droite', key: 'framePaddingH' as const, min: 5, max: 30, step: 1, display: (v: number) => `${v}%`, def: 18 },
+              { label: 'Opacité du cadre', key: 'frameOpacity' as const, min: 0.1, max: 1, step: 0.05, display: (v: number) => `${Math.round(v * 100)}%`, def: 1 },
+              { label: 'Espace haut / bas', key: 'framePaddingV' as const, min: 5, max: 40, step: 1, display: (v: number) => `${v}%`, def: 20 },
+              { label: 'Espace gauche / droite', key: 'framePaddingH' as const, min: 5, max: 35, step: 1, display: (v: number) => `${v}%`, def: 16 },
             ]).map(({ label, key, min, max, step, display, def }) => {
               const val = (data[key] as number) ?? def
               const accent = THEMES[data.style].accent
@@ -847,7 +830,7 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                     <span style={{ fontSize: 12, color: '#4a3728' }}>Opacité du texte</span>
                     <span style={{ fontSize: 12, fontWeight: 700, color: accent, minWidth: 36, textAlign: 'right' }}>{Math.round(val * 100)}%</span>
                   </div>
-                  <input type="range" min={0} max={1} step={0.01} value={val}
+                  <input type="range" min={0.1} max={1} step={0.05} value={val}
                     onChange={e => onChange({ textOpacity: parseFloat(e.target.value) })}
                     style={{ width: '100%', accentColor: accent }} />
                 </div>
@@ -970,42 +953,6 @@ function MairieIllustration({ color }: { color: string }) {
 type ThemeObj = { fond: string; pageFond?: string; accent: string; texte: string; textSecondaire: string; nom: string; carteBordure?: string; dark?: boolean }
 interface CardProps { ceremony: Ceremony; data: FormData; theme: ThemeObj; isShared?: boolean; cardIdx?: number }
 
-const FRAME_BORDER_RATIO: Record<string, { h: number; v: number }> = {
-  'frame-01': { h: 0.08, v: 0.25 },
-  'frame-02': { h: 0.07, v: 0.22 },
-  'frame-03': { h: 0.09, v: 0.28 },
-  'frame-04': { h: 0.05, v: 0.18 },
-  'frame-05': { h: 0.07, v: 0.22 },
-  'frame-06': { h: 0.08, v: 0.26 },
-  'frame-07': { h: 0.07, v: 0.24 },
-  'frame-08': { h: 0.11, v: 0.28 },
-  'frame-09': { h: 0.07, v: 0.22 },
-  'frame-10': { h: 0.12, v: 0.30 },
-  'frame-11': { h: 0.07, v: 0.24 },
-  'frame-12': { h: 0.11, v: 0.28 },
-  'frame-13': { h: 0.13, v: 0.32 },
-  'frame-14': { h: 0.09, v: 0.26 },
-  'frame-15': { h: 0.11, v: 0.28 },
-  'frame-16': { h: 0.07, v: 0.22 },
-  'frame-17': { h: 0.07, v: 0.22 },
-  'frame-18': { h: 0.13, v: 0.32 },
-  'frame-19': { h: 0.11, v: 0.28 },
-  'frame-20': { h: 0.09, v: 0.26 },
-  'frame-21': { h: 0.11, v: 0.28 },
-  'frame-22': { h: 0.07, v: 0.22 },
-  'frame-23': { h: 0.09, v: 0.26 },
-  'frame-24': { h: 0.09, v: 0.26 },
-  'frame-25': { h: 0.08, v: 0.24 },
-  'frame-heart': { h: 0.18, v: 0.22 },
-  'none':     { h: 0.03, v: 0.05 },
-}
-
-function useCardPadding(frameId: string, containerWidth: number) {
-  const ratio = FRAME_BORDER_RATIO[frameId] ?? { h: 0.12, v: 0.14 }
-  const paddingH = Math.round(containerWidth * ratio.h)
-  const paddingV = Math.round(containerWidth * ratio.v)
-  return { paddingLeft: paddingH, paddingRight: paddingH, paddingTop: paddingV, paddingBottom: paddingV }
-}
 
 function OrnementCorner({ url, corner, size = 130 }: {
   url: string
