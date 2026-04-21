@@ -2996,7 +2996,14 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                 <div style={{ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 6 }}>{data.marie1Prenom}</div>
                 <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 20, color: TEXT, textAlign: 'center', marginBottom: 6, opacity: 0.65 }}>&</div>
                 <div style={{ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 18 }}>{data.marie2Prenom}</div>
-                <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginBottom: 28, opacity: 0.78 }}>Et seraient honorés de votre présence</div>
+                {ceremony.type === 'Mairie' ? (
+                  <>
+                    <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78 }}>se diront</div>
+                    <div style={{ fontFamily: FS, fontSize: 'clamp(48px,12vw,80px)', color: G, textAlign: 'center', lineHeight: 1, marginBottom: 28 }}>« Oui »</div>
+                  </>
+                ) : (
+                  <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginBottom: 28, opacity: 0.78 }}>Et seraient honorés de votre présence</div>
+                )}
               </AnimSection>
               <AnimSection delay={380}>
                 <LineSep />
@@ -3023,8 +3030,8 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                   )
                 })()}
                 {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 15, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 8, opacity: 0.8 }}>{hebrewDate}</div>}
-                {ceremony.heure && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 17, color: TEXT, textAlign: 'center', marginBottom: 18, opacity: 0.82 }}>À {formatHeure(ceremony.heure)} précises</div>}
-                {ceremony.lieu && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', lineHeight: 1.6, marginBottom: 4 }}>{formatLieu(ceremony.lieu)}</div>}
+                {ceremony.heure && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 17, color: TEXT, textAlign: 'center', marginBottom: 18, opacity: 0.82 }}>{formatHeure(ceremony.heure)} précises</div>}
+                {ceremony.lieu && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', lineHeight: 1.6, marginBottom: 4 }}>{ceremony.type === 'Mairie' ? conjonctionLieu(ceremony.lieu) : formatLieu(ceremony.lieu)}</div>}
                 {ceremony.adresse && <div style={{ fontFamily: FC, fontSize: 13, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.6, marginBottom: 20 }}>{ceremony.adresse}</div>}
                 {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
                   <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, textAlign: 'center', marginBottom: 16, borderTop: `1px solid ${G}22`, paddingTop: 14 }}>
