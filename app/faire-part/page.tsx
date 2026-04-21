@@ -2000,7 +2000,7 @@ function MusicUploader({ musicUrl, musicName, onChange }: { musicUrl: string; mu
 
 // ── AudioPlayer HTML5 ──────────────────────────────────────────────────────────
 
-function AudioPlayer({ musicUrl, accent }: { musicUrl: string; accent: string }) {
+function AudioPlayer({ musicUrl, accent, playRef }: { musicUrl: string; accent: string; playRef?: React.MutableRefObject<(() => void) | null> }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [muted, setMuted] = useState(false)
   const [started, setStarted] = useState(false)
@@ -2008,9 +2008,13 @@ function AudioPlayer({ musicUrl, accent }: { musicUrl: string; accent: string })
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
+    // Expose une fonction play() appelable directement depuis un handler de clic (iOS compatible)
+    if (playRef) {
+      playRef.current = () => { audio.play().then(() => setStarted(true)).catch(() => {}) }
+    }
     let cleanupListeners: (() => void) | null = null
     audio.play().then(() => setStarted(true)).catch(() => {
-      // Démarre automatiquement au premier clic/touch sur la page (ex: bouton "DÉCOUVRIR")
+      // Fallback : démarre au premier clic/touch sur la page
       const tryPlay = () => {
         audio.play().then(() => setStarted(true)).catch(() => {})
         document.removeEventListener('click', tryPlay, true)
@@ -2023,8 +2027,8 @@ function AudioPlayer({ musicUrl, accent }: { musicUrl: string; accent: string })
         document.removeEventListener('touchend', tryPlay, true)
       }
     })
-    return () => cleanupListeners?.()
-  }, [])
+    return () => { cleanupListeners?.(); if (playRef) playRef.current = null }
+  }, [playRef])
 
   const toggleMute = () => {
     if (!audioRef.current) return
@@ -2685,7 +2689,10 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
     return () => observer.disconnect()
   }, [])
 
+  const audioPlayRef = useRef<(() => void) | null>(null)
+
   const handleDiscover = () => {
+    audioPlayRef.current?.()  // Démarre le MP3 directement dans le handler (iOS compatible)
     onStartYoutube?.()
     setTimeout(() => contentRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
   }
@@ -2987,7 +2994,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
       </footer>
 
       {/* Musique */}
-      {data.musicUrl && <AudioPlayer musicUrl={data.musicUrl} accent={G} />}
+      {data.musicUrl && <AudioPlayer musicUrl={data.musicUrl} accent={G} playRef={audioPlayRef} />}
       {!data.musicUrl && ytIframeRef.current && (
         <button onClick={onToggleYtMute} onTouchEnd={e=>{e.preventDefault();onToggleYtMute()}}
           style={{ ...BTN, position: 'fixed', bottom: 24, right: 24, zIndex: 50, width: 44, height: 44, borderRadius: '50%', background: G, color: 'white', border: 'none', fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }}>
