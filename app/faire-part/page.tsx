@@ -2,15 +2,22 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 
-type Theme = 'floral-bleu' | 'rose-fleuri' | 'or-dentelle' | 'oriental-nuit' | 'champetre'
-type PresentationStyle = 'photo' | 'elegant'
+type Theme = 'rose-fleuri' | 'ivoire-or' | 'bleu-floral' | 'champetre' | 'blanc-gris' | 'noir-blanc' | 'chocolat' | 'bordeaux' | 'bordeaux-nuit' | 'fuchsia' | 'marine-or' | 'menthe'
+type PresentationStyle = 'page-unique' | 'cartes-scrollables' | 'cartes-separees'
 
 const THEMES: Record<Theme, ThemeObj> = {
-  'floral-bleu':   { fond: '#ffffff',  pageFond: '#f0f4fa', accent: '#2c4a7c', texte: '#1a2a4a', textSecondaire: '#4a6080', nom: 'Floral Bleu' },
-  'rose-fleuri':   { fond: '#faf6f4',  pageFond: '#f0e8ec', accent: '#c4829a', texte: '#4a2a3a', textSecondaire: '#8a5060', nom: 'Rose Fleuri' },
-  'or-dentelle':   { fond: '#fdf8f0',  pageFond: '#ede8df', accent: '#C9A84C', texte: '#2d2014', textSecondaire: '#6a5040', nom: 'Or & Dentelle' },
-  'oriental-nuit': { fond: '#0f0a1e',  pageFond: '#060410', accent: '#D4A847', texte: '#f0e6d0', textSecondaire: '#d4c0a0', nom: 'Oriental Nuit', carteBordure: '1px solid rgba(212,168,71,0.4)' },
-  'champetre':     { fond: '#f4f7f0',  pageFond: '#e5ede0', accent: '#7a9e6e', texte: '#2a3520', textSecondaire: '#4a6040', nom: 'Champêtre' },
+  'rose-fleuri':   { fond: '#faf6f4', accent: '#c4829a', texte: '#2d2d2d', textSecondaire: '#8a6070', nom: 'Rose Fleuri' },
+  'ivoire-or':     { fond: '#fdf8f0', accent: '#C9A84C', texte: '#2d2014', textSecondaire: '#6a5040', nom: 'Ivoire & Or' },
+  'bleu-floral':   { fond: '#f0f4f8', accent: '#2c4a7c', texte: '#1a2a3a', textSecondaire: '#4a6a8a', nom: 'Floral Bleu' },
+  'champetre':     { fond: '#f4f7f0', accent: '#7a9e6e', texte: '#2a3520', textSecondaire: '#5a7050', nom: 'Champêtre' },
+  'blanc-gris':    { fond: '#f8f8f8', accent: '#888888', texte: '#1a1a1a', textSecondaire: '#555555', nom: 'Blanc & Gris' },
+  'noir-blanc':    { fond: '#1a1a1a', accent: '#e0e0e0', texte: '#f0f0f0', textSecondaire: '#aaaaaa', nom: 'Noir & Blanc', dark: true },
+  'chocolat':      { fond: '#2c1a0e', accent: '#d4a574', texte: '#f5e6d0', textSecondaire: '#c0a080', nom: 'Chocolat', dark: true },
+  'bordeaux':      { fond: '#fdf8f8', accent: '#8b1a2a', texte: '#2a0808', textSecondaire: '#7a3a3a', nom: 'Bordeaux' },
+  'bordeaux-nuit': { fond: '#1a0810', accent: '#d4829a', texte: '#f5e0e5', textSecondaire: '#c09090', nom: 'Bordeaux Nuit', dark: true },
+  'fuchsia':       { fond: '#fff0f8', accent: '#d4006a', texte: '#2a0020', textSecondaire: '#8a0050', nom: 'Fuchsia' },
+  'marine-or':     { fond: '#0a1628', accent: '#C9A84C', texte: '#e8e0d0', textSecondaire: '#b0a880', nom: 'Marine & Or', dark: true },
+  'menthe':        { fond: '#f0faf5', accent: '#2a9a6a', texte: '#0a2a1a', textSecondaire: '#4a7a5a', nom: 'Menthe' },
 }
 
 const ORNAMENTS: { id: string; label: string; url: string; type: 'corner' | 'divider' }[] = [
@@ -42,10 +49,17 @@ const ORNAMENTS: { id: string; label: string; url: string; type: 'corner' | 'div
 
 const THEME_CARD_BG: Record<string, string> = {
   'rose-fleuri':   '#fff9f6',
-  'floral-bleu':   '#f8faff',
-  'or-dentelle':   '#fffdf5',
-  'champetre':     '#f8fdf6',
-  'oriental-nuit': '#0f0a1e',
+  'ivoire-or':     '#fffdf5',
+  'bleu-floral':   '#f6f9ff',
+  'champetre':     '#f6faf4',
+  'blanc-gris':    '#fafafa',
+  'noir-blanc':    '#1a1a1a',
+  'chocolat':      '#2c1a0e',
+  'bordeaux':      '#fdf5f5',
+  'bordeaux-nuit': '#1a0810',
+  'fuchsia':       '#fff5fc',
+  'marine-or':     '#0a1628',
+  'menthe':        '#f2fbf7',
 }
 
 const CEREMONY_TYPES = ['Mairie', 'Cérémonie religieuse / Houppa', 'Shabbat Hatan', 'Henné', 'Cocktail', 'Soirée', 'Boat Party', 'Autre']
@@ -129,7 +143,7 @@ const defaultFormData: FormData = {
   famille2GpPaPerePrenom: '', famille2GpPaPereNom: '', famille2GpPaMerePrenom: '', famille2GpPaMereNom: '',
   famille2GpMaPerePrenom: '', famille2GpMaPereNom: '', famille2GpMaMerePrenom: '', famille2GpMaMereNom: '',
   ceremonies: [{ ...defaultCeremony }],
-  style: 'floral-bleu', presentationStyle: 'elegant', mariageJuif: false, youtubeUrl: '', musicUrl: '', musicName: '', photoFond: '', photosFond: [], emailMaries: '', textOverrides: {},
+  style: 'rose-fleuri', presentationStyle: 'page-unique', mariageJuif: false, youtubeUrl: '', musicUrl: '', musicName: '', photoFond: '', photosFond: [], emailMaries: '', textOverrides: {},
   monogrammeStyle: 'cercle', monogrammeColor: '',
   ornamentId: 'roses-diagonales',
   fondCeremonie: 'ornements',
@@ -481,44 +495,80 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#4a3728', marginBottom: 24 }}>Style & options</h2>
 
       <div style={{ marginBottom: 24 }}>
-        <Label>Présentation</Label>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <Label>Format</Label>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
           {([
-            { key: 'elegant' as PresentationStyle, label: '✨ Style élégant', desc: 'Monogramme & calligraphie' },
-            { key: 'photo' as PresentationStyle, label: '🌿 Classique', desc: 'Mise en page épurée' },
-          ]).map(opt => (
-            <button key={opt.key} type="button" onClick={() => onChange({ presentationStyle: opt.key })} style={{
-              ...BTN,
-              padding: 16, borderRadius: 12,
-              border: `2px solid ${data.presentationStyle === opt.key ? '#C9A84C' : '#fecdd3'}`,
-              background: data.presentationStyle === opt.key ? '#fdf5e4' : 'white',
-              textAlign: 'left', position: 'relative',
-            }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: data.presentationStyle === opt.key ? '#C9A84C' : '#4a3728', marginBottom: 4 }}>{opt.label}</div>
-              <div style={{ fontSize: 11, color: '#9ca3af' }}>{opt.desc}</div>
-              {data.presentationStyle === opt.key && (
-                <div style={{ position: 'absolute', top: 8, right: 8, width: 18, height: 18, borderRadius: '50%', background: '#C9A84C', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>✓</div>
-              )}
-            </button>
-          ))}
+            {
+              key: 'page-unique' as PresentationStyle,
+              label: 'Page unique',
+              desc: 'Défilement fluide',
+              icon: (
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                  <rect x="6" y="4" width="24" height="28" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+                  <line x1="10" y1="11" x2="26" y2="11" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+                  <line x1="10" y1="15" x2="22" y2="15" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+                  <line x1="10" y1="19" x2="24" y2="19" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+                  <line x1="10" y1="23" x2="20" y2="23" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+                </svg>
+              ),
+            },
+            {
+              key: 'cartes-scrollables' as PresentationStyle,
+              label: 'Cartes scroll',
+              desc: 'Cartes enchaînées',
+              icon: (
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                  <rect x="5" y="3" width="22" height="12" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+                  <rect x="5" y="18" width="22" height="12" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+                  <line x1="30" y1="14" x2="30" y2="22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                  <polyline points="27,19 30,23 33,19" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              ),
+            },
+            {
+              key: 'cartes-separees' as PresentationStyle,
+              label: 'Cartes séparées',
+              desc: 'Une carte à la fois',
+              icon: (
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                  <rect x="4" y="6" width="20" height="24" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+                  <rect x="12" y="4" width="20" height="24" rx="2" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 2"/>
+                </svg>
+              ),
+            },
+          ]).map(opt => {
+            const sel = (data.presentationStyle ?? 'page-unique') === opt.key
+            return (
+              <button key={opt.key} type="button" onClick={() => onChange({ presentationStyle: opt.key })} style={{
+                ...BTN, padding: '12px 8px', borderRadius: 12,
+                border: `2px solid ${sel ? '#C9A84C' : '#fecdd3'}`,
+                background: sel ? '#fdf5e4' : 'white',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+              }}>
+                <div style={{ color: sel ? '#C9A84C' : '#9ca3af' }}>{opt.icon}</div>
+                <div style={{ fontSize: 10, fontWeight: sel ? 700 : 500, color: sel ? '#C9A84C' : '#4a3728', textAlign: 'center', lineHeight: 1.3 }}>{opt.label}</div>
+                <div style={{ fontSize: 9, color: '#9ca3af', textAlign: 'center' }}>{opt.desc}</div>
+              </button>
+            )
+          })}
         </div>
       </div>
 
       <Label>Style visuel</Label>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 16 }}>
         {(Object.entries(THEMES) as [Theme, ThemeObj][]).map(([key, t]) => {
           const sel = data.style === key
           return (
             <button key={key} type="button" onClick={() => onChange({ style: key })} style={{
-              ...BTN, padding: 0, borderRadius: 10,
-              border: `3px solid ${sel ? t.accent : 'transparent'}`,
-              background: 'transparent', textAlign: 'center', overflow: 'hidden',
-              boxShadow: sel ? `0 0 0 1px ${t.accent}` : '0 1px 4px rgba(0,0,0,0.10)',
+              ...BTN, padding: 0, borderRadius: 8, overflow: 'hidden',
+              border: `2px solid ${sel ? t.accent : '#e8e0d8'}`,
+              background: 'transparent', textAlign: 'center',
+              boxShadow: sel ? `0 0 0 1px ${t.accent}` : 'none',
             }}>
-              <div style={{ background: t.fond, width: '100%', height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 24, color: t.accent }}>Aa</span>
+              <div style={{ background: t.fond, width: '100%', height: 55, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: t.accent, letterSpacing: 0.5 }}>A &amp; B</span>
               </div>
-              <div style={{ padding: '6px 4px 7px', background: 'white', fontSize: 10, fontWeight: sel ? 700 : 400, color: sel ? t.accent : '#4a3728', lineHeight: 1.2 }}>
+              <div style={{ padding: '4px 2px 5px', background: sel ? t.accent : '#faf8f6', fontSize: 8, fontWeight: sel ? 700 : 400, color: sel ? 'white' : '#4a3728', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {t.nom}
               </div>
             </button>
@@ -686,7 +736,7 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                   done++
                   if (done === toAdd.length) {
                     const updated = [...current, ...results].slice(0, 5)
-                    onChange({ photosFond: updated, photoFond: updated[0] ?? '', presentationStyle: 'elegant' })
+                    onChange({ photosFond: updated, photoFond: updated[0] ?? '', presentationStyle: 'page-unique' })
                   }
                 }
                 r.readAsDataURL(f)
@@ -704,7 +754,7 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                 <div style={{ position: 'absolute', bottom: 2, left: 2, background: 'rgba(0,0,0,0.55)', color: 'white', fontSize: 9, borderRadius: 4, padding: '1px 4px' }}>Photo {idx + 1}</div>
                 <button type="button" onClick={() => {
                   const updated = (data.photosFond ?? []).filter((_, i) => i !== idx)
-                  onChange({ photosFond: updated, photoFond: updated[0] ?? '', ...(updated.length === 0 ? { presentationStyle: 'photo' } : {}) })
+                  onChange({ photosFond: updated, photoFond: updated[0] ?? '' })
                 }} style={{ ...BTN, position: 'absolute', top: 2, right: 2, background: 'white', border: 'none', borderRadius: '50%', width: 18, height: 18, fontSize: 10, color: '#fb7185', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
               </div>
             ))}
@@ -736,7 +786,7 @@ function MairieIllustration({ color }: { color: string }) {
   )
 }
 
-type ThemeObj = { fond: string; pageFond: string; accent: string; texte: string; textSecondaire: string; nom: string; carteBordure?: string }
+type ThemeObj = { fond: string; pageFond?: string; accent: string; texte: string; textSecondaire: string; nom: string; carteBordure?: string; dark?: boolean }
 interface CardProps { ceremony: Ceremony; data: FormData; theme: ThemeObj; isShared?: boolean; cardIdx?: number }
 
 function CardCornerOrnaments({ ornamentId }: { ornamentId: string }) {
@@ -859,7 +909,7 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const parents1 = fmtParentsLines(data.famille1PerePrenom, data.famille1PereNom, data.famille1MerePrenom, data.famille1MereNom)
   const parents2 = fmtParentsLines(data.famille2PerePrenom, data.famille2PereNom, data.famille2MerePrenom, data.famille2MereNom)
   const hebrewDate = getHebrewDate(ceremony.date)
-  const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
+  const isDark = !!theme.dark
   const ov = data.textOverrides ?? {}
   const ci = cardIdx ?? 0
   const titre = ov[`ceremony_${ci}_titre`] || (data.mariageJuif ? 'Houppa & Soirée' : 'Cérémonie religieuse & Soirée')
@@ -949,7 +999,7 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
 }
 
 function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
-  const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
+  const isDark = !!theme.dark
   const ov = data.textOverrides ?? {}
   const ci = cardIdx ?? 0
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
@@ -1011,7 +1061,7 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
 }
 
 function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
-  const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
+  const isDark = !!theme.dark
   const ov = data.textOverrides ?? {}
   const ci = cardIdx ?? 0
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
@@ -1062,7 +1112,7 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
 
 function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const name = ceremony.type === 'Autre' ? (ceremony.customName || 'Événement') : ceremony.type
-  const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
+  const isDark = !!theme.dark
   const ov = data.textOverrides ?? {}
   const ci = cardIdx ?? 0
   const titreDisplay = ov[`ceremony_${ci}_titre`] || name
@@ -1111,7 +1161,7 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
 }
 
 function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
-  const isDark = ['#1a0a00', '#0f1a2e', '#2d0a14'].includes(theme.fond)
+  const isDark = !!theme.dark
   const ci = cardIdx ?? 0
   const ov = data.textOverrides ?? {}
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
