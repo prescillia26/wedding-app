@@ -1125,7 +1125,7 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   return (
     <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5}>
       <div style={{ position: 'relative' }}>
-        {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
+        
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>La Houppa</div>
         <LogoOrMonogram data={data} theme={theme} />
         {data.mariageJuif && (
@@ -1207,7 +1207,7 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   return (
     <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5}>
       <div style={{ position: 'relative' }}>
-        {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
+        {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>La Mairie</div>
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}><MairieIllustration color={theme.accent} /></div>
@@ -1265,7 +1265,7 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   return (
     <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5}>
       <div style={{ position: 'relative' }}>
-        {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
+        {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>Le Henné</div>
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ textAlign: 'center', fontSize: 24, letterSpacing: '0.5em', color: theme.accent, marginBottom: 24 }}>❋ ✿ ❀</div>
@@ -1314,7 +1314,7 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   return (
     <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5}>
       <div style={{ position: 'relative' }}>
-        {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
+        {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{titreDisplay}</div>
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte, lineHeight: 1.7, marginBottom: 28 }}>
@@ -1367,8 +1367,7 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
   return (
     <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5}>
       <div style={{ position: 'relative' }}>
-        {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
-        <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>Shabbat Hatan</div>
+        {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}{data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}        <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>Shabbat Hatan</div>
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ textAlign: 'center', fontSize: 22, letterSpacing: '0.4em', color: theme.accent, marginBottom: 24 }}>✡ ✦ ✡</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, marginBottom: 24, alignItems: 'start' }}>
@@ -2975,7 +2974,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                   </div>
                 </AnimSection>
               )}
-              {(parents1.length > 0 || parents2.length > 0) && (ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Shabbat Hatan') && (
+              {(parents1.length > 0 || parents2.length > 0) && (
                 <AnimSection delay={150}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 12, textAlign: 'center' }}>
                     <div>
