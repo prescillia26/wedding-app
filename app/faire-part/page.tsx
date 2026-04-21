@@ -946,7 +946,7 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, children }: {
     <div style={{ position: 'relative', width: '100%', background: hasFrame ? '#ffffff' : themeCardBg }}>
       {hasFrame && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={frame.url!} alt="" style={{ position: 'absolute', top: '-10%', left: '-10%', width: '120%', height: '120%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: 0.35, pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
+        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', mixBlendMode: 'multiply', opacity: 0.45, pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
       )}
       <OrnementCorner url={ornUrl} corner="top-right" size={130} />
       <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
@@ -2766,7 +2766,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
         <section style={{ paddingTop: hasFrame ? frame.padding.top * frameSc : 96, paddingBottom: hasFrame ? frame.padding.bottom * frameSc : 96, paddingLeft: hasFrame ? frame.padding.left * frameSc : undefined, paddingRight: hasFrame ? frame.padding.right * frameSc : undefined, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: hasFrame ? 'hidden' : 'visible', background: hasFrame ? '#ffffff' : undefined }}>
           {hasFrame ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={frame.url!} alt="" style={{ position: 'absolute', top: '-10%', left: '-10%', width: '120%', height: '120%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: 0.35, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+            <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', mixBlendMode: 'multiply', opacity: 0.45, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
           ) : (<><OrnTL /><OrnBR /></>)}
           <div style={{ position: 'relative', zIndex: 1 }}>
           <AnimSection>
@@ -2863,7 +2863,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
             <section style={{ paddingTop: hasFrame ? frame.padding.top * frameSc : 96, paddingBottom: hasFrame ? frame.padding.bottom * frameSc : 96, paddingLeft: hasFrame ? frame.padding.left * frameSc : undefined, paddingRight: hasFrame ? frame.padding.right * frameSc : undefined, position: 'relative', overflow: hasFrame ? 'hidden' : 'visible', ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
               {hasFrame ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={frame.url!} alt="" style={{ position: 'absolute', top: '-10%', left: '-10%', width: '120%', height: '120%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: 0.35, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+                <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', mixBlendMode: 'multiply', opacity: 0.45, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
               ) : usePhotoBg ? (
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
