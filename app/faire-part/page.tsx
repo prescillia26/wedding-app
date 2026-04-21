@@ -2963,7 +2963,10 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
               )}
               <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, background: (data.textBg ?? 0.5) > 0 ? `rgba(255,255,255,${data.textBg ?? 0.5})` : undefined, borderRadius: (data.textBg ?? 0.5) > 0 ? 4 : undefined, textShadow: hasFrame ? '0 0 12px rgba(255,255,255,1), 0 0 6px rgba(255,255,255,1)' : undefined }}>
               <AnimSection>
-                <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>{title}</div>
+                {data.mariageJuif && (
+  <div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, marginBottom: 8 }}>בס״ד</div>
+)}
+<div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>{title}</div>
                 <OrnSep />
               </AnimSection>
               {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
