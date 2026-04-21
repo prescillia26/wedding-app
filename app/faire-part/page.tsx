@@ -991,7 +991,7 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
       )}
       <OrnementCorner url={ornUrl} corner="top-right" size={130} />
       <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
-      <div style={{ position: 'relative', zIndex: 10, paddingTop: `${framePaddingV}%`, paddingBottom: `${framePaddingV}%`, paddingLeft: `${framePaddingH}%`, paddingRight: `${framePaddingH}%`, textAlign: 'center', opacity: textOpacity, background: textBg > 0 ? `rgba(255,255,255,${textBg})` : undefined, borderRadius: textBg > 0 ? 4 : undefined }}>
+      <div style={{ position: 'relative', zIndex: 10, paddingTop: `${framePaddingV}%`, paddingBottom: `${framePaddingV}%`, paddingLeft: `${framePaddingH}%`, paddingRight: `${framePaddingH}%`, textAlign: 'center', opacity: textOpacity, background: textBg > 0 ? `rgba(255,255,255,${textBg})` : undefined, borderRadius: textBg > 0 ? 4 : undefined, textShadow: hasFrame ? '0 0 12px rgba(255,255,255,1), 0 0 6px rgba(255,255,255,1)' : undefined }}>
         {children}
       </div>
     </div>
@@ -2914,7 +2914,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                   {i % 2 === 0 ? <><OrnTR /><OrnBL /></> : <><OrnTL /><OrnBR /></>}
                 </>
               )}
-              <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, background: (data.textBg ?? 0) > 0 ? `rgba(255,255,255,${data.textBg})` : undefined, borderRadius: (data.textBg ?? 0) > 0 ? 4 : undefined }}>
+              <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, background: (data.textBg ?? 0) > 0 ? `rgba(255,255,255,${data.textBg})` : undefined, borderRadius: (data.textBg ?? 0) > 0 ? 4 : undefined, textShadow: hasFrame ? '0 0 12px rgba(255,255,255,1), 0 0 6px rgba(255,255,255,1)' : undefined }}>
               <AnimSection>
                 <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>{title}</div>
                 <OrnSep />
