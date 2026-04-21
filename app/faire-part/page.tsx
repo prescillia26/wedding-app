@@ -334,7 +334,6 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           <Field label="Nom" value={data.marie1Nom} onChange={v => onChange({ marie1Nom: v })} placeholder="Martin" />
         </div>
         <Field label="2ème prénom (optionnel)" value={data.marie1Prenom2} onChange={v => onChange({ marie1Prenom2: v })} placeholder="Marie" />
-        <Field label="Prénom hébreu (optionnel)" value={data.marie1PrenomHebreu ?? ''} onChange={v => onChange({ marie1PrenomHebreu: v })} placeholder="שרה" />
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '16px 0' }}>
         <div style={{ flex: 1, height: 1, background: '#fecdd3' }} />
@@ -348,7 +347,6 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           <Field label="Nom" value={data.marie2Nom} onChange={v => onChange({ marie2Nom: v })} placeholder="Dupont" />
         </div>
         <Field label="2ème prénom (optionnel)" value={data.marie2Prenom2} onChange={v => onChange({ marie2Prenom2: v })} placeholder="David" />
-        <Field label="Prénom hébreu (optionnel)" value={data.marie2PrenomHebreu ?? ''} onChange={v => onChange({ marie2PrenomHebreu: v })} placeholder="דוד" />
       </div>
     </div>
   )
@@ -777,34 +775,6 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         </div>
       </div>
 
-      {/* ── Fond des cérémonies ── */}
-      <div style={{ marginBottom: 24 }}>
-        <Label>Fond des sections cérémonies</Label>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          {([
-            { key: 'ornements' as const, label: '🌸 Ornements floraux', desc: 'Fleurs décoratives dans les coins' },
-            { key: 'photo' as const, label: '📷 Photo en fond', desc: 'Votre photo en arrière-plan' },
-          ]).map(opt => {
-            const accent = THEMES[data.style].accent
-            const sel = (data.fondCeremonie ?? 'ornements') === opt.key
-            return (
-              <button key={opt.key} type="button" onClick={() => onChange({ fondCeremonie: opt.key })} style={{
-                ...BTN, padding: 14, borderRadius: 10,
-                border: `2.5px solid ${sel ? accent : '#f0e0d0'}`,
-                background: sel ? `${accent}10` : 'white',
-                textAlign: 'left',
-                boxShadow: sel ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.08)',
-              }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: sel ? accent : '#4a3728', marginBottom: 3 }}>{opt.label}</div>
-                <div style={{ fontSize: 10, color: '#9ca3af', lineHeight: 1.3 }}>{opt.desc}</div>
-                {opt.key === 'photo' && sel && (data.photosFond?.length ?? 0) === 0 && (
-                  <div style={{ fontSize: 10, color: '#f59e0b', marginTop: 4 }}>⚠ Uploadez une photo à l&apos;étape précédente</div>
-                )}
-              </button>
-            )
-          })}
-        </div>
-      </div>
 
       {/* ── Monogramme ── */}
       <div style={{ marginBottom: 24 }}>
@@ -2622,6 +2592,15 @@ function AnimSection({ children, delay = 0, style }: { children: React.ReactNode
 
 // ── SharedPageContent : vue partagée page unique luxe ─────────────────────────
 
+function CeremonyCard({ isCard, accent, children }: { isCard: boolean; accent: string; children: React.ReactNode }) {
+  if (!isCard) return <>{children}</>
+  return (
+    <div style={{ margin: '24px 0', borderRadius: 16, overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.13)', border: `1.5px solid ${accent}22` }}>
+      {children}
+    </div>
+  )
+}
+
 interface SharedPageContentProps {
   data: FormData; theme: ThemeObj; sorted: Ceremony[]; role: string | null; lastShareId: string | null
   onRsvpOpen: () => void; onRsvpListOpen: () => void
@@ -2632,6 +2611,7 @@ interface SharedPageContentProps {
 
 function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute }: SharedPageContentProps) {
   const contentRef = useRef<HTMLDivElement>(null)
+  const [currentCeremonyIdx, setCurrentCeremonyIdx] = useState(0)
   const G = theme.accent
   const TEXT = theme.texte
   const FS = 'var(--font-great-vibes)'
@@ -2736,11 +2716,14 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
             <span style={{ color: introTextColor, fontSize: 10, opacity: 0.7 }}>◆</span>
             <div style={{ flex: 1, height: 0.5, background: introTextColor, opacity: 0.4 }} />
           </div>
-          <div style={{ fontFamily: FS, fontSize: 'clamp(30px,8vw,46px)', color: introTextColor, marginBottom: 32, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.2, textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.4)' : 'none' }}>
+          <div style={{ fontFamily: FS, fontSize: 'clamp(30px,8vw,46px)', color: introTextColor, marginBottom: 16, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.2, textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.4)' : 'none' }}>
             {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
           </div>
+          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: introTextColor, marginBottom: 36, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.35)' : 'none' }}>
+            ont le plaisir de vous convier à leur mariage
+          </div>
           <button onClick={handleDiscover} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '14px 40px', fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', boxShadow: `0 4px 20px ${G}44`, animation: 'sharedFadeIn 1s 0.7s ease forwards', opacity: 0 } as React.CSSProperties}>
-            {data.mariageJuif ? 'גלה ✦ DÉCOUVRIR' : 'DÉCOUVRIR'}
+            DÉCOUVRIR TON INVITATION
           </button>
         </div>
       </div>
@@ -2828,7 +2811,8 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
         )}
 
         {/* SECTION 4 : Cérémonies */}
-        {sorted.map((ceremony, i) => {
+        {(data.presentationStyle === 'cartes-separees' ? [sorted[currentCeremonyIdx]].filter(Boolean) : sorted).map((ceremony, i) => {
+          const realIdx = data.presentationStyle === 'cartes-separees' ? currentCeremonyIdx : i
           const typeTitle: Record<string, string> = {
             'Mairie': 'LA MAIRIE', 'Cérémonie religieuse / Houppa': data.mariageJuif ? 'LA HOUPPA' : 'LA CÉRÉMONIE',
             'Shabbat Hatan': 'SHABBAT HATAN', 'Henné': 'LE HENNÉ', 'Cocktail': 'LE COCKTAIL',
@@ -2837,9 +2821,11 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
           const title = typeTitle[ceremony.type] || (ceremony.customName?.toUpperCase() || ceremony.type.toUpperCase())
           const hebrewDate = getHebrewDate(ceremony.date)
           const usePhotoBg = fondCeremonie === 'photo' && !!firstPhoto
+          const isCard = (data.presentationStyle ?? 'page-unique') !== 'page-unique'
           return (
-            <React.Fragment key={i}>
-            <section style={{ paddingTop: 60, paddingBottom: 52, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: 'hidden' }}>
+            <React.Fragment key={realIdx}>
+            <CeremonyCard isCard={isCard} accent={G}>
+            <section style={{ paddingTop: 60, paddingBottom: 52, position: 'relative', overflow: 'hidden', ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: theme.fond }) }}>
               {usePhotoBg ? (
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -2933,10 +2919,25 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                 )}
               </AnimSection>
             </section>
-            {!isCornerOrn && i < sorted.length - 1 && <FloralDivider ornamentId={ornamentId} themeAccent={G} />}
+            </CeremonyCard>
+            {!isCard && !isCornerOrn && i < sorted.length - 1 && <FloralDivider ornamentId={ornamentId} themeAccent={G} />}
             </React.Fragment>
           )
         })}
+        {/* Navigation cartes séparées */}
+        {(data.presentationStyle === 'cartes-separees') && sorted.length > 1 && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, padding: '20px 0 8px' }}>
+            <button onClick={() => setCurrentCeremonyIdx(idx => Math.max(0, idx - 1))} disabled={currentCeremonyIdx === 0}
+              style={{ ...BTN, padding: '10px 22px', borderRadius: 9999, border: `1.5px solid ${G}`, background: currentCeremonyIdx === 0 ? '#f5f5f5' : 'white', color: currentCeremonyIdx === 0 ? '#ccc' : G, fontSize: 13, fontWeight: 600, cursor: currentCeremonyIdx === 0 ? 'not-allowed' : 'pointer' }}>
+              ← Précédent
+            </button>
+            <span style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: G, opacity: 0.7 }}>{currentCeremonyIdx + 1} / {sorted.length}</span>
+            <button onClick={() => setCurrentCeremonyIdx(idx => Math.min(sorted.length - 1, idx + 1))} disabled={currentCeremonyIdx === sorted.length - 1}
+              style={{ ...BTN, padding: '10px 22px', borderRadius: 9999, border: `1.5px solid ${G}`, background: currentCeremonyIdx === sorted.length - 1 ? '#f5f5f5' : 'white', color: currentCeremonyIdx === sorted.length - 1 ? '#ccc' : G, fontSize: 13, fontWeight: 600, cursor: currentCeremonyIdx === sorted.length - 1 ? 'not-allowed' : 'pointer' }}>
+              Suivant →
+            </button>
+          </div>
+        )}
 
         {/* SECTION 5 : RSVP (vue invité) */}
         {role === 'guest' && (
