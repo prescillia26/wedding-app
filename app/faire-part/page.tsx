@@ -144,6 +144,11 @@ interface FormData {
   marie1PrenomHebreu?: string
   marie2PrenomHebreu?: string
   frameId?: string
+  frameOpacity?: number
+  frameSize?: number
+  framePaddingV?: number
+  framePaddingH?: number
+  textOpacity?: number
 }
 
 const defaultCeremony: Ceremony = {
@@ -171,6 +176,11 @@ const defaultFormData: FormData = {
   marie1PrenomHebreu: '',
   marie2PrenomHebreu: '',
   frameId: 'frame-09',
+  frameOpacity: 1,
+  frameSize: 100,
+  framePaddingV: 22,
+  framePaddingH: 18,
+  textOpacity: 1,
 }
 
 // Propriétés mobiles partagées pour tous les boutons
@@ -799,6 +809,54 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
 
 
 
+      {/* ── Personnalisation cadre & texte ── */}
+      {(data.frameId && data.frameId !== 'none') && (
+        <div style={{ marginBottom: 24 }}>
+          <Label>Personnaliser</Label>
+          <div style={{ background: '#faf8f6', borderRadius: 10, padding: '14px 16px', marginBottom: 10 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#6b5040', marginBottom: 14, letterSpacing: 0.5 }}>🖼️ Cadre</div>
+            {([
+              { label: 'Opacité du cadre', key: 'frameOpacity' as const, min: 0, max: 1, step: 0.01, display: (v: number) => `${Math.round(v * 100)}%`, def: 1 },
+              { label: 'Taille du cadre', key: 'frameSize' as const, min: 50, max: 150, step: 1, display: (v: number) => `${v}%`, def: 100 },
+              { label: 'Espace haut / bas', key: 'framePaddingV' as const, min: 5, max: 35, step: 1, display: (v: number) => `${v}%`, def: 22 },
+              { label: 'Espace gauche / droite', key: 'framePaddingH' as const, min: 5, max: 30, step: 1, display: (v: number) => `${v}%`, def: 18 },
+            ]).map(({ label, key, min, max, step, display, def }) => {
+              const val = (data[key] as number) ?? def
+              const accent = THEMES[data.style].accent
+              return (
+                <div key={key} style={{ marginBottom: 12 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                    <span style={{ fontSize: 12, color: '#4a3728' }}>{label}</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: accent, minWidth: 36, textAlign: 'right' }}>{display(val)}</span>
+                  </div>
+                  <input type="range" min={min} max={max} step={step} value={val}
+                    onChange={e => onChange({ [key]: parseFloat(e.target.value) })}
+                    style={{ width: '100%', accentColor: accent }} />
+                </div>
+              )
+            })}
+          </div>
+          <div style={{ background: '#faf8f6', borderRadius: 10, padding: '14px 16px' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#6b5040', marginBottom: 14, letterSpacing: 0.5 }}>✍️ Texte</div>
+            {(() => {
+              const val = data.textOpacity ?? 1
+              const accent = THEMES[data.style].accent
+              return (
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                    <span style={{ fontSize: 12, color: '#4a3728' }}>Opacité du texte</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: accent, minWidth: 36, textAlign: 'right' }}>{Math.round(val * 100)}%</span>
+                  </div>
+                  <input type="range" min={0} max={1} step={0.01} value={val}
+                    onChange={e => onChange({ textOpacity: parseFloat(e.target.value) })}
+                    style={{ width: '100%', accentColor: accent }} />
+                </div>
+              )
+            })()}
+          </div>
+        </div>
+      )}
+
       {/* ── Monogramme ── */}
       <div style={{ marginBottom: 24 }}>
         <Label>Style du monogramme</Label>
@@ -967,32 +1025,23 @@ function OrnementCorner({ url, corner, size = 130 }: {
   )
 }
 
-function CardFrameWrapper({ frameId, ornamentId, themeCardBg, children }: {
-  frameId: string; ornamentId: string; themeCardBg: string; children: React.ReactNode
+function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, frameSize = 100, framePaddingV = 22, framePaddingH = 18, textOpacity = 1, children }: {
+  frameId: string; ornamentId: string; themeCardBg: string
+  frameOpacity?: number; frameSize?: number; framePaddingV?: number; framePaddingH?: number; textOpacity?: number
+  children: React.ReactNode
 }) {
   const frame = FRAMES.find(f => f.id === frameId) ?? FRAMES[FRAMES.length - 1]
   const hasFrame = !!frame.url
-  const cardRef = useRef<HTMLDivElement>(null)
-  const [containerWidth, setContainerWidth] = useState(320)
-  useEffect(() => {
-    if (!cardRef.current) return
-    const observer = new ResizeObserver(entries => {
-      for (const entry of entries) setContainerWidth(entry.contentRect.width)
-    })
-    observer.observe(cardRef.current)
-    return () => observer.disconnect()
-  }, [])
-  const padding = useCardPadding(frameId, containerWidth)
   const ornUrl = hasFrame ? '' : (ORNEMENTS_LIBRARY.find(o => o.id === ornamentId)?.url ?? '')
   return (
-    <div ref={cardRef} style={{ position: 'relative', width: '100%', margin: 0, padding: 0, background: hasFrame ? '#ffffff' : themeCardBg }}>
+    <div style={{ position: 'relative', width: '100%', margin: 0, padding: 0, background: hasFrame ? '#ffffff' : themeCardBg }}>
       {hasFrame && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: 1, pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
+        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: frameOpacity, transform: `scale(${frameSize / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
       )}
       <OrnementCorner url={ornUrl} corner="top-right" size={130} />
       <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
-      <div style={{ position: 'relative', zIndex: 10, paddingTop: padding.paddingTop, paddingBottom: padding.paddingBottom, paddingLeft: padding.paddingLeft, paddingRight: padding.paddingRight, textAlign: 'center' }}>
+      <div style={{ position: 'relative', zIndex: 10, paddingTop: `${framePaddingV}%`, paddingBottom: `${framePaddingV}%`, paddingLeft: `${framePaddingH}%`, paddingRight: `${framePaddingH}%`, textAlign: 'center', opacity: textOpacity }}>
         {children}
       </div>
     </div>
@@ -1103,7 +1152,7 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const honore = ov[`ceremony_${ci}_honore`] || 'et seront honorés de votre présence à la cérémonie religieuse qui sera célébrée le'
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'}>
+    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
@@ -1187,7 +1236,7 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const ci = cardIdx ?? 0
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'}>
+    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
@@ -1246,7 +1295,7 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const ci = cardIdx ?? 0
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'}>
+    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
@@ -1295,7 +1344,7 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const titreDisplay = ov[`ceremony_${ci}_titre`] || name
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'}>
+    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
@@ -1340,7 +1389,7 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
   const ov = data.textOverrides ?? {}
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'}>
+    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: 20, right: 48, fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl' }}>בס״ד</div>}
         <LogoOrMonogram data={data} theme={theme} />
@@ -2807,12 +2856,12 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
       <div ref={contentRef} style={{ maxWidth: 480, margin: '0 auto', padding: '0 0 80px' }}>
 
         {/* SECTION 2 : Intro */}
-        <section style={{ paddingTop: hasFrame ? framePadding.paddingTop : 96, paddingBottom: hasFrame ? framePadding.paddingBottom : 96, paddingLeft: hasFrame ? framePadding.paddingLeft : undefined, paddingRight: hasFrame ? framePadding.paddingRight : undefined, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: 'visible', background: hasFrame ? '#ffffff' : undefined }}>
+        <section style={{ paddingTop: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingBottom: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingLeft: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: 'visible', background: hasFrame ? '#ffffff' : undefined }}>
           {hasFrame ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: 1, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+            <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: data.frameOpacity ?? 1, transform: `scale(${(data.frameSize ?? 100) / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
           ) : (<><OrnTL /><OrnBR /></>)}
-          <div style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1 }}>
           <AnimSection>
             {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 14, color: G, direction: 'rtl', textAlign: 'right', marginBottom: 16 }}>בס״ד</div>}
             <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: G, textAlign: 'center', letterSpacing: 1, marginBottom: 14 }}>
@@ -2904,10 +2953,10 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
           return (
             <React.Fragment key={realIdx}>
             <CeremonyCard isCard={isCard} accent={G}>
-            <section style={{ paddingTop: hasFrame ? framePadding.paddingTop : 96, paddingBottom: hasFrame ? framePadding.paddingBottom : 96, paddingLeft: hasFrame ? framePadding.paddingLeft : undefined, paddingRight: hasFrame ? framePadding.paddingRight : undefined, position: 'relative', overflow: 'visible', ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
+            <section style={{ paddingTop: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingBottom: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingLeft: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: 'visible', ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
               {hasFrame ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: 1, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+                <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: data.frameOpacity ?? 1, transform: `scale(${(data.frameSize ?? 100) / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
               ) : usePhotoBg ? (
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -2919,7 +2968,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                   {i % 2 === 0 ? <><OrnTR /><OrnBL /></> : <><OrnTL /><OrnBR /></>}
                 </>
               )}
-              <div style={{ position: 'relative', zIndex: 1 }}>
+              <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1 }}>
               <AnimSection>
                 <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>{title}</div>
                 <OrnSep />
