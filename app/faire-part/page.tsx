@@ -1131,7 +1131,7 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
         {data.mariageJuif && (
           <div style={{ marginBottom: 24 }}>
             <div style={{ height: 1, background: theme.accent, opacity: 0.35, marginBottom: 12 }} />
-            <div style={{ fontFamily: 'serif', fontSize: 'clamp(10px, 3.5vw, 16px)', color: theme.accent, direction: 'rtl', textAlign: 'center', lineHeight: 1.9, whiteSpace: 'nowrap' }}>
+            <div style={{ fontFamily: 'serif', fontSize: 'clamp(10px, 3.5vw, 16px)', color: theme.accent, direction: 'rtl', textAlign: 'center', lineHeight: 1.9, whiteSpace: 'nowrap', background: 'rgba(255,255,255,0.75)', borderRadius: 6, padding: '4px 14px', display: 'inline-block', width: '100%', boxSizing: 'border-box' }}>
               קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה, קוֹל חָתָן וְקוֹל כַּלָּה
             </div>
             <div style={{ height: 1, background: theme.accent, opacity: 0.35, marginTop: 12 }} />
@@ -2970,7 +2970,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
               </AnimSection>
               {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
                 <AnimSection delay={100}>
-                  <div style={{ fontFamily: 'serif', fontSize: 'clamp(11px, 4vw, 20px)', color: G, direction: 'rtl', textAlign: 'center', marginBottom: 22, opacity: 0.8, whiteSpace: 'nowrap' }}>קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה</div>
+                  <div style={{ fontFamily: 'serif', fontSize: 'clamp(11px, 4vw, 20px)', color: G, direction: 'rtl', textAlign: 'center', marginBottom: 22, whiteSpace: 'nowrap', background: 'rgba(255,255,255,0.75)', borderRadius: 6, padding: '6px 16px', display: 'inline-block', width: '100%', boxSizing: 'border-box' }}>קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה</div>
                 </AnimSection>
               )}
               {(parents1.length > 0 || parents2.length > 0) && (
