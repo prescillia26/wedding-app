@@ -123,6 +123,7 @@ interface FormData {
   musicName?: string
   ornamentId?: string
   fondCeremonie?: 'ornements' | 'photo'
+  photoPosition?: 'top' | 'center' | 'bottom' | 'left' | 'right'
   marie1PrenomHebreu?: string
   marie2PrenomHebreu?: string
 }
@@ -147,6 +148,7 @@ const defaultFormData: FormData = {
   monogrammeStyle: 'cercle', monogrammeColor: '',
   ornamentId: 'roses-diagonales',
   fondCeremonie: 'ornements',
+  photoPosition: 'center',
   marie1PrenomHebreu: '',
   marie2PrenomHebreu: '',
 }
@@ -745,21 +747,56 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             }} style={{ display: 'none' }} />
           </label>
         )}
-        {(data.photosFond ?? []).length > 0 && (
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>
-            {(data.photosFond ?? []).map((photo, idx) => (
-              <div key={idx} style={{ position: 'relative', width: 88, height: 72 }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 8 }} />
-                <div style={{ position: 'absolute', bottom: 2, left: 2, background: 'rgba(0,0,0,0.55)', color: 'white', fontSize: 9, borderRadius: 4, padding: '1px 4px' }}>Photo {idx + 1}</div>
-                <button type="button" onClick={() => {
-                  const updated = (data.photosFond ?? []).filter((_, i) => i !== idx)
-                  onChange({ photosFond: updated, photoFond: updated[0] ?? '' })
-                }} style={{ ...BTN, position: 'absolute', top: 2, right: 2, background: 'white', border: 'none', borderRadius: '50%', width: 18, height: 18, fontSize: 10, color: '#fb7185', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
+        {(data.photosFond ?? []).length > 0 && (() => {
+          const pos = data.photoPosition ?? 'center'
+          const objPos: Record<string, string> = { top: 'center top', center: 'center center', bottom: 'center bottom', left: 'left center', right: 'right center' }
+          return (
+            <div style={{ marginTop: 12 }}>
+              {/* Miniatures */}
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
+                {(data.photosFond ?? []).map((photo, idx) => (
+                  <div key={idx} style={{ position: 'relative', width: 88, height: 72 }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: objPos[pos], borderRadius: 8 }} />
+                    <div style={{ position: 'absolute', bottom: 2, left: 2, background: 'rgba(0,0,0,0.55)', color: 'white', fontSize: 9, borderRadius: 4, padding: '1px 4px' }}>Photo {idx + 1}</div>
+                    <button type="button" onClick={() => {
+                      const updated = (data.photosFond ?? []).filter((_, i) => i !== idx)
+                      onChange({ photosFond: updated, photoFond: updated[0] ?? '' })
+                    }} style={{ ...BTN, position: 'absolute', top: 2, right: 2, background: 'white', border: 'none', borderRadius: '50%', width: 18, height: 18, fontSize: 10, color: '#fb7185', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        )}
+              {/* Aperçu recadrage */}
+              <div style={{ marginBottom: 10 }}>
+                <Label>Cadrage de la photo</Label>
+                <div style={{ position: 'relative', width: '100%', height: 130, borderRadius: 10, overflow: 'hidden', marginBottom: 10, border: '1.5px solid #fecdd3' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={(data.photosFond ?? [])[0]} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: objPos[pos] }} />
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%)' }} />
+                  <div style={{ position: 'absolute', bottom: 8, left: 0, right: 0, textAlign: 'center', color: 'white', fontSize: 10, fontWeight: 600, letterSpacing: 1 }}>APERÇU</div>
+                </div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  {([
+                    { key: 'top',    label: '↑ Haut' },
+                    { key: 'center', label: '⊙ Centre' },
+                    { key: 'bottom', label: '↓ Bas' },
+                    { key: 'left',   label: '← Gauche' },
+                    { key: 'right',  label: '→ Droite' },
+                  ] as { key: FormData['photoPosition']; label: string }[]).map(opt => (
+                    <button key={opt.key} type="button" onClick={() => onChange({ photoPosition: opt.key })} style={{
+                      ...BTN, flex: 1, padding: '7px 4px', borderRadius: 8, fontSize: 10, fontWeight: pos === opt.key ? 700 : 400,
+                      border: `1.5px solid ${pos === opt.key ? '#C9A84C' : '#fecdd3'}`,
+                      background: pos === opt.key ? '#fdf5e4' : 'white',
+                      color: pos === opt.key ? '#C9A84C' : '#6a5040',
+                    }}>
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )
+        })()}
       </div>
       <div style={{ marginTop: 20 }}>
         <Label>Votre email (notifications RSVP)</Label>
@@ -1354,6 +1391,7 @@ function ElegantSeparator({ color, initial1, initial2 }: { color: string; initia
 
 function ElegantPage1({ data, theme }: { data: FormData; theme: ThemeObj }) {
   const photos = data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])
+  const objPos = ({ top: 'center top', center: 'center center', bottom: 'center bottom', left: 'left center', right: 'right center' } as Record<string, string>)[data.photoPosition ?? 'center'] ?? 'center center'
   const firstDate = sortByDate(data.ceremonies)[0]?.date
   const [idx, setIdx] = useState(0)
   const [visible, setVisible] = useState(true)
@@ -1374,7 +1412,7 @@ function ElegantPage1({ data, theme }: { data: FormData; theme: ThemeObj }) {
     <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', position: 'relative', height: 600 }}>
       {photos.length > 0 ? (
         /* eslint-disable-next-line @next/next/no-img-element */
-        <img src={photos[idx]} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease' }} />
+        <img src={photos[idx]} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: objPos, opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease' }} />
       ) : (
         <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(160deg, ${theme.fond}, ${theme.accent}22)` }} />
       )}
@@ -2419,7 +2457,7 @@ const OrnementDentelleDore = ({ style = {} }: { style?: React.CSSProperties }) =
 
 // ── IntroCarousel : fond photo de la section d'accueil ────────────────────────
 
-function IntroCarousel({ photos, themeAccent }: { photos: string[]; themeAccent: string }) {
+function IntroCarousel({ photos, themeAccent, objectPosition = 'center center' }: { photos: string[]; themeAccent: string; objectPosition?: string }) {
   const valid = photos.filter(p => p && p.length > 0)
   const [idx, setIdx] = useState(0)
   const [visible, setVisible] = useState(true)
@@ -2438,8 +2476,7 @@ function IntroCarousel({ photos, themeAccent }: { photos: string[]; themeAccent:
   return (
     <>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={valid[idx]} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease', zIndex: 0, pointerEvents: 'none' }} />
-      {/* overlay dégradé : transparent en haut, sombre en bas pour lisibilité des noms */}
+      <img src={valid[idx]} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition, opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease', zIndex: 0, pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.12) 55%, rgba(0,0,0,0.0) 100%)', zIndex: 0, pointerEvents: 'none' }} />
       {valid.length > 1 && (
         <div style={{ position: 'absolute', bottom: 80, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6, zIndex: 5, pointerEvents: 'none' }}>
@@ -2505,6 +2542,8 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   const introTextColor = hasIntroPhoto ? 'rgba(255,255,255,0.95)' : G
   const fondCeremonie = data.fondCeremonie ?? 'ornements'
   const firstPhoto = data.photosFond?.[0] ?? data.photoFond ?? ''
+  const PHOTO_POS: Record<string, string> = { top: 'center top', center: 'center center', bottom: 'center bottom', left: 'left center', right: 'right center' }
+  const photoObjPos = PHOTO_POS[data.photoPosition ?? 'center'] ?? 'center center'
 
   const ornamentId = data.ornamentId ?? 'roses-diagonales'
   const activeOrn = ORNAMENTS.find(o => o.id === ornamentId)
@@ -2568,7 +2607,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
 
       {/* ── SECTION 1 : Écran d'accueil ────────────────────────────────────── */}
       <div style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-        <IntroCarousel photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} themeAccent={G} />
+        <IntroCarousel photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} themeAccent={G} objectPosition={{ top: 'center top', center: 'center center', bottom: 'center bottom', left: 'left center', right: 'right center' }[data.photoPosition ?? 'center'] ?? 'center center'} />
         <OrnImg topRight />
         <OrnImg bottomLeft />
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '0 32px', maxWidth: 480, width: '100%', margin: '0 auto' }}>
@@ -2688,7 +2727,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
               {usePhotoBg ? (
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={firstPhoto} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none', zIndex: 0 }} />
+                  <img src={firstPhoto} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: photoObjPos, pointerEvents: 'none', zIndex: 0 }} />
                   <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.82)', pointerEvents: 'none', zIndex: 0 }} />
                 </>
               ) : (
