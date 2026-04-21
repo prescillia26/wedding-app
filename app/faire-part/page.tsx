@@ -912,32 +912,32 @@ type ThemeObj = { fond: string; pageFond?: string; accent: string; texte: string
 interface CardProps { ceremony: Ceremony; data: FormData; theme: ThemeObj; isShared?: boolean; cardIdx?: number }
 
 const FRAME_BORDER_RATIO: Record<string, { h: number; v: number }> = {
-  'frame-01': { h: 0.08, v: 0.10 },
-  'frame-02': { h: 0.07, v: 0.08 },
-  'frame-03': { h: 0.09, v: 0.12 },
-  'frame-04': { h: 0.05, v: 0.07 },
-  'frame-05': { h: 0.07, v: 0.08 },
-  'frame-06': { h: 0.08, v: 0.11 },
-  'frame-07': { h: 0.07, v: 0.09 },
-  'frame-08': { h: 0.11, v: 0.12 },
-  'frame-09': { h: 0.07, v: 0.08 },
-  'frame-10': { h: 0.12, v: 0.13 },
-  'frame-11': { h: 0.07, v: 0.09 },
-  'frame-12': { h: 0.11, v: 0.12 },
-  'frame-13': { h: 0.13, v: 0.15 },
-  'frame-14': { h: 0.09, v: 0.11 },
-  'frame-15': { h: 0.11, v: 0.12 },
-  'frame-16': { h: 0.07, v: 0.08 },
-  'frame-17': { h: 0.07, v: 0.08 },
-  'frame-18': { h: 0.13, v: 0.15 },
-  'frame-19': { h: 0.11, v: 0.12 },
-  'frame-20': { h: 0.09, v: 0.11 },
-  'frame-21': { h: 0.11, v: 0.12 },
-  'frame-22': { h: 0.07, v: 0.08 },
-  'frame-23': { h: 0.09, v: 0.11 },
-  'frame-24': { h: 0.09, v: 0.11 },
-  'frame-25': { h: 0.08, v: 0.09 },
-  'none':     { h: 0.03, v: 0.03 },
+  'frame-01': { h: 0.08, v: 0.25 },
+  'frame-02': { h: 0.07, v: 0.22 },
+  'frame-03': { h: 0.09, v: 0.28 },
+  'frame-04': { h: 0.05, v: 0.18 },
+  'frame-05': { h: 0.07, v: 0.22 },
+  'frame-06': { h: 0.08, v: 0.26 },
+  'frame-07': { h: 0.07, v: 0.24 },
+  'frame-08': { h: 0.11, v: 0.28 },
+  'frame-09': { h: 0.07, v: 0.22 },
+  'frame-10': { h: 0.12, v: 0.30 },
+  'frame-11': { h: 0.07, v: 0.24 },
+  'frame-12': { h: 0.11, v: 0.28 },
+  'frame-13': { h: 0.13, v: 0.32 },
+  'frame-14': { h: 0.09, v: 0.26 },
+  'frame-15': { h: 0.11, v: 0.28 },
+  'frame-16': { h: 0.07, v: 0.22 },
+  'frame-17': { h: 0.07, v: 0.22 },
+  'frame-18': { h: 0.13, v: 0.32 },
+  'frame-19': { h: 0.11, v: 0.28 },
+  'frame-20': { h: 0.09, v: 0.26 },
+  'frame-21': { h: 0.11, v: 0.28 },
+  'frame-22': { h: 0.07, v: 0.22 },
+  'frame-23': { h: 0.09, v: 0.26 },
+  'frame-24': { h: 0.09, v: 0.26 },
+  'frame-25': { h: 0.08, v: 0.24 },
+  'none':     { h: 0.03, v: 0.05 },
 }
 
 function useCardPadding(frameId: string, containerWidth: number) {
@@ -2805,7 +2805,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
       <div ref={contentRef} style={{ maxWidth: 480, margin: '0 auto', padding: '0 0 80px' }}>
 
         {/* SECTION 2 : Intro */}
-        <section style={{ paddingTop: hasFrame ? framePadding.paddingTop : 96, paddingBottom: hasFrame ? framePadding.paddingBottom : 96, paddingLeft: hasFrame ? framePadding.paddingLeft : undefined, paddingRight: hasFrame ? framePadding.paddingRight : undefined, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: hasFrame ? 'hidden' : 'visible', background: hasFrame ? '#ffffff' : undefined }}>
+        <section style={{ paddingTop: hasFrame ? framePadding.paddingTop : 96, paddingBottom: hasFrame ? framePadding.paddingBottom : 96, paddingLeft: hasFrame ? framePadding.paddingLeft : undefined, paddingRight: hasFrame ? framePadding.paddingRight : undefined, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: 'visible', background: hasFrame ? '#ffffff' : undefined }}>
           {hasFrame ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: 1, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
@@ -2902,7 +2902,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
           return (
             <React.Fragment key={realIdx}>
             <CeremonyCard isCard={isCard} accent={G}>
-            <section style={{ paddingTop: hasFrame ? framePadding.paddingTop : 96, paddingBottom: hasFrame ? framePadding.paddingBottom : 96, paddingLeft: hasFrame ? framePadding.paddingLeft : undefined, paddingRight: hasFrame ? framePadding.paddingRight : undefined, position: 'relative', overflow: hasFrame ? 'hidden' : 'visible', ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
+            <section style={{ paddingTop: hasFrame ? framePadding.paddingTop : 96, paddingBottom: hasFrame ? framePadding.paddingBottom : 96, paddingLeft: hasFrame ? framePadding.paddingLeft : undefined, paddingRight: hasFrame ? framePadding.paddingRight : undefined, position: 'relative', overflow: 'visible', ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
               {hasFrame ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: 1, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
