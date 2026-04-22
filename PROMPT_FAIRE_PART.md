@@ -9,6 +9,7 @@ const ORNEMENTS_THEMES = {
     'https://res.cloudinary.com/dau96mui2/image/upload/v1776717314/anuj31may_1_j0pavz.jpg',
     'https://res.cloudinary.com/dau96mui2/image/upload/v1776717363/1200f225-a3cc-4f16-9e1f-1506fe39d391_rq7wsv.jpg',
     'https://res.cloudinary.com/dau96mui2/image/upload/v1776717404/9580620_dq9fdq.png',
+    
   ],
   'floral-bleu': [
     'https://res.cloudinary.com/dau96mui2/image/upload/v1776718390/16_sep_14_bzf6dr.jpg',
@@ -48,7 +49,7 @@ Supprimer tous les anciens ornements SVG.
 3. Depuis pngtree.com free PNG URLs
 
 En attendant de trouver les bonnes URLs, crée une fonction qui génère un ornement SVG VRAIMENT beau et riche pour le thème or-dentelle en imitant la dentelle avec perles de la capture d'écran Ornella & Alexandre :
-
+  
 Pour "or-dentelle", créer un SVG de dentelle avec perles :
 - Branches épaisses avec texture (stroke-width 4-6)
 - Feuilles avec nervures détaillées

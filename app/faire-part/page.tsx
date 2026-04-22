@@ -83,6 +83,17 @@ const ORNEMENTS_LIBRARY: { id: string; url: string; nom: string }[] = [
   { id: 'none', url: '', nom: 'Sans ornement' },
 ]
 
+// ── Illustrations aquarelles Canva ────────────────────────────────────────────
+
+const ILLUSTRATIONS_COUPLES = [
+  { id: 'couple-01', label: '💕 Couple classique avec voile', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878822/81_pzfb2j.png' },
+  { id: 'couple-02', label: '💕 Étreinte élégante', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878824/82_gbqs4r.png' },
+  { id: 'couple-03', label: '💕 Baiser avec bouquet', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878831/83_iw0wq9.png' },
+  { id: 'couple-04', label: '💕 Robe pailletée', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878834/88_e6oobi.png' },
+  { id: 'couple-05', label: '💕 Couple brun + brune', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878835/87_hejtki.png' },
+  { id: 'couple-06', label: '🌸 Arche florale rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878838/94_l7zjbv.png' },
+] as const
+
 const FRAMES: { id: string; label: string; url: string | null }[] = [
   { id: 'frame-02', label: '🤍 Roses Crème Haut/Bas', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/51_m9vx96.png' },
   { id: 'frame-03', label: '🌺 Cadre Floral Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/53_ho1gq8.png' },
@@ -124,6 +135,7 @@ const FRAMES: { id: string; label: string; url: string | null }[] = [
   { id: 'frame-108', label: '🌸 Floral 108', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878858/108_xvumew.png' },
   { id: 'none', label: '⬜ Sans cadre', url: null },
 ]
+
 
 const THEME_CARD_BG: Record<string, string> = {
   'rose-fleuri':   '#fff9f6',
@@ -216,6 +228,8 @@ interface FormData {
   introAnimation?: string
   slug?: string
   zoneStyles?: ZoneStyles 
+  styleAccueil?: 'photo' | 'monogramme' | 'illustration'
+  illustrationCoupleId?: string
 }
 
 const defaultCeremony: Ceremony = {
@@ -253,6 +267,8 @@ const defaultFormData: FormData = {
   introAnimation: 'enveloppe',
   slug: '',
   zoneStyles: {},
+  styleAccueil: 'photo',
+  illustrationCoupleId: '',
 }
 
 // Propriétés mobiles partagées pour tous les boutons
@@ -570,6 +586,94 @@ function Step2({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
   )
 }
 
+// ── IllustrationCoupleSelector : choix de l'illustration aquarelle ────────────
+
+function IllustrationCoupleSelector({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
+  const selected = data.illustrationCoupleId
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#4a3728', marginBottom: 12 }}>
+        🎨 Choisissez votre illustration
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+        {ILLUSTRATIONS_COUPLES.map(illu => {
+          const isSel = selected === illu.id
+          return (
+            <button
+              key={illu.id}
+              type="button"
+              onClick={() => onChange({ illustrationCoupleId: illu.id })}
+              style={{
+                ...BTN,
+                padding: 4,
+                border: isSel ? '2.5px solid #c48b9f' : '1px solid #fecdd3',
+                borderRadius: 10,
+                background: isSel ? '#fdf5e4' : 'white',
+                cursor: 'pointer',
+                position: 'relative',
+                aspectRatio: '3/4',
+                overflow: 'hidden',
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={illu.url} alt={illu.label} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              {isSel && (
+                <div style={{ position: 'absolute', top: 4, right: 4, background: '#c48b9f', color: 'white', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>✓</div>
+              )}
+            </button>
+          )
+        })}
+      </div>
+      <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 8, fontStyle: 'italic' }}>
+        Cette illustration remplacera votre monogramme sur la page d&apos;accueil du faire-part.
+      </div>
+    </div>
+  )
+}
+
+// ── StyleAccueilSelector : photo / monogramme / illustration ──────────────────
+
+function StyleAccueilSelector({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
+  const style = data.styleAccueil || 'photo'
+  const options: Array<{ id: 'photo' | 'monogramme' | 'illustration'; label: string; emoji: string }> = [
+    { id: 'photo', label: 'Photos', emoji: '📸' },
+    { id: 'monogramme', label: 'Monogramme', emoji: '✦' },
+    { id: 'illustration', label: 'Illustration', emoji: '🎨' },
+  ]
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#4a3728', marginBottom: 12 }}>
+        Style de la page d&apos;accueil
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 12 }}>
+        {options.map(opt => {
+          const isSel = style === opt.id
+          return (
+            <button
+              key={opt.id}
+              type="button"
+              onClick={() => onChange({ styleAccueil: opt.id })}
+              style={{
+                ...BTN,
+                padding: '14px 8px',
+                border: isSel ? '2.5px solid #c48b9f' : '1px solid #fecdd3',
+                borderRadius: 10,
+                background: isSel ? '#fdf5e4' : 'white',
+                fontSize: 13,
+                fontWeight: isSel ? 700 : 400,
+                color: '#4a3728',
+              }}
+            >
+              <div style={{ fontSize: 22, marginBottom: 4 }}>{opt.emoji}</div>
+              {opt.label}
+            </button>
+          )
+        })}
+      </div>
+      {style === 'illustration' && <IllustrationCoupleSelector data={data} onChange={onChange} />}
+    </div>
+  )
+}
 // ── PhotoSection : upload + recadrage interactif ──────────────────────────────
 
 function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
