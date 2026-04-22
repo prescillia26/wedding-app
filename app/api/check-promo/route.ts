@@ -11,6 +11,17 @@ interface PromoEntry {
   createdAt: string
   usedAt?: string
   usedBy?: string
+  accessCode?: string
+}
+
+const ACCESS_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+
+function generateAccessCode(): string {
+  let code = ''
+  for (let i = 0; i < 6; i++) {
+    code += ACCESS_CHARS[Math.floor(Math.random() * ACCESS_CHARS.length)]
+  }
+  return code
 }
 
 export async function POST(request: Request) {
@@ -29,26 +40,45 @@ export async function POST(request: Request) {
       return Response.json({ valid: false, reason: 'Cet email ne correspond pas à ce code promo' })
     }
 
-    if (data.usedAt) {
-      return Response.json({ valid: false, reason: 'Ce code promo a déjà été utilisé' })
+    // CAS 1 : Code déjà utilisé par cette personne → on lui redonne son accès
+    if (data.usedAt && data.accessCode) {
+      const existingAccess = await redis.get(`access:${data.accessCode}`)
+      if (existingAccess) {
+        return Response.json({
+          valid: true,
+          accessCode: data.accessCode,
+          pack: data.pack,
+          returning: true,
+        })
+      }
     }
 
-    // Marquer comme utilisé
-    await redis.set(`promo:${normalized}`, {
-      ...data,
-      usedAt: new Date().toISOString(),
-      usedBy: normalizedEmail,
-    })
+    // CAS 2/3 : Première utilisation OU accessCode expiré → on en génère un nouveau
+    const accessCode = generateAccessCode()
+    const entry = {
+      pack: data.pack || 'premium',
+      email: normalizedEmail,
+      promo: normalized,
+      date: new Date().toISOString(),
+    }
 
-    // Générer un code d'accès
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-    let accessCode = ''
-    for (let i = 0; i < 6; i++) accessCode += chars[Math.floor(Math.random() * chars.length)]
-
-    const entry = { pack: data.pack || 'premium', email: normalizedEmail, promo: normalized, date: new Date().toISOString() }
     await redis.set(`access:${accessCode}`, entry, { ex: 60 * 60 * 24 * 365 })
 
-    return Response.json({ valid: true, accessCode, pack: data.pack })
+    await redis.set(`promo:${normalized}`, {
+      ...data,
+      usedAt: data.usedAt || new Date().toISOString(),
+      usedBy: normalizedEmail,
+      accessCode,
+    })
+
+    await redis.set(`email-access:${normalizedEmail}`, accessCode, { ex: 60 * 60 * 24 * 365 })
+
+    return Response.json({
+      valid: true,
+      accessCode,
+      pack: data.pack,
+      returning: !!data.usedAt,
+    })
   } catch (err) {
     console.error('check-promo error:', err)
     return Response.json({ valid: false, reason: 'Erreur serveur' }, { status: 500 })
