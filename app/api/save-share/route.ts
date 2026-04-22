@@ -6,22 +6,27 @@ const redis = new Redis({
   token: process.env.KV_REST_API_TOKEN!,
 })
 
-const MAX_BYTES = 900_000 // 900KB — marge de sécurité sous la limite Upstash 1MB
+const MAX_BYTES = 900_000
 
 export async function POST(request: Request) {
   try {
     const data = await request.json()
-    const id = randomUUID()
+    const { fixedId, ...shareData } = data
 
-    const size = new TextEncoder().encode(JSON.stringify(data)).length
+    // Si un ID fixe existe → on réutilise le même, sinon on en crée un nouveau
+    const id = fixedId ?? randomUUID()
+
+    const size = new TextEncoder().encode(JSON.stringify(shareData)).length
     if (size > MAX_BYTES) {
-      return Response.json({ error: 'Données trop volumineuses. Veuillez réduire la taille des photos.' }, { status: 413 })
+      return Response.json({ error: 'Données trop volumineuses.' }, { status: 413 })
     }
 
-    await redis.set(id, data, { ex: 31536000 }) // 365 jours
-    if (data.emailMaries) {
-      await redis.set(`email:${id}`, data.emailMaries, { ex: 31536000 })
+    await redis.set(id, shareData, { ex: 31536000 })
+
+    if (shareData.emailMaries) {
+      await redis.set(`email:${id}`, shareData.emailMaries, { ex: 31536000 })
     }
+
     return Response.json({ id })
   } catch (err) {
     console.error('save-share error:', err)

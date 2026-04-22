@@ -3632,14 +3632,12 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
 }
 
 // ── CardsView ─────────────────────────────────────────────────────────────────
-
 function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: FormData; onEdit: () => void; onReset: () => void; isShared: boolean; role: string | null; onUpdate?: (d: Partial<FormData>) => void }) {
   const theme = THEMES[data.style]
   const sorted = sortByDate(data.ceremonies)
   const [rsvpOpen, setRsvpOpen] = useState(false)
   const [rsvpListOpen, setRsvpListOpen] = useState(false)
   const [lastShareId, setLastShareId] = useState<string | null>(null)
-
   const [ytMuted, setYtMuted] = useState(false)
   const ytIframeRef = useRef<HTMLIFrameElement | null>(null)
   const [textOverrides, setTextOverrides] = useState<Record<string, string>>({})
@@ -3649,59 +3647,10 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
   const [coupleUrl, setCoupleUrl] = useState<string | null>(null)
   const [sharing, setSharing] = useState(false)
   const [sharingStatus, setSharingStatus] = useState('')
-  const [aiOptimizing, setAiOptimizing] = useState(false)
-  const [aiDone, setAiDone] = useState(false)
-
-  const optimizeWithAI = async () => {
-    if (!onUpdate || aiOptimizing) return
-    setAiOptimizing(true)
-    setAiDone(false)
-    try {
-      const el = document.getElementById('faire-part-preview-target')
-      if (!el) return
-      const html2canvas = (await import('html2canvas')).default
-      const canvas = await html2canvas(el, {
-        useCORS: true,
-        allowTaint: false,
-        scale: 0.35,
-        height: Math.min(el.scrollHeight, 700),
-        windowHeight: Math.min(el.scrollHeight, 700),
-      })
-      const imageBase64 = canvas.toDataURL('image/jpeg', 0.75).split(',')[1]
-      const frame = FRAMES.find(f => f.id === data.frameId)
-      const res = await fetch('/api/analyze-frame', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          imageBase64,
-          frameLabel: frame?.label ?? '',
-          currentSettings: {
-            framePaddingV: data.framePaddingV ?? 35,
-            framePaddingH: data.framePaddingH ?? 16,
-            textBg: data.textBg ?? 0.5,
-            frameOpacity: data.frameOpacity ?? 1,
-          },
-        }),
-      })
-      if (res.ok) {
-        const result = await res.json()
-        const updates: Partial<FormData> = {}
-        if (typeof result.framePaddingV === 'number') updates.framePaddingV = result.framePaddingV
-        if (typeof result.framePaddingH === 'number') updates.framePaddingH = result.framePaddingH
-        if (typeof result.textBg === 'number') updates.textBg = result.textBg
-        if (typeof result.frameOpacity === 'number') updates.frameOpacity = result.frameOpacity
-        if (Object.keys(updates).length > 0) {
-          onUpdate(updates)
-          setAiDone(true)
-          setTimeout(() => setAiDone(false), 3000)
-        }
-      }
-    } catch { /* ignore */ }
-    finally { setAiOptimizing(false) }
-  }
+  const [enveloppeFinie] = useState(true)
 
   const startYoutubeMusic = useCallback((videoId: string) => {
-    if (ytIframeRef.current) return // déjà démarré
+    if (ytIframeRef.current) return
     const iframe = document.createElement('iframe')
     iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=0&enablejsapi=1`
     iframe.style.cssText = 'position:fixed;top:-9999px;width:1px;height:1px;border:none;pointer-events:none;'
@@ -3739,22 +3688,18 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
     try {
       const originalPhotos = data.photosFond ?? []
       let compressedPhotos: string[] = originalPhotos
-      // Supprimer les URLs en double dans photosData (déjà dans photosFond)
       const photosDataToSend = (data.photosData ?? []).map(({ cropX, cropY, cropScale }) => ({ cropX, cropY, cropScale }))
       const buildPayload = () => ({ ...data, photosFond: compressedPhotos, photoFond: compressedPhotos[0] ?? '', photosData: photosDataToSend })
-      const payloadSize = () => new TextEncoder().encode(JSON.stringify(buildPayload())).length
-      const LIMIT = 850_000 // marge de sécurité sous la limite Redis 900KB
-
       compressedPhotos = originalPhotos
-
       setSharingStatus('Envoi...')
       const dataToSend = buildPayload()
-
-      const res = await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataToSend) })
+      const existingId = (() => { try { return localStorage.getItem('lovit_share_id') } catch { return null } })()
+      const res = await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...dataToSend, fixedId: existingId }) })
       const json = await res.json()
       if (!json.id) throw new Error('Pas d\'id retourné : ' + JSON.stringify(json))
       const id = json.id
       setLastShareId(id)
+      try { localStorage.setItem('lovit_share_id', id) } catch { /* ignore */ }
       const base = window.location.origin + '/faire-part?share=' + id
       setGuestUrl(base + '&role=guest')
       setCoupleUrl(base + '&role=couple')
@@ -3769,10 +3714,8 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
   }
 
   if (isShared) {
-    const [enveloppeFinie, setEnveloppeFinie] = useState(true)
     return (
       <div style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
-        {!enveloppeFinie && <EnveloppeAnimation data={data} theme={theme} onDone={() => setEnveloppeFinie(true)} />}
         <SharedPageContent
           data={data}
           theme={theme}
@@ -3787,22 +3730,10 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
           onToggleYtMute={toggleYtMute}
         />
         {rsvpOpen && (
-          <RSVPModal
-            accent={theme.accent}
-            onClose={() => setRsvpOpen(false)}
-            mariee1={data.marie1Prenom}
-            mariee2={data.marie2Prenom}
-            shareId={lastShareId}
-            ceremonies={sorted}
-          />
+          <RSVPModal accent={theme.accent} onClose={() => setRsvpOpen(false)} mariee1={data.marie1Prenom} mariee2={data.marie2Prenom} shareId={lastShareId} ceremonies={sorted} />
         )}
         {rsvpListOpen && (
-          <RSVPListModal
-            accent={theme.accent}
-            onClose={() => setRsvpListOpen(false)}
-            shareId={lastShareId}
-            ceremonies={sorted}
-          />
+          <RSVPListModal accent={theme.accent} onClose={() => setRsvpListOpen(false)} shareId={lastShareId} ceremonies={sorted} />
         )}
       </div>
     )
@@ -3823,8 +3754,6 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         ytMuted={ytMuted}
         onToggleYtMute={toggleYtMute}
       />
-
-      {/* Barre fixe bas — actions créateur */}
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
         <button onClick={onEdit} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>Modifier</button>
         <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{sharing ? (sharingStatus || 'Chargement...') : '🔗 Partager'}</button>
@@ -3834,46 +3763,22 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>✏️ Texte</button>
         <button onClick={onReset} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: '1.5px solid #fecdd3', background: 'transparent', color: '#fb7185', fontSize: 13, fontWeight: 600 }}>Nouveau</button>
       </div>
-
       {rsvpOpen && (
-        <RSVPModal
-          accent={theme.accent}
-          onClose={() => setRsvpOpen(false)}
-          mariee1={data.marie1Prenom}
-          mariee2={data.marie2Prenom}
-          shareId={lastShareId}
-          ceremonies={sorted}
-        />
+        <RSVPModal accent={theme.accent} onClose={() => setRsvpOpen(false)} mariee1={data.marie1Prenom} mariee2={data.marie2Prenom} shareId={lastShareId} ceremonies={sorted} />
       )}
       {rsvpListOpen && (
-        <RSVPListModal
-          accent={theme.accent}
-          onClose={() => setRsvpListOpen(false)}
-          shareId={lastShareId}
-          ceremonies={sorted}
-        />
+        <RSVPListModal accent={theme.accent} onClose={() => setRsvpListOpen(false)} shareId={lastShareId} ceremonies={sorted} />
       )}
       {textEditOpen && (
-        <TextEditModal
-          ceremonies={sorted}
-          textOverrides={textOverrides}
-          onApply={setTextOverrides}
-          onClose={() => setTextEditOpen(false)}
-          theme={theme}
-        />
+        <TextEditModal ceremonies={sorted} textOverrides={textOverrides} onApply={setTextOverrides} onClose={() => setTextEditOpen(false)} theme={theme} />
       )}
       {shareModalOpen && guestUrl && coupleUrl && (
-        <ShareModal
-          accent={theme.accent}
-          guestUrl={guestUrl}
-          coupleUrl={coupleUrl}
-          onClose={() => setShareModalOpen(false)}
-          data={data}
-        />
+        <ShareModal accent={theme.accent} guestUrl={guestUrl} coupleUrl={coupleUrl} onClose={() => setShareModalOpen(false)} data={data} />
       )}
     </div>
   )
 }
+
 
 // ── Page principale ────────────────────────────────────────────────────────────
 
