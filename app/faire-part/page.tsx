@@ -2780,6 +2780,110 @@ interface SharedPageContentProps {
   ytIframeRef: React.RefObject<HTMLIFrameElement | null>
   ytMuted: boolean; onToggleYtMute: () => void
 }
+function EnveloppeAnimation({ data, theme, onDone }: { data: FormData; theme: ThemeObj; onDone: () => void }) {
+  const [rabatOuvert, setRabatOuvert] = useState(false)
+  const [disparait, setDisparait] = useState(false)
+
+  useEffect(() => {
+    setTimeout(() => setRabatOuvert(true), 800)
+    setTimeout(() => setDisparait(true), 2200)
+    setTimeout(() => onDone(), 2800)
+  }, [onDone])
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 9999,
+      background: theme.fond,
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      opacity: disparait ? 0 : 1,
+      transition: 'opacity 0.6s ease',
+      pointerEvents: disparait ? 'none' : 'auto',
+    }}>
+      <style>{`
+        @keyframes envOpen { from{transform:rotateX(0deg)} to{transform:rotateX(-180deg)} }
+        @keyframes contentRise { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(-20px)} }
+      `}</style>
+
+      <div style={{ position: 'relative', width: 280, perspective: 800 }}>
+        {/* Corps enveloppe */}
+        <div style={{
+          background: 'white',
+          border: `1.5px solid ${theme.accent}`,
+          borderRadius: 8,
+          height: 180,
+          overflow: 'hidden',
+          position: 'relative',
+          boxShadow: `0 8px 40px ${theme.accent}33`,
+        }}>
+          {/* Photo ou monogramme à l'intérieur */}
+          {data.photosFond?.[0] ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={data.photosFond[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }} />
+          ) : (
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <MonogramByStyle
+                initial1={(data.marie1Prenom || 'A')[0].toUpperCase()}
+                initial2={(data.marie2Prenom || 'B')[0].toUpperCase()}
+                color={theme.accent}
+                size={80}
+                style={data.monogrammeStyle || 'cercle'}
+              />
+            </div>
+          )}
+          {/* Lignes décoratives */}
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: `linear-gradient(to right, transparent, ${theme.accent}, transparent)`, opacity: 0.4 }} />
+        </div>
+
+        {/* Rabat supérieur qui s'ouvre */}
+        <div style={{
+          position: 'absolute',
+          top: 0, left: 0, right: 0,
+          height: 90,
+          transformOrigin: 'top center',
+          transform: rabatOuvert ? 'rotateX(-180deg)' : 'rotateX(0deg)',
+          transition: 'transform 0.9s cubic-bezier(0.22,1,0.36,1)',
+          zIndex: 10,
+          background: 'white',
+          border: `1.5px solid ${theme.accent}`,
+          borderRadius: '8px 8px 0 0',
+          clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
+          boxShadow: `0 4px 20px ${theme.accent}22`,
+        }} />
+
+        {/* Contenu qui monte quand le rabat s'ouvre */}
+        {rabatOuvert && (
+          <div style={{
+            position: 'absolute',
+            top: -60, left: 0, right: 0,
+            textAlign: 'center',
+            animation: 'contentRise 0.8s ease 0.3s forwards',
+            opacity: 0,
+            zIndex: 5,
+          }}>
+            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 28, color: theme.accent }}>
+              {data.marie1Prenom} & {data.marie2Prenom}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Message en bas */}
+      <div style={{
+        marginTop: 40,
+        fontFamily: 'var(--font-cormorant-garamond)',
+        fontStyle: 'italic',
+        fontSize: 16,
+        color: theme.accent,
+        opacity: rabatOuvert ? 1 : 0,
+        transform: rabatOuvert ? 'translateY(0)' : 'translateY(10px)',
+        transition: 'opacity 0.6s ease 0.5s, transform 0.6s ease 0.5s',
+        letterSpacing: 1,
+      }}>
+        Votre invitation vous attend...
+      </div>
+    </div>
+  )
+}
 function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute }: SharedPageContentProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const [currentCeremonyIdx, setCurrentCeremonyIdx] = useState(0)
@@ -3332,8 +3436,10 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
   }
 
   if (isShared) {
+    const [enveloppeFinie, setEnveloppeFinie] = useState(false)
     return (
       <div style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
+        {!enveloppeFinie && <EnveloppeAnimation data={data} theme={theme} onDone={() => setEnveloppeFinie(true)} />}
         <SharedPageContent
           data={data}
           theme={theme}
