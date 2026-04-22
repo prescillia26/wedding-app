@@ -2843,10 +2843,12 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   const audioPlayRef = useRef<(() => void) | null>(null)
 
   const handleDiscover = () => {
-    audioPlayRef.current?.()
-    onStartYoutube?.()
-    setTimeout(() => contentRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
-  }
+  audioPlayRef.current?.()
+  onStartYoutube?.()
+  setTimeout(() => {
+    window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })
+  }, 50)
+}
 
   return (
     <div style={{ backgroundColor: theme.fond, color: TEXT, minHeight: '100vh' }}>
