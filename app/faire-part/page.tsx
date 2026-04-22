@@ -2737,20 +2737,36 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
 }
 
 // ── AnimSection : fade-in au scroll ───────────────────────────────────────────
-
-function AnimSection({ children, delay = 0, style }: { children: React.ReactNode; delay?: number; style?: React.CSSProperties }) {
+function AnimSection({ children, delay = 0, style, animStyle = 'slide-up' }: { 
+  children: React.ReactNode; delay?: number; style?: React.CSSProperties; animStyle?: string 
+}) {
   const ref = useRef<HTMLDivElement>(null)
+  const getTransform = () => {
+    switch(animStyle) {
+      case 'fade':         return 'none'
+      case 'slide-up':    return 'translateY(40px)'
+      case 'slide-down':  return 'translateY(-40px)'
+      case 'slide-left':  return 'translateX(40px)'
+      case 'slide-right': return 'translateX(-40px)'
+      case 'zoom':        return 'scale(0.85)'
+      default:            return 'translateY(40px)'
+    }
+  }
   useEffect(() => {
     const el = ref.current
     if (!el) return
     const obs = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; obs.disconnect() }
+      if (entries[0].isIntersecting) {
+        el.style.opacity = '1'
+        el.style.transform = 'none'
+        obs.disconnect()
+      }
     }, { threshold: 0.12 })
     obs.observe(el)
     return () => obs.disconnect()
   }, [])
   return (
-    <div ref={ref} style={{ opacity: 0, transform: 'translateY(40px)', transition: `opacity 0.9s ease ${delay}ms, transform 0.9s ease ${delay}ms`, ...style }}>
+    <div ref={ref} style={{ opacity: 0, transform: getTransform(), transition: `opacity 0.9s ease ${delay}ms, transform 0.9s ease ${delay}ms`, ...style }}>
       {children}
     </div>
   )
@@ -2774,7 +2790,6 @@ interface SharedPageContentProps {
   ytIframeRef: React.RefObject<HTMLIFrameElement | null>
   ytMuted: boolean; onToggleYtMute: () => void
 }
-
 function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute }: SharedPageContentProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const [currentCeremonyIdx, setCurrentCeremonyIdx] = useState(0)
@@ -2808,11 +2823,12 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   const ornUrl = ORNEMENTS_LIBRARY.find(o => o.id === (data.ornamentId ?? 'none'))?.url ?? ''
   const frame = FRAMES.find(f => f.id === (data.frameId ?? 'frame-09')) ?? FRAMES[FRAMES.length - 1]
   const hasFrame = !!frame.url
-  // Taille 85px : les sections ont paddingTop/Bottom ≥ 96px → ornements dans la zone de padding, jamais sur le texte
   const OrnTR = () => <OrnementCorner url={ornUrl} corner="top-right" size={85} />
   const OrnBL = () => <OrnementCorner url={ornUrl} corner="bottom-left" size={85} />
   const OrnTL = () => <OrnementCorner url={ornUrl} corner="top-left" size={85} />
   const OrnBR = () => <OrnementCorner url={ornUrl} corner="bottom-right" size={85} />
+
+  const anim = data.animationStyle || 'slide-up'
 
   const OrnSep = () => (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', margin: '0 auto 24px', maxWidth: 160 }}>
@@ -2829,39 +2845,6 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
     </div>
   )
 
-  const getScrollTransform = () => {
-  switch(data.animationStyle || 'slide-up') {
-    case 'fade':         return 'none'
-    case 'slide-up':    return 'translateY(60px)'
-    case 'slide-down':  return 'translateY(-60px)'
-    case 'slide-left':  return 'translateX(60px)'
-    case 'slide-right': return 'translateX(-60px)'
-    case 'zoom':        return 'scale(0.8)'
-    default:            return 'translateY(60px)'
-  }
-}
-const scrollStyle: React.CSSProperties = {
-  opacity: 0,
-  transform: getScrollTransform(),
-  transition: 'opacity 0.9s ease, transform 0.9s ease',
-}
-useEffect(() => {
-  const elements = document.querySelectorAll('.scroll-animate')
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry, index) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => {
-          const el = entry.target as HTMLElement
-          el.style.opacity = '1'
-          el.style.transform = 'none'
-          el.style.transition = 'opacity 0.9s ease, transform 0.9s ease'
-        }, index * 100)
-      }
-    })
-  }, { threshold: 0.1 })
-  elements.forEach(el => observer.observe(el))
-  return () => observer.disconnect()
-}, [data.animationStyle])
   useEffect(() => {
     if (!contentRef.current) return
     const observer = new ResizeObserver(entries => {
@@ -2874,7 +2857,7 @@ useEffect(() => {
   const audioPlayRef = useRef<(() => void) | null>(null)
 
   const handleDiscover = () => {
-    audioPlayRef.current?.()  // Démarre le MP3 directement dans le handler (iOS compatible)
+    audioPlayRef.current?.()
     onStartYoutube?.()
     setTimeout(() => contentRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
   }
@@ -2883,7 +2866,7 @@ useEffect(() => {
     <div style={{ backgroundColor: theme.fond, color: TEXT, minHeight: '100vh' }}>
       <style>{`@keyframes sharedFadeIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}`}</style>
 
-      {/* ── SECTION 1 : Écran d'accueil ────────────────────────────────────── */}
+      {/* SECTION 1 : Écran d'accueil */}
       <div style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
         <IntroCarousel photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} themeAccent={G} photosData={data.photosData} />
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '0 32px', maxWidth: 480, width: '100%', margin: '0 auto' }}>
@@ -2908,84 +2891,84 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* ── CONTENU PRINCIPAL ──────────────────────────────────────────────── */}
+      {/* CONTENU PRINCIPAL */}
       <div ref={contentRef} style={{ maxWidth: 480, margin: '0 auto', padding: '0 0 80px' }}>
 
         {/* SECTION 2 : Intro */}
         <section style={{ paddingTop: 96, paddingBottom: 96, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: 'visible' }}>
           {!hasFrame && <><OrnTL /><OrnBR /></>}
           <div style={{ position: 'relative', zIndex: 1 }}>
-          <AnimSection>
-            {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 14, color: G, direction: 'rtl', textAlign: 'right', marginBottom: 16 }}>בס״ד</div>}
-            <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: G, textAlign: 'center', letterSpacing: 1, marginBottom: 14 }}>
-              Le Mariage de
-            </div>
-            <LineSep />
-          </AnimSection>
-          <AnimSection delay={150}>
-  <style>{`@keyframes prenomAppear{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}`}</style>
-  <div className="scroll-animate" style={{ ...scrollStyle, position: 'relative', textAlign: 'center', marginBottom: 8 }}>
-    {data.marie1PrenomHebreu && (
-      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'serif', fontSize: 'clamp(44px,11vw,70px)', color: G, direction: 'rtl', opacity: 0.12, zIndex: 0, pointerEvents: 'none', userSelect: 'none' }}>
-        {data.marie1PrenomHebreu}
-      </div>
-    )}
-    <div style={{ fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, lineHeight: 1.1, position: 'relative', zIndex: 1, opacity: 0, animation: 'prenomAppear 1.2s ease 0.3s forwards' }}>
-      {data.marie1Prenom || 'Prénom'}
-    </div>
-  </div>
-  <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FC, fontStyle: 'italic', fontSize: 24, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.7 }}>&</div>
-  <div className="scroll-animate" style={{ ...scrollStyle, position: 'relative', textAlign: 'center', marginBottom: 24 }}>
-    {data.marie2PrenomHebreu && (
-      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'serif', fontSize: 'clamp(44px,11vw,70px)', color: G, direction: 'rtl', opacity: 0.12, zIndex: 0, pointerEvents: 'none', userSelect: 'none' }}>
-        {data.marie2PrenomHebreu}
-      </div>
-    )}
-    <div style={{ fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, lineHeight: 1.1, position: 'relative', zIndex: 1, opacity: 0, animation: 'prenomAppear 1.2s ease 0.7s forwards' }}>
-      {data.marie2Prenom || 'Prénom'}
-    </div>
-  </div>
-  {data.mariageJuif && (data.marie1Prenom2 || data.marie2Prenom2) && (
-    <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 16 }}>
-      {data.marie1Prenom2 && <div style={{ fontFamily: 'serif', fontSize: 22, color: G, direction: 'rtl' }}>{data.marie1Prenom2}</div>}
-      {data.marie2Prenom2 && <div style={{ fontFamily: 'serif', fontSize: 22, color: G, direction: 'rtl' }}>{data.marie2Prenom2}</div>}
-    </div>
-  )}
-</AnimSection>
-          {(parents1.length > 0 || parents2.length > 0) && (
-            <AnimSection delay={300}>
-              <OrnSep />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 16, textAlign: 'center' }}>
-                <div>
-                  {parents1.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}
-                  {gpPa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpPa1}</div>}
-                  {gpMa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpMa1}</div>}
-                </div>
-                <div>
-                  {parents2.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}
-                  {gpPa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpPa2}</div>}
-                  {gpMa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpMa2}</div>}
-                </div>
+            <AnimSection animStyle={anim}>
+              {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 14, color: G, direction: 'rtl', textAlign: 'right', marginBottom: 16 }}>בס״ד</div>}
+              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: G, textAlign: 'center', letterSpacing: 1, marginBottom: 14 }}>
+                Le Mariage de
               </div>
-              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, textAlign: 'center', lineHeight: 1.9, opacity: 0.85 }}>
-                {hasGp ? 'ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'ont la joie de vous faire part du mariage de leurs enfants'}
-              </div>
+              <LineSep />
             </AnimSection>
-          )}
+            <AnimSection animStyle={anim} delay={150}>
+              <style>{`@keyframes prenomAppear{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}`}</style>
+              <div style={{ position: 'relative', textAlign: 'center', marginBottom: 8 }}>
+                {data.marie1PrenomHebreu && (
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'serif', fontSize: 'clamp(44px,11vw,70px)', color: G, direction: 'rtl', opacity: 0.12, zIndex: 0, pointerEvents: 'none', userSelect: 'none' }}>
+                    {data.marie1PrenomHebreu}
+                  </div>
+                )}
+                <div style={{ fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, lineHeight: 1.1, position: 'relative', zIndex: 1, opacity: 0, animation: 'prenomAppear 1.2s ease 0.3s forwards' }}>
+                  {data.marie1Prenom || 'Prénom'}
+                </div>
+              </div>
+              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 24, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.7 }}>&</div>
+              <div style={{ position: 'relative', textAlign: 'center', marginBottom: 24 }}>
+                {data.marie2PrenomHebreu && (
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'serif', fontSize: 'clamp(44px,11vw,70px)', color: G, direction: 'rtl', opacity: 0.12, zIndex: 0, pointerEvents: 'none', userSelect: 'none' }}>
+                    {data.marie2PrenomHebreu}
+                  </div>
+                )}
+                <div style={{ fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, lineHeight: 1.1, position: 'relative', zIndex: 1, opacity: 0, animation: 'prenomAppear 1.2s ease 0.7s forwards' }}>
+                  {data.marie2Prenom || 'Prénom'}
+                </div>
+              </div>
+              {data.mariageJuif && (data.marie1Prenom2 || data.marie2Prenom2) && (
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 16 }}>
+                  {data.marie1Prenom2 && <div style={{ fontFamily: 'serif', fontSize: 22, color: G, direction: 'rtl' }}>{data.marie1Prenom2}</div>}
+                  {data.marie2Prenom2 && <div style={{ fontFamily: 'serif', fontSize: 22, color: G, direction: 'rtl' }}>{data.marie2Prenom2}</div>}
+                </div>
+              )}
+            </AnimSection>
+            {(parents1.length > 0 || parents2.length > 0) && (
+              <AnimSection animStyle={anim} delay={300}>
+                <OrnSep />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 16, textAlign: 'center' }}>
+                  <div>
+                    {parents1.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}
+                    {gpPa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpPa1}</div>}
+                    {gpMa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpMa1}</div>}
+                  </div>
+                  <div>
+                    {parents2.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}
+                    {gpPa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpPa2}</div>}
+                    {gpMa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpMa2}</div>}
+                  </div>
+                </div>
+                <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, textAlign: 'center', lineHeight: 1.9, opacity: 0.85 }}>
+                  {hasGp ? 'ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'ont la joie de vous faire part du mariage de leurs enfants'}
+                </div>
+              </AnimSection>
+            )}
           </div>
         </section>
 
         {/* SECTION 3 : Compte à rebours */}
         {firstDate && (
           <section style={{ paddingTop: 56, paddingBottom: 48, textAlign: 'center', borderBottom: `1px solid ${G}1a`, position: 'relative' }}>
-            <AnimSection>
+            <AnimSection animStyle={anim}>
               <div style={{ fontFamily: FP, fontSize: 11, letterSpacing: 4, textTransform: 'uppercase', color: G, marginBottom: 6 }}>PRÉPAREZ-VOUS !</div>
               <div style={{ fontSize: 22, marginBottom: 24 }}>💍</div>
             </AnimSection>
-            <AnimSection delay={150}>
+            <AnimSection animStyle={anim} delay={150}>
               <Countdown targetDate={firstDate} accent={G} />
             </AnimSection>
-            <AnimSection delay={300}>
+            <AnimSection animStyle={anim} delay={300}>
               <div style={{ marginTop: 28, fontSize: 18, color: G, opacity: 0.45, animation: 'sharedBounce 1.5s infinite ease-in-out' }}>↓</div>
               <style>{`@keyframes sharedBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}`}</style>
             </AnimSection>
@@ -3006,122 +2989,123 @@ useEffect(() => {
           const isCard = (data.presentationStyle ?? 'page-unique') !== 'page-unique'
           return (
             <React.Fragment key={realIdx}>
-            <CeremonyCard isCard={isCard} accent={G}>
-            <section style={{ paddingTop: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingBottom: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingLeft: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: 'visible', ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
-              {hasFrame ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: data.frameOpacity ?? 1, transform: `scale(${(data.frameSize ?? 100) / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
-              ) : usePhotoBg ? (
-                <>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={firstPhoto} alt="" style={{ position: 'absolute', top: '50%', left: '50%', transform: firstCropTransform, transformOrigin: 'center center', minWidth: '100%', minHeight: '100%', width: 'auto', height: 'auto', pointerEvents: 'none', zIndex: 0 }} />
-                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.82)', pointerEvents: 'none', zIndex: 0 }} />
-                </>
-              ) : (
-                <>
-                  {i % 2 === 0 ? <><OrnTR /><OrnBL /></> : <><OrnTL /><OrnBR /></>}
-                </>
-              )}
-              <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, background: (data.textBg ?? 0.5) > 0 ? `rgba(255,255,255,${data.textBg ?? 0.5})` : undefined, borderRadius: (data.textBg ?? 0.5) > 0 ? 4 : undefined, textShadow: hasFrame ? '0 0 12px rgba(255,255,255,1), 0 0 6px rgba(255,255,255,1)' : undefined }}>
-              <AnimSection>
-                {data.mariageJuif && (
-  <div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, marginBottom: 8 }}>בס״ד</div>
-)}
-<div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>{title}</div>
-                <OrnSep />
-              </AnimSection>
-              {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
-                <AnimSection delay={100}>
-                  <div style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 8, padding: '10px 20px', marginBottom: 22, overflow: 'hidden' }}>
-                    <div style={{ fontFamily: 'serif', fontSize: 'clamp(10px, 3.2vw, 17px)', color: G, direction: 'rtl', textAlign: 'center', whiteSpace: 'nowrap', lineHeight: 1.9 }}>קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה</div>
+              <CeremonyCard isCard={isCard} accent={G}>
+                <section style={{ paddingTop: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingBottom: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingLeft: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: 'visible', ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
+                  {hasFrame ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: data.frameOpacity ?? 1, transform: `scale(${(data.frameSize ?? 100) / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+                  ) : usePhotoBg ? (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={firstPhoto} alt="" style={{ position: 'absolute', top: '50%', left: '50%', transform: firstCropTransform, transformOrigin: 'center center', minWidth: '100%', minHeight: '100%', width: 'auto', height: 'auto', pointerEvents: 'none', zIndex: 0 }} />
+                      <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.82)', pointerEvents: 'none', zIndex: 0 }} />
+                    </>
+                  ) : (
+                    <>
+                      {i % 2 === 0 ? <><OrnTR /><OrnBL /></> : <><OrnTL /><OrnBR /></>}
+                    </>
+                  )}
+                  <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, background: (data.textBg ?? 0.5) > 0 ? `rgba(255,255,255,${data.textBg ?? 0.5})` : undefined, borderRadius: (data.textBg ?? 0.5) > 0 ? 4 : undefined, textShadow: hasFrame ? '0 0 12px rgba(255,255,255,1), 0 0 6px rgba(255,255,255,1)' : undefined }}>
+                    <AnimSection animStyle={anim}>
+                      {data.mariageJuif && (
+                        <div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, marginBottom: 8 }}>בס״ד</div>
+                      )}
+                      <div style={{ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>{title}</div>
+                      <OrnSep />
+                    </AnimSection>
+                    {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
+                      <AnimSection animStyle={anim} delay={100}>
+                        <div style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 8, padding: '10px 20px', marginBottom: 22, overflow: 'hidden' }}>
+                          <div style={{ fontFamily: 'serif', fontSize: 'clamp(10px, 3.2vw, 17px)', color: G, direction: 'rtl', textAlign: 'center', whiteSpace: 'nowrap', lineHeight: 1.9 }}>קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה</div>
+                        </div>
+                      </AnimSection>
+                    )}
+                    {(parents1.length > 0 || parents2.length > 0) && (
+                      <AnimSection animStyle={anim} delay={150}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 12, textAlign: 'center' }}>
+                          <div>
+                            {parents1.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}
+                            {gpPa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 11, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpPa1}</div>}
+                            {gpMa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 11, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpMa1}</div>}
+                          </div>
+                          <div>
+                            {parents2.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}
+                            {gpPa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 11, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpPa2}</div>}
+                            {gpMa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 11, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpMa2}</div>}
+                          </div>
+                        </div>
+                        <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 24, lineHeight: 1.9, opacity: 0.82 }}>
+                          {hasGp ? 'ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'ont la joie de vous faire part du mariage de leurs enfants'}
+                        </div>
+                      </AnimSection>
+                    )}
+                    <AnimSection animStyle={anim} delay={250}>
+                      <div style={{ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 6 }}>{data.marie1Prenom}</div>
+                      <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 20, color: TEXT, textAlign: 'center', marginBottom: 6, opacity: 0.65 }}>&</div>
+                      <div style={{ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 18 }}>{data.marie2Prenom}</div>
+                      {ceremony.type === 'Mairie' ? (
+                        <>
+                          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78 }}>se diront</div>
+                          <div style={{ fontFamily: FS, fontSize: 'clamp(48px,12vw,80px)', color: G, textAlign: 'center', lineHeight: 1, marginBottom: 28 }}>« Oui »</div>
+                        </>
+                      ) : (
+                        <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginBottom: 28, opacity: 0.78 }}>Et seraient honorés de votre présence</div>
+                      )}
+                    </AnimSection>
+                    <AnimSection animStyle={anim} delay={380}>
+                      <LineSep />
+                      {ceremony.date && (() => {
+                        const d = new Date(ceremony.date + 'T12:00:00')
+                        const parts = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).formatToParts(d)
+                        const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+                        const jourSemaine = cap(parts.find(p => p.type === 'weekday')?.value || '')
+                        const jour = parts.find(p => p.type === 'day')?.value || ''
+                        const mois = cap(parts.find(p => p.type === 'month')?.value || '')
+                        const annee = parts.find(p => p.type === 'year')?.value || ''
+                        return (
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, margin: '24px 0' }}>
+                            <div style={{ textAlign: 'right' }}>
+                              <div style={{ borderBottom: `1px solid ${G}`, paddingBottom: 4, marginBottom: 4, letterSpacing: 3, fontSize: 11, color: G }}>{jourSemaine.toUpperCase()}</div>
+                              <div style={{ fontSize: 11, color: TEXT, letterSpacing: 2 }}>{annee}</div>
+                            </div>
+                            <div style={{ border: `1.5px solid ${G}`, borderRadius: 4, padding: '8px 16px', fontSize: 36, fontFamily: FP, color: G, fontWeight: 600, minWidth: 60, textAlign: 'center' }}>{jour}</div>
+                            <div style={{ textAlign: 'left' }}>
+                              <div style={{ borderBottom: `1px solid ${G}`, paddingBottom: 4, marginBottom: 4, letterSpacing: 3, fontSize: 11, color: G }}>{mois.toUpperCase()}</div>
+                              <div style={{ fontSize: 11, color: TEXT, letterSpacing: 2 }}>{annee}</div>
+                            </div>
+                          </div>
+                        )
+                      })()}
+                      {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 15, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 8, opacity: 0.8 }}>{hebrewDate}</div>}
+                      {ceremony.heure && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 17, color: TEXT, textAlign: 'center', marginBottom: 18, opacity: 0.82 }}>{formatHeure(ceremony.heure)} précises</div>}
+                      {ceremony.lieu && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', lineHeight: 1.6, marginBottom: 4 }}>{ceremony.type === 'Mairie' ? conjonctionLieu(ceremony.lieu) : formatLieu(ceremony.lieu)}</div>}
+                      {ceremony.adresse && <div style={{ fontFamily: FC, fontSize: 13, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.6, marginBottom: 20 }}>{ceremony.adresse}</div>}
+                      {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
+                        <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, textAlign: 'center', marginBottom: 16, borderTop: `1px solid ${G}22`, paddingTop: 14 }}>
+                          <div style={{ fontWeight: 700 }}>La cérémonie sera suivie de {ceremony.evenementSuivantNom}</div>
+                          {ceremony.evenementSuivantAdresse && <div style={{ fontSize: 12, opacity: 0.75, marginTop: 4 }}>{ceremony.evenementSuivantAdresse}</div>}
+                        </div>
+                      )}
+                      {ceremony.note && (
+                        <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: theme.textSecondaire, textAlign: 'center', marginBottom: 16, padding: '12px 0', borderTop: `1px solid ${G}18` }}>{ceremony.note}</div>
+                      )}
+                      {ceremony.adresse && (
+                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+                          <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ceremony.adresse)}`} target="_blank" rel="noopener noreferrer"
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '10px 22px', border: `1px solid ${G}`, color: G, fontFamily: FC, fontStyle: 'italic', fontSize: 14, textDecoration: 'none', borderRadius: 2, letterSpacing: 0.3 }}>
+                            📍 Itinéraire {ceremony.type === 'Cérémonie religieuse / Houppa' ? 'de la Houppa' : ceremony.type === 'Mairie' ? 'de la Mairie' : ''} →
+                          </a>
+                        </div>
+                      )}
+                    </AnimSection>
                   </div>
-                </AnimSection>
-              )}
-              {(parents1.length > 0 || parents2.length > 0) && (
-                <AnimSection delay={150}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 12, textAlign: 'center' }}>
-                    <div>
-                      {parents1.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}
-                      {gpPa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 11, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpPa1}</div>}
-                      {gpMa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 11, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpMa1}</div>}
-                    </div>
-                    <div>
-                      {parents2.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}
-                      {gpPa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 11, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpPa2}</div>}
-                      {gpMa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 11, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpMa2}</div>}
-                    </div>
-                  </div>
-                  <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 24, lineHeight: 1.9, opacity: 0.82 }}>
-                    {hasGp ? 'ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'ont la joie de vous faire part du mariage de leurs enfants'}
-                  </div>
-                </AnimSection>
-              )}
-              <AnimSection delay={250}>
-                <div style={{ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 6 }}>{data.marie1Prenom}</div>
-                <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 20, color: TEXT, textAlign: 'center', marginBottom: 6, opacity: 0.65 }}>&</div>
-                <div style={{ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 18 }}>{data.marie2Prenom}</div>
-                {ceremony.type === 'Mairie' ? (
-                  <>
-                    <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78 }}>se diront</div>
-                    <div style={{ fontFamily: FS, fontSize: 'clamp(48px,12vw,80px)', color: G, textAlign: 'center', lineHeight: 1, marginBottom: 28 }}>« Oui »</div>
-                  </>
-                ) : (
-                  <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginBottom: 28, opacity: 0.78 }}>Et seraient honorés de votre présence</div>
-                )}
-              </AnimSection>
-              <AnimSection delay={380}>
-                <LineSep />
-                {ceremony.date && (() => {
-                  const d = new Date(ceremony.date + 'T12:00:00')
-                  const parts = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).formatToParts(d)
-                  const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
-                  const jourSemaine = cap(parts.find(p => p.type === 'weekday')?.value || '')
-                  const jour = parts.find(p => p.type === 'day')?.value || ''
-                  const mois = cap(parts.find(p => p.type === 'month')?.value || '')
-                  const annee = parts.find(p => p.type === 'year')?.value || ''
-                  return (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, margin: '24px 0' }}>
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ borderBottom: `1px solid ${G}`, paddingBottom: 4, marginBottom: 4, letterSpacing: 3, fontSize: 11, color: G }}>{jourSemaine.toUpperCase()}</div>
-                        <div style={{ fontSize: 11, color: TEXT, letterSpacing: 2 }}>{annee}</div>
-                      </div>
-                      <div style={{ border: `1.5px solid ${G}`, borderRadius: 4, padding: '8px 16px', fontSize: 36, fontFamily: FP, color: G, fontWeight: 600, minWidth: 60, textAlign: 'center' }}>{jour}</div>
-                      <div style={{ textAlign: 'left' }}>
-                        <div style={{ borderBottom: `1px solid ${G}`, paddingBottom: 4, marginBottom: 4, letterSpacing: 3, fontSize: 11, color: G }}>{mois.toUpperCase()}</div>
-                        <div style={{ fontSize: 11, color: TEXT, letterSpacing: 2 }}>{annee}</div>
-                      </div>
-                    </div>
-                  )
-                })()}
-                {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 15, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 8, opacity: 0.8 }}>{hebrewDate}</div>}
-                {ceremony.heure && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 17, color: TEXT, textAlign: 'center', marginBottom: 18, opacity: 0.82 }}>{formatHeure(ceremony.heure)} précises</div>}
-                {ceremony.lieu && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', lineHeight: 1.6, marginBottom: 4 }}>{ceremony.type === 'Mairie' ? conjonctionLieu(ceremony.lieu) : formatLieu(ceremony.lieu)}</div>}
-                {ceremony.adresse && <div style={{ fontFamily: FC, fontSize: 13, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.6, marginBottom: 20 }}>{ceremony.adresse}</div>}
-                {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
-                  <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, textAlign: 'center', marginBottom: 16, borderTop: `1px solid ${G}22`, paddingTop: 14 }}>
-                    <div style={{ fontWeight: 700 }}>La cérémonie sera suivie de {ceremony.evenementSuivantNom}</div>
-                    {ceremony.evenementSuivantAdresse && <div style={{ fontSize: 12, opacity: 0.75, marginTop: 4 }}>{ceremony.evenementSuivantAdresse}</div>}
-                  </div>
-                )}
-                {ceremony.note && (
-                  <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: theme.textSecondaire, textAlign: 'center', marginBottom: 16, padding: '12px 0', borderTop: `1px solid ${G}18` }}>{ceremony.note}</div>
-                )}
-                {ceremony.adresse && (
-                  <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
-                    <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ceremony.adresse)}`} target="_blank" rel="noopener noreferrer"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '10px 22px', border: `1px solid ${G}`, color: G, fontFamily: FC, fontStyle: 'italic', fontSize: 14, textDecoration: 'none', borderRadius: 2, letterSpacing: 0.3 }}>
-                      📍 Itinéraire {ceremony.type === 'Cérémonie religieuse / Houppa' ? 'de la Houppa' : ceremony.type === 'Mairie' ? 'de la Mairie' : ''} →
-                    </a>
-                  </div>
-                )}
-              </AnimSection>
-              </div>
-            </section>
-            </CeremonyCard>
-            {!isCard && i < sorted.length - 1 && <CeremoniesDivider themeAccent={G} />}
+                </section>
+              </CeremonyCard>
+              {!isCard && i < sorted.length - 1 && <CeremoniesDivider themeAccent={G} />}
             </React.Fragment>
           )
         })}
+
         {/* Navigation cartes séparées */}
         {(data.presentationStyle === 'cartes-separees') && sorted.length > 1 && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, padding: '20px 0 8px' }}>
@@ -3137,10 +3121,10 @@ useEffect(() => {
           </div>
         )}
 
-        {/* SECTION 5 : RSVP (vue invité) */}
+        {/* SECTION 5 : RSVP invité */}
         {role === 'guest' && (
           <section style={{ paddingTop: 60, paddingBottom: 52, borderBottom: `1px solid ${G}1a` }}>
-            <AnimSection>
+            <AnimSection animStyle={anim}>
               <div style={{ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>VOTRE RÉPONSE</div>
               <OrnSep />
               <div style={{ border: `1px solid ${G}33`, borderRadius: 4, padding: '32px 24px', textAlign: 'center' }}>
@@ -3155,10 +3139,10 @@ useEffect(() => {
           </section>
         )}
 
-        {/* SECTION 5b : Voir les RSVP (vue couple) */}
+        {/* SECTION 5b : RSVP couple */}
         {role === 'couple' && (
           <section style={{ paddingTop: 52, paddingBottom: 40, borderBottom: `1px solid ${G}1a`, textAlign: 'center' }}>
-            <AnimSection>
+            <AnimSection animStyle={anim}>
               <button onClick={onRsvpListOpen} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '13px 28px', fontFamily: FP, fontSize: 12, fontWeight: 700, letterSpacing: 2, boxShadow: `0 4px 16px ${G}44` }}>
                 📋 Voir les RSVP
               </button>
@@ -3169,7 +3153,7 @@ useEffect(() => {
         {/* SECTION 6 : Localisation */}
         {sorted.some(c => c.adresse) && (
           <section style={{ paddingTop: 60, paddingBottom: 52, borderBottom: `1px solid ${G}1a` }}>
-            <AnimSection>
+            <AnimSection animStyle={anim}>
               <div style={{ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>LOCALISATION</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 32 }}>
                 <div style={{ flex: 1, height: 0.5, background: G, opacity: 0.3 }} />
@@ -3178,7 +3162,7 @@ useEffect(() => {
               </div>
             </AnimSection>
             {sorted.filter(c => c.adresse).map((ceremony, i) => (
-              <AnimSection key={i} delay={i * 120}>
+              <AnimSection animStyle={anim} key={i} delay={i * 120}>
                 <div style={{ marginBottom: 24 }}>
                   <div style={{ fontFamily: FP, fontSize: 10, letterSpacing: 3, textTransform: 'uppercase' as const, color: G, marginBottom: 8, opacity: 0.8 }}>
                     {ceremony.type === 'Autre' ? (ceremony.customName || 'Événement') : ceremony.type}
@@ -3198,7 +3182,7 @@ useEffect(() => {
 
       {/* SECTION 7 : Footer */}
       <footer style={{ padding: '48px 28px 64px', textAlign: 'center', background: `${G}08`, maxWidth: 480, margin: '0 auto' }}>
-        <AnimSection>
+        <AnimSection animStyle={anim}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
             {ornUrl && <img src={ornUrl} alt="" style={{ width: 160, height: 160, objectFit: 'contain', opacity: 0.65 } as React.CSSProperties} />}
           </div>
