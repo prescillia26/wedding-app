@@ -2845,9 +2845,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   const handleDiscover = () => {
   audioPlayRef.current?.()
   onStartYoutube?.()
-  setTimeout(() => {
-    window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })
-  }, 50)
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
   return (
