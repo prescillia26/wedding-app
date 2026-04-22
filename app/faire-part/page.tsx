@@ -7,6 +7,54 @@ type Theme = 'rose-fleuri' | 'ivoire-or' | 'bleu-floral' | 'champetre' | 'blanc-
 type PresentationStyle = 'page-unique' | 'cartes-scrollables' | 'cartes-separees'
 // ⚙️ Nombre max de photos uploadables par couple (carrousel de la section d'accueil)
 const MAX_PHOTOS = 3
+// ── Styles personnalisables par zone ──────────────────────────────────────────
+
+const TEXT_ZONES = ['titres', 'prenoms', 'narratif', 'dateHeure', 'lieu'] as const
+type TextZone = typeof TEXT_ZONES[number]
+
+const ZONE_LABELS: Record<TextZone, string> = {
+  titres: '🏷️ Titres de cérémonie',
+  prenoms: '💑 Prénoms des mariés',
+  narratif: '📝 Textes narratifs',
+  dateHeure: '📅 Date et heure',
+  lieu: '📍 Lieu et adresse',
+}
+
+const FONT_OPTIONS = [
+  { value: 'var(--font-great-vibes)',        label: 'Great Vibes (calligraphie)' },
+  { value: 'var(--font-cormorant-garamond)', label: 'Cormorant (élégant)' },
+  { value: 'var(--font-playfair-display)',   label: 'Playfair (serif)' },
+  { value: 'Georgia, serif',                 label: 'Georgia (classique)' },
+  { value: 'Helvetica, Arial, sans-serif',   label: 'Helvetica (moderne)' },
+  { value: '"Times New Roman", serif',       label: 'Times (traditionnel)' },
+  { value: '"Courier New", monospace',       label: 'Courier (machine à écrire)' },
+  { value: 'cursive',                        label: 'Cursive (script)' },
+]
+
+const COLOR_OPTIONS = [
+  { value: '',        label: 'Thème',    swatch: '#C9A84C' },
+  { value: '#C9A84C', label: 'Doré',     swatch: '#C9A84C' },
+  { value: '#1a1a1a', label: 'Noir',     swatch: '#1a1a1a' },
+  { value: '#9e9e9e', label: 'Argent',   swatch: '#9e9e9e' },
+  { value: '#d4829a', label: 'Rose',     swatch: '#d4829a' },
+  { value: '#8b0000', label: 'Bordeaux', swatch: '#8b0000' },
+  { value: '#2c4a7c', label: 'Marine',   swatch: '#2c4a7c' },
+  { value: '#7a9e6e', label: 'Vert',     swatch: '#7a9e6e' },
+  { value: '#d4a574', label: 'Cuivre',   swatch: '#d4a574' },
+  { value: '#4a3728', label: 'Chocolat', swatch: '#4a3728' },
+  { value: '#ffffff', label: 'Blanc',    swatch: '#ffffff' },
+  { value: '#2a9a6a', label: 'Menthe',   swatch: '#2a9a6a' },
+]
+
+interface ZoneStyle {
+  fontFamily?: string  // '' = police par défaut du thème
+  color?: string       // '' = couleur du thème
+  sizeScale?: number   // 0.8 | 1.0 | 1.2 (petit / normal / grand)
+  bold?: boolean
+  italic?: boolean
+}
+
+type ZoneStyles = Partial<Record<TextZone, ZoneStyle>>
 const THEMES: Record<Theme, ThemeObj> = {
   'rose-fleuri':   { fond: '#faf6f4', accent: '#c4829a', texte: '#2d2d2d', textSecondaire: '#8a6070', nom: 'Rose Fleuri' },
   'ivoire-or':     { fond: '#fdf8f0', accent: '#C9A84C', texte: '#2d2014', textSecondaire: '#6a5040', nom: 'Ivoire & Or' },
@@ -74,7 +122,6 @@ const FRAMES: { id: string; label: string; url: string | null }[] = [
   { id: 'frame-106', label: '🌸 Floral 106', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878859/106_lv0kwe.png' },
   { id: 'frame-107', label: '🌸 Floral 107', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878857/107_jal3jp.png' },
   { id: 'frame-108', label: '🌸 Floral 108', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878858/108_xvumew.png' },
-  { id: 'frame-123', label: '🌸 Floral 123', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878947/123_ieexv8.png' },
   { id: 'none', label: '⬜ Sans cadre', url: null },
 ]
 
@@ -168,6 +215,7 @@ interface FormData {
   animationStyle?: string
   introAnimation?: string
   slug?: string
+  zoneStyles?: ZoneStyles 
 }
 
 const defaultCeremony: Ceremony = {
@@ -204,6 +252,7 @@ const defaultFormData: FormData = {
   animationStyle: 'slide-up',
   introAnimation: 'enveloppe',
   slug: '',
+  zoneStyles: {},
 }
 
 // Propriétés mobiles partagées pour tous les boutons
@@ -320,7 +369,28 @@ function sortByDate(ceremonies: Ceremony[]): Ceremony[] {
     return new Date(a.date).getTime() - new Date(b.date).getTime()
   })
 }
-
+function applyZoneStyle(baseStyle: React.CSSProperties, zone: TextZone, zoneStyles?: ZoneStyles): React.CSSProperties {
+  const z = zoneStyles?.[zone]
+  if (!z) return baseStyle
+  const result: React.CSSProperties = { ...baseStyle }
+  if (z.fontFamily) result.fontFamily = z.fontFamily
+  if (z.color) result.color = z.color
+  if (z.bold) result.fontWeight = 700
+  if (z.italic) result.fontStyle = 'italic'
+  if (z.sizeScale && z.sizeScale !== 1) {
+    // Multiplie la fontSize si elle est définie
+    const currentSize = baseStyle.fontSize
+    if (typeof currentSize === 'number') {
+      result.fontSize = Math.round(currentSize * z.sizeScale)
+    } else if (typeof currentSize === 'string' && currentSize.includes('clamp')) {
+      // On garde le clamp mais on peut jouer sur transform
+      result.transform = `scale(${z.sizeScale})`
+      result.transformOrigin = 'center'
+      result.display = 'inline-block'
+    }
+  }
+  return result
+}
 const S: Record<string, React.CSSProperties> = {
   input: {
     width: '100%', border: '1px solid #fecdd3', borderRadius: 10, padding: '10px 14px',
@@ -2506,58 +2576,168 @@ function ShareModal({ accent, guestUrl, coupleUrl, onClose, data }: { accent: st
     </div>
   )
 }
-
-function TextEditModal({ ceremonies, textOverrides, onApply, onClose, theme }: {
+function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApplyStyles, onClose, theme }: {
   ceremonies: Ceremony[]
   textOverrides: Record<string, string>
+  zoneStyles: ZoneStyles
   onApply: (overrides: Record<string, string>) => void
+  onApplyStyles: (styles: ZoneStyles) => void
   onClose: () => void
   theme: ThemeObj
 }) {
-  const [local, setLocal] = useState<Record<string, string>>(textOverrides)
-  const set = (k: string, v: string) => setLocal(prev => ({ ...prev, [k]: v }))
+  const [tab, setTab] = useState<'texte' | 'style'>('texte')
+  const [localText, setLocalText] = useState<Record<string, string>>(textOverrides)
+  const [localStyles, setLocalStyles] = useState<ZoneStyles>(zoneStyles ?? {})
+  const setText = (k: string, v: string) => setLocalText(prev => ({ ...prev, [k]: v }))
+  const setZoneStyle = (zone: TextZone, patch: Partial<ZoneStyle>) => {
+    setLocalStyles(prev => ({ ...prev, [zone]: { ...(prev[zone] ?? {}), ...patch } }))
+  }
+  const resetZone = (zone: TextZone) => {
+    setLocalStyles(prev => { const n = { ...prev }; delete n[zone]; return n })
+  }
+
+  const tabBtn = (active: boolean): React.CSSProperties => ({
+    ...BTN, flex: 1, padding: '12px', borderRadius: 8, border: 'none',
+    background: active ? theme.accent : 'transparent',
+    color: active ? 'white' : theme.accent, fontSize: 13, fontWeight: 600,
+    letterSpacing: 1, textTransform: 'uppercase',
+  })
 
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-      <div style={{ background: 'white', width: '100%', maxWidth: 600, borderRadius: '16px 16px 0 0', maxHeight: '80vh', overflowY: 'auto', padding: '28px 24px 40px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-          <h2 style={{ margin: 0, fontFamily: 'var(--font-playfair-display)', fontSize: 20, color: theme.texte }}>Modifier le texte</h2>
+      <div style={{ background: 'white', width: '100%', maxWidth: 640, borderRadius: '16px 16px 0 0', maxHeight: '88vh', overflowY: 'auto', padding: '24px 24px 40px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <h2 style={{ margin: 0, fontFamily: 'var(--font-playfair-display)', fontSize: 20, color: theme.texte }}>Personnalisation</h2>
           <button type="button" onClick={onClose} style={{ ...BTN, background: 'none', border: 'none', fontSize: 22, color: '#9ca3af', padding: 0 }}>✕</button>
         </div>
-        {ceremonies.map((c, i) => {
-          const name = c.type === 'Autre' ? (c.customName || 'Événement') : c.type
-          const isHouppa = c.type === 'Cérémonie religieuse / Houppa'
-          return (
-            <div key={i} style={{ marginBottom: 28, paddingBottom: 24, borderBottom: i < ceremonies.length - 1 ? `1px solid ${theme.accent}33` : 'none' }}>
-              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: theme.accent, marginBottom: 12 }}>{name}</div>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Titre de la cérémonie</label>
-              <input value={local[`ceremony_${i}_titre`] ?? ''} onChange={e => set(`ceremony_${i}_titre`, e.target.value)} placeholder={name}
-                style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box', marginBottom: 12 }} />
-              {isHouppa && (
-                <>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Phrase &quot;Ont la joie de...&quot;</label>
-                  <textarea value={local[`ceremony_${i}_joie`] ?? ''} onChange={e => set(`ceremony_${i}_joie`, e.target.value)} placeholder="Ont la joie de vous faire part du mariage de leurs enfants"
-                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 64, marginBottom: 12 }} />
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Phrase &quot;et seront honorés...&quot;</label>
-                  <textarea value={local[`ceremony_${i}_honore`] ?? ''} onChange={e => set(`ceremony_${i}_honore`, e.target.value)} placeholder="et seront honorés de votre présence à la cérémonie qui sera célébrée le"
-                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 64, marginBottom: 12 }} />
-                </>
-              )}
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Lieu (nom)</label>
-              <input value={local[`ceremony_${i}_lieu`] ?? ''} onChange={e => set(`ceremony_${i}_lieu`, e.target.value)} placeholder={c.lieu || 'Nom du lieu'}
-                style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box' }} />
-            </div>
-          )
-        })}
-        <button type="button" onClick={() => { onApply(local); onClose() }}
-          style={{ ...BTN, width: '100%', padding: '14px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 15, fontWeight: 700, letterSpacing: 1 }}>
-          ✓ Appliquer les modifications
+
+        {/* Tabs */}
+        <div style={{ display: 'flex', gap: 4, marginBottom: 24, padding: 4, background: '#fdf5e4', borderRadius: 10 }}>
+          <button type="button" onClick={() => setTab('texte')} style={tabBtn(tab === 'texte')}>✏️ Texte</button>
+          <button type="button" onClick={() => setTab('style')} style={tabBtn(tab === 'style')}>🎨 Style</button>
+        </div>
+
+        {/* TAB TEXTE */}
+        {tab === 'texte' && (
+          <div>
+            {ceremonies.map((c, i) => {
+              const name = c.type === 'Autre' ? (c.customName || 'Événement') : c.type
+              const isHouppa = c.type === 'Cérémonie religieuse / Houppa'
+              return (
+                <div key={i} style={{ marginBottom: 24, paddingBottom: 20, borderBottom: i < ceremonies.length - 1 ? `1px solid ${theme.accent}33` : 'none' }}>
+                  <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: theme.accent, marginBottom: 12 }}>{name}</div>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Titre</label>
+                  <input value={localText[`ceremony_${i}_titre`] ?? ''} onChange={e => setText(`ceremony_${i}_titre`, e.target.value)} placeholder={name}
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box', marginBottom: 12 }} />
+                  {isHouppa && (
+                    <>
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>« Ont la joie de... »</label>
+                      <textarea value={localText[`ceremony_${i}_joie`] ?? ''} onChange={e => setText(`ceremony_${i}_joie`, e.target.value)} placeholder="Ont la joie de vous faire part du mariage de leurs enfants"
+                        style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 56, marginBottom: 12 }} />
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>« et seront honorés... »</label>
+                      <textarea value={localText[`ceremony_${i}_honore`] ?? ''} onChange={e => setText(`ceremony_${i}_honore`, e.target.value)} placeholder="et seront honorés de votre présence"
+                        style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 56, marginBottom: 12 }} />
+                    </>
+                  )}
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Lieu</label>
+                  <input value={localText[`ceremony_${i}_lieu`] ?? ''} onChange={e => setText(`ceremony_${i}_lieu`, e.target.value)} placeholder={c.lieu || 'Nom du lieu'}
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {/* TAB STYLE */}
+        {tab === 'style' && (
+          <div>
+            <p style={{ fontSize: 12, color: '#6a5040', marginBottom: 20, lineHeight: 1.6, background: '#fdf5e4', padding: 12, borderRadius: 8 }}>
+              💡 Personnalisez chaque zone de votre faire-part. Les changements s&apos;appliquent à toutes les cérémonies.
+            </p>
+
+            {TEXT_ZONES.map(zone => {
+              const z = localStyles[zone] ?? {}
+              return (
+                <div key={zone} style={{ marginBottom: 20, padding: 16, border: `1.5px solid ${theme.accent}33`, borderRadius: 12, background: '#fdf8f9' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: theme.accent, fontWeight: 600 }}>{ZONE_LABELS[zone]}</div>
+                    <button type="button" onClick={() => resetZone(zone)} style={{ ...BTN, background: 'none', border: 'none', color: '#9ca3af', fontSize: 11, textDecoration: 'underline' }}>Réinitialiser</button>
+                  </div>
+
+                  {/* Police */}
+                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Police</label>
+                  <select value={z.fontFamily ?? ''} onChange={e => setZoneStyle(zone, { fontFamily: e.target.value })}
+                    style={{ width: '100%', padding: '8px 10px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 13, background: 'white', marginBottom: 12, color: '#4a3728' }}>
+                    <option value="">Par défaut (thème)</option>
+                    {FONT_OPTIONS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
+                  </select>
+
+                  {/* Couleur */}
+                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Couleur</label>
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
+                    {COLOR_OPTIONS.map(c => {
+                      const sel = (z.color ?? '') === c.value
+                      return (
+                        <button key={c.label} type="button" onClick={() => setZoneStyle(zone, { color: c.value })} 
+                          title={c.label}
+                          style={{
+                            ...BTN,
+                            width: 32, height: 32, borderRadius: '50%',
+                            background: c.swatch,
+                            border: sel ? `3px solid ${theme.accent}` : '2px solid white',
+                            boxShadow: sel ? `0 0 0 1px ${theme.accent}` : '0 0 0 1px #e5e7eb',
+                            padding: 0,
+                          }}
+                        />
+                      )
+                    })}
+                  </div>
+
+                  {/* Taille */}
+                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Taille</label>
+                  <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+                    {[{ v: 0.8, l: 'Petit' }, { v: 1, l: 'Normal' }, { v: 1.2, l: 'Grand' }].map(opt => {
+                      const sel = (z.sizeScale ?? 1) === opt.v
+                      return (
+                        <button key={opt.v} type="button" onClick={() => setZoneStyle(zone, { sizeScale: opt.v })} style={{
+                          ...BTN, flex: 1, padding: '8px', borderRadius: 8, fontSize: 12, fontWeight: sel ? 700 : 400,
+                          border: `2px solid ${sel ? theme.accent : '#fecdd3'}`,
+                          background: sel ? `${theme.accent}18` : 'white',
+                          color: sel ? theme.accent : '#4a3728',
+                        }}>{opt.l}</button>
+                      )
+                    })}
+                  </div>
+
+                  {/* Gras / Italique */}
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button type="button" onClick={() => setZoneStyle(zone, { bold: !z.bold })} style={{
+                      ...BTN, flex: 1, padding: '8px', borderRadius: 8, fontSize: 13, fontWeight: 700,
+                      border: `2px solid ${z.bold ? theme.accent : '#fecdd3'}`,
+                      background: z.bold ? `${theme.accent}18` : 'white',
+                      color: z.bold ? theme.accent : '#4a3728',
+                    }}>𝐁 Gras</button>
+                    <button type="button" onClick={() => setZoneStyle(zone, { italic: !z.italic })} style={{
+                      ...BTN, flex: 1, padding: '8px', borderRadius: 8, fontSize: 13, fontStyle: 'italic',
+                      border: `2px solid ${z.italic ? theme.accent : '#fecdd3'}`,
+                      background: z.italic ? `${theme.accent}18` : 'white',
+                      color: z.italic ? theme.accent : '#4a3728',
+                    }}>𝐼 Italique</button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        <button type="button" onClick={() => { onApply(localText); onApplyStyles(localStyles); onClose() }}
+          style={{ ...BTN, width: '100%', padding: '14px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 15, fontWeight: 700, letterSpacing: 1, marginTop: 8 }}>
+          ✓ Appliquer
         </button>
       </div>
     </div>
   )
 }
-
 // ── Countdown ─────────────────────────────────────────────────────────────────
 
 function Countdown({ targetDate, accent }: { targetDate: string; accent: string }) {
@@ -3703,6 +3883,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
   const [ytMuted, setYtMuted] = useState(false)
   const ytIframeRef = useRef<HTMLIFrameElement | null>(null)
   const [textOverrides, setTextOverrides] = useState<Record<string, string>>({})
+  const [zoneStyles, setZoneStyles] = useState<ZoneStyles>(data.zoneStyles ?? {})
   const [textEditOpen, setTextEditOpen] = useState(false)
   const [shareModalOpen, setShareModalOpen] = useState(false)
   const [guestUrl, setGuestUrl] = useState<string | null>(null)
@@ -3784,7 +3965,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
     return (
       <div style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
         <SharedPageContent
-          data={data}
+          data={{ ...data, zoneStyles: data.zoneStyles ?? {} }}
           theme={theme}
           sorted={sorted}
           role={role}
@@ -3809,7 +3990,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
   return (
     <div id="faire-part-preview-target" style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
       <SharedPageContent
-        data={{ ...data, textOverrides: { ...data.textOverrides, ...textOverrides } }}
+        data={{ ...data, textOverrides: { ...data.textOverrides, ...textOverrides }, zoneStyles }}
         theme={theme}
         sorted={sorted}
         role="guest"
@@ -3837,8 +4018,16 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         <RSVPListModal accent={theme.accent} onClose={() => setRsvpListOpen(false)} shareId={lastShareId} ceremonies={sorted} />
       )}
       {textEditOpen && (
-        <TextEditModal ceremonies={sorted} textOverrides={textOverrides} onApply={setTextOverrides} onClose={() => setTextEditOpen(false)} theme={theme} />
-      )}
+  <TextEditModal 
+    ceremonies={sorted} 
+    textOverrides={textOverrides} 
+    zoneStyles={zoneStyles}
+    onApply={setTextOverrides} 
+    onApplyStyles={(s) => { setZoneStyles(s); onUpdate?.({ zoneStyles: s }) }}
+    onClose={() => setTextEditOpen(false)} 
+    theme={theme} 
+  />
+)}
       {shareModalOpen && guestUrl && coupleUrl && (
         <ShareModal accent={theme.accent} guestUrl={guestUrl} coupleUrl={coupleUrl} onClose={() => setShareModalOpen(false)} data={data} />
       )}
