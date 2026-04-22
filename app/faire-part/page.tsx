@@ -3302,25 +3302,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
       const payloadSize = () => new TextEncoder().encode(JSON.stringify(buildPayload())).length
       const LIMIT = 850_000 // marge de sécurité sous la limite Redis 900KB
 
-      if (originalPhotos.length > 0) {
-        // Passes progressives — on compresse jusqu'à ce que le payload TOTAL passe sous la limite
-        const passes = [
-          { maxWidth: 800, quality: 0.7 },
-          { maxWidth: 600, quality: 0.5 },
-          { maxWidth: 400, quality: 0.3 },
-          { maxWidth: 300, quality: 0.2 },
-          { maxWidth: 200, quality: 0.15 },
-        ]
-        for (const { maxWidth, quality } of passes) {
-          setSharingStatus('Compression des photos...')
-          compressedPhotos = await Promise.all(originalPhotos.map(p => compressImage(p, maxWidth, quality)))
-          if (payloadSize() <= LIMIT) break
-        }
-        // Dernier recours : une seule photo au minimum
-        if (payloadSize() > LIMIT && compressedPhotos.length > 1) {
-          compressedPhotos = await Promise.all([originalPhotos[0]].map(p => compressImage(p, 200, 0.15)))
-        }
-      }
+      compressedPhotos = originalPhotos
 
       setSharingStatus('Envoi...')
       const dataToSend = buildPayload()
