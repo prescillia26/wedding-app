@@ -2590,12 +2590,20 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
   const [localStyles, setLocalStyles] = useState<ZoneStyles>(zoneStyles ?? {})
   const setText = (k: string, v: string) => setLocalText(prev => ({ ...prev, [k]: v }))
   const setZoneStyle = (zone: TextZone, patch: Partial<ZoneStyle>) => {
-    setLocalStyles(prev => ({ ...prev, [zone]: { ...(prev[zone] ?? {}), ...patch } }))
+    setLocalStyles(prev => {
+      const next = { ...prev, [zone]: { ...(prev[zone] ?? {}), ...patch } }
+      onApplyStyles(next)  // ← Live preview : applique immédiatement
+      return next
+    })
   }
   const resetZone = (zone: TextZone) => {
-    setLocalStyles(prev => { const n = { ...prev }; delete n[zone]; return n })
+    setLocalStyles(prev => {
+      const n = { ...prev }
+      delete n[zone]
+      onApplyStyles(n)  // ← Live preview
+      return n
+    })
   }
-
   const tabBtn = (active: boolean): React.CSSProperties => ({
     ...BTN, flex: 1, padding: '12px', borderRadius: 8, border: 'none',
     background: active ? theme.accent : 'transparent',
@@ -3578,7 +3586,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                     {data.marie1PrenomHebreu}
                   </div>
                 )}
-                <div style={{ fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, lineHeight: 1.1, position: 'relative', zIndex: 1, opacity: 0, animation: 'prenomAppear 1.2s ease 0.3s forwards' }}>
+                <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, lineHeight: 1.1, position: 'relative', zIndex: 1, opacity: 0, animation: 'prenomAppear 1.2s ease 0.3s forwards' }, 'prenoms', data.zoneStyles)}>
                   {data.marie1Prenom || 'Prénom'}
                 </div>
               </div>
@@ -3589,7 +3597,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                     {data.marie2PrenomHebreu}
                   </div>
                 )}
-                <div style={{ fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, lineHeight: 1.1, position: 'relative', zIndex: 1, opacity: 0, animation: 'prenomAppear 1.2s ease 0.7s forwards' }}>
+                <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, lineHeight: 1.1, position: 'relative', zIndex: 1, opacity: 0, animation: 'prenomAppear 1.2s ease 0.7s forwards' }, 'prenoms', data.zoneStyles)}>
                   {data.marie2Prenom || 'Prénom'}
                 </div>
               </div>
@@ -3615,7 +3623,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                     {gpMa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpMa2}</div>}
                   </div>
                 </div>
-                <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, textAlign: 'center', lineHeight: 1.9, opacity: 0.85 }}>
+                <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, textAlign: 'center', lineHeight: 1.9, opacity: 0.85 }, 'narratif', data.zoneStyles)}>
                   {hasGp ? 'ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'ont la joie de vous faire part du mariage de leurs enfants'}
                 </div>
               </AnimSection>
@@ -3675,7 +3683,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                       {data.mariageJuif && (
                         <div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, marginBottom: 8 }}>בס״ד</div>
                       )}
-                      <div style={{ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>{title}</div>
+                     <div style={applyZoneStyle({ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }, 'titres', data.zoneStyles)}>{title}</div>
                       <OrnSep />
                     </AnimSection>
                     {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
@@ -3699,15 +3707,15 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                             {gpMa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 11, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpMa2}</div>}
                           </div>
                         </div>
-                        <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 24, lineHeight: 1.9, opacity: 0.82 }}>
+                        <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 24, lineHeight: 1.9, opacity: 0.82 }, 'narratif', data.zoneStyles)}>
                           {hasGp ? 'ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'ont la joie de vous faire part du mariage de leurs enfants'}
                         </div>
                       </AnimSection>
                     )}
                     <AnimSection animStyle={anim} delay={250}>
-                      <div style={{ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 6 }}>{data.marie1Prenom}</div>
+                      <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 6 }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom}</div>
                       <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 20, color: TEXT, textAlign: 'center', marginBottom: 6, opacity: 0.65 }}>&</div>
-                      <div style={{ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 18 }}>{data.marie2Prenom}</div>
+                      <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 18 }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom}</div>
                       {ceremony.type === 'Mairie' ? (
                         <>
                           <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78 }}>se diront</div>
@@ -3742,8 +3750,8 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                         )
                       })()}
                       {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 15, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 8, opacity: 0.8 }}>{hebrewDate}</div>}
-                      {ceremony.heure && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 17, color: TEXT, textAlign: 'center', marginBottom: 18, opacity: 0.82 }}>{formatHeure(ceremony.heure)} précises</div>}
-                      {ceremony.lieu && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', lineHeight: 1.6, marginBottom: 4 }}>{ceremony.type === 'Mairie' ? conjonctionLieu(ceremony.lieu) : formatLieu(ceremony.lieu)}</div>}
+                      {ceremony.heure && <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 17, color: TEXT, textAlign: 'center', marginBottom: 18, opacity: 0.82 }, 'dateHeure', data.zoneStyles)}>{formatHeure(ceremony.heure)} précises</div>}
+                      {ceremony.lieu && <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', lineHeight: 1.6, marginBottom: 4 }, 'lieu', data.zoneStyles)}>{ceremony.type === 'Mairie' ? conjonctionLieu(ceremony.lieu) : formatLieu(ceremony.lieu)}</div>}
                       {ceremony.adresse && <div style={{ fontFamily: FC, fontSize: 13, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.6, marginBottom: 20 }}>{ceremony.adresse}</div>}
                       {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
                         <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, textAlign: 'center', marginBottom: 16, borderTop: `1px solid ${G}22`, paddingTop: 14 }}>
