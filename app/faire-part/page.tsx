@@ -819,27 +819,6 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         </div>
       </div>
 <div style={{ marginBottom: 24 }}>
-  <Label>Animation d'ouverture</Label>
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-    {([
-      { key: 'none',      label: '⬜ Aucune' },
-      { key: 'enveloppe', label: '💌 Enveloppe' },
-      { key: 'petales',   label: '🌹 Pétales' },
-      { key: 'parchemin', label: '📜 Parchemin' },
-    ] as {key:string;label:string}[]).map(opt => {
-      const sel = (data.introAnimation || 'none') === opt.key
-      return (
-        <button key={opt.key} type="button" onClick={() => onChange({ introAnimation: opt.key })} style={{
-          ...BTN, padding: '10px 6px', borderRadius: 10, fontSize: 11, fontWeight: sel ? 700 : 400,
-          border: `2px solid ${sel ? THEMES[data.style].accent : '#fecdd3'}`,
-          background: sel ? `${THEMES[data.style].accent}15` : 'white',
-          color: sel ? THEMES[data.style].accent : '#4a3728',
-        }}>{opt.label}</button>
-      )
-    })}
-  </div>
-</div>   
-<div style={{ marginBottom: 24 }}>
   <Label>Animation des textes</Label>
   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
     {([
