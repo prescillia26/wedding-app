@@ -816,56 +816,6 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           })}
         </div>
       </div>
-
-
-
-      {/* ── Personnalisation cadre & texte ── */}
-      {(data.frameId && data.frameId !== 'none') && (
-        <div style={{ marginBottom: 24 }}>
-          <Label>Personnaliser</Label>
-          <div style={{ background: '#faf8f6', borderRadius: 10, padding: '14px 16px', marginBottom: 10 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#6b5040', marginBottom: 14, letterSpacing: 0.5 }}>🖼️ Cadre</div>
-            {([
-              { label: 'Opacité du cadre', key: 'frameOpacity' as const, min: 0.1, max: 1, step: 0.05, display: (v: number) => `${Math.round(v * 100)}%`, def: 1 },
-              { label: 'Fond blanc derrière le texte', key: 'textBg' as const, min: 0, max: 0.95, step: 0.05, display: (v: number) => v === 0 ? 'Off' : `${Math.round(v * 100)}%`, def: 0.5 },
-              { label: 'Espace haut / bas', key: 'framePaddingV' as const, min: 5, max: 40, step: 1, display: (v: number) => `${v}%`, def: 20 },
-              { label: 'Espace gauche / droite', key: 'framePaddingH' as const, min: 5, max: 35, step: 1, display: (v: number) => `${v}%`, def: 16 },
-            ]).map(({ label, key, min, max, step, display, def }) => {
-              const val = (data[key] as number) ?? def
-              const accent = THEMES[data.style].accent
-              return (
-                <div key={key} style={{ marginBottom: 12 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <span style={{ fontSize: 12, color: '#4a3728' }}>{label}</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: accent, minWidth: 36, textAlign: 'right' }}>{display(val)}</span>
-                  </div>
-                  <input type="range" min={min} max={max} step={step} value={val}
-                    onChange={e => onChange({ [key]: parseFloat(e.target.value) })}
-                    style={{ width: '100%', accentColor: accent }} />
-                </div>
-              )
-            })}
-          </div>
-          <div style={{ background: '#faf8f6', borderRadius: 10, padding: '14px 16px' }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#6b5040', marginBottom: 14, letterSpacing: 0.5 }}>✍️ Texte</div>
-            {(() => {
-              const val = data.textOpacity ?? 1
-              const accent = THEMES[data.style].accent
-              return (
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <span style={{ fontSize: 12, color: '#4a3728' }}>Opacité du texte</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: accent, minWidth: 36, textAlign: 'right' }}>{Math.round(val * 100)}%</span>
-                  </div>
-                  <input type="range" min={0.1} max={1} step={0.05} value={val}
-                    onChange={e => onChange({ textOpacity: parseFloat(e.target.value) })}
-                    style={{ width: '100%', accentColor: accent }} />
-                </div>
-              )
-            })()}
-          </div>
-        </div>
-      )}
 <div style={{ marginBottom: 24 }}>
   <Label>Animation des textes</Label>
   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
@@ -3453,11 +3403,6 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
         <button onClick={onEdit} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>Modifier</button>
         <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{sharing ? (sharingStatus || 'Chargement...') : '🔗 Partager'}</button>
-        {onUpdate && (data.frameId && data.frameId !== 'none') && (
-          <button onClick={optimizeWithAI} disabled={aiOptimizing} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: 'none', background: aiDone ? '#22c55e' : aiOptimizing ? '#e8d8c8' : '#4a3728', color: 'white', fontSize: 13, fontWeight: 600, minWidth: 120 }}>
-            {aiDone ? '✓ Appliqué !' : aiOptimizing ? '⏳ Analyse…' : '✨ IA'}
-          </button>
-        )}
         {lastShareId && (
           <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>📋 RSVP</button>
         )}
