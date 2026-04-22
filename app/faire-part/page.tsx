@@ -3824,16 +3824,29 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                         <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: theme.textSecondaire, textAlign: 'center', marginBottom: 16, padding: '12px 0', borderTop: `1px solid ${G}18` }}>{ceremony.note}</div>
                       )}
                       {ceremony.adresse && (
-                        <div style={{ marginTop: 20, textAlign: 'center' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 14 }}>
-                            <div style={{ width: 24, height: 0.5, background: G, opacity: 0.4 }} />
-                            <span style={{ color: G, fontSize: 10, opacity: 0.6 }}>✦</span>
-                            <div style={{ width: 24, height: 0.5, background: G, opacity: 0.4 }} />
+                        <div style={{ marginTop: 24 }}>
+                          {/* Mini-carte Google Maps intégrée */}
+                          <div style={{ marginBottom: 20, borderRadius: 8, overflow: 'hidden', boxShadow: `0 2px 12px ${G}22`, border: `1px solid ${G}22` }}>
+                            <iframe
+                              src={`https://maps.google.com/maps?q=${encodeURIComponent(ceremony.adresse)}&output=embed`}
+                              width="100%" height="180"
+                              style={{ border: 'none', display: 'block' }}
+                              loading="lazy" title={ceremony.type}
+                            />
                           </div>
-                          <div style={{ fontFamily: FP, fontSize: 10, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, marginBottom: 14, opacity: 0.7 }}>
-                            Pour vous rendre sur place
+                          
+                          {/* Séparateur ornemental */}
+                          <div style={{ textAlign: 'center' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 14 }}>
+                              <div style={{ width: 24, height: 0.5, background: G, opacity: 0.4 }} />
+                              <span style={{ color: G, fontSize: 10, opacity: 0.6 }}>✦</span>
+                              <div style={{ width: 24, height: 0.5, background: G, opacity: 0.4 }} />
+                            </div>
+                            <div style={{ fontFamily: FP, fontSize: 10, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, marginBottom: 14, opacity: 0.7 }}>
+                              Pour vous rendre sur place
+                            </div>
+                            <ItineraireButtons adresse={ceremony.adresse} theme={theme} />
                           </div>
-                          <ItineraireButtons adresse={ceremony.adresse} theme={theme} />
                         </div>
                       )}
                     </AnimSection>
@@ -3886,35 +3899,6 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                 📋 Voir les RSVP
               </button>
             </AnimSection>
-          </section>
-        )}
-
-        {/* SECTION 6 : Localisation */}
-        {sorted.some(c => c.adresse) && (
-          <section style={{ paddingTop: 60, paddingBottom: 52, borderBottom: `1px solid ${G}1a` }}>
-            <AnimSection animStyle={anim}>
-              <div style={{ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>LOCALISATION</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 32 }}>
-                <div style={{ flex: 1, height: 0.5, background: G, opacity: 0.3 }} />
-                <span style={{ color: G, fontSize: 10, opacity: 0.7 }}>◈</span>
-                <div style={{ flex: 1, height: 0.5, background: G, opacity: 0.3 }} />
-              </div>
-            </AnimSection>
-            {sorted.filter(c => c.adresse).map((ceremony, i) => (
-              <AnimSection animStyle={anim} key={i} delay={i * 120}>
-                <div style={{ marginBottom: 24 }}>
-                  <div style={{ fontFamily: FP, fontSize: 10, letterSpacing: 3, textTransform: 'uppercase' as const, color: G, marginBottom: 8, opacity: 0.8 }}>
-                    {ceremony.type === 'Autre' ? (ceremony.customName || 'Événement') : ceremony.type}
-                  </div>
-                  <iframe
-                    src={`https://maps.google.com/maps?q=${encodeURIComponent(ceremony.adresse)}&output=embed`}
-                    width="100%" height="200"
-                    style={{ border: 'none', borderRadius: 4, display: 'block' }}
-                    loading="lazy" title={ceremony.type}
-                  />
-                </div>
-              </AnimSection>
-            ))}
           </section>
         )}
       </div>
