@@ -1,6 +1,7 @@
 import { Redis } from '@upstash/redis'
 import type { Metadata } from 'next'
 import { cache } from 'react'
+import RedirectClient from './redirect-client'
 
 const redis = new Redis({
   url: process.env.KV_REST_API_URL!,
@@ -19,7 +20,7 @@ function toCloudinaryOgUrl(raw: string | undefined | null): string {
 }
 
 // ✅ React cache() : évite que Redis soit appelé 2 fois par page
-// (avant : une fois dans generateMetadata + une fois dans SlugPage)
+// (une fois dans generateMetadata + une fois dans SlugPage → mutualisé)
 const getData = cache(async (slug: string) => {
   const shareId = await redis.get<string>(`slug:${slug}`)
   if (!shareId) return null
@@ -28,9 +29,9 @@ const getData = cache(async (slug: string) => {
     marie2Prenom?: string
     photosFond?: string[]
     photoFond?: string
-    dateMariage?: string // optionnel : si tu l'as en base, il sera utilisé
-    ville?: string       // optionnel
-    lieu?: string        // optionnel
+    dateMariage?: string
+    ville?: string
+    lieu?: string
   }>(shareId)
   if (!data) return null
   return { shareId, data }
@@ -74,7 +75,6 @@ export async function generateMetadata(
   ].filter(Boolean)
   const description = descParts.join(' ') + '. Découvrez les informations et confirmez votre présence.'
 
-  // ✅ MÊME transformation Cloudinary que dans le composant
   const rawPhoto = result.data.photosFond?.[0] || result.data.photoFond
   const ogImage = toCloudinaryOgUrl(rawPhoto)
 
@@ -96,24 +96,21 @@ export async function generateMetadata(
         type: 'image/jpeg',
       }] : [],
     },
-    // ✅ Twitter Card : même rendu sur X, LinkedIn, iMessage
     twitter: {
       card: 'summary_large_image',
       title,
       description,
       images: ogImage ? [ogImage] : [],
     },
-    // ✅ Invitations privées : pas d'indexation Google
     robots: { index: false, follow: false },
   }
 }
 
+// ✅ UNE SEULE fonction SlugPage (pas deux !)
 export default async function SlugPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const result = await getData(slug) // ← cache() → pas de 2e appel Redis
+  const result = await getData(slug)
 
-  const prenom1 = result?.data?.marie1Prenom || ''
-  const prenom2 = result?.data?.marie2Prenom || ''
   const rawPhoto = result?.data?.photosFond?.[0] || result?.data?.photoFond || ''
   const photo = toCloudinaryOgUrl(rawPhoto)
   const accent = '#C9A84C'
@@ -122,25 +119,27 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
     : '/faire-part'
 
   return (
-    <div style={{ background: '#fdf8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', fontFamily: 'Georgia, serif' }}>
-      <div style={{ textAlign: 'center', padding: '48px 32px', maxWidth: 400 }}>
-        {photo && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={photo} alt="" style={{ width: 140, height: 140, borderRadius: '50%', objectFit: 'cover', border: `3px solid ${accent}`, marginBottom: 28 }} />
-        )}
-        <div style={{ fontSize: 12, color: '#8a6040', letterSpacing: 4, textTransform: 'uppercase' as const, marginBottom: 20 }}>
-          Invitation de mariage
-        </div>
-        <div style={{ fontSize: 42, color: accent, fontStyle: 'italic', marginBottom: 4 }}>{prenom1}</div>
-        <div style={{ fontSize: 20, color: '#8a6040', marginBottom: 4 }}>&</div>
-        <div style={{ fontSize: 42, color: accent, fontStyle: 'italic', marginBottom: 36 }}>{prenom2}</div>
-        <a href={targetUrl} style={{ display: 'inline-block', padding: '14px 40px', border: `1.5px solid ${accent}`, borderRadius: 9999, color: accent, textDecoration: 'none', fontSize: 13, letterSpacing: 2 }}>
-          Voir l&apos;invitation ✦
-        </a>
-        <div style={{ marginTop: 40, fontSize: 11, color: '#c4b5a0' }}>
-          Créé avec ❤️ par Lov&apos;it
+    <>
+      {/* ✅ Redirection automatique des humains (bots ignorent le JS) */}
+      <RedirectClient to={targetUrl} />
+
+      {/* Écran de transition (~100ms) + fallback si JS désactivé */}
+      <div style={{ background: '#fdf8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', fontFamily: 'Georgia, serif' }}>
+        <div style={{ textAlign: 'center', padding: '48px 32px', maxWidth: 400 }}>
+          {photo && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={photo} alt="" style={{ width: 140, height: 140, borderRadius: '50%', objectFit: 'cover', border: `3px solid ${accent}`, marginBottom: 28 }} />
+          )}
+          <div style={{ fontSize: 14, color: '#8a6040', marginTop: 20 }}>
+            Redirection vers votre invitation…
+          </div>
+          <noscript>
+            <a href={targetUrl} style={{ display: 'inline-block', marginTop: 20, padding: '14px 40px', border: `1.5px solid ${accent}`, borderRadius: 9999, color: accent, textDecoration: 'none' }}>
+              Accéder à l&apos;invitation ✦
+            </a>
+          </noscript>
         </div>
       </div>
-    </div>
+    </>
   )
 }
