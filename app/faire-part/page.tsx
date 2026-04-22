@@ -2888,34 +2888,35 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
             <LineSep />
           </AnimSection>
           <AnimSection delay={150}>
-            <div className="scroll-animate" style={{ ...scrollStyle, position: 'relative', textAlign: 'center', marginBottom: 8 }}>
-              {data.marie1PrenomHebreu && (
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'serif', fontSize: 'clamp(44px,11vw,70px)', color: G, direction: 'rtl', opacity: 0.12, zIndex: 0, pointerEvents: 'none', userSelect: 'none' }}>
-                  {data.marie1PrenomHebreu}
-                </div>
-              )}
-              <div style={{ fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, lineHeight: 1.1, position: 'relative', zIndex: 1 }}>
-                {data.marie1Prenom || 'Prénom'}
-              </div>
-            </div>
-            <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FC, fontStyle: 'italic', fontSize: 24, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.7 }}>&</div>
-            <div className="scroll-animate" style={{ ...scrollStyle, position: 'relative', textAlign: 'center', marginBottom: 24 }}>
-              {data.marie2PrenomHebreu && (
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'serif', fontSize: 'clamp(44px,11vw,70px)', color: G, direction: 'rtl', opacity: 0.12, zIndex: 0, pointerEvents: 'none', userSelect: 'none' }}>
-                  {data.marie2PrenomHebreu}
-                </div>
-              )}
-              <div style={{ fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, lineHeight: 1.1, position: 'relative', zIndex: 1 }}>
-                {data.marie2Prenom || 'Prénom'}
-              </div>
-            </div>
-            {data.mariageJuif && (data.marie1Prenom2 || data.marie2Prenom2) && (
-              <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 16 }}>
-                {data.marie1Prenom2 && <div style={{ fontFamily: 'serif', fontSize: 22, color: G, direction: 'rtl' }}>{data.marie1Prenom2}</div>}
-                {data.marie2Prenom2 && <div style={{ fontFamily: 'serif', fontSize: 22, color: G, direction: 'rtl' }}>{data.marie2Prenom2}</div>}
-              </div>
-            )}
-          </AnimSection>
+  <style>{`@keyframes prenomAppear{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}`}</style>
+  <div className="scroll-animate" style={{ ...scrollStyle, position: 'relative', textAlign: 'center', marginBottom: 8 }}>
+    {data.marie1PrenomHebreu && (
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'serif', fontSize: 'clamp(44px,11vw,70px)', color: G, direction: 'rtl', opacity: 0.12, zIndex: 0, pointerEvents: 'none', userSelect: 'none' }}>
+        {data.marie1PrenomHebreu}
+      </div>
+    )}
+    <div style={{ fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, lineHeight: 1.1, position: 'relative', zIndex: 1, opacity: 0, animation: 'prenomAppear 1.2s ease 0.3s forwards' }}>
+      {data.marie1Prenom || 'Prénom'}
+    </div>
+  </div>
+  <div className="scroll-animate" style={{ ...scrollStyle, fontFamily: FC, fontStyle: 'italic', fontSize: 24, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.7 }}>&</div>
+  <div className="scroll-animate" style={{ ...scrollStyle, position: 'relative', textAlign: 'center', marginBottom: 24 }}>
+    {data.marie2PrenomHebreu && (
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'serif', fontSize: 'clamp(44px,11vw,70px)', color: G, direction: 'rtl', opacity: 0.12, zIndex: 0, pointerEvents: 'none', userSelect: 'none' }}>
+        {data.marie2PrenomHebreu}
+      </div>
+    )}
+    <div style={{ fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, lineHeight: 1.1, position: 'relative', zIndex: 1, opacity: 0, animation: 'prenomAppear 1.2s ease 0.7s forwards' }}>
+      {data.marie2Prenom || 'Prénom'}
+    </div>
+  </div>
+  {data.mariageJuif && (data.marie1Prenom2 || data.marie2Prenom2) && (
+    <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 16 }}>
+      {data.marie1Prenom2 && <div style={{ fontFamily: 'serif', fontSize: 22, color: G, direction: 'rtl' }}>{data.marie1Prenom2}</div>}
+      {data.marie2Prenom2 && <div style={{ fontFamily: 'serif', fontSize: 22, color: G, direction: 'rtl' }}>{data.marie2Prenom2}</div>}
+    </div>
+  )}
+</AnimSection>
           {(parents1.length > 0 || parents2.length > 0) && (
             <AnimSection delay={300}>
               <OrnSep />
