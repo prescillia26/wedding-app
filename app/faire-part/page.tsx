@@ -822,6 +822,7 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
   <Label>Animation d'ouverture</Label>
   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
     {([
+      { key: 'none',      label: '⬜ Aucune' },
       { key: 'enveloppe', label: '💌 Enveloppe' },
       { key: 'bougie',    label: '🕯️ Bougie' },
       { key: 'plume',     label: '✍️ Plume' },
@@ -2806,41 +2807,105 @@ interface SharedPageContentProps {
   ytMuted: boolean; onToggleYtMute: () => void
 }
 // ── 💌 ENVELOPPE ──────────────────────────────────────────────────────────────
+// ── 💌 ENVELOPPE INTERACTIVE ─────────────────────────────────────────────────
 function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeObj; onDone: () => void }) {
+  const [clique, setClique] = useState(false)
   const [rabatOuvert, setRabatOuvert] = useState(false)
   const [disparait, setDisparait] = useState(false)
-  useEffect(() => {
-    setTimeout(() => setRabatOuvert(true), 800)
-    setTimeout(() => setDisparait(true), 2400)
-    setTimeout(() => onDone(), 3000)
-  }, [onDone])
+
+  const handleOpen = () => {
+    if (clique) return
+    setClique(true)
+    setTimeout(() => setRabatOuvert(true), 100)
+    setTimeout(() => setDisparait(true), 1600)
+    setTimeout(() => onDone(), 2200)
+  }
+
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: theme.fond, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: disparait ? 0 : 1, transition: 'opacity 0.6s ease', pointerEvents: disparait ? 'none' : 'auto' }}>
-      <style>{`@keyframes contentRise{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(-10px)}}`}</style>
-      <div style={{ position: 'relative', width: 280, perspective: 800 }}>
-        <div style={{ background: 'white', border: `1.5px solid ${theme.accent}`, borderRadius: 8, height: 180, overflow: 'hidden', boxShadow: `0 8px 40px ${theme.accent}33` }}>
+      <style>{`
+        @keyframes envFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+        @keyframes contentRise{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(-10px)}}
+        @keyframes btnPulse{0%,100%{box-shadow:0 0 0 0 ${theme.accent}44}70%{box-shadow:0 0 0 10px ${theme.accent}00}}
+      `}</style>
+
+      {/* Titre au dessus */}
+      <div style={{ marginBottom: 40, textAlign: 'center', opacity: clique ? 0 : 1, transition: 'opacity 0.3s' }}>
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: theme.accent, letterSpacing: 2, marginBottom: 8 }}>
+          Vous avez reçu une invitation
+        </div>
+        <div style={{ width: 40, height: '0.5px', background: theme.accent, opacity: 0.4, margin: '0 auto' }} />
+      </div>
+
+      {/* Enveloppe */}
+      <div
+        onClick={handleOpen}
+        style={{ position: 'relative', width: 300, cursor: clique ? 'default' : 'pointer', animation: clique ? 'none' : 'envFloat 2.5s ease infinite', perspective: 800 }}
+      >
+        {/* Corps enveloppe */}
+        <div style={{ background: 'white', border: `1.5px solid ${theme.accent}44`, borderRadius: 12, height: 200, overflow: 'hidden', boxShadow: `0 12px 48px ${theme.accent}33, 0 2px 8px rgba(0,0,0,0.08)`, position: 'relative' }}>
+          {/* Photo ou fond dégradé */}
           {data.photosFond?.[0] ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={data.photosFond[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }} />
+            <img src={data.photosFond[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.4 }} />
           ) : (
-            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `${theme.accent}08` }}>
+            <div style={{ width: '100%', height: '100%', background: `linear-gradient(135deg, ${theme.fond}, ${theme.accent}18)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <MonogramByStyle initial1={(data.marie1Prenom || 'A')[0].toUpperCase()} initial2={(data.marie2Prenom || 'B')[0].toUpperCase()} color={theme.accent} size={80} style={data.monogrammeStyle || 'cercle'} />
             </div>
           )}
+          {/* Lignes décoratives en V dans le bas de l'enveloppe */}
+          <svg style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }} width="300" height="80" viewBox="0 0 300 80">
+            <path d="M0 80 L150 30 L300 80" fill={`${theme.accent}18`} stroke={`${theme.accent}33`} strokeWidth="1" />
+          </svg>
         </div>
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 90, transformOrigin: 'top center', transform: rabatOuvert ? 'rotateX(-180deg)' : 'rotateX(0deg)', transition: 'transform 1s cubic-bezier(0.22,1,0.36,1)', zIndex: 10, background: theme.fond, border: `1.5px solid ${theme.accent}`, borderBottom: 'none', clipPath: 'polygon(0 0, 100% 0, 50% 100%)' }} />
+
+        {/* Rabat supérieur */}
+        <div style={{
+          position: 'absolute',
+          top: 0, left: 0, right: 0,
+          height: 110,
+          transformOrigin: 'top center',
+          transform: rabatOuvert ? 'rotateX(-185deg)' : 'rotateX(0deg)',
+          transition: 'transform 1s cubic-bezier(0.22,1,0.36,1)',
+          zIndex: 10,
+          background: `linear-gradient(135deg, white, ${theme.fond})`,
+          border: `1.5px solid ${theme.accent}44`,
+          borderBottom: 'none',
+          borderRadius: '12px 12px 0 0',
+          clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
+          boxShadow: `0 4px 20px ${theme.accent}22`,
+        }} />
+
+        {/* Sceau au centre du rabat */}
+        {!clique && (
+          <div style={{ position: 'absolute', top: 52, left: '50%', transform: 'translateX(-50%)', zIndex: 20, width: 40, height: 40, borderRadius: '50%', background: `radial-gradient(circle at 35% 35%, ${theme.accent}, ${theme.accent}cc)`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 2px 12px ${theme.accent}66`, cursor: 'pointer' }}>
+            <span style={{ fontFamily: 'serif', fontSize: 14, color: 'white', fontWeight: 700 }}>
+              {(data.marie1Prenom || 'A')[0]}{(data.marie2Prenom || 'B')[0]}
+            </span>
+          </div>
+        )}
+
+        {/* Contenu qui monte après ouverture */}
         {rabatOuvert && (
-          <div style={{ position: 'absolute', top: -50, left: 0, right: 0, textAlign: 'center', animation: 'contentRise 0.8s ease 0.2s forwards', opacity: 0, zIndex: 5 }}>
-            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 26, color: theme.accent }}>{data.marie1Prenom} & {data.marie2Prenom}</div>
+          <div style={{ position: 'absolute', top: -55, left: 0, right: 0, textAlign: 'center', animation: 'contentRise 0.8s ease 0.3s forwards', opacity: 0, zIndex: 5, pointerEvents: 'none' }}>
+            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 28, color: theme.accent }}>{data.marie1Prenom} & {data.marie2Prenom}</div>
           </div>
         )}
       </div>
-      <div style={{ marginTop: 36, fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: theme.accent, opacity: rabatOuvert ? 1 : 0, transition: 'opacity 0.6s ease 0.6s', letterSpacing: 1 }}>
-        Votre invitation vous attend...
-      </div>
+
+      {/* Bouton ouvrir */}
+      {!clique && (
+        <button
+          onClick={handleOpen}
+          style={{ ...BTN, marginTop: 40, padding: '14px 40px', border: `1.5px solid ${theme.accent}`, borderRadius: 9999, background: 'transparent', color: theme.accent, fontFamily: 'var(--font-playfair-display)', fontSize: 13, fontWeight: 600, letterSpacing: 3, animation: 'btnPulse 2s ease infinite' }}
+        >
+          Ouvrir mon invitation ✦
+        </button>
+      )}
     </div>
   )
 }
+
 
 // ── 🕯️ BOUGIE ─────────────────────────────────────────────────────────────────
 function AnimBougie({ data, theme, onDone }: { data: FormData; theme: ThemeObj; onDone: () => void }) {
@@ -3099,59 +3164,110 @@ function AnimPetales({ data, theme, onDone }: { data: FormData; theme: ThemeObj;
 
 // ── 📜 PARCHEMIN ──────────────────────────────────────────────────────────────
 function AnimParchemin({ data, theme, onDone }: { data: FormData; theme: ThemeObj; onDone: () => void }) {
+  const [clique, setClique] = useState(false)
   const [ouvert, setOuvert] = useState(false)
   const [disparait, setDisparait] = useState(false)
-  useEffect(() => {
-    setTimeout(() => setOuvert(true), 400)
-    setTimeout(() => setDisparait(true), 3000)
-    setTimeout(() => onDone(), 3600)
-  }, [onDone])
+
+  const handleOpen = () => {
+    if (clique) return
+    setClique(true)
+    setTimeout(() => setOuvert(true), 100)
+    setTimeout(() => setDisparait(true), 3800)
+    setTimeout(() => onDone(), 4400)
+  }
+
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: '#1a1008', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: disparait ? 0 : 1, transition: 'opacity 0.6s ease', pointerEvents: disparait ? 'none' : 'auto' }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: '#1a1008', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: disparait ? 0 : 1, transition: 'opacity 0.6s ease', pointerEvents: disparait ? 'none' : 'auto', padding: '0 20px' }}>
       <style>{`
-        @keyframes derouler{from{max-height:60px;opacity:0.5}to{max-height:480px;opacity:1}}
-        @keyframes parchTextIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes derouler{from{max-height:80px}to{max-height:520px}}
+        @keyframes parchTextIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes rouleauFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+        @keyframes sceauShine{0%,100%{box-shadow:0 0 0 0 #C9A84C44}70%{box-shadow:0 0 0 12px #C9A84C00}}
       `}</style>
-      <div style={{ position: 'relative', width: 300 }}>
-        {/* Rouleau haut */}
-        <div style={{ height: 24, background: `linear-gradient(to bottom, #c8a96e, #a07840)`, borderRadius: '4px 4px 0 0', boxShadow: `0 -4px 12px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.2)` }} />
-        {/* Corps parchemin */}
-        <div style={{ background: `linear-gradient(135deg, #fdf5e4, #f5e6c8, #fdf5e4)`, overflow: 'hidden', maxHeight: ouvert ? 480 : 60, animation: ouvert ? 'derouler 1.4s cubic-bezier(0.22,1,0.36,1) forwards' : 'none', boxShadow: '4px 0 12px rgba(0,0,0,0.3), -4px 0 12px rgba(0,0,0,0.3)' }}>
-          {/* Texture parchemin */}
-          <div style={{ padding: '32px 28px', textAlign: 'center' }}>
-            {data.mariageJuif && (
-              <div style={{ fontFamily: 'serif', fontSize: 16, color: theme.accent, direction: 'rtl', marginBottom: 20, animation: 'parchTextIn 0.6s ease 1s forwards', opacity: 0 }}>בס״ד</div>
-            )}
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: '#8a6040', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 20, animation: 'parchTextIn 0.6s ease 0.8s forwards', opacity: 0 }}>
-              Invitation
-            </div>
-            <div style={{ width: 60, height: '0.5px', background: theme.accent, animation: 'parchTextIn 0.4s ease 0.9s forwards', opacity: 0, margin: '0 auto 20px'}} />
-            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, lineHeight: 1.1, marginBottom: 8, animation: 'parchTextIn 0.8s ease 1.1s forwards', opacity: 0 }}>
-              {data.marie1Prenom}
-            </div>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, color: '#8a6040', marginBottom: 8, animation: 'parchTextIn 0.6s ease 1.3s forwards', opacity: 0 }}>&</div>
-            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, lineHeight: 1.1, marginBottom: 24, animation: 'parchTextIn 0.8s ease 1.5s forwards', opacity: 0 }}>
-              {data.marie2Prenom}
-            </div>
-            <div style={{ width: 60, height: '0.5px', background: theme.accent, animation: 'parchTextIn 0.4s ease 1.7s forwards', opacity: 0, margin: '0 auto 16px' }} />
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: '#8a6040', letterSpacing: 1, animation: 'parchTextIn 0.6s ease 1.9s forwards', opacity: 0 }}>
-              vous invitent à célébrer leur union
-            </div>
-            <div style={{ marginTop: 24, display: 'flex', justifyContent: 'center', animation: 'parchTextIn 0.6s ease 2.1s forwards', opacity: 0 }}>
-              <MonogramByStyle initial1={(data.marie1Prenom || 'A')[0].toUpperCase()} initial2={(data.marie2Prenom || 'B')[0].toUpperCase()} color={theme.accent} size={60} style={data.monogrammeStyle || 'cercle'} />
-            </div>
+
+      {/* Titre */}
+      {!clique && (
+        <div style={{ marginBottom: 32, textAlign: 'center' }}>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#C9A84C', letterSpacing: 2, opacity: 0.8 }}>
+            Un message vous est parvenu...
           </div>
         </div>
+      )}
+
+      <div style={{ position: 'relative', width: '100%', maxWidth: 300, animation: clique ? 'none' : 'rouleauFloat 3s ease infinite' }}>
+        {/* Rouleau haut */}
+        <div style={{ height: 28, background: 'linear-gradient(to bottom, #d4b87a, #a07840, #d4b87a)', borderRadius: '6px 6px 0 0', boxShadow: '0 -4px 16px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.25)', position: 'relative', zIndex: 2 }}>
+          <div style={{ position: 'absolute', left: '10%', right: '10%', top: '50%', transform: 'translateY(-50%)', height: 2, background: 'rgba(255,255,255,0.15)', borderRadius: 1 }} />
+        </div>
+
+        {/* Corps parchemin */}
+        <div style={{ background: 'linear-gradient(135deg, #fdf5e4 0%, #f5e6c8 50%, #fdf5e4 100%)', overflow: 'hidden', maxHeight: ouvert ? 520 : 80, animation: ouvert ? 'derouler 1.6s cubic-bezier(0.22,1,0.36,1) forwards' : 'none', boxShadow: '6px 0 16px rgba(0,0,0,0.4), -6px 0 16px rgba(0,0,0,0.4)', position: 'relative' }}>
+          {/* Texture */}
+          <div style={{ position: 'absolute', inset: 0, backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(160,120,64,0.05) 28px, rgba(160,120,64,0.05) 29px)', pointerEvents: 'none' }} />
+          
+          <div style={{ padding: '28px 32px', textAlign: 'center', position: 'relative' }}>
+            {/* Sceau fermé (avant ouverture) */}
+            {!clique && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+                <div style={{ width: 56, height: 56, borderRadius: '50%', background: `radial-gradient(circle at 35% 35%, ${theme.accent}, ${theme.accent}aa)`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 4px 16px ${theme.accent}66`, animation: 'sceauShine 2s ease infinite', cursor: 'pointer' }} onClick={handleOpen}>
+                  <span style={{ fontFamily: 'serif', fontSize: 18, color: 'white', fontWeight: 700 }}>
+                    {(data.marie1Prenom || 'A')[0]}{(data.marie2Prenom || 'B')[0]}
+                  </span>
+                </div>
+                <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: '#8a6040', letterSpacing: 1 }}>
+                  Brisez le sceau
+                </div>
+              </div>
+            )}
+
+            {/* Contenu révélé */}
+            {ouvert && (
+              <>
+                {data.mariageJuif && (
+                  <div style={{ fontFamily: 'serif', fontSize: 15, color: theme.accent, direction: 'rtl', marginBottom: 16, animation: 'parchTextIn 0.6s ease 0.6s forwards', opacity: 0 }}>בס״ד</div>
+                )}
+                <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: '#8a6040', letterSpacing: 4, textTransform: 'uppercase', marginBottom: 16, animation: 'parchTextIn 0.6s ease 0.8s forwards', opacity: 0 }}>
+                  Invitation
+                </div>
+                <div style={{ width: 50, height: '0.5px', background: theme.accent, opacity: 0.5, margin: '0 auto 18px', animation: 'parchTextIn 0.4s ease 0.9s forwards', opacity: 0 }} />
+                <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, lineHeight: 1.1, marginBottom: 6, animation: 'parchTextIn 0.8s ease 1s forwards', opacity: 0 }}>
+                  {data.marie1Prenom}
+                </div>
+                <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, color: '#8a6040', marginBottom: 6, animation: 'parchTextIn 0.5s ease 1.3s forwards', opacity: 0 }}>&</div>
+                <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, lineHeight: 1.1, marginBottom: 20, animation: 'parchTextIn 0.8s ease 1.5s forwards', opacity: 0 }}>
+                  {data.marie2Prenom}
+                </div>
+                <div style={{ width: 50, height: '0.5px', background: theme.accent, opacity: 0.5, margin: '0 auto 16px', animation: 'parchTextIn 0.4s ease 1.8s forwards', opacity: 0 }} />
+                <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 12, color: '#8a6040', letterSpacing: 1, marginBottom: 20, animation: 'parchTextIn 0.6s ease 2s forwards', opacity: 0 }}>
+                  vous invitent à célébrer leur union
+                </div>
+                <div style={{ animation: 'parchTextIn 0.6s ease 2.4s forwards', opacity: 0 }}>
+                  <MonogramByStyle initial1={(data.marie1Prenom || 'A')[0].toUpperCase()} initial2={(data.marie2Prenom || 'B')[0].toUpperCase()} color={theme.accent} size={55} style={data.monogrammeStyle || 'cercle'} />
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
         {/* Rouleau bas */}
-        <div style={{ height: 24, background: `linear-gradient(to top, #c8a96e, #a07840)`, borderRadius: '0 0 4px 4px', boxShadow: `0 4px 12px rgba(0,0,0,0.4), inset 0 -2px 4px rgba(255,255,255,0.2)` }} />
+        <div style={{ height: 28, background: 'linear-gradient(to top, #d4b87a, #a07840, #d4b87a)', borderRadius: '0 0 6px 6px', boxShadow: '0 4px 16px rgba(0,0,0,0.5), inset 0 -2px 4px rgba(255,255,255,0.25)', position: 'relative', zIndex: 2 }}>
+          <div style={{ position: 'absolute', left: '10%', right: '10%', top: '50%', transform: 'translateY(-50%)', height: 2, background: 'rgba(255,255,255,0.15)', borderRadius: 1 }} />
+        </div>
       </div>
+
+      {/* Bouton découvrir (avant ouverture) */}
+      {!clique && (
+        <button onClick={handleOpen} style={{ ...BTN, marginTop: 36, padding: '14px 40px', border: '1.5px solid #C9A84C', borderRadius: 9999, background: 'transparent', color: '#C9A84C', fontFamily: 'var(--font-playfair-display)', fontSize: 13, fontWeight: 600, letterSpacing: 3 }}>
+          Ouvrir le parchemin ✦
+        </button>
+      )}
     </div>
   )
 }
-
 // ── DISPATCHER ────────────────────────────────────────────────────────────────
 function EnveloppeAnimation({ data, theme, onDone }: { data: FormData; theme: ThemeObj; onDone: () => void }) {
   const anim = data.introAnimation || 'enveloppe'
+  if (anim === 'none')      { onDone(); return null }
   if (anim === 'bougie')    return <AnimBougie    data={data} theme={theme} onDone={onDone} />
   if (anim === 'plume')     return <AnimPlume     data={data} theme={theme} onDone={onDone} />
   if (anim === 'sceau')     return <AnimSceau     data={data} theme={theme} onDone={onDone} />
@@ -3159,6 +3275,7 @@ function EnveloppeAnimation({ data, theme, onDone }: { data: FormData; theme: Th
   if (anim === 'parchemin') return <AnimParchemin data={data} theme={theme} onDone={onDone} />
   return <AnimEnveloppe data={data} theme={theme} onDone={onDone} />
 }
+
 function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute }: SharedPageContentProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const [currentCeremonyIdx, setCurrentCeremonyIdx] = useState(0)
