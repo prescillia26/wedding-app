@@ -871,14 +871,14 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
     {([
       { key: 'fade',        label: '✨ Fondu' },
-      { key: 'slide-up',   label: '⬆️ Du bas' },
-      { key: 'slide-down', label: '⬇️ Du haut' },
+      { key: 'slide-up',   label: '⬆️ Monte' },
+      { key: 'rideau',     label: '🎞️ Rideau' },
+      { key: 'brille',     label: '💫 Brillance' },
+      { key: 'deplie',     label: '📜 Déplie' },
+      { key: 'flou',       label: '🌫️ Flou' },
       { key: 'slide-left', label: '⬅️ De droite' },
-      { key: 'slide-right',label: '➡️ De gauche' },
       { key: 'zoom',       label: '🔍 Zoom' },
-      { key: 'bounce',     label: '🎯 Rebond' },
       { key: 'flip',       label: '🔄 Flip' },
-      { key: 'swing',      label: '🌊 Swing' },
     ] as {key:string;label:string}[]).map(opt => {
       const sel = (data.animationStyle || 'slide-up') === opt.key
       return (
@@ -2750,22 +2750,21 @@ function AnimSection({ children, delay = 0, style, animStyle = 'slide-up' }: {
     el.style.opacity = '0'
     const getAnim = () => {
       switch(animStyle) {
-        case 'fade':        return 'lovitFade 0.8s ease forwards'
+        case 'fade':        return 'lovitFade 1s ease forwards'
         case 'slide-up':    return 'lovitSlideUp 0.9s cubic-bezier(0.22,1,0.36,1) forwards'
-        case 'slide-down':  return 'lovitSlideDown 0.9s cubic-bezier(0.22,1,0.36,1) forwards'
         case 'slide-left':  return 'lovitSlideLeft 0.9s cubic-bezier(0.22,1,0.36,1) forwards'
         case 'slide-right': return 'lovitSlideRight 0.9s cubic-bezier(0.22,1,0.36,1) forwards'
         case 'zoom':        return 'lovitZoom 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards'
-        case 'bounce':      return 'lovitBounce 1s cubic-bezier(0.34,1.56,0.64,1) forwards'
         case 'flip':        return 'lovitFlip 0.8s cubic-bezier(0.22,1,0.36,1) forwards'
-        case 'swing':       return 'lovitSwing 0.9s cubic-bezier(0.34,1.56,0.64,1) forwards'
+        case 'rideau':      return 'lovitRideau 1.1s cubic-bezier(0.22,1,0.36,1) forwards'
+        case 'brille':      return 'lovitBrille 1.2s ease forwards'
+        case 'deplie':      return 'lovitDeplie 0.9s cubic-bezier(0.22,1,0.36,1) forwards'
+        case 'flou':        return 'lovitFlou 1s ease forwards'
         default:            return 'lovitSlideUp 0.9s cubic-bezier(0.22,1,0.36,1) forwards'
       }
     }
     const obs = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting) {
-        el.style.animation = `${getAnim().replace('forwards', '')} ${delay}ms forwards`
-        el.style.animationDelay = `${delay}ms`
         el.style.animation = getAnim()
         el.style.animationDelay = `${delay}ms`
         obs.disconnect()
@@ -2777,26 +2776,45 @@ function AnimSection({ children, delay = 0, style, animStyle = 'slide-up' }: {
   return (
     <div ref={ref} style={{ opacity: 0, ...style }}>
       <style>{`
-        @keyframes lovitFade { from{opacity:0} to{opacity:1} }
-        @keyframes lovitSlideUp { from{opacity:0;transform:translateY(80px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes lovitSlideDown { from{opacity:0;transform:translateY(-80px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes lovitSlideLeft { from{opacity:0;transform:translateX(80px)} to{opacity:1;transform:translateX(0)} }
-        @keyframes lovitSlideRight { from{opacity:0;transform:translateX(-80px)} to{opacity:1;transform:translateX(0)} }
-        @keyframes lovitZoom { from{opacity:0;transform:scale(0.6)} to{opacity:1;transform:scale(1)} }
-        @keyframes lovitBounce { 
-          0%{opacity:0;transform:translateY(-120px)} 
-          60%{opacity:1;transform:translateY(20px)} 
-          80%{transform:translateY(-10px)} 
-          100%{opacity:1;transform:translateY(0)} 
+        @keyframes lovitFade { 
+          from{opacity:0} to{opacity:1} 
+        }
+        @keyframes lovitSlideUp { 
+          from{opacity:0;transform:translateY(60px)} 
+          to{opacity:1;transform:translateY(0)} 
+        }
+        @keyframes lovitSlideLeft { 
+          from{opacity:0;transform:translateX(60px)} 
+          to{opacity:1;transform:translateX(0)} 
+        }
+        @keyframes lovitSlideRight { 
+          from{opacity:0;transform:translateX(-60px)} 
+          to{opacity:1;transform:translateX(0)} 
+        }
+        @keyframes lovitZoom { 
+          from{opacity:0;transform:scale(0.7)} 
+          to{opacity:1;transform:scale(1)} 
         }
         @keyframes lovitFlip { 
-          from{opacity:0;transform:perspective(400px) rotateX(-90deg)} 
-          to{opacity:1;transform:perspective(400px) rotateX(0)} 
+          from{opacity:0;transform:perspective(600px) rotateX(-90deg)} 
+          to{opacity:1;transform:perspective(600px) rotateX(0)} 
         }
-        @keyframes lovitSwing { 
-          0%{opacity:0;transform:translateX(-100px) rotate(-8deg)} 
-          60%{transform:translateX(10px) rotate(2deg)} 
-          100%{opacity:1;transform:translateX(0) rotate(0)} 
+        @keyframes lovitRideau { 
+          from{opacity:1;clip-path:inset(0 100% 0 0)} 
+          to{opacity:1;clip-path:inset(0 0% 0 0)} 
+        }
+        @keyframes lovitBrille { 
+          0%{opacity:0;filter:brightness(3) blur(4px)} 
+          40%{opacity:1;filter:brightness(1.8) blur(1px)} 
+          100%{opacity:1;filter:brightness(1) blur(0)} 
+        }
+        @keyframes lovitDeplie { 
+          from{opacity:0;transform:scaleY(0);transform-origin:top} 
+          to{opacity:1;transform:scaleY(1);transform-origin:top} 
+        }
+        @keyframes lovitFlou { 
+          from{opacity:0;filter:blur(12px);transform:scale(1.05)} 
+          to{opacity:1;filter:blur(0);transform:scale(1)} 
         }
       `}</style>
       {children}
