@@ -1138,6 +1138,7 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         </div>
         <MusicUploader musicUrl={data.musicUrl ?? ''} musicName={data.musicName} onChange={(url, name) => onChange({ musicUrl: url, musicName: name ?? '' })} />
       </div>
+      <StyleAccueilSelector data={data} onChange={onChange} />
       <PhotoSection data={data} onChange={onChange} />
       <div style={{ marginTop: 20 }}>
         <Label>Votre email (notifications RSVP)</Label>
@@ -3706,7 +3707,14 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
 
       {/* SECTION 1 : Écran d'accueil */}
       <div style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-        <IntroCarousel photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} themeAccent={G} photosData={data.photosData} />
+        {data.styleAccueil === 'illustration' && data.illustrationCoupleId ? (
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={ILLUSTRATIONS_COUPLES.find(i => i.id === data.illustrationCoupleId)?.url} alt="" style={{ maxWidth: '80%', maxHeight: '70%', objectFit: 'contain' }} />
+          </div>
+        ) : (
+          <IntroCarousel photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} themeAccent={G} photosData={data.photosData} />
+        )}
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '0 32px', maxWidth: 480, width: '100%', margin: '0 auto' }}>
           {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 16, color: introTextColor, direction: 'rtl', marginBottom: 20, animation: 'sharedFadeIn 0.9s ease forwards' }}>בס״ד</div>}
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
