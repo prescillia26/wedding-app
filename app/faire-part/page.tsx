@@ -3229,7 +3229,7 @@ function AnimParchemin({ data, theme, onDone }: { data: FormData; theme: ThemeOb
                 <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: '#8a6040', letterSpacing: 4, textTransform: 'uppercase', marginBottom: 16, animation: 'parchTextIn 0.6s ease 0.8s forwards', opacity: 0 }}>
                   Invitation
                 </div>
-                <div style={{ width: 50, height: '0.5px', background: theme.accent, opacity: 0.5, margin: '0 auto 18px', animation: 'parchTextIn 0.4s ease 0.9s forwards', opacity: 0 }} />
+                <div style={{ width: 50, height: '0.5px', background: theme.accent, margin: '0 auto 18px', animation: 'parchTextIn 0.4s ease 0.9s forwards', opacity: 0}} />
                 <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, lineHeight: 1.1, marginBottom: 6, animation: 'parchTextIn 0.8s ease 1s forwards', opacity: 0 }}>
                   {data.marie1Prenom}
                 </div>
@@ -3237,7 +3237,7 @@ function AnimParchemin({ data, theme, onDone }: { data: FormData; theme: ThemeOb
                 <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, lineHeight: 1.1, marginBottom: 20, animation: 'parchTextIn 0.8s ease 1.5s forwards', opacity: 0 }}>
                   {data.marie2Prenom}
                 </div>
-                <div style={{ width: 50, height: '0.5px', background: theme.accent, opacity: 0.5, margin: '0 auto 16px', animation: 'parchTextIn 0.4s ease 1.8s forwards', opacity: 0 }} />
+                <div style={{ width: 50, height: '0.5px', background: theme.accent, margin: '0 auto 16px', animation: 'parchTextIn 0.4s ease 1.8s forwards', opacity: 0}} />
                 <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 12, color: '#8a6040', letterSpacing: 1, marginBottom: 20, animation: 'parchTextIn 0.6s ease 2s forwards', opacity: 0 }}>
                   vous invitent à célébrer leur union
                 </div>
