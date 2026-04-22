@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 
+
 type Theme = 'rose-fleuri' | 'ivoire-or' | 'bleu-floral' | 'champetre' | 'blanc-gris' | 'noir-blanc' | 'chocolat' | 'bordeaux' | 'bordeaux-nuit' | 'fuchsia' | 'marine-or' | 'menthe'
 type PresentationStyle = 'page-unique' | 'cartes-scrollables' | 'cartes-separees'
-
+// ⚙️ Nombre max de photos uploadables par couple (carrousel de la section d'accueil)
+const MAX_PHOTOS = 3
 const THEMES: Record<Theme, ThemeObj> = {
   'rose-fleuri':   { fond: '#faf6f4', accent: '#c4829a', texte: '#2d2d2d', textSecondaire: '#8a6070', nom: 'Rose Fleuri' },
   'ivoire-or':     { fond: '#fdf8f0', accent: '#C9A84C', texte: '#2d2014', textSecondaire: '#6a5040', nom: 'Ivoire & Or' },
@@ -45,13 +47,34 @@ const FRAMES: { id: string; label: string; url: string | null }[] = [
   { id: 'frame-32', label: '🌷 Floral 16', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778821/16_cibjrt.png' },
   { id: 'frame-34', label: '🌻 Floral 14', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778816/14_bzmmdm.png' },
   { id: 'frame-55', label: '🌸 Floral 55', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857011/55_l7xahl.png' },
-{ id: 'frame-56', label: '🌸 Floral 56', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857012/56_siwk5j.png' },
-{ id: 'frame-61', label: '🌸 Floral 61', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857014/61_nnkips.png' },
-{ id: 'frame-65', label: '🌸 Floral 65', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857017/65_hzdotl.png' },
-{ id: 'frame-67', label: '🌸 Floral 67', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857018/67_so3kot.png' },
-{ id: 'frame-69', label: '🌸 Floral 69', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857021/69_vko7to.png' },
-{ id: 'frame-70', label: '🌸 Floral 70', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857021/70_skvaop.png' },
-{ id: 'frame-71', label: '🌸 Floral 71', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857022/71_ntcix8.png' },
+  { id: 'frame-56', label: '🌸 Floral 56', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857012/56_siwk5j.png' },
+  { id: 'frame-61', label: '🌸 Floral 61', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857014/61_nnkips.png' },
+  { id: 'frame-65', label: '🌸 Floral 65', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857017/65_hzdotl.png' },
+  { id: 'frame-67', label: '🌸 Floral 67', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857018/67_so3kot.png' },
+  { id: 'frame-69', label: '🌸 Floral 69', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857021/69_vko7to.png' },
+  { id: 'frame-70', label: '🌸 Floral 70', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857021/70_skvaop.png' },
+  { id: 'frame-71', label: '🌸 Floral 71', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857022/71_ntcix8.png' },
+  { id: 'frame-75', label: '🌸 Floral 75', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878823/75_qc4gsm.png' },
+  { id: 'frame-76', label: '🌸 Floral 76', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878833/76_g2u8xr.png' },
+  { id: 'frame-77', label: '🌸 Floral 77', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878824/77_rnfcni.png' },
+  { id: 'frame-78', label: '🌸 Floral 78', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878816/78_umvdax.png' },
+  { id: 'frame-79', label: '🌸 Floral 79', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878824/79_msrbl6.png' },
+  { id: 'frame-80', label: '🌸 Floral 80', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878829/80_vsytvo.png' },
+  { id: 'frame-95', label: '🌸 Floral 95', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878845/95_w9natp.png' },
+  { id: 'frame-96', label: '🌸 Floral 96', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878838/96_bauksw.png' },
+  { id: 'frame-97', label: '🌸 Floral 97', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878845/97_dcccon.png' },
+  { id: 'frame-98', label: '🌸 Floral 98', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878848/98_jau9vb.png' },
+  { id: 'frame-99', label: '🌸 Floral 99', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878852/99_webyut.png' },
+  { id: 'frame-100', label: '🌸 Floral 100', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878852/100_kzuxzq.png' },
+  { id: 'frame-101', label: '🌸 Floral 101', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878850/101_s1bjjf.png' },
+  { id: 'frame-102', label: '🌸 Floral 102', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878855/102_atqmm6.png' },
+  { id: 'frame-103', label: '🌸 Floral 103', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878853/103_siefgf.png' },
+  { id: 'frame-104', label: '🌸 Floral 104', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878854/104_mafsu8.png' },
+  { id: 'frame-105', label: '🌸 Floral 105', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878857/105_cyugrg.png' },
+  { id: 'frame-106', label: '🌸 Floral 106', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878859/106_lv0kwe.png' },
+  { id: 'frame-107', label: '🌸 Floral 107', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878857/107_jal3jp.png' },
+  { id: 'frame-108', label: '🌸 Floral 108', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878858/108_xvumew.png' },
+  { id: 'frame-123', label: '🌸 Floral 123', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878947/123_ieexv8.png' },
   { id: 'none', label: '⬜ Sans cadre', url: null },
 ]
 
