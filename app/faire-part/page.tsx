@@ -2109,22 +2109,17 @@ function AudioPlayer({ musicUrl, accent, playRef }: { musicUrl: string; accent: 
     }
 
     if (wasPreStarted) {
-      // L'audio a déjà été démarré dans next() — ne pas appeler play() à nouveau
-      // (double appel = le navigateur peut annuler le premier)
       if (!audio.paused) {
         setStarted(true)
       } else {
-        // Toujours en cours de chargement, on attend l'événement playing
         const onPlaying = () => setStarted(true)
         audio.addEventListener('playing', onPlaying, { once: true })
       }
       return () => { if (playRef) playRef.current = null }
     }
 
-    // Cas normal (vue invité ou draft) : tenter play()
     let cleanupListeners: (() => void) | null = null
     audio.play().then(() => setStarted(true)).catch(() => {
-      // Fallback : démarre au premier clic/touch (ex: bouton DÉCOUVRIR)
       const tryPlay = () => {
         audio.play().then(() => setStarted(true)).catch(() => {})
         document.removeEventListener('click', tryPlay, true)
@@ -2143,21 +2138,23 @@ function AudioPlayer({ musicUrl, accent, playRef }: { musicUrl: string; accent: 
   const toggleMute = () => {
     const audio = audioRef.current
     if (!audio) return
+    if (!started) {
+      audio.play().then(() => setStarted(true)).catch(() => {})
+      return
+    }
     audio.muted = !muted
     setMuted(m => !m)
   }
 
   return (
     <>
-      {started && (
-        <button
-          onClick={toggleMute}
-          onTouchEnd={e => { e.preventDefault(); toggleMute() }}
-          style={{ ...BTN, position: 'fixed', bottom: 24, right: 24, zIndex: 50, width: 40, height: 40, borderRadius: '50%', background: accent, color: 'white', border: 'none', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-        >
-          {muted ? '🔇' : '🔊'}
-        </button>
-      )}
+      <button
+        onClick={toggleMute}
+        onTouchEnd={e => { e.preventDefault(); toggleMute() }}
+        style={{ ...BTN, position: 'fixed', bottom: 24, right: 24, zIndex: 50, width: 40, height: 40, borderRadius: '50%', background: accent, color: 'white', border: 'none', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      >
+        {!started ? '▶️' : muted ? '🔇' : '🔊'}
+      </button>
     </>
   )
 }
