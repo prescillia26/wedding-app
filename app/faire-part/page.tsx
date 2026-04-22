@@ -1715,6 +1715,7 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
   const [message, setMessage] = useState('')
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [accompagnants, setAccompagnants] = useState<Record<number, string[]>>({})
 
   const setPresent = (i: number, val: boolean) => {
     setReponses(rs => rs.map((r, idx) => idx === i ? { ...r, present: r.present === val ? null : val } : r))
@@ -1731,7 +1732,13 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
         nom,
         email: email || undefined,
         message: message || undefined,
-        reponses: reponses.map(r => ({ ceremonie: r.ceremonie, date: r.date, present: r.present ?? false, nbPersonnes: r.present ? r.nbPersonnes : 0 })),
+        reponses: reponses.map((r, i) => ({
+          ceremonie: r.ceremonie,
+          date: r.date,
+          present: r.present ?? false,
+          nbPersonnes: r.present ? r.nbPersonnes : 0,
+          accompagnants: r.present ? (accompagnants[i] ?? []).filter(Boolean) : [],
+        })),
         sentAt: new Date().toISOString(),
         shareId: shareId ?? undefined,
         mariee1,
@@ -1780,7 +1787,6 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
         <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: accent, textAlign: 'center', marginBottom: 4 }}>RSVP</div>
         <div style={{ fontSize: 13, color: '#9ca3af', textAlign: 'center', marginBottom: 20 }}>{mariee1} & {mariee2}</div>
 
-        {/* Progress bar */}
         <div style={{ height: 4, background: '#f3e8ff', borderRadius: 9999, marginBottom: 28, overflow: 'hidden' }}>
           <div style={{ height: '100%', width: `${progressPct}%`, background: accent, borderRadius: 9999, transition: 'width 0.3s ease' }} />
         </div>
@@ -1828,11 +1834,29 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
                     }}>Absent ✗</button>
                   </div>
                   {r.present === true && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4 }}>
-                      <span style={{ fontSize: 12, color: '#6a5040' }}>Nb de personnes :</span>
-                      <button type="button" onClick={() => setNbPersonnes(i, -1)} style={{ ...BTN, width: 28, height: 28, borderRadius: 9999, border: `1.5px solid ${accent}44`, background: 'white', color: accent, fontWeight: 700, fontSize: 16, padding: 0 }}>−</button>
-                      <span style={{ fontSize: 15, fontWeight: 700, color: accent, minWidth: 20, textAlign: 'center' }}>{r.nbPersonnes}</span>
-                      <button type="button" onClick={() => setNbPersonnes(i, 1)} style={{ ...BTN, width: 28, height: 28, borderRadius: 9999, border: `1.5px solid ${accent}44`, background: 'white', color: accent, fontWeight: 700, fontSize: 16, padding: 0 }}>+</button>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4 }}>
+                        <span style={{ fontSize: 12, color: '#6a5040' }}>Nb de personnes :</span>
+                        <button type="button" onClick={() => setNbPersonnes(i, -1)} style={{ ...BTN, width: 28, height: 28, borderRadius: 9999, border: `1.5px solid ${accent}44`, background: 'white', color: accent, fontWeight: 700, fontSize: 16, padding: 0 }}>−</button>
+                        <span style={{ fontSize: 15, fontWeight: 700, color: accent, minWidth: 20, textAlign: 'center' }}>{r.nbPersonnes}</span>
+                        <button type="button" onClick={() => setNbPersonnes(i, 1)} style={{ ...BTN, width: 28, height: 28, borderRadius: 9999, border: `1.5px solid ${accent}44`, background: 'white', color: accent, fontWeight: 700, fontSize: 16, padding: 0 }}>+</button>
+                      </div>
+                      {r.nbPersonnes > 1 && (
+                        <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                          {Array.from({ length: r.nbPersonnes - 1 }).map((_, j) => (
+                            <input key={j} type="text"
+                              placeholder={`Prénom personne ${j + 2}`}
+                              value={accompagnants[i]?.[j] ?? ''}
+                              onChange={e => {
+                                const u = { ...accompagnants }
+                                if (!u[i]) u[i] = []
+                                u[i][j] = e.target.value
+                                setAccompagnants(u)
+                              }}
+                              style={{ ...S.input, fontSize: 13 }} />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
