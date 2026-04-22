@@ -144,6 +144,7 @@ interface FormData {
   textBg?: number
   animationStyle?: string
   introAnimation?: string
+  slug?: string
 }
 
 const defaultCeremony: Ceremony = {
@@ -179,6 +180,7 @@ const defaultFormData: FormData = {
   textBg: 0.5,
   animationStyle: 'slide-up',
   introAnimation: 'enveloppe',
+  slug: '',
 }
 
 // Propriétés mobiles partagées pour tous les boutons
@@ -384,6 +386,20 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         </div>
         <Field label="2ème prénom (optionnel)" value={data.marie2Prenom2} onChange={v => onChange({ marie2Prenom2: v })} placeholder="David" />
       </div>
+      <div style={{ marginTop: 20, padding: 16, background: '#fdf8f9', borderRadius: 12 }}>
+  <Label>Votre lien personnalisé (optionnel)</Label>
+  <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Ex: sarah-et-david → lovit.fr/sarah-et-david</p>
+  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+    <span style={{ fontSize: 12, color: '#9ca3af', whiteSpace: 'nowrap' }}>lovit.fr/</span>
+    <input
+      type="text"
+      value={data.slug ?? ''}
+      onChange={e => onChange({ slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 40) })}
+      placeholder="prenom1-et-prenom2"
+      style={S.input}
+    />
+  </div>
+</div>
     </div>
   )
 }
@@ -3702,6 +3718,10 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
       try { localStorage.setItem('lovit_share_id', id) } catch { /* ignore */ }
       const base = window.location.origin + '/faire-part?share=' + id
       setGuestUrl(base + '&role=guest')
+      if (data.slug) {
+      const slugUrl = window.location.origin + '/' + data.slug
+      setGuestUrl(slugUrl)
+      }
       setCoupleUrl(base + '&role=couple')
       setShareModalOpen(true)
     } catch (err) {

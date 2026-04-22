@@ -13,7 +13,6 @@ export async function POST(request: Request) {
     const data = await request.json()
     const { fixedId, ...shareData } = data
 
-    // Si un ID fixe existe → on réutilise le même, sinon on en crée un nouveau
     const id = fixedId ?? randomUUID()
 
     const size = new TextEncoder().encode(JSON.stringify(shareData)).length
@@ -27,7 +26,15 @@ export async function POST(request: Request) {
       await redis.set(`email:${id}`, shareData.emailMaries, { ex: 31536000 })
     }
 
-    return Response.json({ id })
+    // Si un slug est fourni, on l'associe à cet ID
+    if (shareData.slug) {
+      const slug = shareData.slug.toLowerCase().replace(/[^a-z0-9-]/g, '')
+      if (slug) {
+        await redis.set(`slug:${slug}`, id, { ex: 31536000 })
+      }
+    }
+
+    return Response.json({ id, slug: shareData.slug || null })
   } catch (err) {
     console.error('save-share error:', err)
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
