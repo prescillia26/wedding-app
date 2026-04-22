@@ -3710,6 +3710,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
       setSharingStatus('Envoi...')
       const dataToSend = buildPayload()
       const existingId = (() => { try { return localStorage.getItem('lovit_share_id') } catch { return null } })()
+      console.log('slug envoyé:', dataToSend.slug)
       const res = await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...dataToSend, fixedId: existingId }) })
       const json = await res.json()
       if (!json.id) throw new Error('Pas d\'id retourné : ' + JSON.stringify(json))
