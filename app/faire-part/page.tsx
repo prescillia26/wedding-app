@@ -2829,11 +2829,22 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
     </div>
   )
 
-  const scrollStyle: React.CSSProperties = {
-    opacity: 0,
-    transform: 'translateY(40px)',
-    transition: 'opacity 0.9s ease, transform 0.9s ease',
+  const getScrollTransform = () => {
+  switch(data.animationStyle || 'slide-up') {
+    case 'fade':         return 'none'
+    case 'slide-up':    return 'translateY(60px)'
+    case 'slide-down':  return 'translateY(-60px)'
+    case 'slide-left':  return 'translateX(60px)'
+    case 'slide-right': return 'translateX(-60px)'
+    case 'zoom':        return 'scale(0.8)'
+    default:            return 'translateY(60px)'
   }
+}
+const scrollStyle: React.CSSProperties = {
+  opacity: 0,
+  transform: getScrollTransform(),
+  transition: 'opacity 0.9s ease, transform 0.9s ease',
+}
 
   useEffect(() => {
   const elements = document.querySelectorAll('.scroll-animate')
