@@ -1192,6 +1192,72 @@ function CarouselBackground({ photos, fond, isOriental, children }: {
   )
 }
 
+// ── ItineraireButtons : Google Maps + Waze avec design luxe ───────────────────
+
+function ItineraireButtons({ adresse, theme, compact = false }: { 
+  adresse: string
+  theme: ThemeObj
+  compact?: boolean 
+}) {
+  const encoded = encodeURIComponent(adresse)
+  const googleUrl = `https://www.google.com/maps/search/?api=1&query=${encoded}`
+  const wazeUrl = `https://waze.com/ul?q=${encoded}&navigate=yes`
+  
+  const primaryBtn: React.CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 8,
+    padding: compact ? '10px 20px' : '12px 26px',
+    background: theme.accent,
+    color: 'white',
+    fontFamily: 'var(--font-playfair-display)',
+    fontSize: compact ? 12 : 13,
+    fontWeight: 600,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    textDecoration: 'none',
+    borderRadius: 2,
+    boxShadow: `0 4px 14px ${theme.accent}44`,
+    border: `1px solid ${theme.accent}`,
+    transition: 'all 0.2s ease',
+  }
+  
+  const secondaryBtn: React.CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 8,
+    padding: compact ? '10px 20px' : '12px 26px',
+    background: 'transparent',
+    color: theme.accent,
+    fontFamily: 'var(--font-playfair-display)',
+    fontSize: compact ? 12 : 13,
+    fontWeight: 600,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    textDecoration: 'none',
+    borderRadius: 2,
+    border: `1px solid ${theme.accent}`,
+    transition: 'all 0.2s ease',
+  }
+
+  return (
+    <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+      <a href={googleUrl} target="_blank" rel="noopener noreferrer" style={primaryBtn}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/>
+        </svg>
+        Google Maps
+      </a>
+      <a href={wazeUrl} target="_blank" rel="noopener noreferrer" style={secondaryBtn}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20.54 6.63c-.83-1.2-1.96-2.18-3.31-2.83C15.88 3.2 14.4 2.88 12.92 3c-1.48.12-2.92.65-4.14 1.54-1.22.89-2.22 2.11-2.86 3.53-.63 1.43-.89 3.01-.72 4.57.17 1.56.76 3.05 1.7 4.3.94 1.26 2.22 2.23 3.68 2.82 1.46.58 3.08.76 4.64.51 1.56-.25 3.04-.91 4.24-1.93 1.2-1.01 2.08-2.35 2.54-3.84.46-1.49.48-3.09.06-4.59-.42-1.51-1.24-2.87-2.38-3.94zM8.5 12.5c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm7 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-3.5 3.5c-1.5 0-2.8-.9-3.4-2.2l1.4-.3c.4.7 1.2 1.2 2 1.2s1.6-.5 2-1.2l1.4.3c-.6 1.3-1.9 2.2-3.4 2.2z"/>
+        </svg>
+        Waze
+      </a>
+    </div>
+  )
+}
+
 function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const gpPa1 = fmtGpCouple(data.famille1GpPaPerePrenom, data.famille1GpPaPereNom, data.famille1GpPaMerePrenom, data.famille1GpPaMereNom)
   const gpMa1 = fmtGpCouple(data.famille1GpMaPerePrenom, data.famille1GpMaPereNom, data.famille1GpMaMerePrenom, data.famille1GpMaMereNom)
@@ -1260,11 +1326,8 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
           {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
         </div>
         {isShared && ceremony.adresse && (
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20, paddingBottom: 8 }}>
-            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ceremony.adresse)}`} target="_blank" rel="noopener noreferrer"
-              style={{ padding: '10px 24px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textDecoration: 'none' }}>
-              📍 Itinéraire
-            </a>
+          <div style={{ marginTop: 20, paddingBottom: 8 }}>
+            <ItineraireButtons adresse={ceremony.adresse} theme={theme} compact />
           </div>
         )}
         {ceremony.note && (
@@ -1365,11 +1428,8 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
           {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
         </div>
         {isShared && ceremony.adresse && (
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20, paddingBottom: 8 }}>
-            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ceremony.adresse)}`} target="_blank" rel="noopener noreferrer"
-              style={{ padding: '10px 24px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textDecoration: 'none' }}>
-              📍 Itinéraire
-            </a>
+          <div style={{ marginTop: 20, paddingBottom: 8 }}>
+            <ItineraireButtons adresse={ceremony.adresse} theme={theme} compact />
           </div>
         )}
         {ceremony.note && (
@@ -1412,11 +1472,8 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
           {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
         </div>
         {isShared && ceremony.adresse && (
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20, paddingBottom: 8 }}>
-            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ceremony.adresse)}`} target="_blank" rel="noopener noreferrer"
-              style={{ padding: '10px 24px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textDecoration: 'none' }}>
-              📍 Itinéraire
-            </a>
+          <div style={{ marginTop: 20, paddingBottom: 8 }}>
+            <ItineraireButtons adresse={ceremony.adresse} theme={theme} compact />
           </div>
         )}
         {ceremony.note && (
@@ -1489,11 +1546,8 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
           {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
         </div>
         {isShared && ceremony.adresse && (
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20, paddingBottom: 8 }}>
-            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ceremony.adresse)}`} target="_blank" rel="noopener noreferrer"
-              style={{ padding: '10px 24px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textDecoration: 'none' }}>
-              📍 Itinéraire
-            </a>
+          <div style={{ marginTop: 20, paddingBottom: 8 }}>
+            <ItineraireButtons adresse={ceremony.adresse} theme={theme} compact />
           </div>
         )}
         {ceremony.note && (
@@ -3472,6 +3526,72 @@ function EnveloppeAnimation({ data, theme, onDone }: { data: FormData; theme: Th
   return <AnimEnveloppe data={data} theme={theme} onDone={onDone} />
 }
 
+// ── ItineraireButtons : Google Maps + Waze avec design luxe ───────────────────
+
+function ItineraireButtons({ adresse, theme, compact = false }: { 
+  adresse: string
+  theme: ThemeObj
+  compact?: boolean 
+}) {
+  const encoded = encodeURIComponent(adresse)
+  const googleUrl = `https://www.google.com/maps/search/?api=1&query=${encoded}`
+  const wazeUrl = `https://waze.com/ul?q=${encoded}&navigate=yes`
+  
+  const primaryBtn: React.CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 8,
+    padding: compact ? '10px 20px' : '12px 26px',
+    background: theme.accent,
+    color: 'white',
+    fontFamily: 'var(--font-playfair-display)',
+    fontSize: compact ? 12 : 13,
+    fontWeight: 600,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    textDecoration: 'none',
+    borderRadius: 2,
+    boxShadow: `0 4px 14px ${theme.accent}44`,
+    border: `1px solid ${theme.accent}`,
+    transition: 'all 0.2s ease',
+  }
+  
+  const secondaryBtn: React.CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 8,
+    padding: compact ? '10px 20px' : '12px 26px',
+    background: 'transparent',
+    color: theme.accent,
+    fontFamily: 'var(--font-playfair-display)',
+    fontSize: compact ? 12 : 13,
+    fontWeight: 600,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    textDecoration: 'none',
+    borderRadius: 2,
+    border: `1px solid ${theme.accent}`,
+    transition: 'all 0.2s ease',
+  }
+
+  return (
+    <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+      <a href={googleUrl} target="_blank" rel="noopener noreferrer" style={primaryBtn}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/>
+        </svg>
+        Google Maps
+      </a>
+      <a href={wazeUrl} target="_blank" rel="noopener noreferrer" style={secondaryBtn}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20.54 6.63c-.83-1.2-1.96-2.18-3.31-2.83C15.88 3.2 14.4 2.88 12.92 3c-1.48.12-2.92.65-4.14 1.54-1.22.89-2.22 2.11-2.86 3.53-.63 1.43-.89 3.01-.72 4.57.17 1.56.76 3.05 1.7 4.3.94 1.26 2.22 2.23 3.68 2.82 1.46.58 3.08.76 4.64.51 1.56-.25 3.04-.91 4.24-1.93 1.2-1.01 2.08-2.35 2.54-3.84.46-1.49.48-3.09.06-4.59-.42-1.51-1.24-2.87-2.38-3.94zM8.5 12.5c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm7 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-3.5 3.5c-1.5 0-2.8-.9-3.4-2.2l1.4-.3c.4.7 1.2 1.2 2 1.2s1.6-.5 2-1.2l1.4.3c-.6 1.3-1.9 2.2-3.4 2.2z"/>
+        </svg>
+        Waze
+      </a>
+    </div>
+  )
+}
+
 function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute }: SharedPageContentProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const [currentCeremonyIdx, setCurrentCeremonyIdx] = useState(0)
@@ -3769,11 +3889,16 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                         <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: theme.textSecondaire, textAlign: 'center', marginBottom: 16, padding: '12px 0', borderTop: `1px solid ${G}18` }}>{ceremony.note}</div>
                       )}
                       {ceremony.adresse && (
-                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
-                          <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ceremony.adresse)}`} target="_blank" rel="noopener noreferrer"
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '10px 22px', border: `1px solid ${G}`, color: G, fontFamily: FC, fontStyle: 'italic', fontSize: 14, textDecoration: 'none', borderRadius: 2, letterSpacing: 0.3 }}>
-                            📍 Itinéraire {ceremony.type === 'Cérémonie religieuse / Houppa' ? 'de la Houppa' : ceremony.type === 'Mairie' ? 'de la Mairie' : ''} →
-                          </a>
+                        <div style={{ marginTop: 20, textAlign: 'center' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 14 }}>
+                            <div style={{ width: 24, height: 0.5, background: G, opacity: 0.4 }} />
+                            <span style={{ color: G, fontSize: 10, opacity: 0.6 }}>✦</span>
+                            <div style={{ width: 24, height: 0.5, background: G, opacity: 0.4 }} />
+                          </div>
+                          <div style={{ fontFamily: FP, fontSize: 10, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, marginBottom: 14, opacity: 0.7 }}>
+                            Pour vous rendre sur place
+                          </div>
+                          <ItineraireButtons adresse={ceremony.adresse} theme={theme} />
                         </div>
                       )}
                     </AnimSection>
