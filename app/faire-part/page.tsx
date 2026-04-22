@@ -2589,12 +2589,12 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
   const [localText, setLocalText] = useState<Record<string, string>>(textOverrides)
   const [localStyles, setLocalStyles] = useState<ZoneStyles>(zoneStyles ?? {})
   const setText = (k: string, v: string) => {
-  setLocalText(prev => {
-    const next = { ...prev, [k]: v }
-    onApply(next)  // ← Live preview du texte
-    return next
-  })
-}
+    setLocalText(prev => {
+      const next = { ...prev, [k]: v }
+      onApply(next)  // ← Live preview du texte
+      return next
+    })
+  }
   const setZoneStyle = (zone: TextZone, patch: Partial<ZoneStyle>) => {
     setLocalStyles(prev => {
       const next = { ...prev, [zone]: { ...(prev[zone] ?? {}), ...patch } }
@@ -2636,20 +2636,19 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
           <div>
             {ceremonies.map((c, i) => {
               const name = c.type === 'Autre' ? (c.customName || 'Événement') : c.type
-              const isHouppa = c.type === 'Cérémonie religieuse / Houppa'
               return (
                 <div key={i} style={{ marginBottom: 24, paddingBottom: 20, borderBottom: i < ceremonies.length - 1 ? `1px solid ${theme.accent}33` : 'none' }}>
                   <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: theme.accent, marginBottom: 12 }}>{name}</div>
                   <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Titre</label>
                   <input value={localText[`ceremony_${i}_titre`] ?? ''} onChange={e => setText(`ceremony_${i}_titre`, e.target.value)} placeholder={name}
                     style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box', marginBottom: 12 }} />
-                  {isHouppa && (
+                  {c.type !== 'Mairie' && (
                     <>
                       <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>« Ont la joie de... »</label>
                       <textarea value={localText[`ceremony_${i}_joie`] ?? ''} onChange={e => setText(`ceremony_${i}_joie`, e.target.value)} placeholder="Ont la joie de vous faire part du mariage de leurs enfants"
                         style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 56, marginBottom: 12 }} />
-                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>« et seront honorés... »</label>
-                      <textarea value={localText[`ceremony_${i}_honore`] ?? ''} onChange={e => setText(`ceremony_${i}_honore`, e.target.value)} placeholder="et seront honorés de votre présence"
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>« Et seraient honorés de votre présence »</label>
+                      <textarea value={localText[`ceremony_${i}_honore`] ?? ''} onChange={e => setText(`ceremony_${i}_honore`, e.target.value)} placeholder="Et seraient honorés de votre présence"
                         style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 56, marginBottom: 12 }} />
                     </>
                   )}
@@ -3729,7 +3728,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                           <div style={{ fontFamily: FS, fontSize: 'clamp(48px,12vw,80px)', color: G, textAlign: 'center', lineHeight: 1, marginBottom: 28 }}>« Oui »</div>
                         </>
                       ) : (
-                        <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginBottom: 28, opacity: 0.78 }}>Et seraient honorés de votre présence</div>
+                        <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginBottom: 28, opacity: 0.78 }, 'narratif', data.zoneStyles)}>{ov[`ceremony_${i}_honore`] || 'Et seraient honorés de votre présence'}</div>
                       )}
                     </AnimSection>
                     <AnimSection animStyle={anim} delay={380}>
