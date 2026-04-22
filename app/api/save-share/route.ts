@@ -26,11 +26,15 @@ export async function POST(request: Request) {
       await redis.set(`email:${id}`, shareData.emailMaries, { ex: 31536000 })
     }
 
-    // Si un slug est fourni, on l'associe à cet ID
+    // Debug slug
+    console.log('slug reçu:', shareData.slug)
+
     if (shareData.slug) {
       const slug = shareData.slug.toLowerCase().replace(/[^a-z0-9-]/g, '')
+      console.log('slug nettoyé:', slug)
       if (slug) {
         await redis.set(`slug:${slug}`, id, { ex: 31536000 })
+        console.log('slug sauvegardé dans Redis:', slug, '→', id)
       }
     }
 
