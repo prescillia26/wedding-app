@@ -146,6 +146,7 @@ interface FormData {
   textOpacity?: number
   textBg?: number
   animationStyle?: string
+  introAnimation?: string
 }
 
 const defaultCeremony: Ceremony = {
@@ -180,6 +181,7 @@ const defaultFormData: FormData = {
   textOpacity: 1,
   textBg: 0.5,
   animationStyle: 'slide-up',
+  introAnimation: 'enveloppe',
 }
 
 // Propriétés mobiles partagées pour tous les boutons
@@ -816,6 +818,29 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           })}
         </div>
       </div>
+<div style={{ marginBottom: 24 }}>
+  <Label>Animation d'ouverture</Label>
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+    {([
+      { key: 'enveloppe', label: '💌 Enveloppe' },
+      { key: 'bougie',    label: '🕯️ Bougie' },
+      { key: 'plume',     label: '✍️ Plume' },
+      { key: 'sceau',     label: '💫 Sceau' },
+      { key: 'petales',   label: '🌹 Pétales' },
+      { key: 'parchemin', label: '📜 Parchemin' },
+    ] as {key:string;label:string}[]).map(opt => {
+      const sel = (data.introAnimation || 'enveloppe') === opt.key
+      return (
+        <button key={opt.key} type="button" onClick={() => onChange({ introAnimation: opt.key })} style={{
+          ...BTN, padding: '10px 6px', borderRadius: 10, fontSize: 11, fontWeight: sel ? 700 : 400,
+          border: `2px solid ${sel ? THEMES[data.style].accent : '#fecdd3'}`,
+          background: sel ? `${THEMES[data.style].accent}15` : 'white',
+          color: sel ? THEMES[data.style].accent : '#4a3728',
+        }}>{opt.label}</button>
+      )
+    })}
+  </div>
+</div>      
 <div style={{ marginBottom: 24 }}>
   <Label>Animation des textes</Label>
   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
@@ -2780,109 +2805,359 @@ interface SharedPageContentProps {
   ytIframeRef: React.RefObject<HTMLIFrameElement | null>
   ytMuted: boolean; onToggleYtMute: () => void
 }
-function EnveloppeAnimation({ data, theme, onDone }: { data: FormData; theme: ThemeObj; onDone: () => void }) {
+// ── 💌 ENVELOPPE ──────────────────────────────────────────────────────────────
+function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeObj; onDone: () => void }) {
   const [rabatOuvert, setRabatOuvert] = useState(false)
   const [disparait, setDisparait] = useState(false)
-
   useEffect(() => {
     setTimeout(() => setRabatOuvert(true), 800)
-    setTimeout(() => setDisparait(true), 2200)
-    setTimeout(() => onDone(), 2800)
+    setTimeout(() => setDisparait(true), 2400)
+    setTimeout(() => onDone(), 3000)
   }, [onDone])
-
   return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 9999,
-      background: theme.fond,
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      opacity: disparait ? 0 : 1,
-      transition: 'opacity 0.6s ease',
-      pointerEvents: disparait ? 'none' : 'auto',
-    }}>
-      <style>{`
-        @keyframes envOpen { from{transform:rotateX(0deg)} to{transform:rotateX(-180deg)} }
-        @keyframes contentRise { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(-20px)} }
-      `}</style>
-
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: theme.fond, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: disparait ? 0 : 1, transition: 'opacity 0.6s ease', pointerEvents: disparait ? 'none' : 'auto' }}>
+      <style>{`@keyframes contentRise{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(-10px)}}`}</style>
       <div style={{ position: 'relative', width: 280, perspective: 800 }}>
-        {/* Corps enveloppe */}
-        <div style={{
-          background: 'white',
-          border: `1.5px solid ${theme.accent}`,
-          borderRadius: 8,
-          height: 180,
-          overflow: 'hidden',
-          position: 'relative',
-          boxShadow: `0 8px 40px ${theme.accent}33`,
-        }}>
-          {/* Photo ou monogramme à l'intérieur */}
+        <div style={{ background: 'white', border: `1.5px solid ${theme.accent}`, borderRadius: 8, height: 180, overflow: 'hidden', boxShadow: `0 8px 40px ${theme.accent}33` }}>
           {data.photosFond?.[0] ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={data.photosFond[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }} />
+            <img src={data.photosFond[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }} />
           ) : (
-            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <MonogramByStyle
-                initial1={(data.marie1Prenom || 'A')[0].toUpperCase()}
-                initial2={(data.marie2Prenom || 'B')[0].toUpperCase()}
-                color={theme.accent}
-                size={80}
-                style={data.monogrammeStyle || 'cercle'}
-              />
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `${theme.accent}08` }}>
+              <MonogramByStyle initial1={(data.marie1Prenom || 'A')[0].toUpperCase()} initial2={(data.marie2Prenom || 'B')[0].toUpperCase()} color={theme.accent} size={80} style={data.monogrammeStyle || 'cercle'} />
             </div>
           )}
-          {/* Lignes décoratives */}
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: `linear-gradient(to right, transparent, ${theme.accent}, transparent)`, opacity: 0.4 }} />
         </div>
-
-        {/* Rabat supérieur qui s'ouvre */}
-        <div style={{
-          position: 'absolute',
-          top: 0, left: 0, right: 0,
-          height: 90,
-          transformOrigin: 'top center',
-          transform: rabatOuvert ? 'rotateX(-180deg)' : 'rotateX(0deg)',
-          transition: 'transform 0.9s cubic-bezier(0.22,1,0.36,1)',
-          zIndex: 10,
-          background: 'white',
-          border: `1.5px solid ${theme.accent}`,
-          borderRadius: '8px 8px 0 0',
-          clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
-          boxShadow: `0 4px 20px ${theme.accent}22`,
-        }} />
-
-        {/* Contenu qui monte quand le rabat s'ouvre */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 90, transformOrigin: 'top center', transform: rabatOuvert ? 'rotateX(-180deg)' : 'rotateX(0deg)', transition: 'transform 1s cubic-bezier(0.22,1,0.36,1)', zIndex: 10, background: theme.fond, border: `1.5px solid ${theme.accent}`, borderBottom: 'none', clipPath: 'polygon(0 0, 100% 0, 50% 100%)' }} />
         {rabatOuvert && (
-          <div style={{
-            position: 'absolute',
-            top: -60, left: 0, right: 0,
-            textAlign: 'center',
-            animation: 'contentRise 0.8s ease 0.3s forwards',
-            opacity: 0,
-            zIndex: 5,
-          }}>
-            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 28, color: theme.accent }}>
-              {data.marie1Prenom} & {data.marie2Prenom}
-            </div>
+          <div style={{ position: 'absolute', top: -50, left: 0, right: 0, textAlign: 'center', animation: 'contentRise 0.8s ease 0.2s forwards', opacity: 0, zIndex: 5 }}>
+            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 26, color: theme.accent }}>{data.marie1Prenom} & {data.marie2Prenom}</div>
           </div>
         )}
       </div>
-
-      {/* Message en bas */}
-      <div style={{
-        marginTop: 40,
-        fontFamily: 'var(--font-cormorant-garamond)',
-        fontStyle: 'italic',
-        fontSize: 16,
-        color: theme.accent,
-        opacity: rabatOuvert ? 1 : 0,
-        transform: rabatOuvert ? 'translateY(0)' : 'translateY(10px)',
-        transition: 'opacity 0.6s ease 0.5s, transform 0.6s ease 0.5s',
-        letterSpacing: 1,
-      }}>
+      <div style={{ marginTop: 36, fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: theme.accent, opacity: rabatOuvert ? 1 : 0, transition: 'opacity 0.6s ease 0.6s', letterSpacing: 1 }}>
         Votre invitation vous attend...
       </div>
     </div>
   )
+}
+
+// ── 🕯️ BOUGIE ─────────────────────────────────────────────────────────────────
+function AnimBougie({ data, theme, onDone }: { data: FormData; theme: ThemeObj; onDone: () => void }) {
+  const [phase, setPhase] = useState(0)
+  const [disparait, setDisparait] = useState(false)
+  useEffect(() => {
+    setTimeout(() => setPhase(1), 400)
+    setTimeout(() => setPhase(2), 1400)
+    setTimeout(() => setPhase(3), 2200)
+    setTimeout(() => setDisparait(true), 3200)
+    setTimeout(() => onDone(), 3800)
+  }, [onDone])
+  const radius = 280
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: disparait ? 0 : 1, transition: 'opacity 0.6s ease', pointerEvents: disparait ? 'none' : 'auto' }}>
+      <style>{`
+        @keyframes flamme{0%,100%{transform:scaleX(1) scaleY(1)}25%{transform:scaleX(0.85) scaleY(1.1)}75%{transform:scaleX(1.1) scaleY(0.95)}}
+        @keyframes lueur{0%,100%{opacity:0.6}50%{opacity:1}}
+        @keyframes bougieReveal{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+      `}</style>
+      {/* Lueur rayonnante */}
+      {phase >= 1 && (
+        <div style={{ position: 'absolute', width: radius*2, height: radius*2, borderRadius: '50%', background: `radial-gradient(circle, ${theme.accent}44 0%, ${theme.accent}11 40%, transparent 70%)`, animation: 'lueur 1.5s ease infinite', transition: 'opacity 1s ease' }} />
+      )}
+      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 2 }}>
+        {/* Flamme SVG */}
+        <div style={{ animation: phase >= 1 ? 'flamme 1.2s ease infinite' : 'none', transformOrigin: 'bottom center', marginBottom: -4 }}>
+          <svg width="24" height="40" viewBox="0 0 24 40">
+            <path d="M12 38 C6 38 2 32 2 26 C2 18 8 12 12 2 C16 12 22 18 22 26 C22 32 18 38 12 38Z" fill={`url(#fg)`} opacity={phase >= 1 ? 1 : 0} style={{ transition: 'opacity 0.5s' }} />
+            <path d="M12 32 C9 32 8 28 8 25 C8 20 12 14 12 14 C12 14 16 20 16 25 C16 28 15 32 12 32Z" fill="white" opacity="0.6" />
+            <defs>
+              <radialGradient id="fg" cx="50%" cy="80%">
+                <stop offset="0%" stopColor="#fff7aa" />
+                <stop offset="40%" stopColor={theme.accent} />
+                <stop offset="100%" stopColor="#ff6600" />
+              </radialGradient>
+            </defs>
+          </svg>
+        </div>
+        {/* Bougie */}
+        <div style={{ width: 20, height: 80, background: `linear-gradient(to bottom, #f5f0e8, #e8e0d0)`, borderRadius: '2px 2px 4px 4px', boxShadow: `0 0 20px ${theme.accent}44`, position: 'relative' }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '60%', background: `linear-gradient(to right, rgba(255,255,255,0.3), transparent, rgba(255,255,255,0.1))` }} />
+        </div>
+        {/* Texte qui apparaît */}
+        {phase >= 2 && (
+          <div style={{ marginTop: 40, textAlign: 'center', animation: 'bougieReveal 0.9s ease forwards' }}>
+            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 42, color: theme.accent, lineHeight: 1.2, textShadow: `0 0 30px ${theme.accent}88` }}>
+              {data.marie1Prenom}
+            </div>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, color: `${theme.accent}99`, margin: '4px 0' }}>&</div>
+            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 42, color: theme.accent, lineHeight: 1.2, textShadow: `0 0 30px ${theme.accent}88` }}>
+              {data.marie2Prenom}
+            </div>
+          </div>
+        )}
+        {phase >= 3 && (
+          <div style={{ marginTop: 20, fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: `${theme.accent}88`, letterSpacing: 2, animation: 'bougieReveal 0.6s ease forwards' }}>
+            vous invitent...
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── ✍️ PLUME ──────────────────────────────────────────────────────────────────
+function AnimPlume({ data, theme, onDone }: { data: FormData; theme: ThemeObj; onDone: () => void }) {
+  const [phase, setPhase] = useState(0)
+  const [disparait, setDisparait] = useState(false)
+  const prenom1 = data.marie1Prenom || 'Prénom'
+  const prenom2 = data.marie2Prenom || 'Prénom'
+  useEffect(() => {
+    setTimeout(() => setPhase(1), 300)
+    setTimeout(() => setPhase(2), 1800)
+    setTimeout(() => setPhase(3), 3000)
+    setTimeout(() => setDisparait(true), 4000)
+    setTimeout(() => onDone(), 4600)
+  }, [onDone])
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: theme.fond, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: disparait ? 0 : 1, transition: 'opacity 0.6s ease', pointerEvents: disparait ? 'none' : 'auto' }}>
+      <style>{`
+        @keyframes ecrire1{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0% 0 0)}}
+        @keyframes ecrire2{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0% 0 0)}}
+        @keyframes plumeMove{0%{transform:translateX(-60px) rotate(-15deg)}100%{transform:translateX(60px) rotate(-15deg)}}
+        @keyframes plumeMove2{0%{transform:translateX(-40px) rotate(-15deg)}100%{transform:translateX(40px) rotate(-15deg)}}
+        @keyframes separateur{from{width:0}to{width:80px}}
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+      `}</style>
+      <div style={{ textAlign: 'center', position: 'relative' }}>
+        {/* Plume qui écrit prénom 1 */}
+        {phase >= 1 && (
+          <div style={{ position: 'relative', marginBottom: 8 }}>
+            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px,12vw,72px)', color: theme.accent, animation: 'ecrire1 1.2s cubic-bezier(0.22,1,0.36,1) forwards', clipPath: 'inset(0 100% 0 0)' }}>
+              {prenom1}
+            </div>
+            <div style={{ position: 'absolute', top: '30%', animation: 'plumeMove 1.2s cubic-bezier(0.22,1,0.36,1) forwards', opacity: phase === 1 ? 1 : 0, transition: 'opacity 0.3s' }}>
+              <svg width="32" height="48" viewBox="0 0 32 48" fill="none">
+                <path d="M28 2 C28 2 4 20 2 44 C2 44 14 30 20 28 C26 26 30 34 28 44" stroke={theme.accent} strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.8"/>
+                <path d="M28 2 C28 2 32 8 28 14 C24 20 18 22 16 28" stroke={theme.accent} strokeWidth="1" strokeLinecap="round" fill={`${theme.accent}33`} opacity="0.6"/>
+                <circle cx="2" cy="44" r="2" fill={theme.accent} opacity="0.9"/>
+              </svg>
+            </div>
+          </div>
+        )}
+        {/* Séparateur */}
+        {phase >= 2 && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 8, animation: 'fadeInUp 0.5s ease forwards' }}>
+            <div style={{ height: '0.5px', background: theme.accent, opacity: 0.4, animation: 'separateur 0.6s ease forwards', width: 0 }} />
+            <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, color: theme.accent, opacity: 0.7 }}>&</span>
+            <div style={{ height: '0.5px', background: theme.accent, opacity: 0.4, animation: 'separateur 0.6s ease forwards', width: 0 }} />
+          </div>
+        )}
+        {/* Plume qui écrit prénom 2 */}
+        {phase >= 2 && (
+          <div style={{ position: 'relative' }}>
+            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px,12vw,72px)', color: theme.accent, animation: 'ecrire2 1.2s cubic-bezier(0.22,1,0.36,1) forwards', clipPath: 'inset(0 100% 0 0)' }}>
+              {prenom2}
+            </div>
+            <div style={{ position: 'absolute', top: '30%', animation: 'plumeMove2 1.2s cubic-bezier(0.22,1,0.36,1) forwards', opacity: phase === 2 ? 1 : 0, transition: 'opacity 0.3s' }}>
+              <svg width="32" height="48" viewBox="0 0 32 48" fill="none">
+                <path d="M28 2 C28 2 4 20 2 44 C2 44 14 30 20 28 C26 26 30 34 28 44" stroke={theme.accent} strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.8"/>
+                <path d="M28 2 C28 2 32 8 28 14 C24 20 18 22 16 28" stroke={theme.accent} strokeWidth="1" strokeLinecap="round" fill={`${theme.accent}33`} opacity="0.6"/>
+                <circle cx="2" cy="44" r="2" fill={theme.accent} opacity="0.9"/>
+              </svg>
+            </div>
+          </div>
+        )}
+        {phase >= 3 && (
+          <div style={{ marginTop: 24, fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: theme.accent, opacity: 0.7, letterSpacing: 2, animation: 'fadeInUp 0.6s ease forwards' }}>
+            vous invitent à célébrer leur union
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── 💫 SCEAU DE CIRE ──────────────────────────────────────────────────────────
+function AnimSceau({ data, theme, onDone }: { data: FormData; theme: ThemeObj; onDone: () => void }) {
+  const [phase, setPhase] = useState(0)
+  const [disparait, setDisparait] = useState(false)
+  useEffect(() => {
+    setTimeout(() => setPhase(1), 400)
+    setTimeout(() => setPhase(2), 1200)
+    setTimeout(() => setPhase(3), 2000)
+    setTimeout(() => setDisparait(true), 3200)
+    setTimeout(() => onDone(), 3800)
+  }, [onDone])
+  const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
+  const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: theme.fond, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: disparait ? 0 : 1, transition: 'opacity 0.8s ease', pointerEvents: disparait ? 'none' : 'auto' }}>
+      <style>{`
+        @keyframes sceauAppear{0%{opacity:0;transform:scale(3) rotate(-30deg)}60%{transform:scale(0.9) rotate(2deg)}100%{opacity:1;transform:scale(1) rotate(0deg)}}
+        @keyframes sceauPulse{0%,100%{box-shadow:0 0 0 0 ${theme.accent}44}50%{box-shadow:0 0 0 20px ${theme.accent}00}}
+        @keyframes sceauCrack{0%{opacity:0}100%{opacity:1}}
+        @keyframes textReveal{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}
+      `}</style>
+      {/* Sceau principal */}
+      {phase >= 1 && (
+        <div style={{ position: 'relative', animation: 'sceauAppear 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards', marginBottom: 40 }}>
+          {/* Cercle extérieur */}
+          <div style={{ width: 160, height: 160, borderRadius: '50%', background: `radial-gradient(circle at 35% 35%, ${theme.accent}ff, ${theme.accent}bb)`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 8px 32px ${theme.accent}66, inset 0 2px 4px rgba(255,255,255,0.3)`, animation: phase === 1 ? 'sceauPulse 1s ease infinite' : 'none', position: 'relative', overflow: 'hidden' }}>
+            {/* Texture cire */}
+            <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: `radial-gradient(circle at 60% 60%, rgba(0,0,0,0.15), transparent 60%)` }} />
+            {/* Bordure décorative */}
+            <svg style={{ position: 'absolute', inset: 0 }} width="160" height="160" viewBox="0 0 160 160">
+              <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1" strokeDasharray="4 3" />
+              <circle cx="80" cy="80" r="60" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.5" />
+            </svg>
+            {/* Monogramme */}
+            <div style={{ position: 'relative', zIndex: 2 }}>
+              <MonogramByStyle initial1={i1} initial2={i2} color="white" size={90} style={data.monogrammeStyle || 'cercle'} />
+            </div>
+          </div>
+          {/* Fissures quand le sceau s'ouvre */}
+          {phase >= 2 && (
+            <svg style={{ position: 'absolute', inset: 0, animation: 'sceauCrack 0.4s ease forwards' }} width="160" height="160" viewBox="0 0 160 160">
+              <path d="M80 10 L75 50 L60 80 L80 80" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+              <path d="M80 150 L85 110 L100 80 L80 80" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+              <path d="M10 80 L50 75 L80 60 L80 80" stroke="rgba(255,255,255,0.4)" strokeWidth="1" fill="none" strokeLinecap="round"/>
+            </svg>
+          )}
+        </div>
+      )}
+      {/* Prénoms qui apparaissent */}
+      {phase >= 3 && (
+        <div style={{ textAlign: 'center', animation: 'textReveal 0.7s cubic-bezier(0.22,1,0.36,1) forwards' }}>
+          <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(36px,9vw,56px)', color: theme.accent, lineHeight: 1.2 }}>
+            {data.marie1Prenom} & {data.marie2Prenom}
+          </div>
+          <div style={{ width: 60, height: '0.5px', background: theme.accent, opacity: 0.4, margin: '12px auto' }} />
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: theme.accent, opacity: 0.7, letterSpacing: 2 }}>
+            Brisez le sceau & découvrez
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── 🌹 PÉTALES ────────────────────────────────────────────────────────────────
+function AnimPetales({ data, theme, onDone }: { data: FormData; theme: ThemeObj; onDone: () => void }) {
+  const [phase, setPhase] = useState(0)
+  const [disparait, setDisparait] = useState(false)
+  useEffect(() => {
+    setTimeout(() => setPhase(1), 200)
+    setTimeout(() => setPhase(2), 1400)
+    setTimeout(() => setDisparait(true), 3400)
+    setTimeout(() => onDone(), 4000)
+  }, [onDone])
+  const petales = Array.from({ length: 18 }, (_, i) => ({
+    id: i,
+    left: Math.random() * 100,
+    delay: Math.random() * 1.5,
+    duration: 2 + Math.random() * 2,
+    size: 12 + Math.random() * 16,
+    rotation: Math.random() * 360,
+  }))
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: theme.fond, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', opacity: disparait ? 0 : 1, transition: 'opacity 0.6s ease', pointerEvents: disparait ? 'none' : 'auto' }}>
+      <style>{`
+        @keyframes petaleFall{0%{transform:translateY(-60px) rotate(0deg);opacity:0}10%{opacity:1}90%{opacity:0.7}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+        @keyframes prenomGlow{from{opacity:0;transform:scale(0.9)}to{opacity:1;transform:scale(1)}}
+      `}</style>
+      {/* Pétales */}
+      {phase >= 1 && petales.map(p => (
+        <div key={p.id} style={{ position: 'absolute', left: `${p.left}%`, top: -20, animation: `petaleFall ${p.duration}s ease ${p.delay}s infinite`, pointerEvents: 'none' }}>
+          <svg width={p.size} height={p.size * 1.3} viewBox="0 0 20 26">
+            <ellipse cx="10" cy="13" rx="8" ry="12" fill={theme.accent} opacity="0.6" transform={`rotate(${p.rotation} 10 13)`} />
+            <ellipse cx="10" cy="13" rx="5" ry="9" fill={theme.accent} opacity="0.3" transform={`rotate(${p.rotation + 30} 10 13)`} />
+          </svg>
+        </div>
+      ))}
+      {/* Contenu central */}
+      <div style={{ textAlign: 'center', position: 'relative', zIndex: 2 }}>
+        {phase >= 2 && (
+          <div style={{ animation: 'prenomGlow 1s cubic-bezier(0.22,1,0.36,1) forwards' }}>
+            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px,12vw,72px)', color: theme.accent, lineHeight: 1.1, textShadow: `0 2px 20px ${theme.accent}44` }}>
+              {data.marie1Prenom}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, margin: '8px 0' }}>
+              <div style={{ width: 32, height: '0.5px', background: theme.accent, opacity: 0.4 }} />
+              <span style={{ color: theme.accent, fontSize: 10 }}>✦</span>
+              <div style={{ width: 32, height: '0.5px', background: theme.accent, opacity: 0.4 }} />
+            </div>
+            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px,12vw,72px)', color: theme.accent, lineHeight: 1.1, textShadow: `0 2px 20px ${theme.accent}44` }}>
+              {data.marie2Prenom}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── 📜 PARCHEMIN ──────────────────────────────────────────────────────────────
+function AnimParchemin({ data, theme, onDone }: { data: FormData; theme: ThemeObj; onDone: () => void }) {
+  const [ouvert, setOuvert] = useState(false)
+  const [disparait, setDisparait] = useState(false)
+  useEffect(() => {
+    setTimeout(() => setOuvert(true), 400)
+    setTimeout(() => setDisparait(true), 3000)
+    setTimeout(() => onDone(), 3600)
+  }, [onDone])
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: '#1a1008', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: disparait ? 0 : 1, transition: 'opacity 0.6s ease', pointerEvents: disparait ? 'none' : 'auto' }}>
+      <style>{`
+        @keyframes derouler{from{max-height:60px;opacity:0.5}to{max-height:480px;opacity:1}}
+        @keyframes parchTextIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+      `}</style>
+      <div style={{ position: 'relative', width: 300 }}>
+        {/* Rouleau haut */}
+        <div style={{ height: 24, background: `linear-gradient(to bottom, #c8a96e, #a07840)`, borderRadius: '4px 4px 0 0', boxShadow: `0 -4px 12px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.2)` }} />
+        {/* Corps parchemin */}
+        <div style={{ background: `linear-gradient(135deg, #fdf5e4, #f5e6c8, #fdf5e4)`, overflow: 'hidden', maxHeight: ouvert ? 480 : 60, animation: ouvert ? 'derouler 1.4s cubic-bezier(0.22,1,0.36,1) forwards' : 'none', boxShadow: '4px 0 12px rgba(0,0,0,0.3), -4px 0 12px rgba(0,0,0,0.3)' }}>
+          {/* Texture parchemin */}
+          <div style={{ padding: '32px 28px', textAlign: 'center' }}>
+            {data.mariageJuif && (
+              <div style={{ fontFamily: 'serif', fontSize: 16, color: theme.accent, direction: 'rtl', marginBottom: 20, animation: 'parchTextIn 0.6s ease 1s forwards', opacity: 0 }}>בס״ד</div>
+            )}
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: '#8a6040', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 20, animation: 'parchTextIn 0.6s ease 0.8s forwards', opacity: 0 }}>
+              Invitation
+            </div>
+            <div style={{ width: 60, height: '0.5px', background: theme.accent, opacity: 0.4, margin: '0 auto 20px', animation: 'parchTextIn 0.4s ease 0.9s forwards', opacity: 0 }} />
+            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, lineHeight: 1.1, marginBottom: 8, animation: 'parchTextIn 0.8s ease 1.1s forwards', opacity: 0 }}>
+              {data.marie1Prenom}
+            </div>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, color: '#8a6040', marginBottom: 8, animation: 'parchTextIn 0.6s ease 1.3s forwards', opacity: 0 }}>&</div>
+            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, lineHeight: 1.1, marginBottom: 24, animation: 'parchTextIn 0.8s ease 1.5s forwards', opacity: 0 }}>
+              {data.marie2Prenom}
+            </div>
+            <div style={{ width: 60, height: '0.5px', background: theme.accent, opacity: 0.4, margin: '0 auto 16px', animation: 'parchTextIn 0.4s ease 1.7s forwards', opacity: 0 }} />
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: '#8a6040', letterSpacing: 1, animation: 'parchTextIn 0.6s ease 1.9s forwards', opacity: 0 }}>
+              vous invitent à célébrer leur union
+            </div>
+            <div style={{ marginTop: 24, display: 'flex', justifyContent: 'center', animation: 'parchTextIn 0.6s ease 2.1s forwards', opacity: 0 }}>
+              <MonogramByStyle initial1={(data.marie1Prenom || 'A')[0].toUpperCase()} initial2={(data.marie2Prenom || 'B')[0].toUpperCase()} color={theme.accent} size={60} style={data.monogrammeStyle || 'cercle'} />
+            </div>
+          </div>
+        </div>
+        {/* Rouleau bas */}
+        <div style={{ height: 24, background: `linear-gradient(to top, #c8a96e, #a07840)`, borderRadius: '0 0 4px 4px', boxShadow: `0 4px 12px rgba(0,0,0,0.4), inset 0 -2px 4px rgba(255,255,255,0.2)` }} />
+      </div>
+    </div>
+  )
+}
+
+// ── DISPATCHER ────────────────────────────────────────────────────────────────
+function EnveloppeAnimation({ data, theme, onDone }: { data: FormData; theme: ThemeObj; onDone: () => void }) {
+  const anim = data.introAnimation || 'enveloppe'
+  if (anim === 'bougie')    return <AnimBougie    data={data} theme={theme} onDone={onDone} />
+  if (anim === 'plume')     return <AnimPlume     data={data} theme={theme} onDone={onDone} />
+  if (anim === 'sceau')     return <AnimSceau     data={data} theme={theme} onDone={onDone} />
+  if (anim === 'petales')   return <AnimPetales   data={data} theme={theme} onDone={onDone} />
+  if (anim === 'parchemin') return <AnimParchemin data={data} theme={theme} onDone={onDone} />
+  return <AnimEnveloppe data={data} theme={theme} onDone={onDone} />
 }
 function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute }: SharedPageContentProps) {
   const contentRef = useRef<HTMLDivElement>(null)
