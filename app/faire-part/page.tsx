@@ -3793,7 +3793,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
   }
 
   if (isShared) {
-    const [enveloppeFinie, setEnveloppeFinie] = useState(!data.introAnimation || data.introAnimation === 'none')
+    const [enveloppeFinie, setEnveloppeFinie] = useState(true)
     return (
       <div style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
         {!enveloppeFinie && <EnveloppeAnimation data={data} theme={theme} onDone={() => setEnveloppeFinie(true)} />}
