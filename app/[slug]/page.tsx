@@ -42,7 +42,8 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
   const result = await getData(slug)
   const prenom1 = result?.data?.marie1Prenom || ''
   const prenom2 = result?.data?.marie2Prenom || ''
-  const photo = result?.data?.photosFond?.[0] || result?.data?.photoFond || ''
+  const rawPhoto = result?.data?.photosFond?.[0] || result?.data?.photoFond || ''
+  const photo = rawPhoto ? rawPhoto.replace('/upload/', '/upload/w_1200,h_630,c_fill/') : ''
   const accent = '#C9A84C'
   const targetUrl = result?.shareId ? `/faire-part?share=${result.shareId}&role=guest` : '/faire-part'
 
