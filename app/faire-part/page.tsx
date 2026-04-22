@@ -876,6 +876,9 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       { key: 'slide-left', label: '⬅️ De droite' },
       { key: 'slide-right',label: '➡️ De gauche' },
       { key: 'zoom',       label: '🔍 Zoom' },
+      { key: 'bounce',     label: '🎯 Rebond' },
+      { key: 'flip',       label: '🔄 Flip' },
+      { key: 'swing',      label: '🌊 Swing' },
     ] as {key:string;label:string}[]).map(opt => {
       const sel = (data.animationStyle || 'slide-up') === opt.key
       return (
@@ -2737,36 +2740,65 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
 }
 
 // ── AnimSection : fade-in au scroll ───────────────────────────────────────────
-function AnimSection({ children, delay = 0, style, animStyle = 'slide-up' }: { 
-  children: React.ReactNode; delay?: number; style?: React.CSSProperties; animStyle?: string 
+function AnimSection({ children, delay = 0, style, animStyle = 'slide-up' }: {
+  children: React.ReactNode; delay?: number; style?: React.CSSProperties; animStyle?: string
 }) {
   const ref = useRef<HTMLDivElement>(null)
-  const getTransform = () => {
-    switch(animStyle) {
-      case 'fade':         return 'none'
-      case 'slide-up':    return 'translateY(40px)'
-      case 'slide-down':  return 'translateY(-40px)'
-      case 'slide-left':  return 'translateX(40px)'
-      case 'slide-right': return 'translateX(-40px)'
-      case 'zoom':        return 'scale(0.85)'
-      default:            return 'translateY(40px)'
-    }
-  }
   useEffect(() => {
     const el = ref.current
     if (!el) return
+    el.style.opacity = '0'
+    const getAnim = () => {
+      switch(animStyle) {
+        case 'fade':        return 'lovitFade 0.8s ease forwards'
+        case 'slide-up':    return 'lovitSlideUp 0.9s cubic-bezier(0.22,1,0.36,1) forwards'
+        case 'slide-down':  return 'lovitSlideDown 0.9s cubic-bezier(0.22,1,0.36,1) forwards'
+        case 'slide-left':  return 'lovitSlideLeft 0.9s cubic-bezier(0.22,1,0.36,1) forwards'
+        case 'slide-right': return 'lovitSlideRight 0.9s cubic-bezier(0.22,1,0.36,1) forwards'
+        case 'zoom':        return 'lovitZoom 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards'
+        case 'bounce':      return 'lovitBounce 1s cubic-bezier(0.34,1.56,0.64,1) forwards'
+        case 'flip':        return 'lovitFlip 0.8s cubic-bezier(0.22,1,0.36,1) forwards'
+        case 'swing':       return 'lovitSwing 0.9s cubic-bezier(0.34,1.56,0.64,1) forwards'
+        default:            return 'lovitSlideUp 0.9s cubic-bezier(0.22,1,0.36,1) forwards'
+      }
+    }
     const obs = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting) {
-        el.style.opacity = '1'
-        el.style.transform = 'none'
+        el.style.animation = `${getAnim().replace('forwards', '')} ${delay}ms forwards`
+        el.style.animationDelay = `${delay}ms`
+        el.style.animation = getAnim()
+        el.style.animationDelay = `${delay}ms`
         obs.disconnect()
       }
     }, { threshold: 0.12 })
     obs.observe(el)
     return () => obs.disconnect()
-  }, [])
+  }, [animStyle, delay])
   return (
-    <div ref={ref} style={{ opacity: 0, transform: getTransform(), transition: `opacity 0.9s ease ${delay}ms, transform 0.9s ease ${delay}ms`, ...style }}>
+    <div ref={ref} style={{ opacity: 0, ...style }}>
+      <style>{`
+        @keyframes lovitFade { from{opacity:0} to{opacity:1} }
+        @keyframes lovitSlideUp { from{opacity:0;transform:translateY(80px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes lovitSlideDown { from{opacity:0;transform:translateY(-80px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes lovitSlideLeft { from{opacity:0;transform:translateX(80px)} to{opacity:1;transform:translateX(0)} }
+        @keyframes lovitSlideRight { from{opacity:0;transform:translateX(-80px)} to{opacity:1;transform:translateX(0)} }
+        @keyframes lovitZoom { from{opacity:0;transform:scale(0.6)} to{opacity:1;transform:scale(1)} }
+        @keyframes lovitBounce { 
+          0%{opacity:0;transform:translateY(-120px)} 
+          60%{opacity:1;transform:translateY(20px)} 
+          80%{transform:translateY(-10px)} 
+          100%{opacity:1;transform:translateY(0)} 
+        }
+        @keyframes lovitFlip { 
+          from{opacity:0;transform:perspective(400px) rotateX(-90deg)} 
+          to{opacity:1;transform:perspective(400px) rotateX(0)} 
+        }
+        @keyframes lovitSwing { 
+          0%{opacity:0;transform:translateX(-100px) rotate(-8deg)} 
+          60%{transform:translateX(10px) rotate(2deg)} 
+          100%{opacity:1;transform:translateX(0) rotate(0)} 
+        }
+      `}</style>
       {children}
     </div>
   )
