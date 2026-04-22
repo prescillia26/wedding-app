@@ -11,14 +11,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const shareId = await redis.get<string>(`slug:${slug}`)
   if (!shareId) return { title: 'Lov\'it' }
-  
   const data = await redis.get<Record<string, string>>(shareId as string)
   if (!data) return { title: 'Lov\'it' }
-
   const prenom1 = data.marie1Prenom || ''
   const prenom2 = data.marie2Prenom || ''
-  const photo = data.photosFond?.[0] || data.photoFond || ''
-
+  const photo = (data as Record<string, unknown>).photosFond?.[0] as string || data.photoFond || ''
   return {
     title: `${prenom1} & ${prenom2} — Faire-part`,
     description: `${prenom1} & ${prenom2} vous invitent à célébrer leur mariage`,
@@ -41,5 +38,35 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const shareId = await redis.get<string>(`slug:${slug}`)
   if (!shareId) redirect('/faire-part')
-  redirect(`/faire-part?share=${shareId}&role=guest`)
+  
+  const data = await redis.get<Record<string, unknown>>(shareId as string)
+  const prenom1 = (data?.marie1Prenom as string) || ''
+  const prenom2 = (data?.marie2Prenom as string) || ''
+  const photo = ((data?.photosFond as string[])?.[0]) || (data?.photoFond as string) || ''
+  const accent = '#C9A84C'
+  const targetUrl = `/faire-part?share=${shareId}&role=guest`
+
+  return (
+    <html>
+      <head>
+        <meta httpEquiv="refresh" content={`0;url=${targetUrl}`} />
+      </head>
+      <body style={{ margin: 0, background: '#fdf8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', fontFamily: 'Georgia, serif' }}>
+        <div style={{ textAlign: 'center', padding: '48px 32px' }}>
+          {photo && (
+            <img src={photo} alt="" style={{ width: 120, height: 120, borderRadius: '50%', objectFit: 'cover', border: `3px solid ${accent}`, marginBottom: 24 }} />
+          )}
+          <div style={{ fontSize: 36, color: accent, marginBottom: 8 }}>
+            {prenom1} & {prenom2}
+          </div>
+          <div style={{ fontSize: 14, color: '#8a6040', marginBottom: 32 }}>
+            vous invitent à célébrer leur mariage
+          </div>
+          <a href={targetUrl} style={{ padding: '14px 40px', border: `1.5px solid ${accent}`, borderRadius: 9999, color: accent, textDecoration: 'none', fontSize: 14 }}>
+            Voir l&apos;invitation ✦
+          </a>
+        </div>
+      </body>
+    </html>
+  )
 }
