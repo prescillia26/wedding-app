@@ -2588,7 +2588,13 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
   const [tab, setTab] = useState<'texte' | 'style'>('texte')
   const [localText, setLocalText] = useState<Record<string, string>>(textOverrides)
   const [localStyles, setLocalStyles] = useState<ZoneStyles>(zoneStyles ?? {})
-  const setText = (k: string, v: string) => setLocalText(prev => ({ ...prev, [k]: v }))
+  const setText = (k: string, v: string) => {
+  setLocalText(prev => {
+    const next = { ...prev, [k]: v }
+    onApply(next)  // ← Live preview du texte
+    return next
+  })
+}
   const setZoneStyle = (zone: TextZone, patch: Partial<ZoneStyle>) => {
     setLocalStyles(prev => {
       const next = { ...prev, [zone]: { ...(prev[zone] ?? {}), ...patch } }
@@ -4030,7 +4036,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
     ceremonies={sorted} 
     textOverrides={textOverrides} 
     zoneStyles={zoneStyles}
-    onApply={setTextOverrides} 
+    onApply={(t) => { setTextOverrides(t); onUpdate?.({ textOverrides: t }) }}
     onApplyStyles={(s) => { setZoneStyles(s); onUpdate?.({ zoneStyles: s }) }}
     onClose={() => setTextEditOpen(false)} 
     theme={theme} 
