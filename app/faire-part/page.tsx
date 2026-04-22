@@ -1681,6 +1681,7 @@ interface RSVPReponse {
   date: string
   present: boolean
   nbPersonnes: number
+  accompagnants?: string[]   // ← NOUVEAU : prénoms des +1, +2...
 }
 
 interface RSVPEntry {
@@ -1889,7 +1890,6 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
     </div>
   )
 }
-
 function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: string; onClose: () => void; shareId: string | null; ceremonies: Ceremony[] }) {
   const [entries, setEntries] = useState<RSVPEntry[]>([])
   const [loading, setLoading] = useState(true)
@@ -1915,12 +1915,21 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
 
   const downloadCSV = () => {
     const evtNames = ceremonies.map(getCeremonyName)
-    // En-têtes : Nom, Email, Message, puis une colonne Présence + Personnes par événement
-    const headers = ['Nom', 'Email', ...evtNames.flatMap(n => [`${n} - Présence`, `${n} - Personnes`]), 'Message']
+    const headers = [
+      'Nom',
+      'Email',
+      ...evtNames.flatMap(n => [`${n} - Présence`, `${n} - Personnes`, `${n} - Accompagnants`]),
+      'Message',
+    ]
     const csvRows = entries.map(e => {
       const evtCols = evtNames.flatMap(nom => {
         const rep = e.reponses?.find(r => r.ceremonie === nom)
-        return [rep ? (rep.present ? 'Présent' : 'Absent') : '—', rep?.present ? String(rep.nbPersonnes) : '0']
+        const accList = (rep?.accompagnants ?? []).filter(Boolean).join(' / ')
+        return [
+          rep ? (rep.present ? 'Présent' : 'Absent') : '—',
+          rep?.present ? String(rep.nbPersonnes) : '0',
+          rep?.present ? accList : '',
+        ]
       })
       return [e.nom, e.email || '', ...evtCols, e.message || ''].map(v => `"${String(v).replace(/"/g, '""')}"`)
     })
@@ -1998,7 +2007,7 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
                 return { e, present: rep ? rep.present : null, nb: rep?.present ? rep.nbPersonnes : 0 }
               })
               const presentRows = tableRows.filter(x => x.present === true)
-              const totalPresents = presentRows.length
+              const totalPresentsEvt = presentRows.length
               const totalNb = presentRows.reduce((s, x) => s + (x.nb || 0), 0)
               return (
                 <div key={ci} style={{ marginBottom: 36 }}>
@@ -2017,24 +2026,39 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
                       </tr>
                     </thead>
                     <tbody>
-                      {tableRows.map(({ e, present, nb }, i) => (
-                        <tr key={i} style={{ borderBottom: '1px solid #fce7f3', background: i % 2 === 0 ? 'white' : '#fdf8f9' }}>
-                          <td style={{ padding: '10px', color: '#4a3728', fontWeight: 500 }}>{e.nom}</td>
-                          <td style={{ padding: '10px', textAlign: 'center', fontSize: 16 }}>
-                            {present === true ? <span style={{ color: '#22c55e', fontWeight: 700 }}>✓</span>
-                              : present === false ? <span style={{ color: '#fb7185', fontWeight: 700 }}>✗</span>
-                              : <span style={{ color: '#9ca3af' }}>—</span>}
-                          </td>
-                          <td style={{ padding: '10px', textAlign: 'center', color: '#6a5040' }}>{present === true ? nb : '—'}</td>
-                          <td style={{ padding: '10px', color: '#6a5040', fontSize: 12 }}>{e.email || '—'}</td>
-                          <td style={{ padding: '10px', color: '#6a5040', fontStyle: 'italic', fontSize: 13 }}>{e.message || '—'}</td>
-                        </tr>
-                      ))}
+                      {tableRows.map(({ e, present, nb }, i) => {
+                        const rep = e.reponses?.find(r => r.ceremonie === nomEvt)
+                        const acc = rep?.accompagnants?.filter(Boolean) ?? []
+                        return (
+                          <tr key={i} style={{ borderBottom: '1px solid #fce7f3', background: i % 2 === 0 ? 'white' : '#fdf8f9' }}>
+                            <td style={{ padding: '10px', color: '#4a3728', fontWeight: 500, verticalAlign: 'top' }}>
+                              {e.nom}
+                              {present === true && acc.length > 0 && (
+                                <div style={{ marginTop: 4, paddingLeft: 10, borderLeft: `2px solid ${accent}55` }}>
+                                  {acc.map((prenom, j) => (
+                                    <div key={j} style={{ fontSize: 12, color: '#8a7860', fontWeight: 400, lineHeight: 1.5 }}>
+                                      <span style={{ color: accent, opacity: 0.6 }}>+</span> {prenom}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </td>
+                            <td style={{ padding: '10px', textAlign: 'center', fontSize: 16, verticalAlign: 'top' }}>
+                              {present === true ? <span style={{ color: '#22c55e', fontWeight: 700 }}>✓</span>
+                                : present === false ? <span style={{ color: '#fb7185', fontWeight: 700 }}>✗</span>
+                                : <span style={{ color: '#9ca3af' }}>—</span>}
+                            </td>
+                            <td style={{ padding: '10px', textAlign: 'center', color: '#6a5040', verticalAlign: 'top' }}>{present === true ? nb : '—'}</td>
+                            <td style={{ padding: '10px', color: '#6a5040', fontSize: 12, verticalAlign: 'top' }}>{e.email || '—'}</td>
+                            <td style={{ padding: '10px', color: '#6a5040', fontStyle: 'italic', fontSize: 13, verticalAlign: 'top' }}>{e.message || '—'}</td>
+                          </tr>
+                        )
+                      })}
                     </tbody>
                     <tfoot>
                       <tr style={{ borderTop: `2px solid ${accent}33`, background: `${accent}08` }}>
                         <td colSpan={2} style={{ padding: '10px', color: '#4a3728', fontWeight: 700, fontSize: 13 }}>
-                          Total présents : <span style={{ color: accent, fontSize: 15 }}>{totalPresents}</span>
+                          Total présents : <span style={{ color: accent, fontSize: 15 }}>{totalPresentsEvt}</span>
                         </td>
                         <td style={{ padding: '10px', textAlign: 'center', color: accent, fontWeight: 700, fontSize: 15 }}>{totalNb}</td>
                         <td colSpan={2} />
@@ -2050,7 +2074,6 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
     </div>
   )
 }
-
 // ── Music Upload (Cloudinary) ──────────────────────────────────────────────────
 
 function MusicUploader({ musicUrl, musicName, onChange }: { musicUrl: string; musicName?: string; onChange: (url: string, name?: string) => void }) {

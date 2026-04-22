@@ -28,16 +28,26 @@ export async function POST(request: Request) {
       const mariee2: string = data.mariee2 ?? ''
       const coupleUrl = `${process.env.NEXT_PUBLIC_BASE_URL ?? 'https://your-app.vercel.app'}/faire-part?share=${shareId}&role=couple`
 
-      const reponsesHtml = (data.reponses ?? []).map((r: { ceremonie: string; present: boolean; nbPersonnes: number }) => `
-        <tr>
-          <td style="padding:10px 16px;font-size:14px;color:#4a3728;border-bottom:1px solid #fce7f3;">${r.ceremonie}</td>
-          <td style="padding:10px 16px;font-size:14px;text-align:center;border-bottom:1px solid #fce7f3;">
-            <span style="color:${r.present ? '#22c55e' : '#fb7185'};font-weight:700;">${r.present ? '✓ Présent(e)' : '✗ Absent(e)'}</span>
-          </td>
-          <td style="padding:10px 16px;font-size:14px;text-align:center;color:#6a5040;border-bottom:1px solid #fce7f3;">${r.present ? r.nbPersonnes : '—'}</td>
-        </tr>
-      `).join('')
-
+      const reponsesHtml = (data.reponses ?? []).map((r: { ceremonie: string; present: boolean; nbPersonnes: number; accompagnants?: string[] }) => {
+  const accList = (r.accompagnants ?? []).filter(Boolean)
+  const accHtml = r.present && accList.length > 0
+    ? `<div style="margin-top:6px;padding-left:12px;border-left:2px solid #C9A84C55;font-size:12px;color:#8a7860;line-height:1.6;">
+         ${accList.map(n => `<div>+ ${n}</div>`).join('')}
+       </div>`
+    : ''
+  return `
+    <tr>
+      <td style="padding:10px 16px;font-size:14px;color:#4a3728;border-bottom:1px solid #fce7f3;">
+        ${r.ceremonie}
+        ${accHtml}
+      </td>
+      <td style="padding:10px 16px;font-size:14px;text-align:center;border-bottom:1px solid #fce7f3;vertical-align:top;">
+        <span style="color:${r.present ? '#22c55e' : '#fb7185'};font-weight:700;">${r.present ? '✓ Présent(e)' : '✗ Absent(e)'}</span>
+      </td>
+      <td style="padding:10px 16px;font-size:14px;text-align:center;color:#6a5040;border-bottom:1px solid #fce7f3;vertical-align:top;">${r.present ? r.nbPersonnes : '—'}</td>
+    </tr>
+  `
+}).join('')
       const html = `
         <!DOCTYPE html>
         <html>
