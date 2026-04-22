@@ -145,6 +145,7 @@ interface FormData {
   framePaddingH?: number
   textOpacity?: number
   textBg?: number
+  animationStyle?: string
 }
 
 const defaultCeremony: Ceremony = {
@@ -178,6 +179,7 @@ const defaultFormData: FormData = {
   framePaddingH: 16,
   textOpacity: 1,
   textBg: 0.5,
+  animationStyle: 'slide-up',
 }
 
 // Propriétés mobiles partagées pour tous les boutons
@@ -864,7 +866,29 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           </div>
         </div>
       )}
-
+<div style={{ marginBottom: 24 }}>
+  <Label>Animation des textes</Label>
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+    {([
+      { key: 'fade',        label: '✨ Fondu' },
+      { key: 'slide-up',   label: '⬆️ Du bas' },
+      { key: 'slide-down', label: '⬇️ Du haut' },
+      { key: 'slide-left', label: '⬅️ De droite' },
+      { key: 'slide-right',label: '➡️ De gauche' },
+      { key: 'zoom',       label: '🔍 Zoom' },
+    ] as {key:string;label:string}[]).map(opt => {
+      const sel = (data.animationStyle || 'slide-up') === opt.key
+      return (
+        <button key={opt.key} type="button" onClick={() => onChange({ animationStyle: opt.key })} style={{
+          ...BTN, padding: '10px 6px', borderRadius: 10, fontSize: 11, fontWeight: sel ? 700 : 400,
+          border: `2px solid ${sel ? THEMES[data.style].accent : '#fecdd3'}`,
+          background: sel ? `${THEMES[data.style].accent}15` : 'white',
+          color: sel ? THEMES[data.style].accent : '#4a3728',
+        }}>{opt.label}</button>
+      )
+    })}
+  </div>
+</div>
       {/* ── Monogramme ── */}
       <div style={{ marginBottom: 24 }}>
         <Label>Style du monogramme</Label>
@@ -2812,20 +2836,40 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   }
 
   useEffect(() => {
-    const elements = document.querySelectorAll('.scroll-animate')
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry, index) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => {
-            (entry.target as HTMLElement).style.opacity = '1';
-            (entry.target as HTMLElement).style.transform = 'translateY(0)'
-          }, index * 100)
-        }
-      })
-    }, { threshold: 0.1 })
-    elements.forEach(el => observer.observe(el))
-    return () => observer.disconnect()
-  }, [])
+  const elements = document.querySelectorAll('.scroll-animate')
+  const anim = data.animationStyle || 'slide-up'
+  const getInitial = () => {
+    switch(anim) {
+      case 'fade':        return { opacity: '0', transform: 'none' }
+      case 'slide-up':   return { opacity: '0', transform: 'translateY(60px)' }
+      case 'slide-down': return { opacity: '0', transform: 'translateY(-60px)' }
+      case 'slide-left': return { opacity: '0', transform: 'translateX(60px)' }
+      case 'slide-right':return { opacity: '0', transform: 'translateX(-60px)' }
+      case 'zoom':       return { opacity: '0', transform: 'scale(0.8)' }
+      default:           return { opacity: '0', transform: 'translateY(60px)' }
+    }
+  }
+  const initial = getInitial()
+  elements.forEach(el => {
+    const h = el as HTMLElement
+    h.style.opacity = initial.opacity
+    h.style.transform = initial.transform
+    h.style.transition = 'opacity 0.9s ease, transform 0.9s ease'
+  })
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, index) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          const el = entry.target as HTMLElement
+          el.style.opacity = '1'
+          el.style.transform = 'none'
+        }, index * 100)
+      }
+    })
+  }, { threshold: 0.1 })
+  elements.forEach(el => observer.observe(el))
+  return () => observer.disconnect()
+}, [data.animationStyle])
 
   useEffect(() => {
     if (!contentRef.current) return
@@ -3370,7 +3414,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         data={{ ...data, textOverrides: { ...data.textOverrides, ...textOverrides } }}
         theme={theme}
         sorted={sorted}
-        role={null}
+        role="guest"
         lastShareId={lastShareId}
         onRsvpOpen={() => setRsvpOpen(true)}
         onRsvpListOpen={() => setRsvpListOpen(true)}
