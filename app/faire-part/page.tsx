@@ -2845,28 +2845,8 @@ const scrollStyle: React.CSSProperties = {
   transform: getScrollTransform(),
   transition: 'opacity 0.9s ease, transform 0.9s ease',
 }
-
-  useEffect(() => {
+useEffect(() => {
   const elements = document.querySelectorAll('.scroll-animate')
-  const anim = data.animationStyle || 'slide-up'
-  const getInitial = () => {
-    switch(anim) {
-      case 'fade':        return { opacity: '0', transform: 'none' }
-      case 'slide-up':   return { opacity: '0', transform: 'translateY(60px)' }
-      case 'slide-down': return { opacity: '0', transform: 'translateY(-60px)' }
-      case 'slide-left': return { opacity: '0', transform: 'translateX(60px)' }
-      case 'slide-right':return { opacity: '0', transform: 'translateX(-60px)' }
-      case 'zoom':       return { opacity: '0', transform: 'scale(0.8)' }
-      default:           return { opacity: '0', transform: 'translateY(60px)' }
-    }
-  }
-  const initial = getInitial()
-  elements.forEach(el => {
-    const h = el as HTMLElement
-    h.style.opacity = initial.opacity
-    h.style.transform = initial.transform
-    h.style.transition = 'opacity 0.9s ease, transform 0.9s ease'
-  })
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry, index) => {
       if (entry.isIntersecting) {
@@ -2874,6 +2854,7 @@ const scrollStyle: React.CSSProperties = {
           const el = entry.target as HTMLElement
           el.style.opacity = '1'
           el.style.transform = 'none'
+          el.style.transition = 'opacity 0.9s ease, transform 0.9s ease'
         }, index * 100)
       }
     })
@@ -2881,7 +2862,6 @@ const scrollStyle: React.CSSProperties = {
   elements.forEach(el => observer.observe(el))
   return () => observer.disconnect()
 }, [data.animationStyle])
-
   useEffect(() => {
     if (!contentRef.current) return
     const observer = new ResizeObserver(entries => {
