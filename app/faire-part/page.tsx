@@ -464,30 +464,34 @@ function Step2({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
 
 function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
   const [cropIdx, setCropIdx] = useState<number | null>(null)
+  const [uploading, setUploading] = useState(false)
   const photos = data.photosFond ?? []
   const photosData = data.photosData ?? []
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? [])
     const toAdd = files.slice(0, 5 - photos.length)
     if (!toAdd.length) return
-    const results: string[] = new Array(toAdd.length)
-    let done = 0
-    toAdd.forEach((f, fi) => {
-      const r = new FileReader()
-      r.onload = ev => {
-        results[fi] = ev.target?.result as string
-        done++
-        if (done === toAdd.length) {
-          const newPhotos = [...photos, ...results].slice(0, 5)
-          const newData = [...photosData, ...results.map(url => ({ url, cropX: 0, cropY: 0, cropScale: 1 }))].slice(0, 5)
-          onChange({ photosFond: newPhotos, photoFond: newPhotos[0] ?? '', photosData: newData, presentationStyle: 'page-unique' })
-          // Auto-ouvrir le cropper sur la première nouvelle photo
-          setCropIdx(photos.length)
-        }
+    setUploading(true)
+    try {
+      const uploaded: string[] = []
+      for (const file of toAdd) {
+        const fd = new FormData()
+        fd.append('file', file)
+        fd.append('upload_preset', 'wedding_music')
+        const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
+        const json = await res.json()
+        if (json.secure_url) uploaded.push(json.secure_url)
       }
-      r.readAsDataURL(f)
-    })
+      const newPhotos = [...photos, ...uploaded].slice(0, 5)
+      const newData = [...photosData, ...uploaded.map(url => ({ url, cropX: 0, cropY: 0, cropScale: 1 }))].slice(0, 5)
+      onChange({ photosFond: newPhotos, photoFond: newPhotos[0] ?? '', photosData: newData, presentationStyle: 'page-unique' })
+      setCropIdx(photos.length)
+    } catch {
+      alert('Erreur upload photo')
+    } finally {
+      setUploading(false)
+    }
     e.target.value = ''
   }
 
@@ -512,18 +516,17 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
       <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Utilisée en fond de la section d&apos;accueil. Recadrez chaque photo individuellement.</p>
 
       {photos.length < 5 && (
-        <label style={{ display: 'block', cursor: 'pointer', marginBottom: photos.length > 0 ? 12 : 0 }}>
-          <div style={{ border: '2px dashed #fecdd3', borderRadius: 10, padding: 16, textAlign: 'center' }}>
-            <div style={{ fontSize: 22, marginBottom: 4 }}>📷</div>
-            <p style={{ fontSize: 13, color: '#4a3728', margin: 0 }}>Cliquer pour ajouter une photo</p>
+        <label style={{ display: 'block', cursor: uploading ? 'wait' : 'pointer', marginBottom: photos.length > 0 ? 12 : 0 }}>
+          <div style={{ border: '2px dashed #fecdd3', borderRadius: 10, padding: 16, textAlign: 'center', background: uploading ? '#fdf5e4' : 'white' }}>
+            <div style={{ fontSize: 22, marginBottom: 4 }}>{uploading ? '⏳' : '📷'}</div>
+            <p style={{ fontSize: 13, color: '#4a3728', margin: 0 }}>{uploading ? 'Upload en cours...' : 'Cliquer pour ajouter une photo'}</p>
           </div>
-          <input type="file" accept="image/*" multiple onChange={handleUpload} style={{ display: 'none' }} />
+          <input type="file" accept="image/*" multiple disabled={uploading} onChange={handleUpload} style={{ display: 'none' }} />
         </label>
       )}
 
       {photos.length > 0 && (
         <div>
-          {/* Miniatures */}
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
             {photos.map((photo, idx) => {
               const crop = photosData[idx]
@@ -544,7 +547,6 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
             })}
           </div>
 
-          {/* ImageCropper inline */}
           {cropIdx !== null && photos[cropIdx] && (
             <div style={{ background: '#fdf8f9', borderRadius: 12, padding: 16, marginBottom: 12, border: '1.5px solid #fecdd3' }}>
               <div style={{ fontSize: 12, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Recadrage — Photo {cropIdx + 1}</div>
@@ -560,7 +562,6 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
     </div>
   )
 }
-
 // ── ImageCropper ───────────────────────────────────────────────────────────────
 
 function ImageCropper({ src, onCrop, onPreview }: { src: string; onCrop: (position: { x: number; y: number; scale: number }) => void; onPreview?: (position: { x: number; y: number; scale: number }) => void }) {
