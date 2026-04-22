@@ -1546,7 +1546,6 @@ function ElegantSeparator({ color, initial1, initial2 }: { color: string; initia
     </div>
   )
 }
-
 function ElegantPage1({ data, theme }: { data: FormData; theme: ThemeObj }) {
   const photos = data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])
   const firstDate = sortByDate(data.ceremonies)[0]?.date
@@ -1568,12 +1567,11 @@ function ElegantPage1({ data, theme }: { data: FormData; theme: ThemeObj }) {
   return (
     <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', position: 'relative', height: 600 }}>
       {photos.length > 0 ? (
-        /* eslint-disable-next-line @next/next/no-img-element */
-        <img src={photos[idx]} alt="" style={{ position: 'absolute', top: '50%', left: '50%', transform: (() => { const c = data.photosData?.[idx]; return c ? `translate(calc(-50% + ${c.cropX}px), calc(-50% + ${c.cropY}px)) scale(${c.cropScale})` : 'translate(-50%, -50%)' })(), transformOrigin: 'center center', minWidth: '100%', minHeight: '100%', width: 'auto', height: 'auto', opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease' }} />
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={photos[idx]} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease' }} />
       ) : (
         <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(160deg, ${theme.fond}, ${theme.accent}22)` }} />
       )}
-      {/* dégradé sombre uniquement en bas pour lisibilité */}
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.18) 45%, transparent 100%)' }} />
       {photos.length > 1 && (
         <div style={{ position: 'absolute', top: 16, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6, zIndex: 10 }}>
@@ -2665,15 +2663,10 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
 
   if (valid.length === 0) return null
 
-  const crop = photosData?.[idx]
-  const cropTransform = crop
-    ? `translate(calc(-50% + ${crop.cropX}px), calc(-50% + ${crop.cropY}px)) scale(${crop.cropScale})`
-    : 'translate(-50%, -50%)'
-
   return (
     <>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={valid[idx]} alt="" style={{ position: 'absolute', top: '50%', left: '50%', transform: cropTransform, transformOrigin: 'center center', minWidth: '100%', minHeight: '100%', width: 'auto', height: 'auto', opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease', zIndex: 0, pointerEvents: 'none' }} />
+      <img src={valid[idx]} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease', zIndex: 0, pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.12) 55%, rgba(0,0,0,0.0) 100%)', zIndex: 0, pointerEvents: 'none' }} />
       {valid.length > 1 && (
         <div style={{ position: 'absolute', bottom: 80, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6, zIndex: 5, pointerEvents: 'none' }}>
@@ -2812,10 +2805,6 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   const introTextColor = hasIntroPhoto ? 'rgba(255,255,255,0.95)' : G
   const fondCeremonie = data.fondCeremonie ?? 'ornements'
   const firstPhoto = data.photosFond?.[0] ?? data.photoFond ?? ''
-  const firstCrop = data.photosData?.[0]
-  const firstCropTransform = firstCrop
-    ? `translate(calc(-50% + ${firstCrop.cropX}px), calc(-50% + ${firstCrop.cropY}px)) scale(${firstCrop.cropScale})`
-    : 'translate(-50%, -50%)'
 
   const ornUrl = ORNEMENTS_LIBRARY.find(o => o.id === (data.ornamentId ?? 'none'))?.url ?? ''
   const frame = FRAMES.find(f => f.id === (data.frameId ?? 'frame-09')) ?? FRAMES[FRAMES.length - 1]
@@ -2994,7 +2983,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                   ) : usePhotoBg ? (
                     <>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={firstPhoto} alt="" style={{ position: 'absolute', top: '50%', left: '50%', transform: firstCropTransform, transformOrigin: 'center center', minWidth: '100%', minHeight: '100%', width: 'auto', height: 'auto', pointerEvents: 'none', zIndex: 0 }} />
+                      <img src={firstPhoto} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', pointerEvents: 'none', zIndex: 0 }} />
                       <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.82)', pointerEvents: 'none', zIndex: 0 }} />
                     </>
                   ) : (
