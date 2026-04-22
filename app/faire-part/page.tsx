@@ -3850,7 +3850,7 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
       })
       const d = await res.json()
       if (d.valid && d.accessCode) {
-        try { sessionStorage.setItem('lovit_access_code', d.accessCode) } catch { /* ignore */ }
+        try { localStorage.setItem('lovit_access_code', d.accessCode) } catch { /* ignore */ }
         onGranted()
       } else {
         setError(d.reason || 'Code promo invalide ou expiré.')
@@ -3865,7 +3865,7 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
       const res = await fetch(`/api/check-access?code=${encodeURIComponent(code.toUpperCase().trim())}`)
       const d = await res.json()
       if (d.valid) {
-        try { sessionStorage.setItem('lovit_access_code', code.toUpperCase().trim()) } catch { /* ignore */ }
+        try {localStorage.setItem('lovit_access_code', code.toUpperCase().trim()) } catch { /* ignore */ }
         onGranted()
       } else {
         setError('Code invalide. Vérifiez votre email ou achetez un accès.')
@@ -4009,7 +4009,7 @@ export default function FairePartPage() {
         const d = await res.json()
         if (d.valid) {
           setAccessGranted(true)
-          try { sessionStorage.setItem('lovit_access_code', code) } catch { /* ignore */ }
+          try {localStorage.setItem('lovit_access_code', code) } catch { /* ignore */ }
         }
       } catch { /* ignore */ }
       setCheckingAccess(false)
@@ -4019,7 +4019,7 @@ export default function FairePartPage() {
       checkAccess(urlCode.toUpperCase().trim())
     } else {
       try {
-        const saved = sessionStorage.getItem('lovit_access_code')
+        const saved = localStorage.getItem('lovit_access_code')
         if (saved) { checkAccess(saved); return }
       } catch { /* ignore */ }
       setCheckingAccess(false)
