@@ -3482,6 +3482,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   const FS = 'var(--font-great-vibes)'
   const FP = 'var(--font-playfair-display)'
   const FC = 'var(--font-cormorant-garamond)'
+  const ov = data.textOverrides ?? {}
   const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
   const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
   const monoColor = data.monogrammeColor || G
@@ -3630,7 +3631,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                   </div>
                 </div>
                 <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, textAlign: 'center', lineHeight: 1.9, opacity: 0.85 }, 'narratif', data.zoneStyles)}>
-                  {hasGp ? 'ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'ont la joie de vous faire part du mariage de leurs enfants'}
+                  {ov['ceremony_0_joie'] || (hasGp ? 'ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'ont la joie de vous faire part du mariage de leurs enfants')}
                 </div>
               </AnimSection>
             )}
@@ -3689,7 +3690,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                       {data.mariageJuif && (
                         <div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, marginBottom: 8 }}>בס״ד</div>
                       )}
-                     <div style={applyZoneStyle({ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }, 'titres', data.zoneStyles)}>{title}</div>
+                     <div style={applyZoneStyle({ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }, 'titres', data.zoneStyles)}>{ov[`ceremony_${i}_titre`] || title}</div>
                       <OrnSep />
                     </AnimSection>
                     {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
@@ -3714,7 +3715,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                           </div>
                         </div>
                         <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 24, lineHeight: 1.9, opacity: 0.82 }, 'narratif', data.zoneStyles)}>
-                          {hasGp ? 'ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'ont la joie de vous faire part du mariage de leurs enfants'}
+                          {ov[`ceremony_${i}_joie`] || (hasGp ? 'ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'ont la joie de vous faire part du mariage de leurs enfants')}
                         </div>
                       </AnimSection>
                     )}
@@ -3757,7 +3758,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                       })()}
                       {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 15, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 8, opacity: 0.8 }}>{hebrewDate}</div>}
                       {ceremony.heure && <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 17, color: TEXT, textAlign: 'center', marginBottom: 18, opacity: 0.82 }, 'dateHeure', data.zoneStyles)}>{formatHeure(ceremony.heure)} précises</div>}
-                      {ceremony.lieu && <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', lineHeight: 1.6, marginBottom: 4 }, 'lieu', data.zoneStyles)}>{ceremony.type === 'Mairie' ? conjonctionLieu(ceremony.lieu) : formatLieu(ceremony.lieu)}</div>}
+                      {(ov[`ceremony_${i}_lieu`] || ceremony.lieu) && <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', lineHeight: 1.6, marginBottom: 4 }, 'lieu', data.zoneStyles)}>{ceremony.type === 'Mairie' ? conjonctionLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu) : formatLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu)}</div>}
                       {ceremony.adresse && <div style={{ fontFamily: FC, fontSize: 13, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.6, marginBottom: 20 }}>{ceremony.adresse}</div>}
                       {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
                         <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, textAlign: 'center', marginBottom: 16, borderTop: `1px solid ${G}22`, paddingTop: 14 }}>
