@@ -13,9 +13,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!shareId) return { title: 'Lov\'it' }
   const data = await redis.get<Record<string, string>>(shareId as string)
   if (!data) return { title: 'Lov\'it' }
-  const prenom1 = data.marie1Prenom || ''
-  const prenom2 = data.marie2Prenom || ''
-  const photo = (data as Record<string, unknown>).photosFond?.[0] as string || data.photoFond || ''
+  const prenom1 = (data as Record<string, unknown>).marie1Prenom as string || ''
+  const prenom2 = (data as Record<string, unknown>).marie2Prenom as string || ''
+  const photosFond = (data as unknown as Record<string, string[]>).photosFond
+  const photo = photosFond?.[0] || (data as Record<string, unknown>).photoFond as string || ''
   return {
     title: `${prenom1} & ${prenom2} — Faire-part`,
     description: `${prenom1} & ${prenom2} vous invitent à célébrer leur mariage`,
