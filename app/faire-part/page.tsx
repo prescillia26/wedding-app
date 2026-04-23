@@ -1202,8 +1202,8 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
         <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: frameOpacity, transform: `scale(${frameSize / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
       )}
       <OrnementCorner url={ornUrl} corner="top-right" size={130} />
-      <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />textShadow: '0 1px 8px rgba(255,255,255,0.9), 0 0 20px rgba(255,255,255,0.7)'
-      <div style={{ position: 'relative', zIndex: 10, paddingTop: `${framePaddingV}%`, paddingBottom: `${framePaddingV}%`, paddingLeft: `${framePaddingH}%`, paddingRight: `${framePaddingH}%`, textAlign: 'center', opacity: textOpacity, background: textBg > 0 ? `rgba(255,255,255,${textBg})` : undefined, borderRadius: textBg > 0 ? 4 : undefined,  }}>
+      <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />textShadow: '0 0 12px rgba(255,255,255,0.8)'
+      <div style={{ position: 'relative', zIndex: 10, paddingTop: `${framePaddingV}%`, paddingBottom: `${framePaddingV}%`, paddingLeft: `${framePaddingH}%`, paddingRight: `${framePaddingH}%`, textAlign: 'center', opacity: textOpacity, background: undefined, borderRadius: undefined, }}>
         {children}
       </div>
     </div>
