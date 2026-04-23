@@ -3863,7 +3863,7 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                       {i % 2 === 0 ? <><OrnTR /><OrnBL /></> : <><OrnTL /><OrnBR /></>}
                     </>
                   )}
-                  <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, background: (data.textBg ?? 0.5) > 0 ? `rgba(255,255,255,${data.textBg ?? 0.5})` : undefined, borderRadius: (data.textBg ?? 0.5) > 0 ? 4 : undefined,  }}>
+                  <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: '0 1px 3px rgba(255,255,255,0.95), 0 0 8px rgba(255,255,255,0.7)' }}>
                     <AnimSection animStyle={anim}>
                       {data.mariageJuif && (
                         <div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, marginBottom: 8 }}>בס״ד</div>
