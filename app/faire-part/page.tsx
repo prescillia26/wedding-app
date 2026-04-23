@@ -1202,8 +1202,8 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
         <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: frameOpacity, transform: `scale(${frameSize / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
       )}
       <OrnementCorner url={ornUrl} corner="top-right" size={130} />
-      <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
-      <div style={{ position: 'relative', zIndex: 10, paddingTop: `${framePaddingV}%`, paddingBottom: `${framePaddingV}%`, paddingLeft: `${framePaddingH}%`, paddingRight: `${framePaddingH}%`, textAlign: 'center', opacity: textOpacity, background: textBg > 0 ? `rgba(255,255,255,${textBg})` : undefined, borderRadius: textBg > 0 ? 4 : undefined, textShadow: hasFrame ? '0 0 12px rgba(255,255,255,1), 0 0 6px rgba(255,255,255,1)' : undefined }}>
+      <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />textShadow: '0 1px 8px rgba(255,255,255,0.9), 0 0 20px rgba(255,255,255,0.7)'
+      <div style={{ position: 'relative', zIndex: 10, paddingTop: `${framePaddingV}%`, paddingBottom: `${framePaddingV}%`, paddingLeft: `${framePaddingH}%`, paddingRight: `${framePaddingH}%`, textAlign: 'center', opacity: textOpacity, background: textBg > 0 ? `rgba(255,255,255,${textBg})` : undefined, borderRadius: textBg > 0 ? 4 : undefined,  }}>
         {children}
       </div>
     </div>
@@ -2667,7 +2667,19 @@ function buildWhatsAppMessage(data: FormData, guestUrl: string): string {
   }
   const p1 = data.marie1Prenom || 'Prénom 1'
   const p2 = data.marie2Prenom || 'Prénom 2'
-  return `Chères Familles, Chers Amis,\n\nNous sommes heureux de vous convier à notre mariage qui se tiendra ${datesStr}${ville ? ` à ${ville}` : ''}.\n\nNous serions ravis de vous compter parmi nous pour célébrer cet événement si précieux de notre vie.\n\nVous trouverez l'ensemble des informations et les RSVP sur notre faire-part digital :\n${guestUrl}\n\nNous vous serions reconnaissants de bien vouloir nous faire part de votre réponse avant le ${dateLimite}.\n\nNous avons hâte de partager ce moment si spécial à vos côtés.\n\nÀ très bientôt,\n${p1} & ${p2} 💍`
+  return `Chères Familles, Chers Amis,
+
+Nous sommes heureux de vous convier à notre mariage qui se tiendra ${datesStr}.
+
+Nous serions ravis de vous compter parmi nous pour célébrer cet événement si précieux de notre vie.
+
+Retrouvez votre invitation ici :
+${guestUrl}
+
+Merci de bien vouloir nous confirmer votre présence via le bouton RSVP.
+
+À très bientôt,
+${p1} & ${p2} 💍`
 }
 
 function CopyTextRow({ text, accent }: { text: string; accent: string }) {
@@ -3850,8 +3862,8 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                     <>
                       {i % 2 === 0 ? <><OrnTR /><OrnBL /></> : <><OrnTL /><OrnBR /></>}
                     </>
-                  )}
-                  <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, background: (data.textBg ?? 0.5) > 0 ? `rgba(255,255,255,${data.textBg ?? 0.5})` : undefined, borderRadius: (data.textBg ?? 0.5) > 0 ? 4 : undefined, textShadow: hasFrame ? '0 0 12px rgba(255,255,255,1), 0 0 6px rgba(255,255,255,1)' : undefined }}>
+                  )}textShadow: '0 1px 8px rgba(255,255,255,0.9), 0 0 20px rgba(255,255,255,0.7)'
+                  <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, background: (data.textBg ?? 0.5) > 0 ? `rgba(255,255,255,${data.textBg ?? 0.5})` : undefined, borderRadius: (data.textBg ?? 0.5) > 0 ? 4 : undefined,  }}>
                     <AnimSection animStyle={anim}>
                       {data.mariageJuif && (
                         <div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, marginBottom: 8 }}>בס״ד</div>
