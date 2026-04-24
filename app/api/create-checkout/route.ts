@@ -3,18 +3,17 @@ import Stripe from 'stripe'
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 const PACKS: Record<string, { amount: number; name: string }> = {
-  essentiel: { amount: 7900, name: "Lov'it Essentiel" },
-  premium:   { amount: 12900, name: "Lov'it Premium" },
-  luxe:      { amount: 19900, name: "Lov'it Luxe" },
+  essentiel: { amount: 100, name: "Lov'it TEST" },
+  premium:   { amount: 100, name: "Lov'it TEST" },
+  luxe:      { amount: 100, name: "Lov'it TEST" },
 }
-
 export async function POST(request: Request) {
   try {
     const { pack } = await request.json() as { pack: string }
     const selected = PACKS[pack]
     if (!selected) return Response.json({ error: 'Pack invalide' }, { status: 400 })
 
-    const origin = request.headers.get('origin') || 'https://lovit.fr'
+    const origin = request.headers.get('origin') || 'https://wedding-app-eight-kappa.vercel.app'
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
