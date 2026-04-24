@@ -3,9 +3,9 @@ import Stripe from 'stripe'
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 const PACKS: Record<string, { amount: number; name: string }> = {
-  essentiel: { amount: 100, name: "Lov'it — Offre de lancement" },  // 69€
-  premium:   { amount: 100, name: "Lov'it — Offre de lancement" },  // 69€
-  luxe:      { amount: 100, name: "Lov'it — Offre de lancement" },  // 69€
+  essentiel: { amount: 6900, name: "Lov'it — Offre de lancement" },  // 69€
+  premium:   { amount: 6900, name: "Lov'it — Offre de lancement" },  // 69€
+  luxe:      { amount: 6900, name: "Lov'it — Offre de lancement" },  // 69€
 }
 
 export async function POST(request: Request) {
