@@ -4296,6 +4296,9 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
 
 function AccessGate({ onGranted }: { onGranted: () => void }) {
   const GOLD = '#C9A84C'
+  // ✅ Auto-validation si code dans l'URL (après paiement réussi)
+  const [autoCheckDone, setAutoCheckDone] = useState(false)
+  const [autoChecking, setAutoChecking] = useState(true)
   const [promoInput, setPromoInput] = useState('')
   const [promoEmail, setPromoEmail] = useState('')
   const [codeInput, setCodeInput] = useState('')
@@ -4339,7 +4342,41 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
     } catch { setError('Erreur réseau. Réessayez.') }
     finally { setChecking(false) }
   }
+   // ✅ Au chargement, si code dans l'URL → validation automatique + nettoyage URL
+  useEffect(() => {
+    if (autoCheckDone) return
+    const params = new URLSearchParams(window.location.search)
+    const urlCode = params.get('code')
+    if (!urlCode) { setAutoChecking(false); setAutoCheckDone(true); return }
 
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/check-access?code=${encodeURIComponent(urlCode.toUpperCase().trim())}`)
+        const d = await res.json()
+        if (d.valid) {
+          try { localStorage.setItem('lovit_access_code', urlCode.toUpperCase().trim()) } catch { /* ignore */ }
+          // Nettoie l'URL pour que le code ne reste pas visible
+          window.history.replaceState({}, '', '/faire-part')
+          onGranted()
+          return
+        }
+      } catch { /* ignore, fallback au formulaire manuel */ }
+      setAutoChecking(false)
+      setAutoCheckDone(true)
+    })()
+  }, [autoCheckDone, onGranted])
+
+  // Pendant la validation auto, affiche un loader doré (pas le formulaire)
+  if (autoChecking) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fdf0f3 0%, #fff5f7 50%, #fdf0f3 100%)' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: GOLD, marginBottom: 8 }}>Lov&apos;it</div>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: '#6a5040' }}>Activation de votre accès…</div>
+        </div>
+      </div>
+    )
+  }
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fdf0f3 0%, #fff5f7 50%, #fdf0f3 100%)', padding: 24 }}>
       <div style={{ textAlign: 'center', maxWidth: 440, width: '100%' }}>
