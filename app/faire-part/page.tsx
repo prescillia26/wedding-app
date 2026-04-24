@@ -1981,6 +1981,19 @@ interface RSVPEntry {
 function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: { accent: string; onClose: () => void; mariee1: string; mariee2: string; shareId: string | null; ceremonies: Ceremony[] }) {
   const getCeremonyName = (c: Ceremony) => c.type === 'Autre' ? (c.customName || 'Événement') : c.type
 
+  // 🔒 Détection si déjà répondu (localStorage)
+  const storageKey = shareId ? `lovit_rsvp_sent_${shareId}` : null
+  const [alreadyAnswered, setAlreadyAnswered] = useState(false)
+  const [forceReopen, setForceReopen] = useState(false)
+
+  useEffect(() => {
+    if (!storageKey) return
+    try {
+      const sent = localStorage.getItem(storageKey)
+      if (sent) setAlreadyAnswered(true)
+    } catch { /* ignore */ }
+  }, [storageKey])
+
   const [step, setStep] = useState(1)
   const [nom, setNom] = useState('')
   const [email, setEmail] = useState('')
@@ -2024,6 +2037,10 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(entry),
       })
+      // 🔒 Marque comme déjà répondu
+      if (storageKey) {
+        try { localStorage.setItem(storageKey, new Date().toISOString()) } catch { /* ignore */ }
+      }
       setSent(true)
     } catch {
       alert("Erreur lors de l'envoi")
@@ -2034,6 +2051,36 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
 
   const STEPS = 3
   const progressPct = (step / STEPS) * 100
+
+  // 🔒 Écran "Déjà répondu"
+  if (alreadyAnswered && !forceReopen) {
+    return (
+      <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+        <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)' }} />
+        <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: 48, width: '100%', maxWidth: 440, textAlign: 'center', boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
+          <button onClick={onClose} style={{ ...BTN, position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 20, color: '#9ca3af' }}>✕</button>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>✓</div>
+          <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 24, color: accent, marginBottom: 16 }}>
+            Merci !
+          </div>
+          <p style={{ fontSize: 15, color: '#4a3728', lineHeight: 1.7, marginBottom: 8 }}>
+            Vous avez déjà répondu à cette invitation.
+          </p>
+          <p style={{ fontSize: 14, color: '#9ca3af', lineHeight: 1.6, marginBottom: 28 }}>
+            Les mariés ont bien reçu votre réponse 💕
+          </p>
+          <button onClick={onClose} style={{ ...BTN, padding: '12px 32px', borderRadius: 9999, background: accent, color: 'white', border: 'none', fontSize: 14, fontWeight: 600, marginBottom: 20 }}>
+            Fermer
+          </button>
+          <div style={{ borderTop: '1px solid #fce7f3', paddingTop: 16 }}>
+            <button onClick={() => setForceReopen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#9ca3af', textDecoration: 'underline' }}>
+              Ce n&apos;est pas moi — répondre en tant qu&apos;autre personne
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (sent) {
     return (
@@ -2195,7 +2242,60 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
 
   const totalPresents = entries.reduce((s, e) => s + (e.reponses?.some(r => r.present) ? 1 : 0), 0)
   const totalPersonnes = entries.reduce((s, e) => s + (e.reponses?.filter(r => r.present).reduce((a, r) => a + (r.nbPersonnes || 0), 0) || 0), 0)
+  const downloadExcel = async () => {
+    const XLSX = await import('xlsx')
+    const wb = XLSX.utils.book_new()
+    const evtNames = ceremonies.map(getCeremonyName)
 
+    // Feuille Résumé
+    const totalPresents = entries.reduce((s, e) => s + (e.reponses?.some(r => r.present) ? 1 : 0), 0)
+    const totalPersonnes = entries.reduce((s, e) => s + (e.reponses?.filter(r => r.present).reduce((a, r) => a + (r.nbPersonnes || 0), 0) || 0), 0)
+    const resumeData = [
+      ['RÉSUMÉ DES RSVP'],
+      [''],
+      ['Total réponses reçues', entries.length],
+      ['Total personnes présentes', totalPersonnes],
+      ['Total foyers présents', totalPresents],
+      [''],
+      ['DÉTAIL PAR CÉRÉMONIE'],
+      [''],
+    ]
+    ceremonies.forEach(c => {
+      const nomEvt = getCeremonyName(c)
+      const presents = entries.filter(e => e.reponses?.find(r => r.ceremonie === nomEvt && r.present))
+      const nbPers = presents.reduce((s, e) => s + (e.reponses?.find(r => r.ceremonie === nomEvt)?.nbPersonnes || 0), 0)
+      resumeData.push([nomEvt, `${presents.length} foyers · ${nbPers} personnes`])
+    })
+    const wsResume = XLSX.utils.aoa_to_sheet(resumeData)
+    wsResume['!cols'] = [{ wch: 35 }, { wch: 25 }]
+    XLSX.utils.book_append_sheet(wb, wsResume, 'Résumé')
+
+    // Une feuille par cérémonie
+    ceremonies.forEach(c => {
+      const nomEvt = getCeremonyName(c)
+      const rows: (string | number)[][] = [
+        ['Nom', 'Email', 'Présence', 'Nb personnes', 'Accompagnants', 'Message'],
+      ]
+      entries.forEach(e => {
+        const rep = e.reponses?.find(r => r.ceremonie === nomEvt)
+        const acc = (rep?.accompagnants ?? []).filter(Boolean).join(' / ')
+        rows.push([
+          e.nom,
+          e.email || '',
+          rep ? (rep.present ? 'Présent' : 'Absent') : '—',
+          rep?.present ? rep.nbPersonnes : 0,
+          rep?.present ? acc : '',
+          e.message || '',
+        ])
+      })
+      const ws = XLSX.utils.aoa_to_sheet(rows)
+      ws['!cols'] = [{ wch: 25 }, { wch: 28 }, { wch: 12 }, { wch: 14 }, { wch: 30 }, { wch: 40 }]
+      const sheetName = nomEvt.substring(0, 31).replace(/[\\/*?:[\]]/g, '')
+      XLSX.utils.book_append_sheet(wb, ws, sheetName)
+    })
+
+    XLSX.writeFile(wb, 'rsvp-lovit.xlsx')
+  }
   const downloadCSV = () => {
     const evtNames = ceremonies.map(getCeremonyName)
     const headers = [
@@ -2265,6 +2365,9 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
               </div>
             </div>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 20 }}>
+              <button onClick={downloadExcel} style={{ ...BTN, padding: '10px 24px', borderRadius: 9999, background: '#16a34a', color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: '0 4px 14px rgba(22,163,74,0.35)' }}>
+                📊 Télécharger Excel
+              </button>
               <button onClick={downloadCSV} style={{ ...BTN, padding: '10px 24px', borderRadius: 9999, background: '#22c55e', color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: '0 4px 14px rgba(34,197,94,0.35)' }}>
                 Télécharger CSV
               </button>
