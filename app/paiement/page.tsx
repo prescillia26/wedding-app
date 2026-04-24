@@ -7,58 +7,25 @@ const CREAM = '#fdf0f3'
 const DARK = '#2d1f14'
 const TEXT = '#6a5040'
 
-type Pack = 'essentiel' | 'premium' | 'luxe'
-
-// ✅ OFFRE DE LANCEMENT : tous à 69€ (sauf Luxe qui reste à venir)
-const PACKS: { key: Pack; prix: number; prixAvant: number; titre: string; badge?: string; features: string[] }[] = [
-  {
-    key: 'essentiel',
-    prix: 69,
-    prixAvant: 79,
-    titre: 'Essentiel',
-    badge: 'Offre de lancement 🎉',
-    features: [
-      '1 faire-part digital',
-      "Jusqu'à 3 événements",
-      'RSVP basique',
-      '1 thème au choix',
-      'Lien de partage WhatsApp',
-    ],
-  },
-  {
-    key: 'premium',
-    prix: 69,
-    prixAvant: 129,
-    titre: 'Premium',
-    badge: 'Le plus populaire ⭐',
-    features: [
-      'Tout l\'Essentiel',
-      'Photos carrousel (5 max)',
-      'Musique de fond',
-      'Compte à rebours',
-      'Dashboard RSVP complet + export Excel',
-      'Bilingue français / hébreu',
-      'Modifications illimitées',
-    ],
-  },
-  {
-    key: 'luxe',
-    prix: 199,
-    prixAvant: 199,
-    titre: 'Luxe',
-    features: [
-      'Tout le Premium',
-      'Plan de table interactif',
-      'Save the date inclus',
-      'Rappels automatiques invités',
-      'Support prioritaire 24h',
-    ],
-  },
+const LAUNCH_FEATURES = [
+  'Design élégant et personnalisable',
+  'Photos carrousel, musique, compte à rebours',
+  'Dashboard RSVP complet + export Excel',
+  'Bilingue français / hébreu',
+  'Modifications illimitées pendant 1 an',
+  'Lien de partage WhatsApp optimisé',
 ]
 
-function CheckIcon({ color }: { color: string }) {
+const UPCOMING_PACKS = [
+  { titre: 'Essentiel', prix: 79, features: ['1 faire-part', "Jusqu'à 3 événements", 'RSVP basique'] },
+  { titre: 'Premium', prix: 129, features: ['Tout l\'Essentiel', 'Photos carrousel', 'Dashboard RSVP'] },
+  { titre: 'Luxe', prix: 199, features: ['Tout le Premium', 'Plan de table', 'Save the date'] },
+]
+
+function CheckIcon({ color, big }: { color: string; big?: boolean }) {
+  const size = big ? 20 : 16
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: 2 }}>
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: 2 }}>
       <circle cx="8" cy="8" r="8" fill={color} opacity="0.12" />
       <path d="M4.5 8.5L6.5 10.5L11.5 5.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
@@ -66,211 +33,177 @@ function CheckIcon({ color }: { color: string }) {
 }
 
 export default function PaiementPage() {
-  const [loading, setLoading] = useState<Pack | null>(null)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [waitlistEmail, setWaitlistEmail] = useState('')
-  const [waitlistSent, setWaitlistSent] = useState(false)
 
-  const startCheckout = async (pack: Pack) => {
-    setLoading(pack)
+  const startCheckout = async () => {
+    setLoading(true)
     setError(null)
     try {
       const res = await fetch('/api/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pack }),
+        body: JSON.stringify({ pack: 'premium' }),  // ← toujours premium pour l'offre de lancement
       })
       const { url, error: err } = await res.json()
       if (err || !url) throw new Error(err || 'Erreur')
       window.location.href = url
     } catch {
       setError('Une erreur est survenue. Veuillez réessayer.')
-      setLoading(null)
+      setLoading(false)
     }
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: `linear-gradient(180deg, #fff 0%, ${CREAM} 100%)`, padding: '64px 24px' }}>
-
-      {/* ✅ BANDEAU OFFRE DE LANCEMENT */}
-      <div style={{
-        maxWidth: 720, margin: '0 auto 32px', padding: '14px 24px',
-        background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`,
-        borderRadius: 9999, textAlign: 'center',
-        boxShadow: `0 8px 32px ${GOLD}44`,
-      }}>
-        <p style={{ margin: 0, fontFamily: 'var(--font-playfair-display)', fontSize: 15, color: 'white', fontWeight: 600, letterSpacing: '0.03em' }}>
-          ✨ OFFRE DE LANCEMENT — Profitez du tarif exclusif à 69€ pour les premières mariées
-        </p>
-      </div>
+    <div style={{ minHeight: '100vh', background: `linear-gradient(180deg, #fff 0%, ${CREAM} 100%)`, padding: '48px 24px 64px' }}>
 
       {/* En-tête */}
-      <div style={{ textAlign: 'center', marginBottom: 56 }}>
-        <a href="/" style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 40, color: GOLD, textDecoration: 'none', display: 'block', marginBottom: 4 }}>Lov&apos;it</a>
-        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: `${GOLD}99`, letterSpacing: 4, textTransform: 'uppercase', marginBottom: 24 }}>
+      <div style={{ textAlign: 'center', marginBottom: 48 }}>
+        <a href="/" style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 42, color: GOLD, textDecoration: 'none', display: 'block', marginBottom: 4 }}>Lov&apos;it</a>
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: `${GOLD}99`, letterSpacing: 4, textTransform: 'uppercase' }}>
           faire-parts de mariage digitaux
         </div>
-        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(22px, 4vw, 34px)', color: DARK, marginBottom: 12, fontWeight: 400 }}>
-          Choisissez votre formule
+      </div>
+
+      {/* ✅ GRAND PANNEAU OFFRE DE LANCEMENT */}
+      <div style={{
+        maxWidth: 640, margin: '0 auto',
+        background: `linear-gradient(160deg, #fff 0%, ${CREAM} 100%)`,
+        borderRadius: 28,
+        padding: '48px 40px 40px',
+        boxShadow: `0 24px 72px ${GOLD}33`,
+        border: `2.5px solid ${GOLD}`,
+        position: 'relative',
+      }}>
+        {/* Badge supérieur */}
+        <div style={{
+          position: 'absolute', top: -18, left: '50%', transform: 'translateX(-50%)',
+          background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`,
+          color: 'white', padding: '8px 24px', borderRadius: 9999,
+          fontFamily: 'var(--font-playfair-display)', fontSize: 13, fontWeight: 700,
+          letterSpacing: '0.1em', whiteSpace: 'nowrap',
+          boxShadow: `0 6px 20px ${GOLD}66`,
+        }}>
+          ✨ OFFRE DE LANCEMENT
         </div>
-        <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: TEXT, maxWidth: 480, margin: '0 auto' }}>
-          Un seul paiement, un faire-part inoubliable.
-        </p>
-      </div>
 
-      {/* Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, maxWidth: 960, margin: '0 auto 48px' }}>
-        {PACKS.map(pack => {
-          const isPremium = pack.key === 'premium'
-          const isLuxe = pack.key === 'luxe'
-          const hasDiscount = pack.prix < pack.prixAvant
+        {/* Titre */}
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(42px, 8vw, 58px)', color: GOLD, lineHeight: 1, marginBottom: 8 }}>
+            Votre faire-part
+          </div>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: TEXT }}>
+            digital, élégant, sur-mesure
+          </div>
+        </div>
 
-          // ── Carte Luxe grisée ──────────────────────────────────────────────
-          if (isLuxe) return (
-            <div key={pack.key} style={{
-              position: 'relative', background: '#f9f9f9', borderRadius: 20,
-              padding: '36px 32px 32px', border: '1px solid #e5e5e5',
-              display: 'flex', flexDirection: 'column', opacity: 0.85,
-            }}>
-              <div style={{
-                position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)',
-                background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`,
-                color: 'white', padding: '5px 18px', borderRadius: 9999,
-                fontFamily: 'var(--font-playfair-display)', fontSize: 12, fontWeight: 700,
-                whiteSpace: 'nowrap', boxShadow: `0 4px 16px ${GOLD}44`,
-              }}>
-                Bientôt disponible
-              </div>
+        {/* Prix */}
+        <div style={{ textAlign: 'center', marginBottom: 36 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 14 }}>
+            <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 28, fontWeight: 400, color: '#aaa', textDecoration: 'line-through' }}>
+              129€
+            </span>
+            <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(64px, 12vw, 84px)', fontWeight: 700, color: GOLD, lineHeight: 1 }}>
+              69€
+            </span>
+          </div>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: TEXT, marginTop: 4 }}>
+            paiement unique · accès pendant 1 an
+          </div>
+        </div>
 
-              <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 36, color: '#aaa', marginBottom: 4 }}>{pack.titre}</div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 24 }}>
-                <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 42, fontWeight: 700, color: '#bbb', textDecoration: 'line-through' }}>{pack.prix}€</span>
-                <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: '#ccc' }}>une seule fois</span>
-              </div>
+        {/* Features */}
+        <div style={{ background: 'white', borderRadius: 16, padding: '28px 28px 24px', marginBottom: 32, border: `1px solid ${GOLD}22` }}>
+          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 13, color: GOLD, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 18, textAlign: 'center', fontWeight: 600 }}>
+            Tout inclus
+          </div>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            {LAUNCH_FEATURES.map(f => (
+              <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 14, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 17, color: DARK, lineHeight: 1.5 }}>
+                <CheckIcon color={GOLD} big />
+                {f}
+              </li>
+            ))}
+          </ul>
+        </div>
 
-              <div style={{ height: 1, background: '#e5e5e5', marginBottom: 24 }} />
+        {/* Bouton principal */}
+        <button
+          onClick={startCheckout}
+          disabled={loading}
+          style={{
+            width: '100%', padding: '18px 0', borderRadius: 9999,
+            cursor: loading ? 'not-allowed' : 'pointer', border: 'none',
+            background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`,
+            color: 'white',
+            fontFamily: 'var(--font-playfair-display)', fontSize: 17, fontWeight: 700, letterSpacing: '0.08em',
+            boxShadow: `0 10px 32px ${GOLD}55`,
+            transition: 'transform 0.15s, box-shadow 0.15s',
+          }}
+        >
+          {loading ? 'Redirection…' : 'Réserver mon accès 69€ →'}
+        </button>
 
-              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', flex: 1 }}>
-                {pack.features.map(f => (
-                  <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 12, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 16, color: '#bbb', lineHeight: 1.5 }}>
-                    <CheckIcon color="#ccc" />{f}
-                  </li>
-                ))}
-              </ul>
+        {error && (
+          <p style={{ textAlign: 'center', color: '#ef4444', fontFamily: 'var(--font-cormorant-garamond)', fontSize: 15, marginTop: 14 }}>{error}</p>
+        )}
 
-              <div style={{ borderTop: '1px solid #e5e5e5', paddingTop: 20 }}>
-                <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', marginBottom: 10, textAlign: 'center' }}>
-                  Rejoignez la liste d&apos;attente
-                </div>
-                {waitlistSent ? (
-                  <div style={{ textAlign: 'center', color: '#16a34a', fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, fontWeight: 600 }}>✓ Nous vous contacterons dès l&apos;ouverture !</div>
-                ) : (
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <input
-                      type="email"
-                      value={waitlistEmail}
-                      onChange={e => setWaitlistEmail(e.target.value)}
-                      placeholder="votre@email.com"
-                      style={{ flex: 1, padding: '9px 12px', borderRadius: 8, border: '1.5px solid #e5e5e5', fontSize: 13, outline: 'none', background: 'white', color: DARK }}
-                    />
-                    <button
-                      onClick={() => { if (waitlistEmail.trim()) setWaitlistSent(true) }}
-                      style={{ padding: '9px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', background: GOLD, color: 'white', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap' }}
-                    >
-                      OK
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          )
+        {/* Urgence */}
+        <div style={{ textAlign: 'center', marginTop: 20, fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: TEXT }}>
+          ⏳ Offre réservée aux <strong style={{ fontStyle: 'normal', color: GOLD }}>50 premières mariées</strong>
+        </div>
 
-          // ── Cartes normales ────────────────────────────────────────────────
-          return (
-            <div key={pack.key} style={{
-              position: 'relative',
-              background: isPremium ? `linear-gradient(160deg, ${CREAM} 0%, #fff 100%)` : 'white',
-              borderRadius: 20,
-              padding: '36px 32px 32px',
-              boxShadow: isPremium ? `0 16px 56px ${GOLD}33` : '0 4px 24px rgba(0,0,0,0.07)',
-              border: isPremium ? `2px solid ${GOLD}` : '1px solid #f0e0d0',
-              display: 'flex',
-              flexDirection: 'column',
-            }}>
-              {pack.badge && (
-                <div style={{
-                  position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)',
-                  background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`,
-                  color: 'white', padding: '5px 18px', borderRadius: 9999,
-                  fontFamily: 'var(--font-playfair-display)', fontSize: 12, fontWeight: 700,
-                  whiteSpace: 'nowrap', boxShadow: `0 4px 16px ${GOLD}55`,
-                }}>
-                  {pack.badge}
-                </div>
-              )}
-              <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 36, color: GOLD, marginBottom: 4 }}>{pack.titre}</div>
-
-              {/* ✅ PRIX AVEC BARRÉ si offre de lancement */}
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
-                {hasDiscount && (
-                  <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 24, fontWeight: 500, color: '#aaa', textDecoration: 'line-through' }}>
-                    {pack.prixAvant}€
-                  </span>
-                )}
-                <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 42, fontWeight: 700, color: hasDiscount ? GOLD : DARK }}>
-                  {pack.prix}€
-                </span>
-              </div>
-              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: TEXT, marginBottom: 24 }}>
-                paiement unique · accès 1 an
-              </div>
-
-              <div style={{ height: 1, background: `${GOLD}22`, marginBottom: 24 }} />
-              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 32px', flex: 1 }}>
-                {pack.features.map(f => (
-                  <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 12, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 16, color: TEXT, lineHeight: 1.5 }}>
-                    <CheckIcon color={GOLD} />{f}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={() => startCheckout(pack.key)}
-                disabled={loading !== null}
-                style={{
-                  width: '100%', padding: '14px 0', borderRadius: 9999, cursor: loading ? 'not-allowed' : 'pointer',
-                  background: isPremium ? `linear-gradient(135deg, ${GOLD}, #e8c96a)` : 'transparent',
-                  border: isPremium ? 'none' : `1.5px solid ${GOLD}`,
-                  color: isPremium ? 'white' : GOLD,
-                  fontFamily: 'var(--font-playfair-display)', fontSize: 15, fontWeight: 700, letterSpacing: '0.05em',
-                  boxShadow: isPremium ? `0 6px 24px ${GOLD}44` : 'none',
-                  opacity: loading && loading !== pack.key ? 0.5 : 1,
-                  transition: 'opacity 0.2s',
-                } as React.CSSProperties}
-              >
-                {loading === pack.key ? 'Redirection…' : 'Commencer'}
-              </button>
-            </div>
-          )
-        })}
-      </div>
-
-      {error && (
-        <p style={{ textAlign: 'center', color: '#ef4444', fontFamily: 'var(--font-cormorant-garamond)', fontSize: 16, marginBottom: 24 }}>{error}</p>
-      )}
-
-      {/* Réassurance */}
-      <div style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 32, flexWrap: 'wrap', marginBottom: 20 }}>
+        {/* Réassurance */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 24, flexWrap: 'wrap', marginTop: 24, paddingTop: 24, borderTop: `1px solid ${GOLD}22` }}>
           {[
             { icon: '🔒', text: 'Paiement sécurisé Stripe' },
-            { icon: '✨', text: 'Accès immédiat après paiement' },
+            { icon: '✨', text: 'Accès immédiat' },
             { icon: '💌', text: 'Code envoyé par email' },
           ].map(({ icon, text }) => (
-            <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 15, color: TEXT }}>
+            <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: TEXT }}>
               <span>{icon}</span><span>{text}</span>
             </div>
           ))}
         </div>
+      </div>
+
+      {/* ── TARIFS APRÈS LANCEMENT ────────────────────────────────────── */}
+      <div style={{ maxWidth: 800, margin: '80px auto 0' }}>
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>
+            Après la période de lancement
+          </div>
+          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 24, color: DARK, fontWeight: 400 }}>
+            Les tarifs standards reviendront à :
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+          {UPCOMING_PACKS.map(pack => (
+            <div key={pack.titre} style={{
+              background: '#f9f9f9', borderRadius: 16,
+              padding: '24px 20px', border: '1px solid #e5e5e5',
+              opacity: 0.75,
+            }}>
+              <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 28, color: '#aaa', marginBottom: 4 }}>{pack.titre}</div>
+              <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 28, fontWeight: 700, color: '#888', marginBottom: 16 }}>
+                {pack.prix}€
+              </div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                {pack.features.map(f => (
+                  <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 8, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: '#999' }}>
+                    <CheckIcon color="#bbb" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Accès direct */}
+      <div style={{ textAlign: 'center', marginTop: 48 }}>
         <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af' }}>
           Vous avez déjà un code ?{' '}
           <a href="/faire-part" style={{ color: GOLD, textDecoration: 'underline' }}>Accéder directement</a>
