@@ -231,6 +231,7 @@ interface FormData {
   styleAccueil?: 'photo' | 'monogramme' | 'illustration'
   illustrationCoupleId?: string
   effetTexte?: 'aucun' | 'or' | 'aquarelle' | 'embosse'
+  dateAccueilOverride?: string // Date affichée sur la page d'accueil (override manuel)
 }
 
 const defaultCeremony: Ceremony = {
@@ -322,6 +323,8 @@ function compressImage(base64: string, maxWidth = 800, quality = 0.7): Promise<s
     img.onerror = () => resolve(base64)
     img.src = base64
   })
+}
+
 function applyTextEffect(effet?: string, accentColor?: string): React.CSSProperties {
   if (effet === 'or') {
     return {
@@ -349,7 +352,7 @@ function applyTextEffect(effet?: string, accentColor?: string): React.CSSPropert
     }
   }
   return {}
-}}
+}
 
 function getYouTubeId(url: string): string | null {
   const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)
@@ -3692,7 +3695,12 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   const gpPa2 = fmtGpCouple(data.famille2GpPaPerePrenom, data.famille2GpPaPereNom, data.famille2GpPaMerePrenom, data.famille2GpPaMereNom)
   const gpMa2 = fmtGpCouple(data.famille2GpMaPerePrenom, data.famille2GpMaPereNom, data.famille2GpMaMerePrenom, data.famille2GpMaMereNom)
   const hasGp = !!(gpPa1 || gpMa1 || gpPa2 || gpMa2)
-  const firstDate = sorted[0]?.date
+  // Date affichée sur la page d'accueil : priorité à l'override manuel, 
+// sinon la cérémonie religieuse/Houppa, sinon la première date
+const dateAccueil = data.dateAccueilOverride 
+  || sorted.find(c => c.type === 'Cérémonie religieuse / Houppa')?.date
+  || sorted[0]?.date
+const firstDate = sorted[0]?.date
 
   const hasIntroPhoto = (data.photosFond?.length ?? 0) > 0 || !!data.photoFond
   const introTextColor = hasIntroPhoto ? 'rgba(255,255,255,0.95)' : G
@@ -3822,40 +3830,40 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
               )}
               
               {/* ✨ NOUVEAU — Date en grand + jour de la semaine */}
-              {firstDate && (
-                <>
-                  <div style={{ width: 40, height: '0.5px', background: G, opacity: 0.4, margin: '24px auto 20px' }} />
-                  <div style={applyZoneStyle({ 
-                    fontFamily: FP, 
-                    fontSize: 'clamp(22px,6vw,28px)', 
-                    color: G, 
-                    letterSpacing: 3, 
-                    fontWeight: 300,
-                    textAlign: 'center',
-                    opacity: 0,
-                    animation: 'prenomAppear 1.2s ease 1s forwards',
-                  }, 'dateHeure', data.zoneStyles)}>
-                    {new Date(firstDate).toLocaleDateString('fr-FR', { 
-                      day: '2-digit', 
-                      month: '2-digit', 
-                      year: 'numeric' 
-                    }).replace(/\//g, ' · ')}
-                  </div>
-                  <div style={{ 
-                    fontFamily: FP, 
-                    fontSize: 10, 
-                    color: G, 
-                    marginTop: 8,
-                    letterSpacing: 3,
-                    textTransform: 'uppercase',
-                    opacity: 0.7,
-                    textAlign: 'center',
-                    animation: 'prenomAppear 1.2s ease 1.2s forwards',
-                  }}>
-                    {new Date(firstDate).toLocaleDateString('fr-FR', { weekday: 'long' })}
-                  </div>
-                </>
-              )}
+{dateAccueil && (
+  <>
+    <div style={{ width: 40, height: '0.5px', background: G, opacity: 0.4, margin: '24px auto 20px' }} />
+    <div style={applyZoneStyle({ 
+      fontFamily: FP, 
+      fontSize: 'clamp(22px,6vw,28px)', 
+      color: G, 
+      letterSpacing: 3, 
+      fontWeight: 300,
+      textAlign: 'center',
+      opacity: 0,
+      animation: 'prenomAppear 1.2s ease 1s forwards',
+    }, 'dateHeure', data.zoneStyles)}>
+      {new Date(dateAccueil).toLocaleDateString('fr-FR', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric' 
+      }).replace(/\//g, ' · ')}
+    </div>
+    <div style={{ 
+      fontFamily: FP, 
+      fontSize: 10, 
+      color: G, 
+      marginTop: 8,
+      letterSpacing: 3,
+      textTransform: 'uppercase',
+      opacity: 0.7,
+      textAlign: 'center',
+      animation: 'prenomAppear 1.2s ease 1.2s forwards',
+    }}>
+      {new Date(dateAccueil).toLocaleDateString('fr-FR', { weekday: 'long' })}
+    </div>
+  </>
+)}
             </AnimSection>
             {(parents1.length > 0 || parents2.length > 0) && (
               <AnimSection animStyle={anim} delay={300}>
