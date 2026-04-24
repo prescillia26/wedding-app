@@ -3766,7 +3766,7 @@ const firstDate = sorted[0]?.date
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '0 32px', maxWidth: 480, width: '100%', margin: '0 auto' }}>
           {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 16, color: introTextColor, direction: 'rtl', marginBottom: 20, animation: 'sharedFadeIn 0.9s ease forwards' }}>בס״ד</div>}
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
-            <MonogramByStyle initial1={i1} initial2={i2} color={hasIntroPhoto ? 'rgba(255,255,255,0.9)' : monoColor} size={140} style={data.monogrammeStyle || 'cercle'} />
+            <MonogramByStyle initial1={i1} initial2={i2} color={monoColor}size={140} style={data.monogrammeStyle || 'cercle'} />
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', margin: '0 auto 16px', maxWidth: 160 }}>
             <div style={{ flex: 1, height: 0.5, background: introTextColor, opacity: 0.4 }} />
