@@ -6,15 +6,17 @@ const GOLD = '#C9A84C'
 const CREAM = '#fdf0f3'
 const DARK = '#2d1f14'
 const TEXT = '#6a5040'
-const LIGHT_GOLD = '#fdf8ef'
 
 type Pack = 'essentiel' | 'premium' | 'luxe'
 
-const PACKS: { key: Pack; prix: number; titre: string; badge?: string; features: string[] }[] = [
+// ✅ OFFRE DE LANCEMENT : tous à 69€ (sauf Luxe qui reste à venir)
+const PACKS: { key: Pack; prix: number; prixAvant: number; titre: string; badge?: string; features: string[] }[] = [
   {
     key: 'essentiel',
-    prix: 79,
+    prix: 69,
+    prixAvant: 79,
     titre: 'Essentiel',
+    badge: 'Offre de lancement 🎉',
     features: [
       '1 faire-part digital',
       "Jusqu'à 3 événements",
@@ -25,7 +27,8 @@ const PACKS: { key: Pack; prix: number; titre: string; badge?: string; features:
   },
   {
     key: 'premium',
-    prix: 129,
+    prix: 69,
+    prixAvant: 129,
     titre: 'Premium',
     badge: 'Le plus populaire ⭐',
     features: [
@@ -41,6 +44,7 @@ const PACKS: { key: Pack; prix: number; titre: string; badge?: string; features:
   {
     key: 'luxe',
     prix: 199,
+    prixAvant: 199,
     titre: 'Luxe',
     features: [
       'Tout le Premium',
@@ -88,6 +92,18 @@ export default function PaiementPage() {
   return (
     <div style={{ minHeight: '100vh', background: `linear-gradient(180deg, #fff 0%, ${CREAM} 100%)`, padding: '64px 24px' }}>
 
+      {/* ✅ BANDEAU OFFRE DE LANCEMENT */}
+      <div style={{
+        maxWidth: 720, margin: '0 auto 32px', padding: '14px 24px',
+        background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`,
+        borderRadius: 9999, textAlign: 'center',
+        boxShadow: `0 8px 32px ${GOLD}44`,
+      }}>
+        <p style={{ margin: 0, fontFamily: 'var(--font-playfair-display)', fontSize: 15, color: 'white', fontWeight: 600, letterSpacing: '0.03em' }}>
+          ✨ OFFRE DE LANCEMENT — Profitez du tarif exclusif à 69€ pour les premières mariées
+        </p>
+      </div>
+
       {/* En-tête */}
       <div style={{ textAlign: 'center', marginBottom: 56 }}>
         <a href="/" style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 40, color: GOLD, textDecoration: 'none', display: 'block', marginBottom: 4 }}>Lov&apos;it</a>
@@ -107,6 +123,7 @@ export default function PaiementPage() {
         {PACKS.map(pack => {
           const isPremium = pack.key === 'premium'
           const isLuxe = pack.key === 'luxe'
+          const hasDiscount = pack.prix < pack.prixAvant
 
           // ── Carte Luxe grisée ──────────────────────────────────────────────
           if (isLuxe) return (
@@ -115,7 +132,6 @@ export default function PaiementPage() {
               padding: '36px 32px 32px', border: '1px solid #e5e5e5',
               display: 'flex', flexDirection: 'column', opacity: 0.85,
             }}>
-              {/* Badge bientôt dispo */}
               <div style={{
                 position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)',
                 background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`,
@@ -126,7 +142,6 @@ export default function PaiementPage() {
                 Bientôt disponible
               </div>
 
-              {/* Titre & Prix barré */}
               <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 36, color: '#aaa', marginBottom: 4 }}>{pack.titre}</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 24 }}>
                 <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 42, fontWeight: 700, color: '#bbb', textDecoration: 'line-through' }}>{pack.prix}€</span>
@@ -135,7 +150,6 @@ export default function PaiementPage() {
 
               <div style={{ height: 1, background: '#e5e5e5', marginBottom: 24 }} />
 
-              {/* Features grisées */}
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', flex: 1 }}>
                 {pack.features.map(f => (
                   <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 12, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 16, color: '#bbb', lineHeight: 1.5 }}>
@@ -144,7 +158,6 @@ export default function PaiementPage() {
                 ))}
               </ul>
 
-              {/* Liste d'attente */}
               <div style={{ borderTop: '1px solid #e5e5e5', paddingTop: 20 }}>
                 <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', marginBottom: 10, textAlign: 'center' }}>
                   Rejoignez la liste d&apos;attente
@@ -196,10 +209,22 @@ export default function PaiementPage() {
                 </div>
               )}
               <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 36, color: GOLD, marginBottom: 4 }}>{pack.titre}</div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 24 }}>
-                <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 42, fontWeight: 700, color: DARK }}>{pack.prix}€</span>
-                <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: TEXT }}>une seule fois</span>
+
+              {/* ✅ PRIX AVEC BARRÉ si offre de lancement */}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
+                {hasDiscount && (
+                  <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 24, fontWeight: 500, color: '#aaa', textDecoration: 'line-through' }}>
+                    {pack.prixAvant}€
+                  </span>
+                )}
+                <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 42, fontWeight: 700, color: hasDiscount ? GOLD : DARK }}>
+                  {pack.prix}€
+                </span>
               </div>
+              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: TEXT, marginBottom: 24 }}>
+                paiement unique · accès 1 an
+              </div>
+
               <div style={{ height: 1, background: `${GOLD}22`, marginBottom: 24 }} />
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 32px', flex: 1 }}>
                 {pack.features.map(f => (
@@ -256,7 +281,7 @@ export default function PaiementPage() {
       <div style={{ textAlign: 'center', marginTop: 64 }}>
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 28, color: `${GOLD}66`, marginBottom: 8 }}>Lov&apos;it</div>
         <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: '#c4b5a0' }}>
-          © 2025 Lov&apos;it — faire-parts de mariage digitaux
+          © 2026 Lov&apos;it — faire-parts de mariage digitaux
         </p>
       </div>
     </div>
