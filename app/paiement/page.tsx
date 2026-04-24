@@ -11,7 +11,6 @@ const LAUNCH_FEATURES = [
   'Design élégant et personnalisable',
   'Photos carrousel, musique, compte à rebours',
   'Dashboard RSVP complet + export Excel',
-  'Bilingue français / hébreu',
   'Modifications illimitées pendant 1 an',
   'Lien de partage WhatsApp optimisé',
 ]
