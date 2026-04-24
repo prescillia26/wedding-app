@@ -230,6 +230,7 @@ interface FormData {
   zoneStyles?: ZoneStyles 
   styleAccueil?: 'photo' | 'monogramme' | 'illustration'
   illustrationCoupleId?: string
+  effetTexte?: 'aucun' | 'or' | 'aquarelle' | 'embosse'
 }
 
 const defaultCeremony: Ceremony = {
@@ -321,7 +322,34 @@ function compressImage(base64: string, maxWidth = 800, quality = 0.7): Promise<s
     img.onerror = () => resolve(base64)
     img.src = base64
   })
-}
+function applyTextEffect(effet?: string, accentColor?: string): React.CSSProperties {
+  if (effet === 'or') {
+    return {
+      background: 'linear-gradient(135deg, #d4a574 0%, #f4e4b8 30%, #d4a574 60%, #a67c3f 100%)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text',
+    }
+  }
+  if (effet === 'aquarelle') {
+    return {
+      position: 'relative' as const,
+      color: accentColor,
+      textShadow: `0 0 12px ${accentColor}55, 0 0 24px ${accentColor}33`,
+    }
+  }
+  if (effet === 'embosse') {
+    return {
+      color: '#d4c9b8',
+      textShadow: `
+        1px 1px 0 rgba(255,255,255,0.9),
+        -1px -1px 1px ${accentColor}66,
+        0 0 2px ${accentColor}44
+      `,
+    }
+  }
+  return {}
+}}
 
 function getYouTubeId(url: string): string | null {
   const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)
@@ -3791,6 +3819,42 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
                   {data.marie1Prenom2 && <div style={{ fontFamily: 'serif', fontSize: 22, color: G, direction: 'rtl' }}>{data.marie1Prenom2}</div>}
                   {data.marie2Prenom2 && <div style={{ fontFamily: 'serif', fontSize: 22, color: G, direction: 'rtl' }}>{data.marie2Prenom2}</div>}
                 </div>
+              )}
+              
+              {/* ✨ NOUVEAU — Date en grand + jour de la semaine */}
+              {firstDate && (
+                <>
+                  <div style={{ width: 40, height: '0.5px', background: G, opacity: 0.4, margin: '24px auto 20px' }} />
+                  <div style={applyZoneStyle({ 
+                    fontFamily: FP, 
+                    fontSize: 'clamp(22px,6vw,28px)', 
+                    color: G, 
+                    letterSpacing: 3, 
+                    fontWeight: 300,
+                    textAlign: 'center',
+                    opacity: 0,
+                    animation: 'prenomAppear 1.2s ease 1s forwards',
+                  }, 'dateHeure', data.zoneStyles)}>
+                    {new Date(firstDate).toLocaleDateString('fr-FR', { 
+                      day: '2-digit', 
+                      month: '2-digit', 
+                      year: 'numeric' 
+                    }).replace(/\//g, ' · ')}
+                  </div>
+                  <div style={{ 
+                    fontFamily: FP, 
+                    fontSize: 10, 
+                    color: G, 
+                    marginTop: 8,
+                    letterSpacing: 3,
+                    textTransform: 'uppercase',
+                    opacity: 0.7,
+                    textAlign: 'center',
+                    animation: 'prenomAppear 1.2s ease 1.2s forwards',
+                  }}>
+                    {new Date(firstDate).toLocaleDateString('fr-FR', { weekday: 'long' })}
+                  </div>
+                </>
               )}
             </AnimSection>
             {(parents1.length > 0 || parents2.length > 0) && (
