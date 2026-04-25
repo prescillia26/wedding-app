@@ -3361,7 +3361,6 @@ const OrnementDentelleDore = ({ style = {} }: { style?: React.CSSProperties }) =
 // ── IntroCarousel : fond photo de la section d'accueil ────────────────────────
 
 type CropData = { url: string; cropX: number; cropY: number; cropScale: number }
-
 function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; themeAccent: string; photosData?: CropData[] }) {
   const valid = photos.filter(p => p && p.length > 0)
   const [idx, setIdx] = useState(0)
@@ -3380,9 +3379,57 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
 
   return (
     <>
+      {/* Fond flouté qui remplit l'espace (effet "blurred backdrop") */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={valid[idx]} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease', zIndex: 0, pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.12) 55%, rgba(0,0,0,0.0) 100%)', zIndex: 0, pointerEvents: 'none' }} />
+      <img
+        src={valid[idx]}
+        alt=""
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          objectPosition: 'center',
+          opacity: visible ? 0.7 : 0,
+          transition: 'opacity 0.6s ease',
+          zIndex: 0,
+          pointerEvents: 'none',
+          filter: 'blur(40px) brightness(0.6) saturate(1.2)',
+          transform: 'scale(1.15)', // évite que les bords flous laissent voir du vide
+        }}
+      />
+      {/* Photo principale, affichée en entier (objectFit: contain) */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={valid[idx]}
+        alt=""
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'contain',
+          objectPosition: 'center',
+          opacity: visible ? 1 : 0,
+          transition: 'opacity 0.6s ease',
+          zIndex: 1,
+          pointerEvents: 'none',
+        }}
+      />
+      {/* Voile sombre dégradé pour que le texte reste lisible en bas */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.05) 55%, rgba(0,0,0,0) 100%)',
+          zIndex: 2,
+          pointerEvents: 'none',
+        }}
+      />
       {valid.length > 1 && (
         <div style={{ position: 'absolute', bottom: 80, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6, zIndex: 5, pointerEvents: 'none' }}>
           {valid.map((_, i) => (
@@ -3393,7 +3440,6 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
     </>
   )
 }
-
 // ── AnimSection : fade-in au scroll ───────────────────────────────────────────
 function AnimSection({ children, delay = 0, style, animStyle = 'slide-up' }: {
   children: React.ReactNode; delay?: number; style?: React.CSSProperties; animStyle?: string
