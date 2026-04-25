@@ -358,6 +358,29 @@ function applyTextEffect(effet?: string, accentColor?: string): React.CSSPropert
   }
   return {}
 }
+// ── Génération automatique d'un slug joli pour l'URL ────────────────────────
+// Format : "ornella-samuel-x7k" (prénoms + suffixe court pour éviter les collisions)
+function generateAutoSlug(prenom1: string, prenom2: string): string {
+  const clean = (s: string) =>
+    (s || '')
+      .toLowerCase()
+      .normalize('NFD')                       // décompose les accents (é → e + ́)
+      .replace(/[\u0300-\u036f]/g, '')        // supprime les diacritiques
+      .replace(/[^a-z0-9]+/g, '')             // garde uniquement lettres+chiffres
+      .slice(0, 12)                            // max 12 chars par prénom
+
+  const p1 = clean(prenom1) || 'maries'
+  const p2 = clean(prenom2) || 'maries'
+
+  // Suffixe aléatoire 3 chars (alphanumérique) pour unicité
+  const chars = 'abcdefghijkmnpqrstuvwxyz23456789' // sans 0/o/1/l/i (lisibilité)
+  let suffix = ''
+  for (let i = 0; i < 3; i++) {
+    suffix += chars[Math.floor(Math.random() * chars.length)]
+  }
+
+  return `${p1}-${p2}-${suffix}`
+}
 
 function getYouTubeId(url: string): string | null {
   const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)
@@ -4532,7 +4555,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
     }
   }, [isShared])
 
-  const handleShare = async () => {
+ const handleShare = async () => {
     if (sharing) return
     setSharing(true)
     try {
@@ -4543,6 +4566,13 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
       compressedPhotos = originalPhotos
       setSharingStatus('Envoi...')
       const dataToSend = buildPayload()
+
+      // ✅ Auto-génération du slug si non renseigné par les mariés
+      // → garantit toujours une URL propre + preview WhatsApp dynamique
+      if (!dataToSend.slug || !dataToSend.slug.trim()) {
+        dataToSend.slug = generateAutoSlug(dataToSend.marie1Prenom, dataToSend.marie2Prenom)
+      }
+
       const existingId = (() => { try { return localStorage.getItem('lovit_share_id') } catch { return null } })()
       console.log('slug envoyé:', dataToSend.slug)
       const res = await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...dataToSend, fixedId: existingId }) })
