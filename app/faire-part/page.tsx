@@ -414,38 +414,111 @@ function getHebrewDate(dateStr: string): string {
   } catch { return '' }
 }
 
-// ── Phrase d'invitation par défaut selon le type d'événement ─────────────────
-// (modifiable ensuite via le bouton "✏️ Texte" → ceremony_{i}_invitation)
-function getInvitationPhrase(ceremony: Ceremony, data: FormData): string {
+// ── Phrase d'invitation par défaut, mise en page élégante ─────────────────────
+// Retourne un JSX avec la structure : intro + NOMS en valeur + suite
+function renderInvitationPhrase(
+  ceremony: Ceremony,
+  data: FormData,
+  accent: string,
+  textColor: string
+): React.ReactNode {
   const p1 = data.marie1Prenom || 'Prénom'
   const p2 = data.marie2Prenom || 'Prénom'
   const nom1 = data.famille1PereNom || data.marie1Nom || ''
   const nom2 = data.famille2PereNom || data.marie2Nom || ''
 
+  const FC = 'var(--font-cormorant-garamond)'
+  const FP = 'var(--font-playfair-display)'
+
+  // Style des lignes "intro" et "fin de phrase"
+  const introStyle: React.CSSProperties = {
+    fontFamily: FC,
+    fontStyle: 'italic',
+    fontSize: 16,
+    color: textColor,
+    textAlign: 'center',
+    lineHeight: 1.7,
+    opacity: 0.85,
+    margin: '0 0 10px',
+  }
+
+  // Style des NOMS et PRÉNOMS mis en avant
+  const highlightStyle: React.CSSProperties = {
+    fontFamily: FP,
+    fontSize: 'clamp(18px, 4.5vw, 22px)',
+    color: accent,
+    fontWeight: 700,
+    letterSpacing: 3,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    margin: '6px 0 14px',
+    whiteSpace: 'nowrap',          // ← NOMS jamais coupés
+    overflowWrap: 'normal',
+    wordBreak: 'keep-all',
+  }
+
   switch (ceremony.type) {
     case 'Shabbat Hatan': {
-      const familles = [nom1, nom2].filter(Boolean).join(' et ')
-      return familles
-        ? `Les familles ${familles} seront ravies de vous convier au Shabbat Hatan de ${p1} et ${p2}`
-        : `Vous êtes conviés au Shabbat Hatan de ${p1} et ${p2}`
+      const familles = [nom1, nom2].filter(Boolean).join(' & ')
+      return (
+        <>
+          {familles && <div style={introStyle}>Les familles</div>}
+          {familles && <div style={highlightStyle}>{familles}</div>}
+          <div style={introStyle}>
+            {familles ? 'seront ravies de vous convier au' : 'Vous êtes conviés au'}
+          </div>
+          <div style={{ ...introStyle, margin: '0 0 4px' }}>Shabbat Hatan de</div>
+          <div style={highlightStyle}>{p1} &amp; {p2}</div>
+        </>
+      )
     }
     case 'Henné':
-      return `${p1} et ${p2} vous convient à célébrer leur soirée de henné, dans la tradition et la joie`
+      return (
+        <>
+          <div style={introStyle}>Vous êtes chaleureusement conviés à</div>
+          <div style={{ ...introStyle, margin: '0 0 4px' }}>la soirée du henné de</div>
+          <div style={highlightStyle}>{p1} &amp; {p2}</div>
+          <div style={introStyle}>dans la tradition et la joie</div>
+        </>
+      )
     case 'Cocktail':
-      return `${p1} et ${p2} vous invitent à lever leur verre, pour célébrer ensemble le début de cette belle aventure`
+      return (
+        <>
+          <div style={{ ...introStyle, margin: '0 0 4px' }}>Levons notre verre avec</div>
+          <div style={highlightStyle}>{p1} &amp; {p2}</div>
+          <div style={introStyle}>pour célébrer ensemble<br />le début de cette belle aventure</div>
+        </>
+      )
     case 'Soirée':
-      return `${p1} et ${p2} vous invitent à danser, rire et célébrer leur amour jusqu'au bout de la nuit`
+      return (
+        <>
+          <div style={{ ...introStyle, margin: '0 0 4px' }}>Dansez, riez et célébrez avec</div>
+          <div style={highlightStyle}>{p1} &amp; {p2}</div>
+          <div style={introStyle}>jusqu&apos;au bout de la nuit</div>
+        </>
+      )
     case 'Boat Party':
-      return `Embarquez avec ${p1} et ${p2} pour une soirée inoubliable, entre ciel et mer`
+      return (
+        <>
+          <div style={{ ...introStyle, margin: '0 0 4px' }}>Embarquez avec</div>
+          <div style={highlightStyle}>{p1} &amp; {p2}</div>
+          <div style={introStyle}>pour une soirée inoubliable,<br />entre ciel et mer</div>
+        </>
+      )
     case 'Autre': {
       const evt = ceremony.customName || 'cet événement'
-      return `Rejoignez ${p1} et ${p2} pour ${evt}, un moment à partager ensemble`
+      return (
+        <>
+          <div style={{ ...introStyle, margin: '0 0 4px' }}>Rejoignez</div>
+          <div style={highlightStyle}>{p1} &amp; {p2}</div>
+          <div style={introStyle}>pour {evt}</div>
+        </>
+      )
     }
     default:
-      return ''
+      return null
   }
 }
-
 function sortByDate(ceremonies: Ceremony[]): Ceremony[] {
   return [...ceremonies].sort((a, b) => {
     if (!a.date) return 1
@@ -4122,10 +4195,10 @@ const firstDate = sorted[0]?.date
                     </>
                   )}
                   <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: '0 1px 3px rgba(255,255,255,0.95), 0 0 8px rgba(255,255,255,0.7)' }}>
+                    {data.mariageJuif && (
+                      <div style={{ position: 'absolute', top: 18, right: 22, fontSize: 16, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, zIndex: 5, opacity: 0.85, letterSpacing: 1 }}>בס״ד</div>
+                    )}
                     <AnimSection animStyle={anim}>
-                      {data.mariageJuif && (
-                        <div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, marginBottom: 8 }}>בס״ד</div>
-                      )}
                      <div style={applyZoneStyle({ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }, 'titres', data.zoneStyles)}>{ov[`ceremony_${i}_titre`] || title}</div>
                       <OrnSep />
                     </AnimSection>
@@ -4156,9 +4229,16 @@ const firstDate = sorted[0]?.date
                       </AnimSection>
                     )}
                     <AnimSection animStyle={anim} delay={250}>
-                      <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 6 }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom}</div>
-                      <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 20, color: TEXT, textAlign: 'center', marginBottom: 6, opacity: 0.65 }}>&</div>
-                      <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 18 }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom}</div>
+                      {/* Gros prénoms calligraphiés : SEULEMENT pour Houppa et Mairie */}
+                      {(ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Mairie') && (
+                        <>
+                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 6, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom}</div>
+                          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 20, color: TEXT, textAlign: 'center', marginBottom: 6, opacity: 0.65 }}>&</div>
+                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 18, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom}</div>
+                        </>
+                      )}
+
+                      {/* Phrase narrative selon le type */}
                       {ceremony.type === 'Mairie' ? (
                         <>
                           <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78 }}>se diront</div>
@@ -4167,8 +4247,19 @@ const firstDate = sorted[0]?.date
                       ) : ceremony.type === 'Cérémonie religieuse / Houppa' ? (
                         <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginBottom: 28, opacity: 0.78 }, 'narratif', data.zoneStyles)}>{ov[`ceremony_${i}_honore`] || 'Et seraient honorés de votre présence'}</div>
                       ) : (
-                        <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginBottom: 28, opacity: 0.85, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles)}>
-                          {ov[`ceremony_${i}_invitation`] || getInvitationPhrase(ceremony, data)}
+                        // Pour tous les autres types : phrase mise en page avec NOMS en valeur
+                        <div style={{ marginBottom: 28 }}>
+                          {ov[`ceremony_${i}_invitation`] ? (
+                            // Si les mariés ont édité la phrase → affichage simple en italique
+                            <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', opacity: 0.85, lineHeight: 1.7, padding: '0 8px', whiteSpace: 'pre-wrap' as const }, 'narratif', data.zoneStyles)}>
+                              {ov[`ceremony_${i}_invitation`]}
+                            </div>
+                          ) : (
+                            // Sinon → mise en page élégante avec NOMS en valeur
+                            <div style={applyZoneStyle({ padding: '0 8px' }, 'narratif', data.zoneStyles)}>
+                              {renderInvitationPhrase(ceremony, data, G, TEXT)}
+                            </div>
+                          )}
                         </div>
                       )}
                     </AnimSection>
