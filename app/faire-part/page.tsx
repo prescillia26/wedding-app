@@ -4371,16 +4371,6 @@ const firstDate = sorted[0]?.date
                       )}
                       {ceremony.adresse && (
                         <div style={{ marginTop: 24 }}>
-                          {/* Mini-carte Google Maps intégrée */}
-                          <div style={{ marginBottom: 20, borderRadius: 8, overflow: 'hidden', boxShadow: `0 2px 12px ${G}22`, border: `1px solid ${G}22` }}>
-                            <iframe
-                              src={`https://maps.google.com/maps?q=${encodeURIComponent(ceremony.adresse)}&output=embed`}
-                              width="100%" height="180"
-                              style={{ border: 'none', display: 'block' }}
-                              loading="lazy" title={ceremony.type}
-                            />
-                          </div>
-                          
                           {/* Séparateur ornemental */}
                           <div style={{ textAlign: 'center' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 14 }}>
