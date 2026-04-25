@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   // ✅ CRUCIAL : permet à toutes les URLs relatives d'être transformées en URLs absolues.
   // Sans ça, WhatsApp/Facebook ne peuvent pas résoudre les images OG.
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "https://wedding-app-eight-kappa.vercel.app"
+   process.env.NEXT_PUBLIC_SITE_URL || "https://getlovit.fr"
   ),
 
   // ✅ Titre avec template : les pages enfant (comme /[slug]) peuvent définir leur propre titre,
