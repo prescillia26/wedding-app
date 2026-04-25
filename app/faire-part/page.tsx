@@ -165,6 +165,10 @@ interface Ceremony {
   evenementSuivantNom: string
   evenementSuivantAdresse: string
   note: string
+  // ── Infos pratiques (transport / hébergement) ──
+  infosTransportActif: boolean
+  transport: string
+  hebergement: string
 }
 
 interface FormData {
@@ -238,6 +242,7 @@ const defaultCeremony: Ceremony = {
   type: 'Cérémonie religieuse / Houppa',
   customName: '', lieu: '', adresse: '', date: '', heure: '',
   suiviDAutre: false, evenementSuivantNom: '', evenementSuivantAdresse: '', note: '',
+  infosTransportActif: false, transport: '', hebergement: '',
 }
 
 const defaultFormData: FormData = {
@@ -407,6 +412,38 @@ function getHebrewDate(dateStr: string): string {
     return new Intl.DateTimeFormat('he-IL-u-ca-hebrew', { year: 'numeric', month: 'long', day: 'numeric' })
       .format(new Date(dateStr + 'T12:00:00'))
   } catch { return '' }
+}
+
+// ── Phrase d'invitation par défaut selon le type d'événement ─────────────────
+// (modifiable ensuite via le bouton "✏️ Texte" → ceremony_{i}_invitation)
+function getInvitationPhrase(ceremony: Ceremony, data: FormData): string {
+  const p1 = data.marie1Prenom || 'Prénom'
+  const p2 = data.marie2Prenom || 'Prénom'
+  const nom1 = data.famille1PereNom || data.marie1Nom || ''
+  const nom2 = data.famille2PereNom || data.marie2Nom || ''
+
+  switch (ceremony.type) {
+    case 'Shabbat Hatan': {
+      const familles = [nom1, nom2].filter(Boolean).join(' et ')
+      return familles
+        ? `Les familles ${familles} seront ravies de vous convier au Shabbat Hatan de ${p1} et ${p2}`
+        : `Vous êtes conviés au Shabbat Hatan de ${p1} et ${p2}`
+    }
+    case 'Henné':
+      return `${p1} et ${p2} vous convient à célébrer leur soirée de henné, dans la tradition et la joie`
+    case 'Cocktail':
+      return `${p1} et ${p2} vous invitent à lever leur verre, pour célébrer ensemble le début de cette belle aventure`
+    case 'Soirée':
+      return `${p1} et ${p2} vous invitent à danser, rire et célébrer leur amour jusqu'au bout de la nuit`
+    case 'Boat Party':
+      return `Embarquez avec ${p1} et ${p2} pour une soirée inoubliable, entre ciel et mer`
+    case 'Autre': {
+      const evt = ceremony.customName || 'cet événement'
+      return `Rejoignez ${p1} et ${p2} pour ${evt}, un moment à partager ensemble`
+    }
+    default:
+      return ''
+  }
 }
 
 function sortByDate(ceremonies: Ceremony[]): Ceremony[] {
@@ -931,6 +968,38 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             <textarea value={c.note} onChange={e => update(i, { note: e.target.value })}
               placeholder="ex: Tenue de soirée exigée / Parking disponible / Entrée par la rue de..."
               rows={2} style={{ ...S.input, resize: 'vertical', minHeight: 56, fontFamily: 'inherit', fontSize: 13 }} />
+          </div>
+
+          {/* ── Infos transport / hébergement (optionnel) ── */}
+          <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px dashed #fecdd3' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: '#4a3728' }}>
+              <input
+                type="checkbox"
+                checked={c.infosTransportActif}
+                onChange={e => update(i, { infosTransportActif: e.target.checked })}
+              />
+              ➕ Ajouter des infos transport / hébergement
+            </label>
+            {c.infosTransportActif && (
+              <div style={{ marginTop: 12 }}>
+                <Label>🚌 Transport (optionnel)</Label>
+                <textarea
+                  value={c.transport}
+                  onChange={e => update(i, { transport: e.target.value })}
+                  placeholder="ex: Un car partira de la gare de Lyon à 14h, retour prévu à 2h. Inscription auprès de Sarah au 06..."
+                  rows={3}
+                  style={{ ...S.input, resize: 'vertical', minHeight: 70, fontFamily: 'inherit', fontSize: 13, marginBottom: 12 }}
+                />
+                <Label>🏨 Hébergement (optionnel)</Label>
+                <textarea
+                  value={c.hebergement}
+                  onChange={e => update(i, { hebergement: e.target.value })}
+                  placeholder="ex: Hôtel partenaire : Hôtel Le Domaine — code LOVIT pour -15% — réservations sur leur site..."
+                  rows={3}
+                  style={{ ...S.input, resize: 'vertical', minHeight: 70, fontFamily: 'inherit', fontSize: 13 }}
+                />
+              </div>
+            )}
           </div>
         </div>
       ))}
@@ -2947,7 +3016,7 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
                   <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Titre</label>
                   <input value={localText[`ceremony_${i}_titre`] ?? ''} onChange={e => setText(`ceremony_${i}_titre`, e.target.value)} placeholder={name}
                     style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box', marginBottom: 12 }} />
-                  {c.type !== 'Mairie' && (
+                  {c.type === 'Cérémonie religieuse / Houppa' && (
                     <>
                       <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>« Ont la joie de... »</label>
                       <textarea value={localText[`ceremony_${i}_joie`] ?? ''} onChange={e => setText(`ceremony_${i}_joie`, e.target.value)} placeholder="Ont la joie de vous faire part du mariage de leurs enfants"
@@ -2955,6 +3024,20 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
                       <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>« Et seraient honorés de votre présence »</label>
                       <textarea value={localText[`ceremony_${i}_honore`] ?? ''} onChange={e => setText(`ceremony_${i}_honore`, e.target.value)} placeholder="Et seraient honorés de votre présence"
                         style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 56, marginBottom: 12 }} />
+                    </>
+                  )}
+                  {c.type !== 'Mairie' && c.type !== 'Cérémonie religieuse / Houppa' && (
+                    <>
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Phrase d&apos;invitation</label>
+                      <textarea
+                        value={localText[`ceremony_${i}_invitation`] ?? ''}
+                        onChange={e => setText(`ceremony_${i}_invitation`, e.target.value)}
+                        placeholder={`ex: ${c.type === 'Shabbat Hatan' ? 'Les familles X et Y seront ravies de vous convier au Shabbat Hatan de...' : c.type === 'Henné' ? 'Vous convient à célébrer leur soirée de henné...' : c.type === 'Cocktail' ? 'Vous invitent à lever leur verre...' : c.type === 'Soirée' ? 'Vous invitent à danser et célébrer leur amour...' : c.type === 'Boat Party' ? 'Embarquez avec eux pour une soirée inoubliable...' : 'Rejoignez-les pour cet événement...'}`}
+                        style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 70, marginBottom: 12 }}
+                      />
+                      <p style={{ fontSize: 11, color: '#9ca3af', fontStyle: 'italic', marginTop: -6, marginBottom: 12 }}>
+                        Laissez vide pour utiliser le texte par défaut adapté à ce type d&apos;événement.
+                      </p>
                     </>
                   )}
                   <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Lieu</label>
@@ -4053,7 +4136,7 @@ const firstDate = sorted[0]?.date
                         </div>
                       </AnimSection>
                     )}
-                    {(parents1.length > 0 || parents2.length > 0) && (
+                    {(parents1.length > 0 || parents2.length > 0) && ceremony.type === 'Cérémonie religieuse / Houppa' && (
                       <AnimSection animStyle={anim} delay={150}>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 12, textAlign: 'center' }}>
                           <div>
@@ -4081,8 +4164,12 @@ const firstDate = sorted[0]?.date
                           <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78 }}>se diront</div>
                           <div style={{ fontFamily: FS, fontSize: 'clamp(48px,12vw,80px)', color: G, textAlign: 'center', lineHeight: 1, marginBottom: 28 }}>« Oui »</div>
                         </>
-                      ) : (
+                      ) : ceremony.type === 'Cérémonie religieuse / Houppa' ? (
                         <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginBottom: 28, opacity: 0.78 }, 'narratif', data.zoneStyles)}>{ov[`ceremony_${i}_honore`] || 'Et seraient honorés de votre présence'}</div>
+                      ) : (
+                        <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginBottom: 28, opacity: 0.85, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles)}>
+                          {ov[`ceremony_${i}_invitation`] || getInvitationPhrase(ceremony, data)}
+                        </div>
                       )}
                     </AnimSection>
                     <AnimSection animStyle={anim} delay={380}>
@@ -4146,6 +4233,32 @@ const firstDate = sorted[0]?.date
                             </div>
                             <ItineraireButtons adresse={ceremony.adresse} theme={theme} />
                           </div>
+                        </div>
+                      )}
+
+                      {/* ── Encart Infos pratiques (transport / hébergement) ── */}
+                      {(ceremony.transport || ceremony.hebergement) && (
+                        <div style={{ marginTop: 32, paddingTop: 24, borderTop: `1px solid ${G}22` }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 14 }}>
+                            <div style={{ width: 24, height: 0.5, background: G, opacity: 0.4 }} />
+                            <span style={{ color: G, fontSize: 10, opacity: 0.6 }}>✦</span>
+                            <div style={{ width: 24, height: 0.5, background: G, opacity: 0.4 }} />
+                          </div>
+                          <div style={{ fontFamily: FP, fontSize: 10, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 20, opacity: 0.7 }}>
+                            Infos pratiques
+                          </div>
+                          {ceremony.transport && (
+                            <div style={{ marginBottom: ceremony.hebergement ? 18 : 0, textAlign: 'center' }}>
+                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: G, marginBottom: 6, fontWeight: 600 }}>🚌 Transport</div>
+                              <div style={{ fontFamily: FC, fontSize: 13, color: TEXT, lineHeight: 1.7, whiteSpace: 'pre-wrap', opacity: 0.9 }}>{ceremony.transport}</div>
+                            </div>
+                          )}
+                          {ceremony.hebergement && (
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: G, marginBottom: 6, fontWeight: 600 }}>🏨 Hébergement</div>
+                              <div style={{ fontFamily: FC, fontSize: 13, color: TEXT, lineHeight: 1.7, whiteSpace: 'pre-wrap', opacity: 0.9 }}>{ceremony.hebergement}</div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </AnimSection>
