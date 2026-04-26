@@ -3400,27 +3400,44 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
 
   if (valid.length === 0) return null
 
+  // Récupère le crop pour la photo courante (ou défaut si pas défini)
+  const crop = photosData?.[idx] ?? { cropX: 0, cropY: 0, cropScale: 1 }
+
   return (
     <>
-      {/* Photo en plein écran, centrée sur le haut pour garder les visages visibles */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={valid[idx]}
-        alt=""
+      {/* Conteneur qui clip la photo aux dimensions de l'écran */}
+      <div
         style={{
           position: 'absolute',
           top: 0,
           left: 0,
           width: '100%',
           height: '100%',
-          objectFit: 'cover',
-          objectPosition: 'center 25%',
-          opacity: visible ? 1 : 0,
-          transition: 'opacity 0.6s ease',
+          overflow: 'hidden',
           zIndex: 0,
           pointerEvents: 'none',
         }}
-      />
+      >
+        {/* Photo centrée avec le recadrage manuel des mariés */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={valid[idx]}
+          alt=""
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            minWidth: '100%',
+            minHeight: '100%',
+            width: 'auto',
+            height: 'auto',
+            transform: `translate(calc(-50% + ${crop.cropX}px), calc(-50% + ${crop.cropY}px)) scale(${crop.cropScale})`,
+            transformOrigin: 'center center',
+            opacity: visible ? 1 : 0,
+            transition: 'opacity 0.6s ease',
+          }}
+        />
+      </div>
       {/* Voile sombre dégradé pour que le texte reste lisible en bas */}
       <div
         style={{
