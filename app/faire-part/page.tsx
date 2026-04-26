@@ -381,7 +381,17 @@ function generateAutoSlug(prenom1: string, prenom2: string): string {
 
   return `${p1}-${p2}-${suffix}`
 }
-
+// ── Recadrage IA automatique sur les visages (Cloudinary g_auto) ─────────────
+// Transforme l'URL Cloudinary pour appliquer un crop intelligent qui détecte
+// les visages et les positionne au centre. Format 9:16 (vertical mobile).
+function toCloudinaryFaceCrop(url: string, width = 800, height = 1200): string {
+  if (!url || !url.includes('/upload/')) return url
+  // Si l'URL a déjà des transformations, on les remplace
+  if (url.match(/\/upload\/[^/]+\//) && url.match(/\/upload\/(w_|h_|c_|g_)/)) {
+    return url.replace(/\/upload\/[^/]+\//, `/upload/w_${width},h_${height},c_fill,g_auto:faces,q_auto,f_auto/`)
+  }
+  return url.replace('/upload/', `/upload/w_${width},h_${height},c_fill,g_auto:faces,q_auto,f_auto/`)
+}
 function getYouTubeId(url: string): string | null {
   const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)
   return match ? match[1] : null
@@ -3400,14 +3410,19 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
 
   if (valid.length === 0) return null
 
-  // Récupère le crop pour la photo courante
+  // Récupère le crop manuel pour la photo courante (si la mariée a recadré)
   const crop = photosData?.[idx]
-  const hasCustomCrop = crop && (crop.cropX !== 0 || crop.cropY !== 0 || crop.cropScale !== 1)
+  const hasCustomCrop = crop && (crop.cropX !== 0 || crop.cropY !== 0 || (crop.cropScale && crop.cropScale !== 1))
+
+  // ── Source de la photo ──
+  // - Si crop manuel : on utilise l'URL originale (le transform CSS gère le crop)
+  // - Sinon : on utilise l'URL avec recadrage IA automatique sur les visages
+  const photoSrc = hasCustomCrop ? valid[idx] : toCloudinaryFaceCrop(valid[idx])
 
   return (
     <>
       {hasCustomCrop ? (
-        // ── Mode crop manuel : la mariée a recadré sa photo ─────────────
+        // ── Mode crop manuel : la mariée a recadré sa photo ──────────────
         <div
           style={{
             position: 'absolute',
@@ -3422,7 +3437,7 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={valid[idx]}
+            src={photoSrc}
             alt=""
             style={{
               position: 'absolute',
@@ -3439,10 +3454,10 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
           />
         </div>
       ) : (
-        // ── Mode par défaut : objectFit cover, pas d'étirement ──────────
+        // ── Mode IA automatique : crop sur les visages par Cloudinary ────
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={valid[idx]}
+          src={photoSrc}
           alt=""
           style={{
             position: 'absolute',
@@ -3451,7 +3466,7 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            objectPosition: 'center 30%',
+            objectPosition: 'center',
             opacity: visible ? 1 : 0,
             transition: 'opacity 0.6s ease',
             zIndex: 0,
@@ -3459,7 +3474,7 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
           }}
         />
       )}
-      {/* Voile sombre dégradé pour la lisibilité du texte */}
+      {/* Voile sombre en bas pour la lisibilité du texte */}
       <div
         style={{
           position: 'absolute',
@@ -3479,7 +3494,6 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
     </>
   )
 }
-
 // ── AnimSection : fade-in au scroll ───────────────────────────────────────────
 function AnimSection({ children, delay = 0, style, animStyle = 'slide-up' }: {
   children: React.ReactNode; delay?: number; style?: React.CSSProperties; animStyle?: string
