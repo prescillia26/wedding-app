@@ -4109,11 +4109,11 @@ const firstDate = sorted[0]?.date
 }
 
   return (
-    <div style={{ backgroundColor: theme.fond, color: TEXT, minHeight: '100vh' }}>
+    <div style={{ backgroundColor: '#f5f0e8', minHeight: '100vh' }}>
+      <div style={{ backgroundColor: theme.fond, color: TEXT, minHeight: '100vh', maxWidth: 480, margin: '0 auto', boxShadow: '0 0 40px rgba(0,0,0,0.08)' }}>
       <style>{`@keyframes sharedFadeIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}`}</style>
-
-      {/* SECTION 1 : Écran d'accueil */}
-      <div style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+{/* SECTION 1 : Écran d'accueil */}
+      <div style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', maxWidth: 480, margin: '0 auto', boxShadow: '0 8px 60px rgba(0,0,0,0.15)' }}>
         {data.styleAccueil === 'illustration' && data.illustrationCoupleId ? (
           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -4141,6 +4141,7 @@ const firstDate = sorted[0]?.date
           <button onClick={handleDiscover} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '14px 40px', fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', boxShadow: `0 4px 20px ${G}44`, animation: 'sharedFadeIn 1s 0.7s ease forwards', opacity: 0 } as React.CSSProperties}>
             DÉCOUVRIR TON INVITATION
           </button>
+        </div>
         </div>
       </div>
 
