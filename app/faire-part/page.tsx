@@ -3400,45 +3400,66 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
 
   if (valid.length === 0) return null
 
-  // Récupère le crop pour la photo courante (ou défaut si pas défini)
-  const crop = photosData?.[idx] ?? { cropX: 0, cropY: 0, cropScale: 1 }
+  // Récupère le crop pour la photo courante
+  const crop = photosData?.[idx]
+  const hasCustomCrop = crop && (crop.cropX !== 0 || crop.cropY !== 0 || crop.cropScale !== 1)
 
   return (
     <>
-      {/* Conteneur qui clip la photo aux dimensions de l'écran */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          overflow: 'hidden',
-          zIndex: 0,
-          pointerEvents: 'none',
-        }}
-      >
-        {/* Photo centrée avec le recadrage manuel des mariés */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+      {hasCustomCrop ? (
+        // ── Mode crop manuel : la mariée a recadré sa photo ─────────────
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden',
+            zIndex: 0,
+            pointerEvents: 'none',
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={valid[idx]}
+            alt=""
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              width: 'auto',
+              height: '100%',
+              transform: `translate(calc(-50% + ${crop!.cropX}px), calc(-50% + ${crop!.cropY}px)) scale(${crop!.cropScale})`,
+              transformOrigin: 'center center',
+              opacity: visible ? 1 : 0,
+              transition: 'opacity 0.6s ease',
+              maxWidth: 'none',
+            }}
+          />
+        </div>
+      ) : (
+        // ── Mode par défaut : objectFit cover, pas d'étirement ──────────
+        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={valid[idx]}
           alt=""
           style={{
             position: 'absolute',
-            top: '50%',
-            left: '50%',
-            minWidth: '100%',
-            minHeight: '100%',
-            width: 'auto',
-            height: 'auto',
-            transform: `translate(calc(-50% + ${crop.cropX}px), calc(-50% + ${crop.cropY}px)) scale(${crop.cropScale})`,
-            transformOrigin: 'center center',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center 30%',
             opacity: visible ? 1 : 0,
             transition: 'opacity 0.6s ease',
+            zIndex: 0,
+            pointerEvents: 'none',
           }}
         />
-      </div>
-      {/* Voile sombre dégradé pour que le texte reste lisible en bas */}
+      )}
+      {/* Voile sombre dégradé pour la lisibilité du texte */}
       <div
         style={{
           position: 'absolute',
@@ -3458,6 +3479,7 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
     </>
   )
 }
+
 // ── AnimSection : fade-in au scroll ───────────────────────────────────────────
 function AnimSection({ children, delay = 0, style, animStyle = 'slide-up' }: {
   children: React.ReactNode; delay?: number; style?: React.CSSProperties; animStyle?: string
