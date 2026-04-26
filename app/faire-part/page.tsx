@@ -3402,12 +3402,11 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
 
   return (
     <>
-      {/* Fond flouté qui remplit l'espace (effet "blurred backdrop") */}
+      {/* Photo en plein écran, centrée sur le haut pour garder les visages visibles */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={valid[idx]}
         alt=""
-        aria-hidden="true"
         style={{
           position: 'absolute',
           top: 0,
@@ -3415,31 +3414,10 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          objectPosition: 'center',
-          opacity: visible ? 0.7 : 0,
-          transition: 'opacity 0.6s ease',
-          zIndex: 0,
-          pointerEvents: 'none',
-          filter: 'blur(40px) brightness(0.6) saturate(1.2)',
-          transform: 'scale(1.15)', // évite que les bords flous laissent voir du vide
-        }}
-      />
-      {/* Photo principale, affichée en entier (objectFit: contain) */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={valid[idx]}
-        alt=""
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'contain',
-          objectPosition: 'center',
+          objectPosition: 'center 25%',
           opacity: visible ? 1 : 0,
           transition: 'opacity 0.6s ease',
-          zIndex: 1,
+          zIndex: 0,
           pointerEvents: 'none',
         }}
       />
@@ -3448,8 +3426,8 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.05) 55%, rgba(0,0,0,0) 100%)',
-          zIndex: 2,
+          background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0) 100%)',
+          zIndex: 1,
           pointerEvents: 'none',
         }}
       />
