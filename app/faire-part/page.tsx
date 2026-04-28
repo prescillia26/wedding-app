@@ -169,8 +169,12 @@ interface Ceremony {
   infosTransportActif: boolean
   transport: string
   hebergement: string
+  // ── Pensées pour les défunts (Houppa principalement) ──
+  penseesDefuntsActif: boolean
+  penseesDefuntsIntro: string
+  penseesDefuntsNoms: string[]
+  penseesDefuntsFin: string
 }
-
 interface FormData {
   marie1Prenom: string
   marie1Nom: string
@@ -237,12 +241,15 @@ interface FormData {
   effetTexte?: 'aucun' | 'or' | 'aquarelle' | 'embosse'
   dateAccueilOverride?: string // Date affichée sur la page d'accueil (override manuel)
 }
-
 const defaultCeremony: Ceremony = {
   type: 'Cérémonie religieuse / Houppa',
   customName: '', lieu: '', adresse: '', date: '', heure: '',
   suiviDAutre: false, evenementSuivantNom: '', evenementSuivantAdresse: '', note: '',
   infosTransportActif: false, transport: '', hebergement: '',
+  penseesDefuntsActif: false,
+  penseesDefuntsIntro: 'Zihrona Levraha — Que leur mémoire soit une bénédiction',
+  penseesDefuntsNoms: [],
+  penseesDefuntsFin: 'Présents dans nos cœurs en ce jour',
 }
 
 const defaultFormData: FormData = {
@@ -4314,14 +4321,14 @@ const firstDate = sorted[0]?.date
                       <AnimSection animStyle={anim} delay={150}>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 12, textAlign: 'center' }}>
                           <div>
-                            {parents1.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}
-                            {gpPa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 11, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpPa1}</div>}
-                            {gpMa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 11, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpMa1}</div>}
+                            {gpPa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7 }}>{gpPa1}</div>}
+                            {gpMa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7 }}>{gpMa1}</div>}
+                            {parents1.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7, marginTop: (gpPa1 || gpMa1) ? 6 : 0 }}>{l}</div>)}
                           </div>
                           <div>
-                            {parents2.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}
-                            {gpPa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 11, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpPa2}</div>}
-                            {gpMa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 11, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpMa2}</div>}
+                            {gpPa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7 }}>{gpPa2}</div>}
+                            {gpMa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7 }}>{gpMa2}</div>}
+                            {parents2.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7, marginTop: (gpPa2 || gpMa2) ? 6 : 0 }}>{l}</div>)}
                           </div>
                         </div>
                         <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 24, lineHeight: 1.9, opacity: 0.82 }, 'narratif', data.zoneStyles)}>
