@@ -1114,6 +1114,98 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
               </div>
             )}
           </div>
+
+          {/* ── Pensées pour les défunts (Houppa uniquement) ── */}
+          {c.type === 'Cérémonie religieuse / Houppa' && (
+            <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px dashed #fecdd3' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: '#4a3728' }}>
+                <input
+                  type="checkbox"
+                  checked={c.penseesDefuntsActif}
+                  onChange={e => update(i, { penseesDefuntsActif: e.target.checked })}
+                />
+                🕯 En mémoire de proches disparus
+              </label>
+              {c.penseesDefuntsActif && (
+                <div style={{ marginTop: 14 }}>
+                  <Label>Formule introductive</Label>
+                  <select
+                    value={c.penseesDefuntsIntro}
+                    onChange={e => update(i, { penseesDefuntsIntro: e.target.value })}
+                    style={{ ...S.input, marginBottom: 8 }}
+                  >
+                    <option value="Zihrona Levraha — Que leur mémoire soit une bénédiction">Zihrona Levraha — Que leur mémoire soit une bénédiction</option>
+                    <option value="En mémoire bénie de">En mémoire bénie de</option>
+                    <option value="Avec une pensée pour ceux qui veillent sur nous">Avec une pensée pour ceux qui veillent sur nous</option>
+                    <option value="Cette journée est aussi la leur">Cette journée est aussi la leur</option>
+                    <option value="">— Personnalisée (écrire ci-dessous) —</option>
+                  </select>
+                  <input
+                    type="text"
+                    value={c.penseesDefuntsIntro}
+                    onChange={e => update(i, { penseesDefuntsIntro: e.target.value })}
+                    placeholder="Ou écrivez votre propre formule..."
+                    style={{ ...S.input, marginBottom: 14, fontSize: 13 }}
+                  />
+
+                  <Label>Noms des proches disparus (ז״ל ajouté automatiquement)</Label>
+                  {c.penseesDefuntsNoms.map((nom, nomIdx) => (
+                    <div key={nomIdx} style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+                      <input
+                        type="text"
+                        value={nom}
+                        onChange={e => {
+                          const newNoms = [...c.penseesDefuntsNoms]
+                          newNoms[nomIdx] = e.target.value
+                          update(i, { penseesDefuntsNoms: newNoms })
+                        }}
+                        placeholder="ex: Léa Cohen, grand-mère du marié"
+                        style={{ ...S.input, flex: 1, fontSize: 13 }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newNoms = c.penseesDefuntsNoms.filter((_, j) => j !== nomIdx)
+                          update(i, { penseesDefuntsNoms: newNoms })
+                        }}
+                        style={{ ...BTN, padding: '0 12px', borderRadius: 8, border: '1px solid #fecdd3', background: 'white', cursor: 'pointer', fontSize: 14 }}
+                        title="Supprimer ce nom"
+                      >
+                        🗑
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => update(i, { penseesDefuntsNoms: [...c.penseesDefuntsNoms, ''] })}
+                    style={{ ...BTN, marginTop: 4, marginBottom: 14, padding: '8px 14px', borderRadius: 8, border: '1px dashed #C9A84C', background: 'transparent', color: '#C9A84C', cursor: 'pointer', fontSize: 12, fontWeight: 500 }}
+                  >
+                    + Ajouter un nom
+                  </button>
+
+                  <Label>Phrase de fin (optionnelle)</Label>
+                  <select
+                    value={c.penseesDefuntsFin}
+                    onChange={e => update(i, { penseesDefuntsFin: e.target.value })}
+                    style={{ ...S.input, marginBottom: 8 }}
+                  >
+                    <option value="">— Aucune —</option>
+                    <option value="Présents dans nos cœurs en ce jour">Présents dans nos cœurs en ce jour</option>
+                    <option value="Veillant sur notre union depuis là-haut">Veillant sur notre union depuis là-haut</option>
+                    <option value="Que leur âme repose en paix">Que leur âme repose en paix</option>
+                    <option value="Toujours dans nos pensées">Toujours dans nos pensées</option>
+                  </select>
+                  <input
+                    type="text"
+                    value={c.penseesDefuntsFin}
+                    onChange={e => update(i, { penseesDefuntsFin: e.target.value })}
+                    placeholder="Ou écrivez votre propre phrase..."
+                    style={{ ...S.input, fontSize: 13 }}
+                  />
+                </div>
+              )}
+            </div>
+          )}
         </div>
       ))}
       {data.ceremonies.length < 6 && (
@@ -4314,6 +4406,39 @@ const firstDate = sorted[0]?.date
                       <AnimSection animStyle={anim} delay={100}>
                         <div style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 8, padding: '10px 20px', marginBottom: 22, overflow: 'hidden' }}>
                           <div style={{ fontFamily: 'serif', fontSize: 'clamp(10px, 3.2vw, 17px)', color: G, direction: 'rtl', textAlign: 'center', whiteSpace: 'nowrap', lineHeight: 1.9 }}>קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה</div>
+                        </div>
+                      </AnimSection>
+                    )}
+                    {/* ── Pensées pour les défunts (Houppa uniquement) ── */}
+                    {ceremony.type === 'Cérémonie religieuse / Houppa' && ceremony.penseesDefuntsActif && ceremony.penseesDefuntsNoms.filter(n => n.trim()).length > 0 && (
+                      <AnimSection animStyle={anim} delay={120}>
+                        <div style={{ textAlign: 'center', marginBottom: 32, paddingBottom: 24, borderBottom: `1px solid ${G}22` }}>
+                          {/* Séparateur ornemental haut */}
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: 16 }}>
+                            <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
+                            <span style={{ fontSize: 14, color: G }}>🕯</span>
+                            <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
+                          </div>
+                          {/* Formule introductive en italique */}
+                          {ceremony.penseesDefuntsIntro && (
+                            <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, opacity: 0.85, marginBottom: 14, lineHeight: 1.6, padding: '0 12px' }}>
+                              {ceremony.penseesDefuntsIntro}
+                            </div>
+                          )}
+                          {/* Liste des noms */}
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: ceremony.penseesDefuntsFin ? 14 : 0 }}>
+                            {ceremony.penseesDefuntsNoms.filter(n => n.trim()).map((nom, k) => (
+                              <div key={k} style={{ fontFamily: FP, fontSize: 16, color: TEXT, fontWeight: 500, lineHeight: 1.6 }}>
+                                {nom} <span style={{ color: G, fontSize: 14, fontFamily: 'serif' }}>ז״ל</span>
+                              </div>
+                            ))}
+                          </div>
+                          {/* Phrase de fin */}
+                          {ceremony.penseesDefuntsFin && (
+                            <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, opacity: 0.75, lineHeight: 1.6, padding: '0 12px' }}>
+                              {ceremony.penseesDefuntsFin}
+                            </div>
+                          )}
                         </div>
                       </AnimSection>
                     )}
