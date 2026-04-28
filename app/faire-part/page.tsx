@@ -4876,6 +4876,7 @@ export default function FairePartPage() {
   const [role, setRole] = useState<string | null>(null)
   const [loadingShare, setLoadingShare] = useState(false)
   const [hasDraft, setHasDraft] = useState(false)
+  const [savedAt, setSavedAt] = useState<Date | null>(null)
   const [accessGranted, setAccessGranted] = useState(false)
   const [checkingAccess, setCheckingAccess] = useState(true)
   // Prevents double-firing when both onTouchEnd and onClick trigger
@@ -4946,8 +4947,18 @@ export default function FairePartPage() {
       if (draft) setHasDraft(true)
     } catch { /* ignore */ }
   }, [])
-
-  const update = useCallback((u: Partial<FormData>) => setFormData(p => ({ ...p, ...u })), [])
+  const update = useCallback((u: Partial<FormData>) => {
+    setFormData(p => {
+      const next = { ...p, ...u }
+      // ✅ AUTO-SAVE : à chaque modification, on sauvegarde dans le navigateur
+      // pour que la mariée ne perde JAMAIS son travail si elle ferme l'onglet
+      try {
+        localStorage.setItem('wedding-draft', JSON.stringify(next))
+        setSavedAt(new Date())
+      } catch { /* quota localStorage dépassé, ignore */ }
+      return next
+    })
+  }, [])
 
   const resumeDraft = useCallback(() => {
     try {
@@ -5020,11 +5031,32 @@ export default function FairePartPage() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '48px 16px', background: 'linear-gradient(160deg, #fdf0f3 0%, #fff5f7 50%, #fdf0f3 100%)' }}>
       <div style={{ textAlign: 'center', marginBottom: 36 }}>
         <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(201,168,76,0.65)', fontWeight: 600, marginBottom: 10 }}>Invitation de mariage</p>
-        <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '2.2rem', fontWeight: 300, color: 'rgba(74,55,40,0.7)', letterSpacing: '0.06em', margin: '0 0 12px' }}>Votre faire-part</h1>
+        {savedAt && (
+          <div style={{ fontSize: 11, color: '#7a9e6e', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+            <span style={{ fontSize: 13 }}>✓</span>
+            Sauvegardé automatiquement à {savedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+          </div>
+        )}
         {hasDraft && (
-          <button onClick={resumeDraft} style={{ ...BTN, marginTop: 16, padding: '12px 28px', borderRadius: 9999, background: 'linear-gradient(135deg, #C9A84C, #e8c96a)', color: 'white', border: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 4px 16px rgba(201,168,76,0.35)' }}>
-            Reprendre mon faire-part →
-          </button>
+          <div style={{ marginTop: 16, marginBottom: 16, textAlign: 'center' }}>
+            <div style={{ fontSize: 13, color: '#7a9e6e', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', marginBottom: 10 }}>
+              ✓ Votre travail est sauvegardé sur cet appareil
+            </div>
+            <button onClick={resumeDraft} style={{ ...BTN, padding: '14px 32px', borderRadius: 9999, background: 'linear-gradient(135deg, #C9A84C, #e8c96a)', color: 'white', border: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 4px 16px rgba(201,168,76,0.35)' }}>
+              Reprendre mon faire-part →
+            </button>
+            <button
+              onClick={() => {
+                if (confirm('Êtes-vous sûre de vouloir tout effacer et recommencer ?')) {
+                  try { localStorage.removeItem('wedding-draft') } catch {}
+                  setHasDraft(false)
+                }
+              }}
+              style={{ ...BTN, display: 'block', margin: '12px auto 0', background: 'none', border: 'none', fontSize: 11, color: '#9ca3af', textDecoration: 'underline' }}
+            >
+              ou recommencer à zéro
+            </button>
+          </div>
         )}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
           <div style={{ width: 40, height: 1, background: 'rgba(201,168,76,0.3)' }} />
