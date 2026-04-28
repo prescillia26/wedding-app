@@ -4925,7 +4925,12 @@ export default function FairePartPage() {
         const d = await res.json()
         if (d.valid) {
           setAccessGranted(true)
-          try {localStorage.setItem('lovit_access_code', code) } catch { /* ignore */ }
+          try { localStorage.setItem('lovit_access_code', code) } catch { /* ignore */ }
+          // ✅ FIX : détecter le brouillon APRÈS validation du code
+          try {
+            const draft = localStorage.getItem('wedding-draft')
+            if (draft) setHasDraft(true)
+          } catch { /* ignore */ }
         }
       } catch { /* ignore */ }
       setCheckingAccess(false)
