@@ -4324,26 +4324,6 @@ const firstDate = sorted[0]?.date
   </>
 )}
             </AnimSection>
-            {(parents1.length > 0 || parents2.length > 0) && (
-              <AnimSection animStyle={anim} delay={300}>
-                <OrnSep />
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 16, textAlign: 'center' }}>
-                  <div>
-                    {parents1.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}
-                    {gpPa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpPa1}</div>}
-                    {gpMa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpMa1}</div>}
-                  </div>
-                  <div>
-                    {parents2.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, lineHeight: 1.7 }}>{l}</div>)}
-                    {gpPa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpPa2}</div>}
-                    {gpMa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: TEXT, lineHeight: 1.7, opacity: 0.75 }}>{gpMa2}</div>}
-                  </div>
-                </div>
-                <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, textAlign: 'center', lineHeight: 1.9, opacity: 0.85 }, 'narratif', data.zoneStyles)}>
-                  {ov['ceremony_0_joie'] || (hasGp ? 'ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'ont la joie de vous faire part du mariage de leurs enfants')}
-                </div>
-              </AnimSection>
-            )}
           </div>
         </section>
 
@@ -4445,15 +4425,15 @@ const firstDate = sorted[0]?.date
                     {(parents1.length > 0 || parents2.length > 0) && ceremony.type === 'Cérémonie religieuse / Houppa' && (
                       <AnimSection animStyle={anim} delay={150}>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 12, textAlign: 'center' }}>
-                          <div>
-                            {gpPa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7 }}>{gpPa1}</div>}
-                            {gpMa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7 }}>{gpMa1}</div>}
-                            {parents1.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7, marginTop: (gpPa1 || gpMa1) ? 6 : 0 }}>{l}</div>)}
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {gpPa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{gpPa1}</div>}
+                            {gpMa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{gpMa1}</div>}
+                            {parents1.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{l}</div>)}
                           </div>
-                          <div>
-                            {gpPa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7 }}>{gpPa2}</div>}
-                            {gpMa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7 }}>{gpMa2}</div>}
-                            {parents2.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.7, marginTop: (gpPa2 || gpMa2) ? 6 : 0 }}>{l}</div>)}
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {gpPa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{gpPa2}</div>}
+                            {gpMa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{gpMa2}</div>}
+                            {parents2.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{l}</div>)}
                           </div>
                         </div>
                         <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 24, lineHeight: 1.9, opacity: 0.82 }, 'narratif', data.zoneStyles)}>
