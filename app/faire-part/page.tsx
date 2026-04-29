@@ -4619,7 +4619,7 @@ const firstDate = sorted[0]?.date
             {data.marie1Prenom} & {data.marie2Prenom}
           </div>
           <div style={{ color: G, fontSize: 12, marginBottom: 18, opacity: 0.45 }}>✦</div>
-          <a href="https://lovit.fr" target="_blank" rel="noopener noreferrer" style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: G, textDecoration: 'none', opacity: 0.45 }}>
+          <a href="https://getlovit.fr" target="_blank" rel="noopener noreferrer" style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: G, textDecoration: 'none', opacity: 0.45 }}>
             Créé avec ❤️ par Lov&apos;it
           </a>
         </AnimSection>
