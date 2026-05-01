@@ -5037,11 +5037,34 @@ export default function FairePartPage() {
         if (d.valid) {
           setAccessGranted(true)
           try { localStorage.setItem('lovit_access_code', code) } catch { /* ignore */ }
-          // ✅ FIX : détecter le brouillon APRÈS validation du code
+
+          // 1) D'abord essayer le brouillon localStorage
+          let hasLocalDraft = false
           try {
             const draft = localStorage.getItem('wedding-draft')
-            if (draft) setHasDraft(true)
+            if (draft) { hasLocalDraft = true; setHasDraft(true) }
           } catch { /* ignore */ }
+
+          // 2) Si pas de brouillon local, charger le faire-part depuis le serveur via shareId
+          if (!hasLocalDraft) {
+            try {
+              const savedShareId = localStorage.getItem('lovit_share_id')
+              if (savedShareId) {
+                const shareRes = await fetch(`/api/get-share?id=${savedShareId}`)
+                if (shareRes.ok) {
+                  const shareData = await shareRes.json()
+                  if (shareData && !shareData.error) {
+                    // Reconstruire photosData.url depuis photosFond
+                    if (shareData.photosFond?.length && shareData.photosData?.length) {
+                      shareData.photosData = shareData.photosData.map((c: { cropX?: number; cropY?: number; cropScale?: number }, i: number) => ({ ...c, url: shareData.photosFond[i] ?? '' }))
+                    }
+                    setFormData(shareData as FormData)
+                    setHasDraft(true)
+                  }
+                }
+              }
+            } catch { /* ignore */ }
+          }
         }
       } catch { /* ignore */ }
       setCheckingAccess(false)
