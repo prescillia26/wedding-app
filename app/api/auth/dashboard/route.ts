@@ -25,12 +25,13 @@ export async function GET() {
     // Récupérer les données de chaque faire-part
     const faireparts = await Promise.all(
       user.faireparts.map(async (shareId) => {
-        const [data, rsvps] = await Promise.all([
+        const [data, rsvpsRaw] = await Promise.all([
           redis.get<FairepartData>(shareId),
-          redis.get<RsvpEntry[]>(`rsvp:${shareId}`) ?? [],
+          redis.get<RsvpEntry[]>(`rsvp:${shareId}`),
         ])
+        const rsvps = rsvpsRaw ?? []
 
-        const rsvpList = rsvps ?? []
+        const rsvpList = rsvps
         const totalInvites = rsvpList.length
         const confirmes = rsvpList.filter(r =>
           r.reponses?.some(rep => rep.present)

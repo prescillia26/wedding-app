@@ -22,7 +22,7 @@ export async function GET(request: Request) {
     if (!sessionId) return Response.json({ error: 'session_id manquant' }, { status: 400 })
 
     // Idempotence : si déjà généré pour cette session, retourner le même code
-    const existingCode = await redis.get<string>(`session:${sessionId}`)
+    const existingCode = await redis.get<string>(`stripe-session:${sessionId}`)
     if (existingCode) {
       const data = await redis.get<Record<string, string>>(`access:${existingCode}`)
       return Response.json({ code: existingCode, ...data })
@@ -47,7 +47,7 @@ export async function GET(request: Request) {
 
     // Stocker 1 an
     await redis.set(`access:${code}`, entry, { ex: 60 * 60 * 24 * 365 })
-    await redis.set(`session:${sessionId}`, code, { ex: 60 * 60 * 24 * 365 })
+    await redis.set(`stripe-session:${sessionId}`, code, { ex: 60 * 60 * 24 * 365 })
 
     // ✅ Création automatique du compte utilisateur
     if (email) {

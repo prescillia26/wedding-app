@@ -20,9 +20,9 @@ export default function VerifyPage() {
     }
 
     fetch(`/api/auth/verify?token=${token}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.ok) {
+      .then(res => res.json().then(data => ({ ok: res.ok, data })))
+      .then(({ ok, data }) => {
+        if (ok && data.ok) {
           setStatus('success')
           // Rediriger vers /mon-espace après 2 secondes
           setTimeout(() => {

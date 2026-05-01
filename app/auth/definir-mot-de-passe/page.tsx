@@ -26,9 +26,9 @@ export default function DefinirMotDePassePage() {
     }
 
     fetch(`/api/auth/verify?token=${token}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.ok) {
+      .then(res => res.json().then(data => ({ ok: res.ok, data })))
+      .then(({ ok, data }) => {
+        if (ok && data.ok) {
           setVerified(true)
         } else {
           setError(data.error || 'Lien invalide ou expiré.')

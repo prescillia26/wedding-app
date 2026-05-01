@@ -4826,7 +4826,7 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
   const [pwConfirm, setPwConfirm] = useState('')
   const [pwError, setPwError] = useState<string | null>(null)
   const [pwLoading, setPwLoading] = useState(false)
-  const [savedAccessCode, setSavedAccessCode] = useState<string | null>(null)
+  const savedAccessCodeRef = useRef<string | null>(null)
 
   const inputStyle: React.CSSProperties = { width: '100%', padding: '11px 14px', borderRadius: 8, border: `1.5px solid ${GOLD}33`, fontSize: 15, fontFamily: 'var(--font-cormorant-garamond)', outline: 'none', background: '#fdf8f9', boxSizing: 'border-box' }
 
@@ -4842,7 +4842,7 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
       const d = await res.json()
       if (d.valid && d.accessCode) {
         try { localStorage.setItem('lovit_access_code', d.accessCode) } catch { /* ignore */ }
-        setSavedAccessCode(d.accessCode)
+        savedAccessCodeRef.current = d.accessCode
         // Si c'est un retour (compte existant), accès direct
         if (d.returning) {
           onGranted()
@@ -4964,12 +4964,6 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
             </button>
           </form>
 
-          <button
-            onClick={onGranted}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', textDecoration: 'underline' }}
-          >
-            Passer cette étape
-          </button>
         </div>
       </div>
     )
