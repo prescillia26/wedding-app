@@ -9,6 +9,9 @@ export default function ConnexionPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [needsPassword, setNeedsPassword] = useState(false)
+  const [magicLinkSent, setMagicLinkSent] = useState(false)
+  const [sendingMagicLink, setSendingMagicLink] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,6 +28,11 @@ export default function ConnexionPage() {
       const data = await res.json()
 
       if (!res.ok) {
+        if (data.error === 'needsPassword') {
+          setNeedsPassword(true)
+          setError(null)
+          return
+        }
         setError(data.error || 'Erreur de connexion')
         return
       }
@@ -56,6 +64,42 @@ export default function ConnexionPage() {
           {error && (
             <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 12, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: '#dc2626' }}>
               {error}
+            </div>
+          )}
+
+          {needsPassword && (
+            <div style={{ background: '#fff8ed', border: `1px solid ${GOLD}44`, borderRadius: 12, padding: '16px 20px', marginBottom: 20, textAlign: 'center' }}>
+              <p style={{ fontSize: 14, color: '#4a3728', margin: '0 0 12px', lineHeight: 1.5 }}>
+                Vous n&apos;avez pas encore défini de mot de passe.<br />
+                Cliquez ci-dessous pour recevoir un lien par email.
+              </p>
+              {magicLinkSent ? (
+                <p style={{ fontSize: 13, color: '#16a34a', fontWeight: 600, margin: 0 }}>
+                  Lien envoyé ! Vérifiez votre boîte mail.
+                </p>
+              ) : (
+                <button
+                  type="button"
+                  disabled={sendingMagicLink}
+                  onClick={async () => {
+                    setSendingMagicLink(true)
+                    await fetch('/api/auth/magic-link', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ email }),
+                    })
+                    setMagicLinkSent(true)
+                    setSendingMagicLink(false)
+                  }}
+                  style={{
+                    padding: '10px 24px', borderRadius: 9999, border: 'none', cursor: 'pointer',
+                    background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`, color: 'white',
+                    fontSize: 13, fontWeight: 700,
+                  }}
+                >
+                  {sendingMagicLink ? 'Envoi…' : 'Recevoir un lien de connexion'}
+                </button>
+              )}
             </div>
           )}
 

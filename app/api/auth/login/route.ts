@@ -27,8 +27,11 @@ export async function POST(request: Request) {
 
     // Vérifier l'utilisateur
     const user = await redis.get<User>(`user:${normalizedEmail}`)
-    if (!user || !user.passwordHash) {
+    if (!user) {
       return Response.json({ error: 'Email ou mot de passe incorrect' }, { status: 401 })
+    }
+    if (!user.passwordHash) {
+      return Response.json({ error: 'needsPassword' }, { status: 401 })
     }
 
     const valid = await bcrypt.compare(password, user.passwordHash)
