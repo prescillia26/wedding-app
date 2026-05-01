@@ -99,6 +99,7 @@ export default function Home() {
         </p>
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 64 }}>
           <a href="/paiement" style={S.btnPrimary}>Créer mon faire-part</a>
+          <a href="/connexion" style={S.btnOutline}>Accéder à mon espace</a>
         </div>
         {/* Aperçu carte */}
         <div style={{ maxWidth: 420, margin: '0 auto', transform: 'rotate(-1.5deg)', boxShadow: '0 24px 80px rgba(0,0,0,0.14)', borderRadius: 16, overflow: 'hidden' }}>
@@ -280,6 +281,11 @@ export default function Home() {
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: GOLD, marginBottom: 12 }}>Lov&apos;it</div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: `rgba(255,255,255,0.7)`, marginBottom: 24 }}>
           Fait avec ❤️ pour les plus beaux jours de votre vie
+        </div>
+        <div style={{ display: 'flex', gap: 24, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 24 }}>
+          <a href="/connexion" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: `rgba(255,255,255,0.6)`, textDecoration: 'none' }}>Mon espace</a>
+          <a href="/paiement" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: `rgba(255,255,255,0.6)`, textDecoration: 'none' }}>Tarif</a>
+          <a href="/mentions-legales" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: `rgba(255,255,255,0.6)`, textDecoration: 'none' }}>Mentions légales</a>
         </div>
         <Separator />
         <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: `rgba(255,255,255,0.35)`, marginTop: 28, marginBottom: 0 }}>
