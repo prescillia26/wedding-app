@@ -94,7 +94,7 @@ export async function POST(request: Request) {
       `
 
       await resend.emails.send({
-        from: 'noreply@resend.dev',
+        from: 'Lov\'it <onboarding@resend.dev>',
         to: emailMaries,
         subject: `${nom} a répondu à votre faire-part`,
         html,
