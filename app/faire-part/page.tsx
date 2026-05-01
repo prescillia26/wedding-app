@@ -4820,6 +4820,13 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
   const [promoEmail, setPromoEmail] = useState('')
   const [checking, setChecking] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Étape mot de passe après code promo
+  const [showPasswordStep, setShowPasswordStep] = useState(false)
+  const [pwInput, setPwInput] = useState('')
+  const [pwConfirm, setPwConfirm] = useState('')
+  const [pwError, setPwError] = useState<string | null>(null)
+  const [pwLoading, setPwLoading] = useState(false)
+  const [savedAccessCode, setSavedAccessCode] = useState<string | null>(null)
 
   const inputStyle: React.CSSProperties = { width: '100%', padding: '11px 14px', borderRadius: 8, border: `1.5px solid ${GOLD}33`, fontSize: 15, fontFamily: 'var(--font-cormorant-garamond)', outline: 'none', background: '#fdf8f9', boxSizing: 'border-box' }
 
@@ -4835,12 +4842,41 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
       const d = await res.json()
       if (d.valid && d.accessCode) {
         try { localStorage.setItem('lovit_access_code', d.accessCode) } catch { /* ignore */ }
-        onGranted()
+        setSavedAccessCode(d.accessCode)
+        // Si c'est un retour (compte existant), accès direct
+        if (d.returning) {
+          onGranted()
+        } else {
+          // Nouveau compte → demander de définir un mot de passe
+          setShowPasswordStep(true)
+        }
       } else {
         setError(d.reason || 'Code promo invalide ou expiré.')
       }
     } catch { setError('Erreur réseau. Réessayez.') }
     finally { setChecking(false) }
+  }
+
+  const handleSetPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setPwError(null)
+    if (pwInput.length < 8) { setPwError('Le mot de passe doit contenir au moins 8 caractères.'); return }
+    if (pwInput !== pwConfirm) { setPwError('Les mots de passe ne correspondent pas.'); return }
+    setPwLoading(true)
+    try {
+      const res = await fetch('/api/auth/set-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pwInput }),
+      })
+      if (res.ok) {
+        onGranted()
+      } else {
+        const data = await res.json()
+        setPwError(data.error || 'Erreur. Réessayez.')
+      }
+    } catch { setPwError('Erreur serveur.') }
+    finally { setPwLoading(false) }
   }
 
   // ✅ Au chargement, si code dans l'URL → validation automatique + nettoyage URL
@@ -4878,6 +4914,68 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
       </div>
     )
   }
+  // Étape 2 : définir mot de passe après code promo validé
+  if (showPasswordStep) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fdf0f3 0%, #fff5f7 50%, #fdf0f3 100%)', padding: 24 }}>
+        <div style={{ textAlign: 'center', maxWidth: 440, width: '100%' }}>
+          <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: GOLD, marginBottom: 4 }}>Lov&apos;it</div>
+          <div style={{ width: 50, height: 1, background: GOLD, opacity: 0.3, margin: '0 auto 32px' }} />
+
+          <form onSubmit={handleSetPassword} style={{ background: 'white', borderRadius: 20, padding: '36px 32px', boxShadow: '0 12px 48px rgba(201,168,76,0.12)', border: `1px solid ${GOLD}22`, marginBottom: 20, textAlign: 'left' }}>
+            <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 20, color: '#2d1f14', marginBottom: 6, textAlign: 'center' }}>Créez votre compte</div>
+            <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#6a5040', marginBottom: 24, textAlign: 'center' }}>
+              Choisissez un mot de passe pour retrouver votre faire-part depuis n&apos;importe quel appareil
+            </p>
+
+            {pwError && <p style={{ marginBottom: 14, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: '#ef4444', textAlign: 'center' }}>{pwError}</p>}
+
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: 'block', fontFamily: 'var(--font-cormorant-garamond)', fontSize: 12, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Mot de passe</label>
+              <input
+                type="password"
+                value={pwInput}
+                onChange={e => setPwInput(e.target.value)}
+                required
+                minLength={8}
+                placeholder="8 caractères minimum"
+                style={inputStyle}
+              />
+            </div>
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ display: 'block', fontFamily: 'var(--font-cormorant-garamond)', fontSize: 12, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Confirmer</label>
+              <input
+                type="password"
+                value={pwConfirm}
+                onChange={e => setPwConfirm(e.target.value)}
+                required
+                minLength={8}
+                placeholder="••••••••"
+                style={inputStyle}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={pwLoading}
+              style={{ width: '100%', padding: '14px', borderRadius: 9999, border: 'none', cursor: pwLoading ? 'not-allowed' : 'pointer', background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`, color: 'white', fontFamily: 'var(--font-playfair-display)', fontSize: 15, fontWeight: 700, letterSpacing: '0.05em', boxShadow: `0 6px 24px ${GOLD}44` }}
+            >
+              {pwLoading ? 'Création…' : 'Créer mon compte et commencer'}
+            </button>
+          </form>
+
+          <button
+            onClick={onGranted}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', textDecoration: 'underline' }}
+          >
+            Passer cette étape
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Étape 1 : code promo + email
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fdf0f3 0%, #fff5f7 50%, #fdf0f3 100%)', padding: 24 }}>
       <div style={{ textAlign: 'center', maxWidth: 440, width: '100%' }}>
