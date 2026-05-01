@@ -1,7 +1,9 @@
 import Stripe from 'stripe'
 import { Redis } from '@upstash/redis'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!)
+}
 const redis = new Redis({
   url: process.env.KV_REST_API_URL!,
   token: process.env.KV_REST_API_TOKEN!,
@@ -28,7 +30,7 @@ export async function GET(request: Request) {
       return Response.json({ code: existingCode, ...data })
     }
 
-    const session = await stripe.checkout.sessions.retrieve(sessionId)
+    const session = await getStripe().checkout.sessions.retrieve(sessionId)
     if (session.payment_status !== 'paid') {
       return Response.json({ error: 'Paiement non complété' }, { status: 402 })
     }

@@ -1,6 +1,9 @@
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!)
+}
+
 
 const PACKS: Record<string, { amount: number; name: string }> = {
   essentiel: { amount: 6900, name: "Lov'it — Offre de lancement" },  // 69€
@@ -16,7 +19,7 @@ export async function POST(request: Request) {
 
     const origin = request.headers.get('origin') || 'https://getlovit.fr'
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
       locale: 'fr',
