@@ -4984,6 +4984,12 @@ export default function FairePartPage() {
   const [savedAt, setSavedAt] = useState<Date | null>(null)
   const [accessGranted, setAccessGranted] = useState(false)
   const [checkingAccess, setCheckingAccess] = useState(true)
+  // Auth & sauvegarde serveur
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+  const [userFaireparts, setUserFaireparts] = useState<string[]>([])
+  const [serverSavedAt, setServerSavedAt] = useState<Date | null>(null)
+  const [serverSaving, setServerSaving] = useState(false)
+  const serverSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Prevents double-firing when both onTouchEnd and onClick trigger
   const lastTap = useRef(0)
 
@@ -5057,6 +5063,70 @@ export default function FairePartPage() {
       if (draft) setHasDraft(true)
     } catch { /* ignore */ }
   }, [])
+
+  // ✅ Vérifier l'authentification au chargement + charger brouillon serveur
+  useEffect(() => {
+    let cancelled = false
+    async function checkAuth() {
+      try {
+        const res = await fetch('/api/auth/me')
+        if (!res.ok) return
+        const data = await res.json()
+        if (cancelled) return
+        setUserEmail(data.email)
+        setUserFaireparts(data.faireparts ?? [])
+
+        // Si connecté et qu'on a des faire-parts, tenter de charger le brouillon serveur
+        const faireparts: string[] = data.faireparts ?? []
+        if (faireparts.length > 0) {
+          // Charger le dernier faire-part
+          const shareId = faireparts[faireparts.length - 1]
+          try {
+            const draftRes = await fetch(`/api/get-draft?shareId=${shareId}`)
+            if (draftRes.ok) {
+              const draftData = await draftRes.json()
+              if (!cancelled && draftData.formData) {
+                // Le brouillon serveur a la priorité sur le localStorage
+                // sauf si le localStorage est plus récent (on ne peut pas le savoir,
+                // donc on privilégie le serveur)
+                setFormData(draftData.formData as FormData)
+                setHasDraft(true)
+                setAccessGranted(true)
+                setCheckingAccess(false)
+              }
+            }
+          } catch { /* ignore */ }
+        }
+      } catch { /* pas connecté, ignore */ }
+    }
+    checkAuth()
+    return () => { cancelled = true }
+  }, [])
+
+  // ✅ Sauvegarde serveur debounced
+  const saveToServer = useCallback((data: FormData) => {
+    if (!userEmail) return
+    // Trouver le shareId actif
+    const shareId = (() => { try { return localStorage.getItem('lovit_share_id') } catch { return null } })()
+    if (!shareId || !userFaireparts.includes(shareId)) return
+
+    if (serverSaveTimer.current) clearTimeout(serverSaveTimer.current)
+    serverSaveTimer.current = setTimeout(async () => {
+      setServerSaving(true)
+      try {
+        const res = await fetch('/api/save-draft', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ shareId, formData: data }),
+        })
+        if (res.ok) {
+          setServerSavedAt(new Date())
+        }
+      } catch { /* ignore */ }
+      setServerSaving(false)
+    }, 1000) // debounce 1 seconde
+  }, [userEmail, userFaireparts])
+
   const update = useCallback((u: Partial<FormData>) => {
     setFormData(p => {
       const next = { ...p, ...u }
@@ -5066,9 +5136,11 @@ export default function FairePartPage() {
         localStorage.setItem('wedding-draft', JSON.stringify(next))
         setSavedAt(new Date())
       } catch { /* quota localStorage dépassé, ignore */ }
+      // ✅ Sauvegarde serveur (debounced) si connecté
+      saveToServer(next)
       return next
     })
-  }, [])
+  }, [saveToServer])
 
   const resumeDraft = useCallback(() => {
     try {
@@ -5142,9 +5214,18 @@ export default function FairePartPage() {
       <div style={{ textAlign: 'center', marginBottom: 36 }}>
         <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(201,168,76,0.65)', fontWeight: 600, marginBottom: 10 }}>Invitation de mariage</p>
         {savedAt && (
-          <div style={{ fontSize: 11, color: '#7a9e6e', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+          <div style={{ fontSize: 11, color: '#7a9e6e', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', marginBottom: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
             <span style={{ fontSize: 13 }}>✓</span>
             Sauvegardé automatiquement à {savedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+          </div>
+        )}
+        {userEmail && (
+          <div style={{ fontSize: 11, color: serverSaving ? '#C9A84C' : '#7a9e6e', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+            {serverSaving ? (
+              <>Sauvegarde sur le serveur…</>
+            ) : serverSavedAt ? (
+              <><span style={{ fontSize: 13 }}>☁</span> Sauvegardé sur le serveur à {serverSavedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</>
+            ) : null}
           </div>
         )}
         {hasDraft && (
