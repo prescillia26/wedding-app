@@ -4818,10 +4818,8 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
   const [autoChecking, setAutoChecking] = useState(true)
   const [promoInput, setPromoInput] = useState('')
   const [promoEmail, setPromoEmail] = useState('')
-  const [codeInput, setCodeInput] = useState('')
   const [checking, setChecking] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [showAccessCode, setShowAccessCode] = useState(false)
 
   const inputStyle: React.CSSProperties = { width: '100%', padding: '11px 14px', borderRadius: 8, border: `1.5px solid ${GOLD}33`, fontSize: 15, fontFamily: 'var(--font-cormorant-garamond)', outline: 'none', background: '#fdf8f9', boxSizing: 'border-box' }
 
@@ -4845,21 +4843,7 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
     finally { setChecking(false) }
   }
 
-  const checkCode = async (code: string) => {
-    setChecking(true); setError(null)
-    try {
-      const res = await fetch(`/api/check-access?code=${encodeURIComponent(code.toUpperCase().trim())}`)
-      const d = await res.json()
-      if (d.valid) {
-        try {localStorage.setItem('lovit_access_code', code.toUpperCase().trim()) } catch { /* ignore */ }
-        onGranted()
-      } else {
-        setError('Code invalide. Vérifiez votre email ou achetez un accès.')
-      }
-    } catch { setError('Erreur réseau. Réessayez.') }
-    finally { setChecking(false) }
-  }
-   // ✅ Au chargement, si code dans l'URL → validation automatique + nettoyage URL
+  // ✅ Au chargement, si code dans l'URL → validation automatique + nettoyage URL
   useEffect(() => {
     if (autoCheckDone) return
     const params = new URLSearchParams(window.location.search)
@@ -4939,33 +4923,12 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
           {error && <p style={{ marginTop: 14, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 15, color: '#ef4444', textAlign: 'center' }}>{error}</p>}
         </div>
 
-        {/* Accès avec code Stripe (secondaire) */}
-        {!showAccessCode ? (
-          <button onClick={() => { setShowAccessCode(true); setError(null) }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: GOLD, textDecoration: 'underline' }}>
-            J&apos;ai un code d&apos;accès (reçu après paiement)
-          </button>
-        ) : (
-          <div style={{ background: 'white', borderRadius: 16, padding: '20px 24px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: `1px solid ${GOLD}22` }}>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: '#9ca3af', marginBottom: 10 }}>Code d&apos;accès (6 caractères)</div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <input
-                value={codeInput}
-                onChange={e => setCodeInput(e.target.value.toUpperCase())}
-                onKeyDown={e => e.key === 'Enter' && checkCode(codeInput)}
-                placeholder="XXXXXX"
-                maxLength={6}
-                style={{ ...inputStyle, fontFamily: 'var(--font-playfair-display)', fontWeight: 700, letterSpacing: '0.2em', textAlign: 'center', fontSize: 18, flex: 1 }}
-              />
-              <button onClick={() => checkCode(codeInput)} disabled={checking || codeInput.length < 4} style={{ padding: '10px 18px', borderRadius: 8, border: 'none', cursor: 'pointer', background: GOLD, color: 'white', fontFamily: 'var(--font-playfair-display)', fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap' }}>
-                {checking ? '…' : 'OK'}
-              </button>
-            </div>
-          </div>
-        )}
-
-        <div style={{ marginTop: 28 }}>
-          <a href="/paiement" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: GOLD, textDecoration: 'underline' }}>
-            Pas encore de code ? Acheter un accès →
+        <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+          <a href="/connexion" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: GOLD, textDecoration: 'underline' }}>
+            Déjà un compte ? Me connecter
+          </a>
+          <a href="/paiement" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', textDecoration: 'underline' }}>
+            Pas encore de compte ? Créer mon faire-part →
           </a>
         </div>
       </div>

@@ -201,11 +201,11 @@ export default function PaiementPage() {
         </div>
       </div>
 
-      {/* Accès direct */}
+      {/* Lien connexion */}
       <div style={{ textAlign: 'center', marginTop: 48 }}>
         <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af' }}>
-          Vous avez déjà un code ?{' '}
-          <a href="/faire-part" style={{ color: GOLD, textDecoration: 'underline' }}>Accéder directement</a>
+          Déjà un compte ?{' '}
+          <a href="/connexion" style={{ color: GOLD, textDecoration: 'underline' }}>Me connecter</a>
         </p>
       </div>
 
