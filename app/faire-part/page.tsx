@@ -562,6 +562,22 @@ function renderInvitationPhrase(
       return null
   }
 }
+function Linkify({ text, color }: { text: string; color: string }) {
+  const urlRegex = /(https?:\/\/[^\s,)]+)/g
+  const parts = text.split(urlRegex)
+  return (
+    <>
+      {parts.map((part, i) =>
+        urlRegex.test(part) ? (
+          <a key={i} href={part} target="_blank" rel="noopener noreferrer" style={{ color, textDecoration: 'underline', wordBreak: 'break-all' }}>{part}</a>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  )
+}
+
 function sortByDate(ceremonies: Ceremony[]): Ceremony[] {
   return [...ceremonies].sort((a, b) => {
     if (!a.date) return 1
@@ -4721,13 +4737,13 @@ const firstDate = sorted[0]?.date
                           {ceremony.transport && (
                             <div style={{ marginBottom: ceremony.hebergement ? 18 : 0, textAlign: 'center' }}>
                               <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: G, marginBottom: 6, fontWeight: 600 }}>🚌 Transport</div>
-                              <div style={{ fontFamily: FC, fontSize: 13, color: TEXT, lineHeight: 1.7, whiteSpace: 'pre-wrap', opacity: 0.9 }}>{ceremony.transport}</div>
+                              <div style={{ fontFamily: FC, fontSize: 13, color: TEXT, lineHeight: 1.7, whiteSpace: 'pre-wrap', opacity: 0.9 }}><Linkify text={ceremony.transport} color={G} /></div>
                             </div>
                           )}
                           {ceremony.hebergement && (
                             <div style={{ textAlign: 'center' }}>
                               <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: G, marginBottom: 6, fontWeight: 600 }}>🏨 Hébergement</div>
-                              <div style={{ fontFamily: FC, fontSize: 13, color: TEXT, lineHeight: 1.7, whiteSpace: 'pre-wrap', opacity: 0.9 }}>{ceremony.hebergement}</div>
+                              <div style={{ fontFamily: FC, fontSize: 13, color: TEXT, lineHeight: 1.7, whiteSpace: 'pre-wrap', opacity: 0.9 }}><Linkify text={ceremony.hebergement} color={G} /></div>
                             </div>
                           )}
                         </div>
