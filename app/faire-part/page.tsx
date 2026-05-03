@@ -4389,12 +4389,7 @@ const firstDate = sorted[0]?.date
       <style>{`@keyframes sharedFadeIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}`}</style>
 {/* SECTION 1 : Écran d'accueil */}
       <div style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', maxWidth: 480, margin: '0 auto', boxShadow: '0 8px 60px rgba(0,0,0,0.15)' }}>
-        {data.styleAccueil === 'illustration' && data.illustrationCoupleId ? (
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={ILLUSTRATIONS_COUPLES.find(i => i.id === data.illustrationCoupleId)?.url} alt="" style={{ maxWidth: '80%', maxHeight: '70%', objectFit: 'contain' }} />
-          </div>
-        ) : (
+        {data.styleAccueil !== 'illustration' && (
           <IntroCarousel photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} themeAccent={G} photosData={data.photosData} />
         )}
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '0 32px', maxWidth: 480, width: '100%', margin: '0 auto' }}>
@@ -4402,6 +4397,12 @@ const firstDate = sorted[0]?.date
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
             {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={140} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor}size={140} style={data.monogrammeStyle || 'cercle'} />}
           </div>
+          {data.styleAccueil === 'illustration' && data.illustrationCoupleId && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 30, animation: 'sharedFadeIn 1s 0.2s ease forwards', opacity: 0 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url} alt="" style={{ maxWidth: '70%', maxHeight: 280, objectFit: 'contain' }} />
+            </div>
+          )}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', margin: '0 auto 16px', maxWidth: 160 }}>
             <div style={{ flex: 1, height: 0.5, background: introTextColor, opacity: 0.4 }} />
             <span style={{ color: introTextColor, fontSize: 10, opacity: 0.7 }}>◆</span>
