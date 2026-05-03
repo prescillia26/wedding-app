@@ -1223,31 +1223,61 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
 function CustomLogoUpload({ logoUrl, onChange, accent }: { logoUrl?: string; onChange: (d: Partial<FormData>) => void; accent: string }) {
   const [uploading, setUploading] = useState(false)
 
+  const removeBackground = (file: File): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        canvas.width = img.width
+        canvas.height = img.height
+        const ctx = canvas.getContext('2d')
+        if (!ctx) { reject(new Error('Canvas non supporté')); return }
+        ctx.drawImage(img, 0, 0)
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+        const d = imageData.data
+
+        // Détecter la couleur de fond (pixel en haut à gauche)
+        const bgR = d[0], bgG = d[1], bgB = d[2]
+
+        // Seuil de tolérance pour la suppression du fond
+        const tolerance = 45
+
+        for (let i = 0; i < d.length; i += 4) {
+          const dr = Math.abs(d[i] - bgR)
+          const dg = Math.abs(d[i + 1] - bgG)
+          const db = Math.abs(d[i + 2] - bgB)
+          if (dr < tolerance && dg < tolerance && db < tolerance) {
+            // Rendre transparent progressivement (plus le pixel est proche du fond, plus il est transparent)
+            const maxDiff = Math.max(dr, dg, db)
+            d[i + 3] = Math.round((maxDiff / tolerance) * 255)
+          }
+        }
+        ctx.putImageData(imageData, 0, 0)
+        canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Erreur conversion')), 'image/png')
+      }
+      img.onerror = () => reject(new Error('Erreur chargement image'))
+      img.src = URL.createObjectURL(file)
+    })
+  }
+
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
     if (file.size > 5 * 1024 * 1024) { alert('Le fichier est trop lourd (max 5 Mo)'); return }
     setUploading(true)
     try {
+      // Supprimer le fond côté client avant upload
+      const transparentBlob = await removeBackground(file)
+
       const fd = new (globalThis.FormData)()
-      fd.append('file', file)
+      fd.append('file', transparentBlob)
       fd.append('upload_preset', 'wedding_music')
       const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
       const json = await res.json()
       if (json.secure_url) {
-        // Forcer le format PNG (transparence) + détourage du fond
-        const withTransform = json.secure_url
-          .replace('/upload/', '/upload/e_background_removal/f_png/')
-        // Fallback : si e_background_removal échoue (addon non activé),
-        // on utilise l'image originale en PNG
-        const fallbackUrl = json.secure_url
-          .replace(/\.\w+$/, '.png')
-        try {
-          const check = await fetch(withTransform, { method: 'HEAD' })
-          onChange({ customLogoUrl: check.ok ? withTransform : fallbackUrl })
-        } catch {
-          onChange({ customLogoUrl: fallbackUrl })
-        }
+        // Forcer le format PNG dans l'URL pour préserver la transparence
+        const pngUrl = json.secure_url.replace(/\.\w+$/, '.png')
+        onChange({ customLogoUrl: pngUrl })
       }
     } catch { alert('Erreur lors de l\'upload du logo') }
     finally { setUploading(false) }
