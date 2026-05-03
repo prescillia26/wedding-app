@@ -821,7 +821,6 @@ function StyleAccueilSelector({ data, onChange }: { data: FormData; onChange: (d
   const style = data.styleAccueil || 'photo'
   const options: Array<{ id: 'photo' | 'monogramme' | 'illustration'; label: string; emoji: string }> = [
     { id: 'photo', label: 'Photos', emoji: '📸' },
-    { id: 'monogramme', label: 'Monogramme', emoji: '✦' },
     { id: 'illustration', label: 'Illustration', emoji: '🎨' },
   ]
   return (
@@ -829,7 +828,7 @@ function StyleAccueilSelector({ data, onChange }: { data: FormData; onChange: (d
       <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#4a3728', marginBottom: 12 }}>
         Style de la page d&apos;accueil
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginBottom: 12 }}>
         {options.map(opt => {
           const isSel = style === opt.id
           return (
