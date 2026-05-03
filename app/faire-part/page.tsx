@@ -1301,16 +1301,7 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
       <div style={{ textAlign: 'center' }}>
         <p style={{ fontSize: 12, fontWeight: 600, color: '#4a3728', marginBottom: 8 }}>Votre logo</p>
         <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 160, height: 160, borderRadius: 8, border: '1px solid #e5d5c5', background: 'repeating-conic-gradient(#f0f0f0 0% 25%, white 0% 50%) 0 0 / 16px 16px' }}>
-          {logoColor ? (
-            <div style={{
-              width: previewSize, height: previewSize,
-              backgroundColor: logoColor,
-              WebkitMaskImage: `url(${logoUrl})`, WebkitMaskSize: 'contain', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center',
-              maskImage: `url(${logoUrl})`, maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center',
-            }} />
-          ) : (
-            <img src={logoUrl} alt="Logo" style={{ width: previewSize, height: previewSize, objectFit: 'contain' }} />
-          )}
+          <img src={logoColor && logoUrl?.includes('cloudinary.com') ? logoUrl.replace('/upload/', `/upload/e_grayscale/e_tint:100:${logoColor.replace('#', '')}/`) : logoUrl!} alt="Logo" style={{ width: previewSize, height: previewSize, objectFit: 'contain' }} />
         </div>
 
         {/* Réglages avancés */}
@@ -2161,17 +2152,14 @@ function renderCard(ceremony: Ceremony, data: FormData, theme: ThemeObj, photoId
 
 function CustomLogo({ url, size, scale = 100, color }: { url: string; size: number; scale?: number; color?: string }) {
   const s = size * (scale / 100)
-  if (color) {
-    return (
-      <div style={{
-        width: s, height: s,
-        backgroundColor: color,
-        WebkitMaskImage: `url(${url})`, WebkitMaskSize: 'contain', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center',
-        maskImage: `url(${url})`, maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center',
-      }} />
-    )
+  let src = url
+  if (color && url.includes('cloudinary.com')) {
+    // Transformer via Cloudinary : e_grayscale puis e_tint pour teinter les pixels
+    // tout en préservant la transparence
+    const hex = color.replace('#', '')
+    src = url.replace('/upload/', `/upload/e_grayscale/e_tint:100:${hex}/`)
   }
-  return <img src={url} alt="Logo" style={{ width: s, height: s, objectFit: 'contain' }} />
+  return <img src={src} alt="Logo" style={{ width: s, height: s, objectFit: 'contain' }} />
 }
 
 function LogoOrMonogram({ data, theme }: { data: FormData; theme: ThemeObj }) {
