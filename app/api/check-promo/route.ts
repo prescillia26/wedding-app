@@ -105,7 +105,7 @@ export async function POST(request: Request) {
       const resend = new Resend(process.env.RESEND_API_KEY)
 
       await resend.emails.send({
-        from: 'Lov\'it <onboarding@resend.dev>',
+        from: 'Lov\'it <noreply@getlovit.fr>',
         to: normalizedEmail,
         subject: 'Bienvenue sur Lov\'it — Votre faire-part vous attend !',
         html: `

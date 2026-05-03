@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     if (process.env.RESEND_API_KEY) {
       const resend = new Resend(process.env.RESEND_API_KEY)
       await resend.emails.send({
-        from: 'Lov\'it <onboarding@resend.dev>',
+        from: 'Lov\'it <noreply@getlovit.fr>',
         to: normalizedEmail,
         subject: 'Votre lien de connexion Lov\'it',
         html: `
