@@ -1301,7 +1301,7 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
       <div style={{ textAlign: 'center' }}>
         <p style={{ fontSize: 12, fontWeight: 600, color: '#4a3728', marginBottom: 8 }}>Votre logo</p>
         <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 160, height: 160, borderRadius: 8, border: '1px solid #e5d5c5', background: 'repeating-conic-gradient(#f0f0f0 0% 25%, white 0% 50%) 0 0 / 16px 16px' }}>
-          <img src={logoColor && logoUrl?.includes('cloudinary.com') ? logoUrl.replace('/upload/', `/upload/e_grayscale/e_tint:100:${logoColor.replace('#', '')}/`) : logoUrl!} alt="Logo" style={{ width: previewSize, height: previewSize, objectFit: 'contain' }} />
+          <img src={logoColor && logoUrl?.includes('cloudinary.com') ? logoUrl.replace('/upload/', `/upload/e_colorize:100,co_rgb:${logoColor.replace('#', '')}/`) : logoUrl!} alt="Logo" style={{ width: previewSize, height: previewSize, objectFit: 'contain' }} />
         </div>
 
         {/* Réglages avancés */}
@@ -2154,10 +2154,8 @@ function CustomLogo({ url, size, scale = 100, color }: { url: string; size: numb
   const s = size * (scale / 100)
   let src = url
   if (color && url.includes('cloudinary.com')) {
-    // Transformer via Cloudinary : e_grayscale puis e_tint pour teinter les pixels
-    // tout en préservant la transparence
     const hex = color.replace('#', '')
-    src = url.replace('/upload/', `/upload/e_grayscale/e_tint:100:${hex}/`)
+    src = url.replace('/upload/', `/upload/e_colorize:100,co_rgb:${hex}/`)
   }
   return <img src={src} alt="Logo" style={{ width: s, height: s, objectFit: 'contain' }} />
 }
