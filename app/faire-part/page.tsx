@@ -4577,7 +4577,7 @@ const firstDate = sorted[0]?.date
                     </AnimSection>
                     {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
                       <AnimSection animStyle={anim} delay={100}>
-                        <div style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 8, padding: '10px 20px', marginBottom: 22, overflow: 'hidden' }}>
+                        <div style={{ padding: '0 20px', marginBottom: 22 }}>
                           <div style={{ fontFamily: 'serif', fontSize: 'clamp(10px, 3.2vw, 17px)', color: G, direction: 'rtl', textAlign: 'center', whiteSpace: 'nowrap', lineHeight: 1.9 }}>קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה</div>
                         </div>
                       </AnimSection>
