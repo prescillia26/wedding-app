@@ -5294,7 +5294,9 @@ export default function FairePartPage() {
           }
           setFormData(d)
           if (r === 'edit') {
-            // Mode édition : afficher le formulaire (étape 1) avec données pré-remplies
+            // Mode édition : revenir au formulaire local (pas en mode partagé)
+            setIsShared(false)
+            setRole(null)
             setShowCards(false)
             setStep(1)
           } else {
