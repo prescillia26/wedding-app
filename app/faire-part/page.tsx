@@ -4748,11 +4748,35 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
           ytMuted={ytMuted}
           onToggleYtMute={toggleYtMute}
         />
+        {role === 'couple' && (
+          <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button onClick={onEdit} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>Modifier</button>
+            <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>✏️ Texte</button>
+            <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{sharing ? (sharingStatus || 'Chargement...') : '🔗 Partager'}</button>
+            {lastShareId && (
+              <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>📋 RSVP</button>
+            )}
+          </div>
+        )}
         {rsvpOpen && (
           <RSVPModal accent={theme.accent} onClose={() => setRsvpOpen(false)} mariee1={data.marie1Prenom} mariee2={data.marie2Prenom} shareId={lastShareId} ceremonies={sorted} />
         )}
         {rsvpListOpen && (
           <RSVPListModal accent={theme.accent} onClose={() => setRsvpListOpen(false)} shareId={lastShareId} ceremonies={sorted} />
+        )}
+        {textEditOpen && (
+          <TextEditModal
+            ceremonies={sorted}
+            textOverrides={textOverrides}
+            zoneStyles={zoneStyles}
+            onApply={(t) => { setTextOverrides(t); onUpdate?.({ textOverrides: t }) }}
+            onApplyStyles={(s) => { setZoneStyles(s); onUpdate?.({ zoneStyles: s }) }}
+            onClose={() => setTextEditOpen(false)}
+            theme={theme}
+          />
+        )}
+        {shareModalOpen && guestUrl && coupleUrl && (
+          <ShareModal accent={theme.accent} guestUrl={guestUrl} coupleUrl={coupleUrl} onClose={() => setShareModalOpen(false)} data={data} />
         )}
       </div>
     )
