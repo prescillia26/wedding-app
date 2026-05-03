@@ -253,7 +253,7 @@ function FairepartCardComponent({ fp }: { fp: FairepartCard }) {
         {/* Actions */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <a
-            href={`/faire-part?share=${fp.shareId}&role=couple`}
+            href={`/faire-part?share=${fp.shareId}&role=edit`}
             style={{
               flex: 1, textAlign: 'center', padding: '10px 12px', borderRadius: 9999,
               background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`,

@@ -5077,7 +5077,14 @@ export default function FairePartPage() {
           if (d.photosFond?.length && d.photosData?.length) {
             d.photosData = d.photosData.map((c, i) => ({ ...c, url: d.photosFond![i] ?? '' }))
           }
-          setFormData(d); setShowCards(true)
+          setFormData(d)
+          if (r === 'edit') {
+            // Mode édition : afficher le formulaire (étape 1) avec données pré-remplies
+            setShowCards(false)
+            setStep(1)
+          } else {
+            setShowCards(true)
+          }
         })
         .catch(() => { setLoadingShare(false) })
         .finally(() => setLoadingShare(false))
