@@ -1235,8 +1235,19 @@ function CustomLogoUpload({ logoUrl, onChange, accent }: { logoUrl?: string; onC
       const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
       const json = await res.json()
       if (json.secure_url) {
-        const detoured = json.secure_url.replace('/upload/', '/upload/e_background_removal/')
-        onChange({ customLogoUrl: detoured })
+        // Forcer le format PNG (transparence) + détourage du fond
+        const withTransform = json.secure_url
+          .replace('/upload/', '/upload/e_background_removal/f_png/')
+        // Fallback : si e_background_removal échoue (addon non activé),
+        // on utilise l'image originale en PNG
+        const fallbackUrl = json.secure_url
+          .replace(/\.\w+$/, '.png')
+        try {
+          const check = await fetch(withTransform, { method: 'HEAD' })
+          onChange({ customLogoUrl: check.ok ? withTransform : fallbackUrl })
+        } catch {
+          onChange({ customLogoUrl: fallbackUrl })
+        }
       }
     } catch { alert('Erreur lors de l\'upload du logo') }
     finally { setUploading(false) }
@@ -1247,7 +1258,7 @@ function CustomLogoUpload({ logoUrl, onChange, accent }: { logoUrl?: string; onC
     return (
       <div style={{ textAlign: 'center' }}>
         <p style={{ fontSize: 12, fontWeight: 600, color: '#4a3728', marginBottom: 8 }}>Votre logo</p>
-        <img src={logoUrl} alt="Logo personnalisé" style={{ maxWidth: 140, maxHeight: 140, objectFit: 'contain', borderRadius: 8, border: '1px solid #e5d5c5', padding: 8, background: 'white' }} />
+        <img src={logoUrl} alt="Logo personnalisé" style={{ maxWidth: 140, maxHeight: 140, objectFit: 'contain', borderRadius: 8, border: '1px solid #e5d5c5', padding: 8, background: 'repeating-conic-gradient(#f0f0f0 0% 25%, white 0% 50%) 0 0 / 16px 16px' }} />
         <div style={{ marginTop: 10 }}>
           <button type="button" onClick={() => onChange({ customLogoUrl: '' })} style={{ cursor: 'pointer', background: 'transparent', border: `1px solid #fecdd3`, borderRadius: 9999, padding: '6px 16px', fontSize: 11, color: '#fb7185', fontWeight: 600 }}>
             Supprimer mon logo
