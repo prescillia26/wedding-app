@@ -31,6 +31,7 @@ export async function POST(request: Request) {
         },
         quantity: 1,
       }],
+      allow_promotion_codes: true,
       metadata: { pack },
       success_url: `${origin}/succes?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/paiement`,
