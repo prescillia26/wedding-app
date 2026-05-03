@@ -4680,16 +4680,17 @@ const firstDate = sorted[0]?.date
                         const mois = cap(parts.find(p => p.type === 'month')?.value || '')
                         const annee = parts.find(p => p.type === 'year')?.value || ''
                         return (
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, margin: '24px 0' }}>
-                            <div style={{ textAlign: 'right' }}>
-                              <div style={{ borderBottom: `1px solid ${G}`, paddingBottom: 4, marginBottom: 4, letterSpacing: 3, fontSize: 11, color: G }}>{jourSemaine.toUpperCase()}</div>
-                              <div style={{ fontSize: 11, color: TEXT, letterSpacing: 2 }}>{annee}</div>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '24px 0' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+                              <div style={{ textAlign: 'right' }}>
+                                <div style={{ borderBottom: `1px solid ${G}`, paddingBottom: 4, letterSpacing: 3, fontSize: 11, color: G }}>{jourSemaine.toUpperCase()}</div>
+                              </div>
+                              <div style={{ border: `1.5px solid ${G}`, borderRadius: 4, padding: '8px 16px', fontSize: 36, fontFamily: FP, color: G, fontWeight: 600, minWidth: 60, textAlign: 'center' }}>{jour}</div>
+                              <div style={{ textAlign: 'left' }}>
+                                <div style={{ borderBottom: `1px solid ${G}`, paddingBottom: 4, letterSpacing: 3, fontSize: 11, color: G }}>{mois.toUpperCase()}</div>
+                              </div>
                             </div>
-                            <div style={{ border: `1.5px solid ${G}`, borderRadius: 4, padding: '8px 16px', fontSize: 36, fontFamily: FP, color: G, fontWeight: 600, minWidth: 60, textAlign: 'center' }}>{jour}</div>
-                            <div style={{ textAlign: 'left' }}>
-                              <div style={{ borderBottom: `1px solid ${G}`, paddingBottom: 4, marginBottom: 4, letterSpacing: 3, fontSize: 11, color: G }}>{mois.toUpperCase()}</div>
-                              <div style={{ fontSize: 11, color: TEXT, letterSpacing: 2 }}>{annee}</div>
-                            </div>
+                            <div style={{ fontSize: 11, color: TEXT, letterSpacing: 2, marginTop: 6 }}>{annee}</div>
                           </div>
                         )
                       })()}
