@@ -1851,7 +1851,7 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
         {data.mariageJuif && (
           <div style={{ marginBottom: 24 }}>
             <div style={{ height: 1, background: theme.accent, opacity: 0.35, marginBottom: 12 }} />
-            <div style={{ fontFamily: 'serif', fontSize: 'clamp(10px, 3.5vw, 16px)', color: theme.accent, direction: 'rtl', textAlign: 'center', lineHeight: 1.9, whiteSpace: 'nowrap', background: 'rgba(255,255,255,0.75)', borderRadius: 6, padding: '4px 14px', display: 'inline-block', width: '100%', boxSizing: 'border-box' }}>
+            <div style={{ fontFamily: 'serif', fontSize: 'clamp(10px, 3.5vw, 16px)', color: theme.accent, direction: 'rtl', textAlign: 'center', lineHeight: 1.9, whiteSpace: 'nowrap', padding: '4px 14px' }}>
               קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה, קוֹל חָתָן וְקוֹל כַּלָּה
             </div>
             <div style={{ height: 1, background: theme.accent, opacity: 0.35, marginTop: 12 }} />
