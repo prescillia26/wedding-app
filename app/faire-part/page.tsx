@@ -240,6 +240,7 @@ interface FormData {
   illustrationCoupleId?: string
   effetTexte?: 'aucun' | 'or' | 'aquarelle' | 'embosse'
   dateAccueilOverride?: string // Date affichée sur la page d'accueil (override manuel)
+  customLogoUrl?: string
 }
 const defaultCeremony: Ceremony = {
   type: 'Cérémonie religieuse / Houppa',
@@ -1219,6 +1220,63 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
   )
 }
 
+function CustomLogoUpload({ logoUrl, onChange, accent }: { logoUrl?: string; onChange: (d: Partial<FormData>) => void; accent: string }) {
+  const [uploading, setUploading] = useState(false)
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 5 * 1024 * 1024) { alert('Le fichier est trop lourd (max 5 Mo)'); return }
+    setUploading(true)
+    try {
+      const fd = new (globalThis.FormData)()
+      fd.append('file', file)
+      fd.append('upload_preset', 'wedding_music')
+      const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
+      const json = await res.json()
+      if (json.secure_url) {
+        const detoured = json.secure_url.replace('/upload/', '/upload/e_background_removal/')
+        onChange({ customLogoUrl: detoured })
+      }
+    } catch { alert('Erreur lors de l\'upload du logo') }
+    finally { setUploading(false) }
+    e.target.value = ''
+  }
+
+  if (logoUrl) {
+    return (
+      <div style={{ textAlign: 'center' }}>
+        <p style={{ fontSize: 12, fontWeight: 600, color: '#4a3728', marginBottom: 8 }}>Votre logo</p>
+        <img src={logoUrl} alt="Logo personnalisé" style={{ maxWidth: 140, maxHeight: 140, objectFit: 'contain', borderRadius: 8, border: '1px solid #e5d5c5', padding: 8, background: 'white' }} />
+        <div style={{ marginTop: 10 }}>
+          <button type="button" onClick={() => onChange({ customLogoUrl: '' })} style={{ cursor: 'pointer', background: 'transparent', border: `1px solid #fecdd3`, borderRadius: 9999, padding: '6px 16px', fontSize: 11, color: '#fb7185', fontWeight: 600 }}>
+            Supprimer mon logo
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ textAlign: 'center' }}>
+      <label style={{
+        display: 'inline-flex', alignItems: 'center', gap: 8,
+        padding: '12px 24px', borderRadius: 10, cursor: uploading ? 'wait' : 'pointer',
+        border: `1.5px dashed ${accent}88`, background: `${accent}08`,
+        fontSize: 13, color: accent, fontWeight: 600,
+        opacity: uploading ? 0.6 : 1,
+      }}>
+        <span>{uploading ? 'Upload en cours…' : 'Importer mon propre logo'}</span>
+        <input type="file" accept="image/png,image/jpg,image/jpeg" onChange={handleLogoUpload} style={{ display: 'none' }} disabled={uploading} />
+      </label>
+      <p style={{ fontSize: 10, color: '#9ca3af', marginTop: 8, fontStyle: 'italic', lineHeight: 1.5 }}>
+        PNG ou JPG, max 5 Mo — le fond sera automatiquement supprimé.<br />
+        Pour un meilleur rendu, choisissez un logo simple et élégant, idéalement en noir, doré, ou couleur unie.
+      </p>
+    </div>
+  )
+}
+
 function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
   return (
     <div>
@@ -1419,6 +1477,13 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             )
           })}
         </div>
+        {/* ── Logo personnalisé ── */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '18px 0 10px' }}>
+          <div style={{ flex: 1, height: 1, background: '#e5d5c5' }} />
+          <span style={{ fontSize: 12, color: '#9ca3af', fontStyle: 'italic' }}>ou</span>
+          <div style={{ flex: 1, height: 1, background: '#e5d5c5' }} />
+        </div>
+        <CustomLogoUpload logoUrl={data.customLogoUrl} onChange={onChange} accent={THEMES[data.style].accent} />
       </div>
 
       <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 14, border: '1px solid #fecdd3', borderRadius: 10, cursor: 'pointer', marginBottom: 20, fontSize: 14, color: '#4a3728' }}>
@@ -1990,7 +2055,18 @@ function renderCard(ceremony: Ceremony, data: FormData, theme: ThemeObj, photoId
 
 // ── Style élégant ──────────────────────────────────────────────────────────────
 
+function CustomLogo({ url, size }: { url: string; size: number }) {
+  return <img src={url} alt="Logo" style={{ width: size, height: size, objectFit: 'contain' }} />
+}
+
 function LogoOrMonogram({ data, theme }: { data: FormData; theme: ThemeObj }) {
+  if (data.customLogoUrl) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
+        <CustomLogo url={data.customLogoUrl} size={110} />
+      </div>
+    )
+  }
   const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
   const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
   const color = data.monogrammeColor || theme.accent
@@ -2188,7 +2264,7 @@ function ElegantPage2({ data, theme }: { data: FormData; theme: ThemeObj }) {
   return (
     <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', backgroundColor: theme.fond, padding: '56px 48px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
       {data.mariageJuif && <div style={{ fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl', marginBottom: 20 }}>בס״ד</div>}
-      <MonogramByStyle initial1={i1} initial2={i2} color={data.monogrammeColor || theme.accent} size={200} style={data.monogrammeStyle || 'cercle'} />
+      {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} size={200} /> : <MonogramByStyle initial1={i1} initial2={i2} color={data.monogrammeColor || theme.accent} size={200} style={data.monogrammeStyle || 'cercle'} />}
       <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, marginTop: 20, textAlign: 'center', lineHeight: 1.2 }}>
         {data.marie1Prenom} & {data.marie2Prenom}
       </div>
@@ -3733,7 +3809,7 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
         {carteVisible && (
           <div style={{ position: 'absolute', top: 0, left: 10, right: 10, zIndex: 5, animation: 'carteSort 1.2s cubic-bezier(0.22,1,0.36,1) forwards', background: 'white', borderRadius: 8, padding: '24px 20px', textAlign: 'center', boxShadow: `0 20px 60px ${theme.accent}44`, border: `1px solid ${theme.accent}33` }}>
             {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 13, color: theme.accent, direction: 'rtl', marginBottom: 12 }}>בס״ד</div>}
-            <MonogramByStyle initial1={(data.marie1Prenom || 'A')[0].toUpperCase()} initial2={(data.marie2Prenom || 'B')[0].toUpperCase()} color={theme.accent} size={60} style={data.monogrammeStyle || 'cercle'} />
+            {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} size={60} /> : <MonogramByStyle initial1={(data.marie1Prenom || 'A')[0].toUpperCase()} initial2={(data.marie2Prenom || 'B')[0].toUpperCase()} color={theme.accent} size={60} style={data.monogrammeStyle || 'cercle'} />}
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 38, color: theme.accent, lineHeight: 1.2, marginTop: 8 }}>
               {data.marie1Prenom}
             </div>
@@ -3757,7 +3833,7 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
               <img src={data.photosFond[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.35 }} />
             ) : (
               <div style={{ width: '100%', height: '100%', background: `linear-gradient(135deg, ${theme.fond}, ${theme.accent}18)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <MonogramByStyle initial1={(data.marie1Prenom || 'A')[0].toUpperCase()} initial2={(data.marie2Prenom || 'B')[0].toUpperCase()} color={theme.accent} size={70} style={data.monogrammeStyle || 'cercle'} />
+                {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} size={70} /> : <MonogramByStyle initial1={(data.marie1Prenom || 'A')[0].toUpperCase()} initial2={(data.marie2Prenom || 'B')[0].toUpperCase()} color={theme.accent} size={70} style={data.monogrammeStyle || 'cercle'} />}
               </div>
             )}
             {/* V en bas */}
@@ -3972,7 +4048,7 @@ function AnimSceau({ data, theme, onDone }: { data: FormData; theme: ThemeObj; o
             </svg>
             {/* Monogramme */}
             <div style={{ position: 'relative', zIndex: 2 }}>
-              <MonogramByStyle initial1={i1} initial2={i2} color="white" size={90} style={data.monogrammeStyle || 'cercle'} />
+              {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} size={90} /> : <MonogramByStyle initial1={i1} initial2={i2} color="white" size={90} style={data.monogrammeStyle || 'cercle'} />}
             </div>
           </div>
           {/* Fissures quand le sceau s'ouvre */}
@@ -4094,7 +4170,7 @@ function AnimParchemin({ data, theme, onDone }: { data: FormData; theme: ThemeOb
             </div>
             <div style={{ width: 50, height: '0.5px', background: theme.accent, margin: '0 auto 20px', animation: 'parchTextIn 0.4s ease 1.1s forwards', opacity: 0 }} />
             <div style={{ animation: 'parchTextIn 0.6s ease 1.2s forwards', opacity: 0, marginBottom: 16 }}>
-              <MonogramByStyle initial1={(data.marie1Prenom || 'A')[0].toUpperCase()} initial2={(data.marie2Prenom || 'B')[0].toUpperCase()} color={theme.accent} size={60} style={data.monogrammeStyle || 'cercle'} />
+              {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} size={60} /> : <MonogramByStyle initial1={(data.marie1Prenom || 'A')[0].toUpperCase()} initial2={(data.marie2Prenom || 'B')[0].toUpperCase()} color={theme.accent} size={60} style={data.monogrammeStyle || 'cercle'} />}
             </div>
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, lineHeight: 1.1, animation: 'parchTextIn 0.8s ease 1.4s forwards', opacity: 0 }}>
               {data.marie1Prenom}
@@ -4224,7 +4300,7 @@ const firstDate = sorted[0]?.date
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '0 32px', maxWidth: 480, width: '100%', margin: '0 auto' }}>
           {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 16, color: introTextColor, direction: 'rtl', marginBottom: 20, animation: 'sharedFadeIn 0.9s ease forwards' }}>בס״ד</div>}
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
-            <MonogramByStyle initial1={i1} initial2={i2} color={monoColor}size={140} style={data.monogrammeStyle || 'cercle'} />
+            {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} size={140} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor}size={140} style={data.monogrammeStyle || 'cercle'} />}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', margin: '0 auto 16px', maxWidth: 160 }}>
             <div style={{ flex: 1, height: 0.5, background: introTextColor, opacity: 0.4 }} />
