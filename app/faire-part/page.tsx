@@ -1072,6 +1072,7 @@ function ImageCropper({ src, onCrop, onPreview }: { src: string; onCrop: (positi
 }
 
 function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
+  const { t } = useT()
   const update = (i: number, u: Partial<Ceremony>) =>
     onChange({ ceremonies: data.ceremonies.map((c, idx) => idx === i ? { ...c, ...u } : c) })
   const add = () => data.ceremonies.length < 6 && onChange({ ceremonies: [...data.ceremonies, { ...defaultCeremony, type: 'Soirée' }] })
@@ -1079,44 +1080,44 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
 
   return (
     <div>
-      <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#4a3728', marginBottom: 24 }}>Les cérémonies</h2>
+      <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#4a3728', marginBottom: 24 }}>{t.fairepart.step3Title}</h2>
       {data.ceremonies.map((c, i) => (
         <div key={i} style={{ background: '#fdf8f9', borderRadius: 12, padding: 20, marginBottom: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <span style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Événement {i + 1}</span>
             {data.ceremonies.length > 1 && (
-              <button type="button" onClick={() => remove(i)} style={{ ...BTN, background: 'none', border: 'none', color: '#fb7185', fontSize: 12 }}>Supprimer</button>
+              <button type="button" onClick={() => remove(i)} style={{ ...BTN, background: 'none', border: 'none', color: '#fb7185', fontSize: 12 }}>{t.fairepart.removeCeremony}</button>
             )}
           </div>
           <Label>Type</Label>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
-            {CEREMONY_TYPES.map(t => (
-              <button key={t} type="button" onClick={() => update(i, { type: t })} style={{
+            {CEREMONY_TYPES.map(ct => (
+              <button key={ct} type="button" onClick={() => update(i, { type: ct })} style={{
                 ...BTN,
                 padding: '6px 14px', borderRadius: 9999, fontSize: 12,
                 border: '1px solid #C9A84C',
-                background: c.type === t ? '#C9A84C' : 'transparent',
-                color: c.type === t ? 'white' : '#C9A84C',
-              }}>{t}</button>
+                background: c.type === ct ? '#C9A84C' : 'transparent',
+                color: c.type === ct ? 'white' : '#C9A84C',
+              }}>{t.fairepart.ceremonyTypes[ct] || ct}</button>
             ))}
           </div>
-          {c.type === 'Autre' && <Field label="Nom de l'événement" value={c.customName} onChange={v => update(i, { customName: v })} />}
-          <Field label="Lieu / Salle" value={c.lieu} onChange={v => update(i, { lieu: v })} placeholder="Château de Vincennes" />
-          <Field label="Adresse (optionnel)" value={c.adresse} onChange={v => update(i, { adresse: v })} />
+          {c.type === 'Autre' && <Field label={t.fairepart.customEventName} value={c.customName} onChange={v => update(i, { customName: v })} />}
+          <Field label={t.fairepart.venue} value={c.lieu} onChange={v => update(i, { lieu: v })} placeholder="Château de Vincennes" />
+          <Field label={t.fairepart.address} value={c.adresse} onChange={v => update(i, { adresse: v })} />
           <div style={{ display: 'flex', gap: 12 }}>
-            <Field label="Date" value={c.date} onChange={v => update(i, { date: v })} type="date" />
-            <Field label="Heure" value={c.heure} onChange={v => update(i, { heure: v })} type="time" />
+            <Field label={t.fairepart.date} value={c.date} onChange={v => update(i, { date: v })} type="date" />
+            <Field label={t.fairepart.time} value={c.heure} onChange={v => update(i, { heure: v })} type="time" />
           </div>
           {c.type === 'Mairie' && (
             <div>
               <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: '#4a3728' }}>
                 <input type="checkbox" checked={c.suiviDAutre} onChange={e => update(i, { suiviDAutre: e.target.checked })} />
-                Suivi d'un autre événement ?
+                {t.fairepart.afterEvent}
               </label>
               {c.suiviDAutre && (
                 <div style={{ marginTop: 10 }}>
-                  <Field label="After Mairie" value={c.evenementSuivantNom} onChange={v => update(i, { evenementSuivantNom: v })} placeholder="ex: Cocktail, Vin d'honneur..." />
-                  <Field label="Adresse (optionnel)" value={c.evenementSuivantAdresse} onChange={v => update(i, { evenementSuivantAdresse: v })} />
+                  <Field label={t.fairepart.afterEventName} value={c.evenementSuivantNom} onChange={v => update(i, { evenementSuivantNom: v })} placeholder="ex: Cocktail, Vin d'honneur..." />
+                  <Field label={t.fairepart.afterEventAddress} value={c.evenementSuivantAdresse} onChange={v => update(i, { evenementSuivantAdresse: v })} />
                 </div>
               )}
             </div>
@@ -1136,11 +1137,11 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                 checked={c.infosTransportActif}
                 onChange={e => update(i, { infosTransportActif: e.target.checked })}
               />
-              ➕ Ajouter des infos transport / hébergement
+              {`➕ ${t.fairepart.transportToggle}`}
             </label>
             {c.infosTransportActif && (
               <div style={{ marginTop: 12 }}>
-                <Label>🚌 Transport (optionnel)</Label>
+                <Label>{`🚌 ${t.fairepart.transportLabel}`}</Label>
                 <textarea
                   value={c.transport}
                   onChange={e => update(i, { transport: e.target.value })}
@@ -1148,7 +1149,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                   rows={3}
                   style={{ ...S.input, resize: 'vertical', minHeight: 70, fontFamily: 'inherit', fontSize: 13, marginBottom: 12 }}
                 />
-                <Label>🏨 Hébergement (optionnel)</Label>
+                <Label>{`🏨 ${t.fairepart.accommodationLabel}`}</Label>
                 <textarea
                   value={c.hebergement}
                   onChange={e => update(i, { hebergement: e.target.value })}
@@ -1169,21 +1170,20 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                   checked={c.penseesDefuntsActif}
                   onChange={e => update(i, { penseesDefuntsActif: e.target.checked })}
                 />
-                🕯 En mémoire de proches disparus
+                {`🕯 ${t.fairepart.memorialToggle}`}
               </label>
               {c.penseesDefuntsActif && (
                 <div style={{ marginTop: 14 }}>
-                  <Label>Formule introductive</Label>
+                  <Label>{t.fairepart.introPhrase}</Label>
                   <select
                     value={c.penseesDefuntsIntro}
                     onChange={e => update(i, { penseesDefuntsIntro: e.target.value })}
                     style={{ ...S.input, marginBottom: 8 }}
                   >
-                    <option value="Zihrona Levraha — Que leur mémoire soit une bénédiction">Zihrona Levraha — Que leur mémoire soit une bénédiction</option>
-                    <option value="En mémoire bénie de">En mémoire bénie de</option>
-                    <option value="Avec une pensée pour ceux qui veillent sur nous">Avec une pensée pour ceux qui veillent sur nous</option>
-                    <option value="Cette journée est aussi la leur">Cette journée est aussi la leur</option>
-                    <option value="">— Personnalisée (écrire ci-dessous) —</option>
+                    {t.fairepart.memorialOptions.slice(0, 4).map(opt => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                    <option value="">—</option>
                   </select>
                   <input
                     type="text"
@@ -1193,7 +1193,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                     style={{ ...S.input, marginBottom: 14, fontSize: 13 }}
                   />
 
-                  <Label>Noms des proches disparus (ז״ל ajouté automatiquement)</Label>
+                  <Label>{t.fairepart.memorialNames}</Label>
                   {c.penseesDefuntsNoms.map((nom, nomIdx) => (
                     <div key={nomIdx} style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
                       <input
@@ -1228,17 +1228,16 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                     + Ajouter un nom
                   </button>
 
-                  <Label>Phrase de fin (optionnelle)</Label>
+                  <Label>{t.fairepart.memorialEnd}</Label>
                   <select
                     value={c.penseesDefuntsFin}
                     onChange={e => update(i, { penseesDefuntsFin: e.target.value })}
                     style={{ ...S.input, marginBottom: 8 }}
                   >
-                    <option value="">— Aucune —</option>
-                    <option value="Présents dans nos cœurs en ce jour">Présents dans nos cœurs en ce jour</option>
-                    <option value="Veillant sur notre union depuis là-haut">Veillant sur notre union depuis là-haut</option>
-                    <option value="Que leur âme repose en paix">Que leur âme repose en paix</option>
-                    <option value="Toujours dans nos pensées">Toujours dans nos pensées</option>
+                    <option value="">—</option>
+                    {t.fairepart.memorialOptions.slice(4).map(opt => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
                   </select>
                   <input
                     type="text"
@@ -1258,7 +1257,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           ...BTN,
           width: '100%', padding: 12, border: '2px dashed #C9A84C', borderRadius: 10,
           background: 'transparent', color: '#C9A84C', fontSize: 14,
-        }}>+ Ajouter un événement</button>
+        }}>{`+ ${t.fairepart.addCeremony}`}</button>
       )}
     </div>
   )
