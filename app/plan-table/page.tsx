@@ -192,6 +192,47 @@ export default function PlanTablePage() {
     }
   }
 
+  const [showAutoPanel, setShowAutoPanel] = useState(false)
+  const [autoNbTables, setAutoNbTables] = useState(8)
+  const [autoMaxPerTable, setAutoMaxPerTable] = useState(8)
+
+  const TABLE_NAME_THEMES: { label: string; names: string[] }[] = [
+    { label: '🌸 Fleurs', names: ['Rose', 'Pivoine', 'Jasmin', 'Orchidée', 'Lilas', 'Camélia', 'Magnolia', 'Dahlia', 'Iris', 'Tulipe', 'Hortensia', 'Lavande', 'Freesia', 'Amaryllis', 'Lys'] },
+    { label: '🌍 Villes', names: ['Paris', 'Rome', 'Barcelone', 'Lisbonne', 'Marrakech', 'Tokyo', 'New York', 'Athènes', 'Jérusalem', 'Venise', 'Florence', 'Londres', 'Prague', 'Amsterdam', 'Santorini'] },
+    { label: '✈️ Voyages', names: ['Bali', 'Toscane', 'Mykonos', 'Maldives', 'Seychelles', 'Amalfi', 'Capri', 'Zanzibar', 'Tahiti', 'Bora Bora', 'Hawaï', 'Dubrovnik', 'Majorque', 'Sardaigne', 'Corfou'] },
+    { label: '💎 Pierres', names: ['Diamant', 'Émeraude', 'Rubis', 'Saphir', 'Perle', 'Améthyste', 'Topaze', 'Opale', 'Jade', 'Grenat', 'Cristal', 'Agate', 'Onyx', 'Quartz', 'Turquoise'] },
+    { label: '🎵 Musique', names: ['Adagio', 'Allegro', 'Sérénade', 'Valse', 'Nocturne', 'Mélodie', 'Harmonie', 'Symphonie', 'Ballade', 'Bolero', 'Sonate', 'Prelude', 'Cantate', 'Aria', 'Rondo'] },
+    { label: '⭐ Étoiles', names: ['Sirius', 'Véga', 'Altaïr', 'Polaris', 'Cassiopée', 'Orion', 'Andromède', 'Lyra', 'Pégase', 'Antarès', 'Bételgeuse', 'Rigel', 'Aldébaran', 'Arcturus', 'Capella'] },
+  ]
+
+  const generateRandomPlan = () => {
+    const shuffled = [...guests].sort(() => Math.random() - 0.5)
+    const newTables: TableData[] = []
+    for (let i = 0; i < autoNbTables; i++) {
+      newTables.push({
+        id: `t${Date.now()}-${i}`,
+        nom: `Table ${i + 1}`,
+        maxPersonnes: autoMaxPerTable,
+        invites: [],
+      })
+    }
+    let tableIdx = 0
+    for (const guest of shuffled) {
+      if (newTables[tableIdx].invites.length >= autoMaxPerTable) {
+        tableIdx++
+        if (tableIdx >= newTables.length) break
+      }
+      newTables[tableIdx].invites.push(guest)
+    }
+    _tableCounter = autoNbTables + 1
+    setTables(newTables)
+    setShowAutoPanel(false)
+  }
+
+  const applyTableNames = (names: string[]) => {
+    setTables(prev => prev.map((t, i) => ({ ...t, nom: names[i] || t.nom })))
+  }
+
   const copyGuestLink = () => {
     const url = `${window.location.origin}/plan-table?shareId=${shareId}&view=guest`
     navigator.clipboard.writeText(url).then(() => { setCopyDone(true); setTimeout(() => setCopyDone(false), 2000) })
@@ -220,17 +261,62 @@ export default function PlanTablePage() {
           <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 2 }}>{guests.length} invités · {tables.length} tables · {unassigned.length} non placés</div>
         </div>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <button onClick={() => setShowAutoPanel(p => !p)} style={{ ...BTN, padding: '9px 18px', borderRadius: 9999, border: `1px solid ${GOLD}`, background: showAutoPanel ? `${GOLD}15` : 'transparent', color: GOLD, fontSize: 13 }}>
+            🎲 Auto
+          </button>
           <button onClick={addTable} style={{ ...BTN, padding: '9px 18px', borderRadius: 9999, border: `1px solid ${GOLD}`, background: 'transparent', color: GOLD, fontSize: 13 }}>
             + Table
           </button>
           <button onClick={copyGuestLink} style={{ ...BTN, padding: '9px 18px', borderRadius: 9999, border: `1px solid ${GOLD}`, background: 'transparent', color: GOLD, fontSize: 13 }}>
-            {copyDone ? '✓ Lien copié !' : '🔗 Partager aux invités'}
+            {copyDone ? '✓ Lien copié !' : '🔗 Partager'}
           </button>
           <button onClick={savePlan} disabled={saving} style={{ ...BTN, padding: '9px 20px', borderRadius: 9999, background: saved ? '#22c55e' : `linear-gradient(135deg,${GOLD},#e8c96a)`, color: 'white', border: 'none', fontSize: 13, fontWeight: 700 }}>
             {saving ? 'Sauvegarde…' : saved ? '✓ Sauvegardé !' : '💾 Sauvegarder'}
           </button>
         </div>
       </div>
+
+      {/* Panneau placement automatique */}
+      {showAutoPanel && (
+        <div style={{ background: 'white', borderBottom: `1px solid ${GOLD}22`, padding: '16px 24px' }}>
+          <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+            {/* Config tables */}
+            <div style={{ display: 'flex', gap: 16, alignItems: 'flex-end' }}>
+              <div>
+                <label style={{ fontSize: 11, color: '#9ca3af', display: 'block', marginBottom: 4 }}>Nb tables</label>
+                <input type="number" min={1} max={30} value={autoNbTables} onChange={e => setAutoNbTables(Number(e.target.value))}
+                  style={{ width: 60, padding: '6px 8px', borderRadius: 8, border: `1px solid ${GOLD}44`, fontSize: 14, textAlign: 'center' }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, color: '#9ca3af', display: 'block', marginBottom: 4 }}>Places/table</label>
+                <input type="number" min={4} max={15} value={autoMaxPerTable} onChange={e => setAutoMaxPerTable(Number(e.target.value))}
+                  style={{ width: 60, padding: '6px 8px', borderRadius: 8, border: `1px solid ${GOLD}44`, fontSize: 14, textAlign: 'center' }} />
+              </div>
+              <button onClick={generateRandomPlan} style={{ ...BTN, padding: '8px 20px', borderRadius: 9999, background: `linear-gradient(135deg,${GOLD},#e8c96a)`, color: 'white', border: 'none', fontSize: 13, fontWeight: 700 }}>
+                🎲 Générer
+              </button>
+            </div>
+
+            {/* Séparateur */}
+            <div style={{ width: 1, height: 40, background: `${GOLD}33` }} />
+
+            {/* Noms de tables */}
+            <div>
+              <label style={{ fontSize: 11, color: '#9ca3af', display: 'block', marginBottom: 6 }}>Noms de tables</label>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {TABLE_NAME_THEMES.map(theme => (
+                  <button key={theme.label} onClick={() => applyTableNames(theme.names)} style={{ ...BTN, padding: '5px 12px', borderRadius: 9999, border: `1px solid ${GOLD}44`, background: 'transparent', color: TEXT, fontSize: 12 }}>
+                    {theme.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 8, fontStyle: 'italic' }}>
+            {guests.length} invités → {autoNbTables} tables × {autoMaxPerTable} places = {autoNbTables * autoMaxPerTable} places ({autoNbTables * autoMaxPerTable >= guests.length ? '✓ suffisant' : `⚠ manque ${guests.length - autoNbTables * autoMaxPerTable} places`})
+          </div>
+        </div>
+      )}
 
       {/* Body */}
       <DragDropContext onDragEnd={handleDragEnd}>
