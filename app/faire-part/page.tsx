@@ -133,6 +133,13 @@ const FRAMES: { id: string; label: string; url: string | null }[] = [
   { id: 'frame-106', label: '🌸 Floral 106', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878859/106_lv0kwe.png' },
   { id: 'frame-107', label: '🌸 Floral 107', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878857/107_jal3jp.png' },
   { id: 'frame-108', label: '🌸 Floral 108', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878858/108_xvumew.png' },
+  { id: 'frame-147', label: '🌿 Feuillage 147', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896737/147_vmtvha.png' },
+  { id: 'frame-148', label: '🌿 Feuillage 148', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896737/148_hdqw48.png' },
+  { id: 'frame-149', label: '🌿 Feuillage 149', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896746/149_jwshu6.png' },
+  { id: 'frame-150', label: '🌿 Feuillage 150', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896741/150_rzlu80.png' },
+  { id: 'frame-151', label: '🌿 Feuillage 151', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896742/151_mllw5q.png' },
+  { id: 'frame-152', label: '🌿 Feuillage 152', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896745/152_vlbdi9.png' },
+  { id: 'frame-154', label: '🌿 Feuillage 154', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896718/154_pxirys.png' },
   { id: 'none', label: '⬜ Sans cadre', url: null },
 ]
 
