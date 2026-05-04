@@ -1,11 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useT } from '@/lib/i18n'
 
 const GOLD = '#C9A84C'
 const CREAM = '#fff8ed'
 
 export default function VerifyPage() {
+  const { t } = useT()
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [error, setError] = useState<string | null>(null)
 
@@ -14,7 +16,7 @@ export default function VerifyPage() {
     const token = params.get('token')
 
     if (!token) {
-      setError('Lien invalide — aucun token trouvé.')
+      setError(t.auth.verifyError)
       setStatus('error')
       return
     }
@@ -29,12 +31,12 @@ export default function VerifyPage() {
             window.location.href = '/mon-espace'
           }, 2000)
         } else {
-          setError(data.error || 'Lien invalide ou expiré.')
+          setError(data.error || t.auth.verifyError)
           setStatus('error')
         }
       })
       .catch(() => {
-        setError('Erreur de vérification. Réessayez.')
+        setError(t.auth.verifyError)
         setStatus('error')
       })
   }, [])
@@ -50,7 +52,7 @@ export default function VerifyPage() {
         {status === 'loading' && (
           <div>
             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, color: '#4a3728', marginBottom: 16 }}>
-              Vérification en cours…
+              {t.auth.verifyLoading}
             </div>
             <div style={{ width: 40, height: 2, background: GOLD, opacity: 0.5, margin: '0 auto', borderRadius: 1, animation: 'pulse 1.5s ease-in-out infinite' }} />
           </div>
@@ -60,10 +62,10 @@ export default function VerifyPage() {
           <div>
             <div style={{ fontSize: 48, marginBottom: 16 }}>&#10003;</div>
             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, color: '#4a3728', marginBottom: 8 }}>
-              Connexion réussie !
+              {t.auth.verifySuccess}
             </div>
             <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af' }}>
-              Redirection vers votre espace…
+              {t.auth.verifyRedirect}
             </p>
           </div>
         )}
@@ -83,7 +85,7 @@ export default function VerifyPage() {
                   fontFamily: 'var(--font-playfair-display)',
                 }}
               >
-                Se connecter
+                {t.common.login}
               </a>
               <a
                 href="/auth/mot-de-passe-oublie"
@@ -94,7 +96,7 @@ export default function VerifyPage() {
                   fontFamily: 'var(--font-playfair-display)',
                 }}
               >
-                Recevoir un nouveau lien
+                {t.auth.sendMagicLink}
               </a>
             </div>
           </div>

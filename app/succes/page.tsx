@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useT } from '@/lib/i18n'
 
 const GOLD = '#C9A84C'
 const CREAM = '#fff8ed'
@@ -13,12 +14,16 @@ const inputStyle: React.CSSProperties = {
 }
 
 export default function SuccesPage() {
+  const { t } = useT()
+  const s = t.success
+  const a = t.auth
+  const c = t.common
+
   const [code, setCode] = useState<string | null>(null)
   const [pack, setPack] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // Mot de passe
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [pwError, setPwError] = useState<string | null>(null)
@@ -28,7 +33,7 @@ export default function SuccesPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const sessionId = params.get('session_id')
-    if (!sessionId) { setError('Paramètre manquant.'); setLoading(false); return }
+    if (!sessionId) { setError(s.errorMissing); setLoading(false); return }
 
     fetch(`/api/verify-payment?session_id=${sessionId}`)
       .then(r => r.json())
@@ -38,7 +43,6 @@ export default function SuccesPage() {
         setPack(d.pack)
         try { sessionStorage.setItem('lovit_access_code', d.code) } catch { /* ignore */ }
 
-        // Si l'utilisateur a déjà un mdp (2ème achat), skip le formulaire
         try {
           const meRes = await fetch('/api/auth/me')
           if (meRes.ok) {
@@ -50,7 +54,7 @@ export default function SuccesPage() {
           }
         } catch { /* ignore */ }
       })
-      .catch(() => setError('Erreur de vérification. Contactez-nous.'))
+      .catch(() => setError(s.errorVerify))
       .finally(() => setLoading(false))
   }, [])
 
@@ -59,11 +63,11 @@ export default function SuccesPage() {
     setPwError(null)
 
     if (password.length < 8) {
-      setPwError('Le mot de passe doit contenir au moins 8 caractères.')
+      setPwError(a.passwordMin)
       return
     }
     if (password !== confirm) {
-      setPwError('Les mots de passe ne correspondent pas.')
+      setPwError(a.passwordMismatch)
       return
     }
 
@@ -76,14 +80,13 @@ export default function SuccesPage() {
       })
       if (res.ok) {
         setPwDone(true)
-        // Rediriger directement vers le formulaire de création
         setTimeout(() => { window.location.href = `/faire-part?code=${code}` }, 1500)
       } else {
         const data = await res.json()
-        setPwError(data.error || 'Erreur lors de la création du mot de passe.')
+        setPwError(data.error || c.error)
       }
     } catch {
-      setPwError('Erreur serveur. Réessayez.')
+      setPwError(c.error)
     } finally {
       setPwLoading(false)
     }
@@ -91,7 +94,7 @@ export default function SuccesPage() {
 
   if (loading) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: CREAM }}>
-      <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: GOLD }}>Vérification…</div>
+      <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: GOLD }}>{s.verifying}</div>
     </div>
   )
 
@@ -100,7 +103,7 @@ export default function SuccesPage() {
       <div style={{ textAlign: 'center', maxWidth: 480 }}>
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 36, color: GOLD, marginBottom: 16 }}>Oops…</div>
         <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 18, color: '#4a3728', marginBottom: 24 }}>{error}</p>
-        <a href="/paiement" style={{ padding: '12px 28px', borderRadius: 9999, background: GOLD, color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 600 }}>Retour</a>
+        <a href="/paiement" style={{ padding: '12px 28px', borderRadius: 9999, background: GOLD, color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 600 }}>{c.back}</a>
       </div>
     </div>
   )
@@ -109,25 +112,24 @@ export default function SuccesPage() {
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(160deg, ${CREAM} 0%, #fffaf4 50%, ${CREAM} 100%)`, padding: 24 }}>
       <div style={{ textAlign: 'center', maxWidth: 540 }}>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: `${GOLD}99`, letterSpacing: 4, textTransform: 'uppercase', marginBottom: 12 }}>
-          Paiement confirmé
+          {s.title}
         </div>
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(40px, 8vw, 60px)', color: GOLD, marginBottom: 8, lineHeight: 1.2 }}>
-          Félicitations !
+          {s.title}
         </div>
         <div style={{ width: 60, height: 1, background: GOLD, opacity: 0.4, margin: '0 auto 28px' }} />
 
         <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, color: '#4a3728', lineHeight: 1.7, marginBottom: 36 }}>
-          Votre pack <strong style={{ fontStyle: 'normal', color: GOLD, textTransform: 'capitalize' }}>{pack}</strong> est activé.
+          {s.packActive.replace('{pack}', pack || '')}
         </p>
 
-        {/* Formulaire mot de passe */}
         {!pwDone ? (
           <form onSubmit={handleSetPassword} style={{ background: 'white', borderRadius: 20, padding: '32px 32px', boxShadow: '0 12px 48px rgba(201,168,76,0.15)', border: `1px solid ${GOLD}33`, marginBottom: 28, textAlign: 'left' }}>
             <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 17, color: '#4a3728', marginBottom: 4, textAlign: 'center' }}>
-              Créez votre compte
+              {s.createAccountTitle}
             </div>
             <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', marginBottom: 24, textAlign: 'center' }}>
-              Pour retrouver votre faire-part depuis n&apos;importe quel appareil
+              {s.createAccountSub}
             </p>
 
             {pwError && (
@@ -138,80 +140,54 @@ export default function SuccesPage() {
 
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#4a3728', marginBottom: 6, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                Mot de passe
+                {s.passwordLabel}
               </label>
-              <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-                minLength={8}
-                placeholder="8 caractères minimum"
-                style={inputStyle}
-              />
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={8} placeholder={a.passwordPlaceholder} style={inputStyle} />
             </div>
 
             <div style={{ marginBottom: 20 }}>
               <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#4a3728', marginBottom: 6, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                Confirmer le mot de passe
+                {s.confirmLabel}
               </label>
-              <input
-                type="password"
-                value={confirm}
-                onChange={e => setConfirm(e.target.value)}
-                required
-                minLength={8}
-                placeholder="••••••••"
-                style={inputStyle}
-              />
+              <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required minLength={8} placeholder="••••••••" style={inputStyle} />
             </div>
 
-            <button
-              type="submit"
-              disabled={pwLoading}
-              style={{
-                width: '100%', padding: '14px 24px', borderRadius: 9999,
-                background: pwLoading ? '#d4b86a' : `linear-gradient(135deg, ${GOLD}, #e8c96a)`,
-                color: 'white', border: 'none', fontSize: 15, fontWeight: 700,
-                fontFamily: 'var(--font-playfair-display)', letterSpacing: '0.05em',
-                cursor: pwLoading ? 'not-allowed' : 'pointer',
-                boxShadow: `0 6px 24px ${GOLD}44`,
-              }}
-            >
-              {pwLoading ? 'Création…' : 'Créer votre compte'}
+            <button type="submit" disabled={pwLoading} style={{
+              width: '100%', padding: '14px 24px', borderRadius: 9999,
+              background: pwLoading ? '#d4b86a' : `linear-gradient(135deg, ${GOLD}, #e8c96a)`,
+              color: 'white', border: 'none', fontSize: 15, fontWeight: 700,
+              fontFamily: 'var(--font-playfair-display)', letterSpacing: '0.05em',
+              cursor: pwLoading ? 'not-allowed' : 'pointer',
+              boxShadow: `0 6px 24px ${GOLD}44`,
+            }}>
+              {pwLoading ? c.saving : s.createBtn}
             </button>
           </form>
         ) : (
           <div style={{ background: 'white', borderRadius: 20, padding: '32px 32px', boxShadow: '0 12px 48px rgba(201,168,76,0.15)', border: `1px solid ${GOLD}33`, marginBottom: 28 }}>
             <div style={{ fontSize: 36, marginBottom: 12, color: '#16a34a' }}>&#10003;</div>
             <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 17, color: '#4a3728', marginBottom: 8 }}>
-              Compte créé avec succès !
+              {s.accountCreated}
             </div>
             <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', margin: 0 }}>
-              Redirection vers votre faire-part…
+              {s.redirecting}
             </p>
           </div>
         )}
 
-        <a
-          href={`/faire-part?code=${code}`}
-          style={{
-            display: 'inline-block', padding: '16px 40px', borderRadius: 9999,
-            background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`,
-            color: 'white', textDecoration: 'none', fontSize: 16, fontWeight: 700,
-            fontFamily: 'var(--font-playfair-display)', letterSpacing: '0.06em',
-            boxShadow: `0 8px 28px ${GOLD}55`,
-          }}
-        >
-          Créer votre faire-part →
+        <a href={`/faire-part?code=${code}`} style={{
+          display: 'inline-block', padding: '16px 40px', borderRadius: 9999,
+          background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`,
+          color: 'white', textDecoration: 'none', fontSize: 16, fontWeight: 700,
+          fontFamily: 'var(--font-playfair-display)', letterSpacing: '0.06em',
+          boxShadow: `0 8px 28px ${GOLD}55`,
+        }}>
+          {s.createFairepart}
         </a>
 
         <div style={{ marginTop: 16 }}>
-          <a
-            href="/mon-espace"
-            style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: GOLD, textDecoration: 'underline' }}
-          >
-            Aller à votre espace
+          <a href="/mon-espace" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: GOLD, textDecoration: 'underline' }}>
+            {s.goToSpace}
           </a>
         </div>
       </div>

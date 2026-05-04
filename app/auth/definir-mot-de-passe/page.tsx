@@ -1,11 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useT } from '@/lib/i18n'
 
 const GOLD = '#C9A84C'
 const CREAM = '#fff8ed'
 
 export default function DefinirMotDePassePage() {
+  const { t } = useT()
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -20,7 +22,7 @@ export default function DefinirMotDePassePage() {
     const token = params.get('token')
 
     if (!token) {
-      setError('Lien invalide.')
+      setError(t.auth.verifyError)
       setVerifying(false)
       return
     }
@@ -31,10 +33,10 @@ export default function DefinirMotDePassePage() {
         if (ok && data.ok) {
           setVerified(true)
         } else {
-          setError(data.error || 'Lien invalide ou expiré.')
+          setError(data.error || t.auth.verifyError)
         }
       })
-      .catch(() => setError('Erreur de vérification.'))
+      .catch(() => setError(t.auth.verifyError))
       .finally(() => setVerifying(false))
   }, [])
 
@@ -43,11 +45,11 @@ export default function DefinirMotDePassePage() {
     setError(null)
 
     if (password.length < 8) {
-      setError('Le mot de passe doit contenir au moins 8 caractères.')
+      setError(t.auth.passwordMin)
       return
     }
     if (password !== confirm) {
-      setError('Les mots de passe ne correspondent pas.')
+      setError(t.auth.passwordMismatch)
       return
     }
 
@@ -61,7 +63,7 @@ export default function DefinirMotDePassePage() {
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error || 'Erreur lors de la définition du mot de passe.')
+        setError(data.error || t.common.error)
         return
       }
 
@@ -70,7 +72,7 @@ export default function DefinirMotDePassePage() {
         window.location.href = '/mon-espace'
       }, 2000)
     } catch {
-      setError('Erreur serveur. Réessayez.')
+      setError(t.common.error)
     } finally {
       setLoading(false)
     }
@@ -79,7 +81,7 @@ export default function DefinirMotDePassePage() {
   if (verifying) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(160deg, ${CREAM} 0%, #fff5f7 50%, ${CREAM} 100%)` }}>
-        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: GOLD }}>Vérification…</div>
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: GOLD }}>{t.auth.verifyLoading}</div>
       </div>
     )
   }
@@ -91,10 +93,10 @@ export default function DefinirMotDePassePage() {
           <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: GOLD, marginBottom: 16 }}>Lov&apos;it</div>
           <div style={{ fontSize: 48, marginBottom: 16 }}>&#10003;</div>
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, color: '#4a3728' }}>
-            Mot de passe défini avec succès !
+            {t.auth.setPasswordDone}
           </div>
           <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', marginTop: 8 }}>
-            Redirection vers votre espace…
+            {t.auth.verifyRedirect}
           </p>
         </div>
       </div>
@@ -111,10 +113,10 @@ export default function DefinirMotDePassePage() {
           </a>
           <div style={{ width: 40, height: 1, background: GOLD, opacity: 0.4, margin: '0 auto 16px' }} />
           <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: '#4a3728' }}>
-            Définissez votre mot de passe
+            {t.auth.setPasswordTitle}
           </p>
           <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', marginTop: 4 }}>
-            Pour vous connecter depuis n&apos;importe quel appareil
+            {t.auth.setPasswordSub}
           </p>
         </div>
 
@@ -129,7 +131,7 @@ export default function DefinirMotDePassePage() {
                 color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 700,
               }}
             >
-              Recevoir un nouveau lien
+              {t.auth.magicLinkSent}
             </a>
           </div>
         ) : (
@@ -142,7 +144,7 @@ export default function DefinirMotDePassePage() {
 
             <div style={{ marginBottom: 20 }}>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#4a3728', marginBottom: 6, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                Nouveau mot de passe
+                {t.auth.password}
               </label>
               <input
                 type="password"
@@ -150,14 +152,14 @@ export default function DefinirMotDePassePage() {
                 onChange={e => setPassword(e.target.value)}
                 required
                 minLength={8}
-                placeholder="8 caractères minimum"
+                placeholder={t.auth.passwordPlaceholder}
                 style={{ width: '100%', padding: '12px 16px', borderRadius: 12, border: `1px solid ${GOLD}44`, fontSize: 15, color: '#4a3728', background: '#fefcf8', outline: 'none', boxSizing: 'border-box', fontFamily: 'Georgia, serif' }}
               />
             </div>
 
             <div style={{ marginBottom: 28 }}>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#4a3728', marginBottom: 6, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                Confirmer le mot de passe
+                {t.auth.passwordPlaceholder}
               </label>
               <input
                 type="password"
@@ -182,7 +184,7 @@ export default function DefinirMotDePassePage() {
                 boxShadow: `0 6px 24px ${GOLD}44`,
               }}
             >
-              {loading ? 'Enregistrement…' : 'Définir votre mot de passe'}
+              {loading ? t.common.loading : t.auth.setPasswordBtn}
             </button>
           </form>
         )}

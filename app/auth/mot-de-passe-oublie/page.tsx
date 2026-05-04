@@ -1,11 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import { useT } from '@/lib/i18n'
 
 const GOLD = '#C9A84C'
 const CREAM = '#fff8ed'
 
 export default function MotDePasseOubliePage() {
+  const { t } = useT()
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -25,13 +27,13 @@ export default function MotDePasseOubliePage() {
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error || 'Erreur lors de l\'envoi.')
+        setError(data.error || t.common.error)
         return
       }
 
       setSent(true)
     } catch {
-      setError('Erreur serveur. Réessayez.')
+      setError(t.common.error)
     } finally {
       setLoading(false)
     }
@@ -47,7 +49,7 @@ export default function MotDePasseOubliePage() {
           </a>
           <div style={{ width: 40, height: 1, background: GOLD, opacity: 0.4, margin: '0 auto 16px' }} />
           <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: '#4a3728' }}>
-            Mot de passe oublié
+            {t.auth.forgotTitle}
           </p>
         </div>
 
@@ -55,10 +57,10 @@ export default function MotDePasseOubliePage() {
           <div style={{ background: 'white', borderRadius: 20, padding: '36px 32px', boxShadow: '0 12px 48px rgba(201,168,76,0.12)', border: `1px solid ${GOLD}22`, textAlign: 'center' }}>
             <div style={{ fontSize: 40, marginBottom: 16 }}>&#9993;</div>
             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: '#4a3728', marginBottom: 12, lineHeight: 1.6 }}>
-              Si un compte existe avec cet email, vous recevrez un lien de connexion dans quelques instants.
+              {t.auth.forgotSuccess}
             </div>
             <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: '#9ca3af', marginBottom: 24 }}>
-              Pensez à vérifier vos spams.
+              {t.auth.forgotCheckSpam}
             </p>
             <a
               href="/connexion"
@@ -69,13 +71,13 @@ export default function MotDePasseOubliePage() {
                 fontFamily: 'var(--font-playfair-display)',
               }}
             >
-              Retour à la connexion
+              {t.auth.forgotBack}
             </a>
           </div>
         ) : (
           <form onSubmit={handleSubmit} style={{ background: 'white', borderRadius: 20, padding: '36px 32px', boxShadow: '0 12px 48px rgba(201,168,76,0.12)', border: `1px solid ${GOLD}22` }}>
             <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#8a7860', marginBottom: 24, lineHeight: 1.6 }}>
-              Entrez votre adresse email et nous vous enverrons un lien magique pour vous connecter.
+              {t.auth.sendMagicLink}
             </p>
 
             {error && (
@@ -86,14 +88,14 @@ export default function MotDePasseOubliePage() {
 
             <div style={{ marginBottom: 24 }}>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#4a3728', marginBottom: 6, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                Email
+                {t.auth.email}
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
-                placeholder="votre@email.com"
+                placeholder={t.auth.emailPlaceholder}
                 style={{ width: '100%', padding: '12px 16px', borderRadius: 12, border: `1px solid ${GOLD}44`, fontSize: 15, color: '#4a3728', background: '#fefcf8', outline: 'none', boxSizing: 'border-box', fontFamily: 'Georgia, serif' }}
               />
             </div>
@@ -110,12 +112,12 @@ export default function MotDePasseOubliePage() {
                 boxShadow: `0 6px 24px ${GOLD}44`,
               }}
             >
-              {loading ? 'Envoi…' : 'Recevoir un lien de connexion'}
+              {loading ? t.auth.sending : t.auth.forgotSend}
             </button>
 
             <div style={{ textAlign: 'center', marginTop: 20 }}>
               <a href="/connexion" style={{ fontSize: 13, color: GOLD, textDecoration: 'none', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic' }}>
-                Retour à la connexion
+                {t.auth.forgotBack}
               </a>
             </div>
           </form>
