@@ -307,20 +307,26 @@ const BTN: React.CSSProperties = {
 function joinName(prenom: string, nom: string) {
   return [prenom, nom].filter(Boolean).join(' ')
 }
-function fmtGpCouple(perePrenom: string, pereNom: string, merePrenom: string, mereNom: string): string {
+function fmtGpCouple(perePrenom: string, pereNom: string, merePrenom: string, mereNom: string, titles?: { mr: string; mrs: string; mrAndMrs: string }): string {
+  const mr = titles?.mr ?? 'M.'
+  const mrs = titles?.mrs ?? 'Mme'
+  const mrAndMrs = titles?.mrAndMrs ?? 'M. & Mme'
   const hasPere = perePrenom || pereNom
   const hasMere = merePrenom || mereNom
-  if (hasPere && hasMere) return ['M. & Mme', perePrenom, pereNom || mereNom].filter(Boolean).join(' ')
-  if (hasPere) return ['M.', perePrenom, pereNom].filter(Boolean).join(' ')
-  if (hasMere) return ['Mme', merePrenom, mereNom].filter(Boolean).join(' ')
+  if (hasPere && hasMere) return [mrAndMrs, perePrenom, pereNom || mereNom].filter(Boolean).join(' ')
+  if (hasPere) return [mr, perePrenom, pereNom].filter(Boolean).join(' ')
+  if (hasMere) return [mrs, merePrenom, mereNom].filter(Boolean).join(' ')
   return ''
 }
-function fmtParentsLines(pPrenom: string, pNom: string, mPrenom: string, mNom: string): string[] {
+function fmtParentsLines(pPrenom: string, pNom: string, mPrenom: string, mNom: string, titles?: { mr: string; mrs: string; mrAndMrs: string }): string[] {
+  const mr = titles?.mr ?? 'M.'
+  const mrs = titles?.mrs ?? 'Mme'
+  const mrAndMrs = titles?.mrAndMrs ?? 'M. & Mme'
   const pFull = joinName(pPrenom, pNom)
   const mFull = joinName(mPrenom, mNom)
-  if (pFull && mFull) return ['M. & Mme ' + pFull]
-  if (pFull) return ['M. ' + pFull]
-  if (mFull) return ['Mme ' + mFull]
+  if (pFull && mFull) return [mrAndMrs + ' ' + pFull]
+  if (pFull) return [mr + ' ' + pFull]
+  if (mFull) return [mrs + ' ' + mFull]
   return []
 }
 
@@ -492,7 +498,8 @@ function renderInvitationPhrase(
   ceremony: Ceremony,
   data: FormData,
   accent: string,
-  textColor: string
+  textColor: string,
+  dict?: import('@/lib/i18n/types').FairepartDict
 ): React.ReactNode {
   const p1 = data.marie1Prenom || 'Prénom'
   const p2 = data.marie2Prenom || 'Prénom'
@@ -534,12 +541,12 @@ function renderInvitationPhrase(
       const familles = [nom1, nom2].filter(Boolean).join(' & ')
       return (
         <>
-          {familles && <div style={introStyle}>Les familles</div>}
+          {familles && <div style={introStyle}>{dict?.inviteFamilies ?? 'Les familles'}</div>}
           {familles && <div style={highlightStyle}>{familles}</div>}
           <div style={introStyle}>
-            {familles ? 'seront ravies de vous convier au' : 'Vous êtes conviés au'}
+            {familles ? (dict?.inviteWillBeDelightedToInviteYou ?? 'seront ravies de vous convier au') : (dict?.inviteYouAreInvitedTo ?? 'Vous êtes conviés au')}
           </div>
-          <div style={{ ...introStyle, margin: '0 0 4px' }}>Shabbat Hatan de</div>
+          <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteShabbatHatanOf ?? 'Shabbat Hatan de'}</div>
           <div style={highlightStyle}>{p1} &amp; {p2}</div>
         </>
       )
@@ -547,43 +554,43 @@ function renderInvitationPhrase(
     case 'Henné':
       return (
         <>
-          <div style={introStyle}>Vous êtes chaleureusement conviés à</div>
-          <div style={{ ...introStyle, margin: '0 0 4px' }}>la soirée du henné de</div>
+          <div style={introStyle}>{dict?.inviteHenneIntro ?? 'Vous êtes chaleureusement conviés à'}</div>
+          <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteHenneOf ?? 'la soirée du henné de'}</div>
           <div style={highlightStyle}>{p1} &amp; {p2}</div>
-          <div style={introStyle}>dans la tradition et la joie</div>
+          <div style={introStyle}>{dict?.inviteHenneTradition ?? 'dans la tradition et la joie'}</div>
         </>
       )
     case 'Cocktail':
       return (
         <>
-          <div style={{ ...introStyle, margin: '0 0 4px' }}>Levons notre verre avec</div>
+          <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteCocktailIntro ?? 'Levons notre verre avec'}</div>
           <div style={highlightStyle}>{p1} &amp; {p2}</div>
-          <div style={introStyle}>pour célébrer ensemble<br />le début de cette belle aventure</div>
+          <div style={introStyle}>{(dict?.inviteCocktailCelebrate ?? 'pour célébrer ensemble\nle début de cette belle aventure').split('\n').map((line, i) => <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>)}</div>
         </>
       )
     case 'Soirée':
       return (
         <>
-          <div style={{ ...introStyle, margin: '0 0 4px' }}>Dansez, riez et célébrez avec</div>
+          <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteSoireeIntro ?? 'Dansez, riez et célébrez avec'}</div>
           <div style={highlightStyle}>{p1} &amp; {p2}</div>
-          <div style={introStyle}>jusqu&apos;au bout de la nuit</div>
+          <div style={introStyle}>{dict?.inviteSoireeAllNight ?? "jusqu'au bout de la nuit"}</div>
         </>
       )
     case 'Boat Party':
       return (
         <>
-          <div style={{ ...introStyle, margin: '0 0 4px' }}>Embarquez avec</div>
+          <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteBoatPartyIntro ?? 'Embarquez avec'}</div>
           <div style={highlightStyle}>{p1} &amp; {p2}</div>
-          <div style={introStyle}>pour une soirée inoubliable,<br />entre ciel et mer</div>
+          <div style={introStyle}>{(dict?.inviteBoatPartySea ?? 'pour une soirée inoubliable,\nentre ciel et mer').split('\n').map((line, i) => <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>)}</div>
         </>
       )
     case 'Autre': {
-      const evt = ceremony.customName || 'cet événement'
+      const evt = ceremony.customName || (dict?.inviteAutreDefaultEvent ?? 'cet événement')
       return (
         <>
-          <div style={{ ...introStyle, margin: '0 0 4px' }}>Rejoignez</div>
+          <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteAutreJoin ?? 'Rejoignez'}</div>
           <div style={highlightStyle}>{p1} &amp; {p2}</div>
-          <div style={introStyle}>pour {evt}</div>
+          <div style={introStyle}>{dict?.inviteAutreFor ?? 'pour'} {evt}</div>
         </>
       )
     }
@@ -961,14 +968,14 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
 
   return (
     <div>
-      <Label>Photos de fond (optionnel — max 5)</Label>
-      <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Utilisée en fond de la section d&apos;accueil. Recadrez chaque photo individuellement.</p>
+      <Label>{t.fairepart.photoSectionTitle}</Label>
+      <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>{t.fairepart.photoSectionHelp}</p>
 
       {photos.length < 5 && (
         <label style={{ display: 'block', cursor: uploading ? 'wait' : 'pointer', marginBottom: photos.length > 0 ? 12 : 0 }}>
           <div style={{ border: '2px dashed #fecdd3', borderRadius: 10, padding: 16, textAlign: 'center', background: uploading ? '#fdf5e4' : 'white' }}>
             <div style={{ fontSize: 22, marginBottom: 4 }}>{uploading ? '⏳' : '📷'}</div>
-            <p style={{ fontSize: 13, color: '#4a3728', margin: 0 }}>{uploading ? 'Upload en cours...' : 'Cliquer pour ajouter une photo'}</p>
+            <p style={{ fontSize: 13, color: '#4a3728', margin: 0 }}>{uploading ? t.fairepart.photoUploading : t.fairepart.photoClickToAdd}</p>
           </div>
           <input type="file" accept="image/*" multiple disabled={uploading} onChange={handleUpload} style={{ display: 'none' }} />
         </label>
@@ -989,7 +996,7 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
                     <button type="button" onClick={() => handleDelete(idx)} style={{ ...BTN, position: 'absolute', top: 2, right: 2, background: 'white', border: 'none', borderRadius: '50%', width: 16, height: 16, fontSize: 9, color: '#fb7185', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
                   </div>
                   <button type="button" onClick={() => setCropIdx(isCropping ? null : idx)} style={{ ...BTN, display: 'block', width: 80, marginTop: 4, padding: '4px 0', borderRadius: 6, border: `1px solid ${isCropping ? '#C9A84C' : '#fecdd3'}`, background: isCropping ? '#fdf5e4' : 'white', color: isCropping ? '#C9A84C' : '#4a3728', fontSize: 9, fontWeight: isCropping ? 700 : 400 }}>
-                    {isCropping ? '▲ Fermer' : '✂ Recadrer'}
+                    {isCropping ? t.fairepart.photoCropClose : t.fairepart.photoCropBtn}
                   </button>
                 </div>
               )
@@ -998,7 +1005,7 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
 
           {cropIdx !== null && photos[cropIdx] && (
             <div style={{ background: '#fdf8f9', borderRadius: 12, padding: 16, marginBottom: 12, border: '1.5px solid #fecdd3' }}>
-              <div style={{ fontSize: 12, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Recadrage — Photo {cropIdx + 1}</div>
+              <div style={{ fontSize: 12, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>{t.fairepart.photoCropTitle} {cropIdx + 1}</div>
               <ImageCropper
                 src={photos[cropIdx]}
                 onPreview={crop => updateCrop(cropIdx, crop)}
@@ -1014,6 +1021,7 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
 // ── ImageCropper ───────────────────────────────────────────────────────────────
 
 function ImageCropper({ src, onCrop, onPreview }: { src: string; onCrop: (position: { x: number; y: number; scale: number }) => void; onPreview?: (position: { x: number; y: number; scale: number }) => void }) {
+  const { t } = useT()
   const [pos, setPos] = useState({ x: 0, y: 0 })
   const [scale, setScale] = useState(1)
   const [dragging, setDragging] = useState(false)
@@ -1048,7 +1056,7 @@ function ImageCropper({ src, onCrop, onPreview }: { src: string; onCrop: (positi
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <p style={{ fontSize: 12, color: '#9ca3af', marginBottom: 8 }}>🖐️ Glisse la photo pour cadrer, utilise le slider pour zoomer</p>
+      <p style={{ fontSize: 12, color: '#9ca3af', marginBottom: 8 }}>{t.fairepart.cropDragHelp}</p>
       <div style={{ width: 240, height: 320, overflow: 'hidden', border: '2px solid #C9A84C', borderRadius: 8, margin: '0 auto 12px', cursor: dragging ? 'grabbing' : 'grab', position: 'relative', userSelect: 'none' }}
         onMouseDown={handleMouseDown} onMouseMove={handleMouseMove}
         onMouseUp={() => setDragging(false)} onMouseLeave={() => setDragging(false)}
@@ -1070,11 +1078,11 @@ function ImageCropper({ src, onCrop, onPreview }: { src: string; onCrop: (positi
         <span style={{ fontSize: 11, color: '#9ca3af', minWidth: 28, textAlign: 'right' }}>{scale.toFixed(2)}x</span>
       </div>
       <div style={{ fontSize: 10, color: '#c4b5a0', marginBottom: 10 }}>
-        {scale < 0.8 ? 'Dézoom' : scale > 1.2 ? 'Zoom' : 'Normal'}
+        {scale < 0.8 ? t.fairepart.cropDezoom : scale > 1.2 ? t.fairepart.cropZoom : t.fairepart.cropNormal}
       </div>
       <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-        <button type="button" onClick={() => { setPos({ x: 0, y: 0 }); setScale(1); onPreview?.({ x: 0, y: 0, scale: 1 }) }} style={{ ...BTN, padding: '8px 16px', borderRadius: 20, border: '1px solid #C9A84C', background: 'transparent', color: '#C9A84C', fontSize: 12 }}>Réinitialiser</button>
-        <button type="button" onClick={() => onCrop({ x: pos.x, y: pos.y, scale })} style={{ ...BTN, padding: '8px 16px', borderRadius: 20, background: '#C9A84C', color: 'white', border: 'none', fontSize: 12, fontWeight: 500 }}>✓ Valider</button>
+        <button type="button" onClick={() => { setPos({ x: 0, y: 0 }); setScale(1); onPreview?.({ x: 0, y: 0, scale: 1 }) }} style={{ ...BTN, padding: '8px 16px', borderRadius: 20, border: '1px solid #C9A84C', background: 'transparent', color: '#C9A84C', fontSize: 12 }}>{t.fairepart.cropReset}</button>
+        <button type="button" onClick={() => onCrop({ x: pos.x, y: pos.y, scale })} style={{ ...BTN, padding: '8px 16px', borderRadius: 20, background: '#C9A84C', color: 'white', border: 'none', fontSize: 12, fontWeight: 500 }}>{t.fairepart.cropValidate}</button>
       </div>
     </div>
   )
@@ -1125,16 +1133,16 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
               </label>
               {c.suiviDAutre && (
                 <div style={{ marginTop: 10 }}>
-                  <Field label={t.fairepart.afterEventName} value={c.evenementSuivantNom} onChange={v => update(i, { evenementSuivantNom: v })} placeholder="ex: Cocktail, Vin d'honneur..." />
+                  <Field label={t.fairepart.afterEventName} value={c.evenementSuivantNom} onChange={v => update(i, { evenementSuivantNom: v })} placeholder={t.fairepart.afterEventPlaceholder} />
                   <Field label={t.fairepart.afterEventAddress} value={c.evenementSuivantAdresse} onChange={v => update(i, { evenementSuivantAdresse: v })} />
                 </div>
               )}
             </div>
           )}
           <div style={{ marginTop: 4 }}>
-            <Label>Note pour cet événement (optionnel)</Label>
+            <Label>{t.fairepart.eventNoteLabel}</Label>
             <textarea value={c.note} onChange={e => update(i, { note: e.target.value })}
-              placeholder="ex: Tenue de soirée exigée / Parking disponible / Entrée par la rue de..."
+              placeholder={t.fairepart.eventNotePlaceholder}
               rows={2} style={{ ...S.input, resize: 'vertical', minHeight: 56, fontFamily: 'inherit', fontSize: 13 }} />
           </div>
 
@@ -1154,7 +1162,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                 <textarea
                   value={c.transport}
                   onChange={e => update(i, { transport: e.target.value })}
-                  placeholder="ex: Un car partira de la gare de Lyon à 14h, retour prévu à 2h. Inscription auprès de Sarah au 06..."
+                  placeholder={t.fairepart.transportPlaceholder}
                   rows={3}
                   style={{ ...S.input, resize: 'vertical', minHeight: 70, fontFamily: 'inherit', fontSize: 13, marginBottom: 12 }}
                 />
@@ -1162,7 +1170,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                 <textarea
                   value={c.hebergement}
                   onChange={e => update(i, { hebergement: e.target.value })}
-                  placeholder="ex: Hôtel partenaire : Hôtel Le Domaine — code LOVIT pour -15% — réservations sur leur site..."
+                  placeholder={t.fairepart.accommodationPlaceholder}
                   rows={3}
                   style={{ ...S.input, resize: 'vertical', minHeight: 70, fontFamily: 'inherit', fontSize: 13 }}
                 />
@@ -1198,7 +1206,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                     type="text"
                     value={c.penseesDefuntsIntro}
                     onChange={e => update(i, { penseesDefuntsIntro: e.target.value })}
-                    placeholder="Ou écrivez votre propre formule..."
+                    placeholder={t.fairepart.memorialCustomPlaceholder}
                     style={{ ...S.input, marginBottom: 14, fontSize: 13 }}
                   />
 
@@ -1213,7 +1221,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                           newNoms[nomIdx] = e.target.value
                           update(i, { penseesDefuntsNoms: newNoms })
                         }}
-                        placeholder="ex: Léa Cohen, grand-mère du marié"
+                        placeholder={t.fairepart.memorialNamePlaceholder}
                         style={{ ...S.input, flex: 1, fontSize: 13 }}
                       />
                       <button
@@ -1223,7 +1231,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                           update(i, { penseesDefuntsNoms: newNoms })
                         }}
                         style={{ ...BTN, padding: '0 12px', borderRadius: 8, border: '1px solid #fecdd3', background: 'white', cursor: 'pointer', fontSize: 14 }}
-                        title="Supprimer ce nom"
+                        title={t.fairepart.memorialDeleteName}
                       >
                         🗑
                       </button>
@@ -1234,7 +1242,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                     onClick={() => update(i, { penseesDefuntsNoms: [...c.penseesDefuntsNoms, ''] })}
                     style={{ ...BTN, marginTop: 4, marginBottom: 14, padding: '8px 14px', borderRadius: 8, border: '1px dashed #C9A84C', background: 'transparent', color: '#C9A84C', cursor: 'pointer', fontSize: 12, fontWeight: 500 }}
                   >
-                    + Ajouter un nom
+                    {t.fairepart.memorialAddName}
                   </button>
 
                   <Label>{t.fairepart.memorialEnd}</Label>
@@ -1412,7 +1420,7 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
         fontSize: 13, color: accent, fontWeight: 600,
         opacity: uploading ? 0.6 : 1,
       }}>
-        <span>{uploading ? 'Upload en cours…' : t.fairepart.logoUpload}</span>
+        <span>{uploading ? t.fairepart.logoUploading : t.fairepart.logoUpload}</span>
         <input type="file" accept="image/png,image/jpg,image/jpeg" onChange={handleLogoUpload} style={{ display: 'none' }} disabled={uploading} />
       </label>
       <p style={{ fontSize: 10, color: '#9ca3af', marginTop: 8, fontStyle: 'italic', lineHeight: 1.5 }}>
@@ -1630,7 +1638,7 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       <div style={{ marginBottom: 20 }}>
         <Label>{t.fairepart.musicLabel}</Label>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-          <p style={{ fontSize: 11, color: '#9ca3af', margin: 0, flex: 1 }}>Convertissez votre chanson en MP3, puis uploadez-la ici</p>
+          <p style={{ fontSize: 11, color: '#9ca3af', margin: 0, flex: 1 }}>{t.fairepart.musicHelp}</p>
           <a href="https://yt2mp3.gs" target="_blank" rel="noopener noreferrer" style={{
             display: 'inline-flex', alignItems: 'center', gap: 5,
             padding: '7px 14px', borderRadius: 9999,
@@ -1640,7 +1648,7 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             boxShadow: '0 2px 10px #C9A84C44',
             fontFamily: 'var(--font-playfair-display)',
           }}>
-            🎵 Télécharger en MP3
+            {t.fairepart.musicDownloadMp3}
           </a>
         </div>
         <MusicUploader musicUrl={data.musicUrl ?? ''} musicName={data.musicName} onChange={(url, name) => onChange({ musicUrl: url, musicName: name ?? '' })} />
@@ -1648,8 +1656,8 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       <StyleAccueilSelector data={data} onChange={onChange} />
       <PhotoSection data={data} onChange={onChange} />
       <div style={{ marginTop: 20 }}>
-        <Label>Votre email (notifications RSVP)</Label>
-        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Recevez une notification à chaque nouvelle réponse RSVP</p>
+        <Label>{t.fairepart.emailSectionTitle}</Label>
+        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>{t.fairepart.emailSectionHelp}</p>
         <input type="email" value={data.emailMaries ?? ''} onChange={e => onChange({ emailMaries: e.target.value })} placeholder="marie@exemple.com" style={S.input} />
       </div>
     </div>
@@ -1871,25 +1879,27 @@ function ItineraireButtons({ adresse, theme, compact = false }: {
 }
 
 function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
-  const gpPa1 = fmtGpCouple(data.famille1GpPaPerePrenom, data.famille1GpPaPereNom, data.famille1GpPaMerePrenom, data.famille1GpPaMereNom)
-  const gpMa1 = fmtGpCouple(data.famille1GpMaPerePrenom, data.famille1GpMaPereNom, data.famille1GpMaMerePrenom, data.famille1GpMaMereNom)
-  const gpPa2 = fmtGpCouple(data.famille2GpPaPerePrenom, data.famille2GpPaPereNom, data.famille2GpPaMerePrenom, data.famille2GpPaMereNom)
-  const gpMa2 = fmtGpCouple(data.famille2GpMaPerePrenom, data.famille2GpMaPereNom, data.famille2GpMaMerePrenom, data.famille2GpMaMereNom)
+  const { t } = useT()
+  const titles = { mr: t.fairepart.mr, mrs: t.fairepart.mrs, mrAndMrs: t.fairepart.mrAndMrs }
+  const gpPa1 = fmtGpCouple(data.famille1GpPaPerePrenom, data.famille1GpPaPereNom, data.famille1GpPaMerePrenom, data.famille1GpPaMereNom, titles)
+  const gpMa1 = fmtGpCouple(data.famille1GpMaPerePrenom, data.famille1GpMaPereNom, data.famille1GpMaMerePrenom, data.famille1GpMaMereNom, titles)
+  const gpPa2 = fmtGpCouple(data.famille2GpPaPerePrenom, data.famille2GpPaPereNom, data.famille2GpPaMerePrenom, data.famille2GpPaMereNom, titles)
+  const gpMa2 = fmtGpCouple(data.famille2GpMaPerePrenom, data.famille2GpMaPereNom, data.famille2GpMaMerePrenom, data.famille2GpMaMereNom, titles)
   const hasGp = gpPa1 || gpMa1 || gpPa2 || gpMa2
-  const parents1 = fmtParentsLines(data.famille1PerePrenom, data.famille1PereNom, data.famille1MerePrenom, data.famille1MereNom)
-  const parents2 = fmtParentsLines(data.famille2PerePrenom, data.famille2PereNom, data.famille2MerePrenom, data.famille2MereNom)
+  const parents1 = fmtParentsLines(data.famille1PerePrenom, data.famille1PereNom, data.famille1MerePrenom, data.famille1MereNom, titles)
+  const parents2 = fmtParentsLines(data.famille2PerePrenom, data.famille2PereNom, data.famille2MerePrenom, data.famille2MereNom, titles)
   const hebrewDate = getHebrewDate(ceremony.date)
   const ov = data.textOverrides ?? {}
   const ci = cardIdx ?? 0
-  const titre = ov[`ceremony_${ci}_titre`] || (data.mariageJuif ? 'Houppa & Soirée' : 'Cérémonie religieuse & Soirée')
-  const joie = ov[`ceremony_${ci}_joie`] || (hasGp ? 'Ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'Ont la joie de vous faire part du mariage de leurs enfants')
-  const honore = ov[`ceremony_${ci}_honore`] || 'et seront honorés de votre présence à la cérémonie religieuse qui sera célébrée le'
+  const titre = ov[`ceremony_${ci}_titre`] || (data.mariageJuif ? t.fairepart.cardHouppaAndSoiree : t.fairepart.cardReligiousAndSoiree)
+  const joie = ov[`ceremony_${ci}_joie`] || (hasGp ? t.fairepart.joyMessageGp : t.fairepart.joyMessage)
+  const honore = ov[`ceremony_${ci}_honore`] || t.fairepart.cardHonore
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
     <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
-        <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>La Houppa</div>
+        <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{t.fairepart.cardLaHouppa}</div>
         <LogoOrMonogram data={data} theme={theme} />
         {data.mariageJuif && (
           <div style={{ marginBottom: 24 }}>
@@ -1934,7 +1944,7 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
         {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 18, color: theme.accent, direction: 'rtl', textAlign: 'center', marginBottom: 16 }}>{hebrewDate}</div>}
         <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 26, color: theme.accent, textAlign: 'center', marginBottom: 16, letterSpacing: 2 }}>{formatHeure(ceremony.heure)}</div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte, lineHeight: 1.6 }}>
-          {lieuDisplay && <><div>{formatLieu(lieuDisplay)}</div><div>ainsi qu'à la réception qui suivra</div></>}
+          {lieuDisplay && <><div>{formatLieu(lieuDisplay)}</div><div>{t.fairepart.cardFollowedByReception}</div></>}
           {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
         </div>
         {isShared && ceremony.adresse && (
@@ -1950,7 +1960,7 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
         {isShared && (
           <div style={{ marginTop: 28, textAlign: 'center' }}>
             <a href="https://lovit.fr" target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: theme.accent, textDecoration: 'none', opacity: 0.45, letterSpacing: 0.5 }}>
-              Créé avec ❤️ par Lov&apos;it
+              {t.fairepart.cardCreatedWith}
             </a>
           </div>
         )}
@@ -1960,6 +1970,7 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
 }
 
 function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
+  const { t } = useT()
   const isDark = !!theme.dark
   const ov = data.textOverrides ?? {}
   const ci = cardIdx ?? 0
@@ -1968,12 +1979,12 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
     <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
-        <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>La Mairie</div>
+        <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{t.fairepart.cardLaMairie}</div>
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}><MairieIllustration color={theme.accent} /></div>
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(36px, 8vw, 60px)', color: theme.accent, textAlign: 'center', marginBottom: 12, lineHeight: 1.2 }}>{data.marie1Prenom} & {data.marie2Prenom}</div>
-        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, textAlign: 'center', color: theme.texte, marginBottom: 8 }}>se diront</div>
-        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 72, color: theme.accent, textAlign: 'center', marginBottom: 20, lineHeight: 1 }}>« Oui »</div>
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, textAlign: 'center', color: theme.texte, marginBottom: 8 }}>{t.fairepart.cardSeDiront}</div>
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 72, color: theme.accent, textAlign: 'center', marginBottom: 20, lineHeight: 1 }}>{t.fairepart.cardOui}</div>
         <div style={{ fontFamily: 'var(--font-playfair-display)', fontWeight: 'bold', fontSize: 20, textAlign: 'center', color: theme.texte, marginBottom: 12 }}>{formatDateFrCap(ceremony.date)}</div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, textAlign: 'center', color: theme.texte, marginBottom: 12, lineHeight: 1.6 }}>
           <div>{lieuDisplay ? conjonctionLieu(lieuDisplay) : ''}</div>
@@ -1984,14 +1995,14 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
             <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ceremony.adresse)}`} target="_blank" rel="noopener noreferrer"
               style={{ padding: '10px 24px', borderRadius: 9999, border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, textDecoration: 'none' }}>
-              📍 Itinéraire
+              {t.fairepart.cardItineraire}
             </a>
           </div>
         )}
         {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
           <div style={{ textAlign: 'center', paddingTop: 20, borderTop: `1px solid ${theme.accent}`, lineHeight: 1.8 }}>
             <div style={{ fontFamily: 'var(--font-playfair-display)', fontWeight: 'bold', fontSize: 16, color: theme.texte }}>
-              La mairie sera suivie de {ceremony.evenementSuivantNom}
+              {t.fairepart.cardMairieFollowedBy} {ceremony.evenementSuivantNom}
             </div>
             {ceremony.evenementSuivantAdresse && (
               <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: theme.textSecondaire, marginTop: 4 }}>
@@ -2008,7 +2019,7 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
         {isShared && (
           <div style={{ marginTop: 28, textAlign: 'center' }}>
             <a href="https://lovit.fr" target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: theme.accent, textDecoration: 'none', opacity: 0.45, letterSpacing: 0.5 }}>
-              Créé avec ❤️ par Lov&apos;it
+              {t.fairepart.cardCreatedWith}
             </a>
           </div>
         )}
@@ -2018,6 +2029,7 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
 }
 
 function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
+  const { t } = useT()
   const isDark = !!theme.dark
   const ov = data.textOverrides ?? {}
   const ci = cardIdx ?? 0
@@ -2026,11 +2038,11 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
     <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
-        <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>Le Henné</div>
+        <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{t.fairepart.cardLeHenne}</div>
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ textAlign: 'center', fontSize: 24, letterSpacing: '0.5em', color: theme.accent, marginBottom: 24 }}>❋ ✿ ❀</div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte, lineHeight: 1.7, marginBottom: 28 }}>
-          Vous êtes chaleureusement invités à célébrer la soirée du henné de<br />
+          {t.fairepart.cardHenneInvite}<br />
           <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 36, color: theme.accent }}>{data.marie1Prenom} & {data.marie2Prenom}</span>
         </div>
         <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, color: theme.accent, textAlign: 'center', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 12 }}>{formatDateFr(ceremony.date)}</div>
@@ -2052,7 +2064,7 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
         {isShared && (
           <div style={{ marginTop: 28, textAlign: 'center' }}>
             <a href="https://lovit.fr" target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: theme.accent, textDecoration: 'none', opacity: 0.45, letterSpacing: 0.5 }}>
-              Créé avec ❤️ par Lov&apos;it
+              {t.fairepart.cardCreatedWith}
             </a>
           </div>
         )}
@@ -2062,7 +2074,8 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
 }
 
 function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
-  const name = ceremony.type === 'Autre' ? (ceremony.customName || 'Événement') : ceremony.type
+  const { t } = useT()
+  const name = ceremony.type === 'Autre' ? (ceremony.customName || t.fairepart.cardAutreDefaultEvent) : ceremony.type
   const isDark = !!theme.dark
   const ov = data.textOverrides ?? {}
   const ci = cardIdx ?? 0
@@ -2075,7 +2088,7 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{titreDisplay}</div>
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte, lineHeight: 1.7, marginBottom: 28 }}>
-          Rejoignez <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: theme.accent }}>{data.marie1Prenom} & {data.marie2Prenom}</span> pour {titreDisplay.toLowerCase()}
+          {t.fairepart.cardAutreJoin} <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: theme.accent }}>{data.marie1Prenom} & {data.marie2Prenom}</span> {t.fairepart.cardAutreFor} {titreDisplay.toLowerCase()}
         </div>
         <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, color: theme.accent, textAlign: 'center', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 12 }}>{formatDateFr(ceremony.date)}</div>
         <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 24, color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{formatHeure(ceremony.heure)}</div>
@@ -2096,7 +2109,7 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
         {isShared && (
           <div style={{ marginTop: 28, textAlign: 'center' }}>
             <a href="https://lovit.fr" target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: theme.accent, textDecoration: 'none', opacity: 0.45, letterSpacing: 0.5 }}>
-              Créé avec ❤️ par Lov&apos;it
+              {t.fairepart.cardCreatedWith}
             </a>
           </div>
         )}
@@ -2106,22 +2119,24 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
 }
 
 function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
+  const { t } = useT()
+  const titles = { mr: t.fairepart.mr, mrs: t.fairepart.mrs, mrAndMrs: t.fairepart.mrAndMrs }
   const ci = cardIdx ?? 0
   const ov = data.textOverrides ?? {}
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
-  const gpPa1 = fmtGpCouple(data.famille1GpPaPerePrenom, data.famille1GpPaPereNom, data.famille1GpPaMerePrenom, data.famille1GpPaMereNom)
-  const gpMa1 = fmtGpCouple(data.famille1GpMaPerePrenom, data.famille1GpMaPereNom, data.famille1GpMaMerePrenom, data.famille1GpMaMereNom)
-  const gpPa2 = fmtGpCouple(data.famille2GpPaPerePrenom, data.famille2GpPaPereNom, data.famille2GpPaMerePrenom, data.famille2GpPaMereNom)
-  const gpMa2 = fmtGpCouple(data.famille2GpMaPerePrenom, data.famille2GpMaPereNom, data.famille2GpMaMerePrenom, data.famille2GpMaMereNom)
+  const gpPa1 = fmtGpCouple(data.famille1GpPaPerePrenom, data.famille1GpPaPereNom, data.famille1GpPaMerePrenom, data.famille1GpPaMereNom, titles)
+  const gpMa1 = fmtGpCouple(data.famille1GpMaPerePrenom, data.famille1GpMaPereNom, data.famille1GpMaMerePrenom, data.famille1GpMaMereNom, titles)
+  const gpPa2 = fmtGpCouple(data.famille2GpPaPerePrenom, data.famille2GpPaPereNom, data.famille2GpPaMerePrenom, data.famille2GpPaMereNom, titles)
+  const gpMa2 = fmtGpCouple(data.famille2GpMaPerePrenom, data.famille2GpMaPereNom, data.famille2GpMaMerePrenom, data.famille2GpMaMereNom, titles)
   const hasGp = gpPa1 || gpMa1 || gpPa2 || gpMa2
-  const parents1 = fmtParentsLines(data.famille1PerePrenom, data.famille1PereNom, data.famille1MerePrenom, data.famille1MereNom)
-  const parents2 = fmtParentsLines(data.famille2PerePrenom, data.famille2PereNom, data.famille2MerePrenom, data.famille2MereNom)
-  const joie = ov[`ceremony_${ci}_joie`] || (hasGp ? 'Ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'Ont la joie de vous faire part du mariage de leurs enfants')
+  const parents1 = fmtParentsLines(data.famille1PerePrenom, data.famille1PereNom, data.famille1MerePrenom, data.famille1MereNom, titles)
+  const parents2 = fmtParentsLines(data.famille2PerePrenom, data.famille2PereNom, data.famille2MerePrenom, data.famille2MereNom, titles)
+  const joie = ov[`ceremony_${ci}_joie`] || (hasGp ? t.fairepart.joyMessageGp : t.fairepart.joyMessage)
   return (
     <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
-        <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>Shabbat Hatan</div>
+        <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{t.fairepart.cardShabbatHatan}</div>
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ textAlign: 'center', fontSize: 22, letterSpacing: '0.4em', color: theme.accent, marginBottom: 24 }}>✡ ✦ ✡</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, marginBottom: 24, alignItems: 'start' }}>
@@ -2170,7 +2185,7 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
         {isShared && (
           <div style={{ marginTop: 28, textAlign: 'center' }}>
             <a href="https://lovit.fr" target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: theme.accent, textDecoration: 'none', opacity: 0.45, letterSpacing: 0.5 }}>
-              Créé avec ❤️ par Lov&apos;it
+              {t.fairepart.cardCreatedWith}
             </a>
           </div>
         )}
@@ -2471,7 +2486,7 @@ interface RSVPEntry {
 
 function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: { accent: string; onClose: () => void; mariee1: string; mariee2: string; shareId: string | null; ceremonies: Ceremony[] }) {
   const { t } = useT()
-  const getCeremonyName = (c: Ceremony) => c.type === 'Autre' ? (c.customName || 'Événement') : c.type
+  const getCeremonyName = (c: Ceremony) => c.type === 'Autre' ? (c.customName || t.fairepart.cardAutreDefaultEvent) : c.type
 
   // 🔒 Détection si déjà répondu (localStorage)
   const storageKey = shareId ? `lovit_rsvp_sent_${shareId}` : null
@@ -2553,20 +2568,20 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
           <button onClick={onClose} style={{ ...BTN, position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 20, color: '#9ca3af' }}>✕</button>
           <div style={{ fontSize: 48, marginBottom: 16 }}>✓</div>
           <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 24, color: accent, marginBottom: 16 }}>
-            Merci !
+            {t.fairepart.rsvpThankYou}
           </div>
           <p style={{ fontSize: 15, color: '#4a3728', lineHeight: 1.7, marginBottom: 8 }}>
-            Vous avez déjà répondu à cette invitation.
+            {t.fairepart.rsvpAlreadyRespondedMsg}
           </p>
           <p style={{ fontSize: 14, color: '#9ca3af', lineHeight: 1.6, marginBottom: 28 }}>
-            Les mariés ont bien reçu votre réponse 💕
+            {t.fairepart.rsvpCoupleReceivedResponse}
           </p>
           <button onClick={onClose} style={{ ...BTN, padding: '12px 32px', borderRadius: 9999, background: accent, color: 'white', border: 'none', fontSize: 14, fontWeight: 600, marginBottom: 20 }}>
-            Fermer
+            {t.fairepart.rsvpClose}
           </button>
           <div style={{ borderTop: '1px solid #fce7f3', paddingTop: 16 }}>
             <button onClick={() => setForceReopen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#9ca3af', textDecoration: 'underline' }}>
-              Ce n&apos;est pas moi — répondre en tant qu&apos;autre personne
+              {t.fairepart.rsvpNotMeBtn}
             </button>
           </div>
         </div>
@@ -2581,12 +2596,12 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
         <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: 48, width: '100%', maxWidth: 420, textAlign: 'center', boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
           <div style={{ fontSize: 52, marginBottom: 16 }}>🎉</div>
           <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: accent, marginBottom: 12 }}>
-            Merci {nom.split(' ')[0]} !
+            {t.fairepart.rsvpThankYouName.replace('{name}', nom.split(' ')[0])}
           </div>
           <p style={{ fontSize: 15, color: '#6a5040', lineHeight: 1.7 }}>
             {t.fairepart.rsvpSent}
           </p>
-          <button onClick={onClose} style={{ ...BTN, marginTop: 24, padding: '12px 32px', borderRadius: 9999, background: accent, color: 'white', border: 'none', fontSize: 14, fontWeight: 600 }}>Fermer</button>
+          <button onClick={onClose} style={{ ...BTN, marginTop: 24, padding: '12px 32px', borderRadius: 9999, background: accent, color: 'white', border: 'none', fontSize: 14, fontWeight: 600 }}>{t.fairepart.rsvpClose}</button>
         </div>
       </div>
     )
@@ -2731,7 +2746,7 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
       .catch(() => {})
   }, [shareId])
 
-  const getCeremonyName = (c: Ceremony) => c.type === 'Autre' ? (c.customName || 'Événement') : c.type
+  const getCeremonyName = (c: Ceremony) => c.type === 'Autre' ? (c.customName || t.fairepart.cardAutreDefaultEvent) : c.type
 
   const totalPresents = entries.reduce((s, e) => s + (e.reponses?.some(r => r.present) ? 1 : 0), 0)
   const totalPersonnes = entries.reduce((s, e) => s + (e.reponses?.filter(r => r.present).reduce((a, r) => a + (r.nbPersonnes || 0), 0) || 0), 0)
@@ -2956,6 +2971,7 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
 // ── Music Upload (Cloudinary) ──────────────────────────────────────────────────
 
 function MusicUploader({ musicUrl, musicName, onChange }: { musicUrl: string; musicName?: string; onChange: (url: string, name?: string) => void }) {
+  const { t } = useT()
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
 
@@ -2971,10 +2987,10 @@ function MusicUploader({ musicUrl, musicName, onChange }: { musicUrl: string; mu
       if (json.secure_url) {
         onChange(json.secure_url, file.name)
       } else {
-        setError("Erreur upload : " + (json.error?.message ?? 'inconnu'))
+        setError(t.fairepart.musicUploadError + " : " + (json.error?.message ?? 'inconnu'))
       }
     } catch (e) {
-      setError("Erreur réseau : " + (e instanceof Error ? e.message : String(e)))
+      setError(t.fairepart.musicNetworkError + " : " + (e instanceof Error ? e.message : String(e)))
     } finally {
       setUploading(false)
     }
@@ -2984,8 +3000,8 @@ function MusicUploader({ musicUrl, musicName, onChange }: { musicUrl: string; mu
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', border: '1px solid #C9A84C44', borderRadius: 10, background: '#fdf5e4' }}>
         <span style={{ fontSize: 18 }}>🎵</span>
-        <span style={{ flex: 1, fontSize: 12, color: '#4a3728', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{musicName || 'Musique uploadée'}</span>
-        <button type="button" onClick={() => onChange('')} style={{ ...BTN, background: 'none', border: 'none', color: '#fb7185', fontSize: 13 }}>✕ Supprimer</button>
+        <span style={{ flex: 1, fontSize: 12, color: '#4a3728', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{musicName || t.fairepart.musicUploaded}</span>
+        <button type="button" onClick={() => onChange('')} style={{ ...BTN, background: 'none', border: 'none', color: '#fb7185', fontSize: 13 }}>{t.fairepart.musicDelete}</button>
       </div>
     )
   }
@@ -2995,8 +3011,8 @@ function MusicUploader({ musicUrl, musicName, onChange }: { musicUrl: string; mu
       <label style={{ display: 'block', cursor: uploading ? 'wait' : 'pointer' }}>
         <div style={{ border: '2px dashed #C9A84C66', borderRadius: 10, padding: 20, textAlign: 'center', background: uploading ? '#fdf5e4' : 'white' }}>
           <div style={{ fontSize: 24, marginBottom: 6 }}>{uploading ? '⏳' : '🎵'}</div>
-          <p style={{ fontSize: 13, color: '#4a3728', margin: 0 }}>{uploading ? 'Upload en cours…' : 'Cliquer pour uploader un fichier MP3'}</p>
-          <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>Format MP3, max 10 Mo</p>
+          <p style={{ fontSize: 13, color: '#4a3728', margin: 0 }}>{uploading ? t.fairepart.musicUploadInProgress : t.fairepart.musicClickToUpload}</p>
+          <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>{t.fairepart.musicFormatHelp}</p>
         </div>
         <input type="file" accept="audio/mp3,audio/mpeg,audio/*" disabled={uploading} onChange={e => { const f = e.target.files?.[0]; if (f) upload(f); e.target.value = '' }} style={{ display: 'none' }} />
       </label>
@@ -3259,31 +3275,33 @@ function CopyLinkRow({ label, url, accent }: { label: string; url: string; accen
       <div style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>{label}</div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <input readOnly value={url} onFocus={e => e.target.select()} style={{ flex: 1, fontSize: 11, color: '#4a3728', background: '#fdf8f9', border: `1px solid ${accent}33`, borderRadius: 6, padding: '8px 10px', outline: 'none' }} />
-        <button onClick={copy} style={{ ...BTN, padding: '8px 14px', borderRadius: 6, background: copied ? '#22c55e' : accent, color: 'white', border: 'none', fontSize: 12, whiteSpace: 'nowrap', transition: 'background 0.2s' }}>{copied ? `✓ ${t.fairepart.shareCopied}` : 'Copier'}</button>
+        <button onClick={copy} style={{ ...BTN, padding: '8px 14px', borderRadius: 6, background: copied ? '#22c55e' : accent, color: 'white', border: 'none', fontSize: 12, whiteSpace: 'nowrap', transition: 'background 0.2s' }}>{copied ? `✓ ${t.fairepart.shareCopied}` : t.fairepart.shareCopyBtn}</button>
       </div>
     </div>
   )
 }
 
-function shortDateFr(dateStr: string): string {
+function shortDateLocale(dateStr: string, locale: string): string {
   if (!dateStr) return ''
   const d = new Date(dateStr + 'T12:00:00')
   const day = d.getDate()
-  const month = new Intl.DateTimeFormat('fr-FR', { month: 'long' }).format(d)
+  const loc = locale === 'en' ? 'en-US' : 'fr-FR'
+  const month = new Intl.DateTimeFormat(loc, { month: 'long' }).format(d)
   const year = d.getFullYear()
+  if (locale === 'en') return `${month} ${day}, ${year}`
   return `${day === 1 ? '1er' : day} ${month} ${year}`
 }
 
-function buildWhatsAppMessage(data: FormData, guestUrl: string): string {
+function buildWhatsAppMessage(data: FormData, guestUrl: string, dict: import('@/lib/i18n/types').FairepartDict, locale: string): string {
   const sorted = sortByDate(data.ceremonies).filter(c => c.date)
   let datesStr = ''
   if (sorted.length === 0) {
-    datesStr = 'prochainement'
+    datesStr = dict.whatsappSoon
   } else if (sorted.length === 1) {
-    datesStr = `le ${shortDateFr(sorted[0].date)}`
+    datesStr = `${dict.whatsappOn} ${shortDateLocale(sorted[0].date, locale)}`
   } else {
-    const parts = sorted.map(c => shortDateFr(c.date))
-    datesStr = `les ${parts.slice(0, -1).join(', ')} et ${parts[parts.length - 1]}`
+    const parts = sorted.map(c => shortDateLocale(c.date, locale))
+    datesStr = `${dict.whatsappOnDates} ${parts.slice(0, -1).join(', ')} ${dict.whatsappAnd} ${parts[parts.length - 1]}`
   }
   const firstLieu = sorted[0]?.lieu || data.ceremonies[0]?.lieu || ''
   const ville = firstLieu.trim().split(/\s+/).pop() || ''
@@ -3292,22 +3310,22 @@ function buildWhatsAppMessage(data: FormData, guestUrl: string): string {
   if (firstDate) {
     const d = new Date(firstDate + 'T12:00:00')
     d.setDate(d.getDate() - 30)
-    dateLimite = shortDateFr(d.toISOString().split('T')[0])
+    dateLimite = shortDateLocale(d.toISOString().split('T')[0], locale)
   }
-  const p1 = data.marie1Prenom || 'Prénom 1'
-  const p2 = data.marie2Prenom || 'Prénom 2'
-  return `Chères Familles, Chers Amis,
+  const p1 = data.marie1Prenom || dict.whatsappDefaultName1
+  const p2 = data.marie2Prenom || dict.whatsappDefaultName2
+  return `${dict.whatsappDearFriends}
 
-Nous sommes heureux de vous convier à notre mariage qui se tiendra ${datesStr}.
+${dict.whatsappInviteText} ${datesStr}.
 
-Nous serions ravis de vous compter parmi nous pour célébrer cet événement si précieux de notre vie.
+${dict.whatsappCelebrateText}
 
-Retrouvez votre invitation ici :
+${dict.whatsappFindInvitation}
 ${guestUrl}
 
-Merci de bien vouloir nous confirmer votre présence via le bouton RSVP.
+${dict.whatsappConfirmPresence}
 
-À très bientôt,
+${dict.whatsappSeeYouSoon}
 ${p1} & ${p2} 💍`
 }
 
@@ -3325,21 +3343,21 @@ function CopyTextRow({ text, accent }: { text: string; accent: string }) {
   }
   return (
     <button onClick={copy} style={{ ...BTN, padding: '10px 20px', borderRadius: 8, background: copied ? '#22c55e' : accent, color: 'white', border: 'none', fontSize: 13, fontWeight: 600 }}>
-      {copied ? `✓ ${t.fairepart.shareCopied}` : 'Copier le message'}
+      {copied ? `✓ ${t.fairepart.shareCopied}` : t.fairepart.shareCopyMsg}
     </button>
   )
 }
 
 function ShareModal({ accent, guestUrl, coupleUrl, onClose, data }: { accent: string; guestUrl: string; coupleUrl: string; onClose: () => void; data: FormData }) {
-  const { t } = useT()
-  const [message, setMessage] = useState(() => buildWhatsAppMessage(data, guestUrl))
+  const { t, locale } = useT()
+  const [message, setMessage] = useState(() => buildWhatsAppMessage(data, guestUrl, t.fairepart, locale))
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)' }} />
       <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: 40, width: '100%', maxWidth: 520, boxShadow: '0 24px 64px rgba(0,0,0,0.25)', maxHeight: '90vh', overflowY: 'auto' }}>
         <button onClick={onClose} style={{ ...BTN, position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 22, color: '#9ca3af', lineHeight: 1 }}>✕</button>
 
-        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: accent, textAlign: 'center', marginBottom: 28 }}>Votre faire-part est prêt ! ✨</div>
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: accent, textAlign: 'center', marginBottom: 28 }}>{t.fairepart.shareReadyTitle}</div>
 
         {/* Section 1 — Lien invités */}
         <div style={{ marginBottom: 24 }}>
@@ -3348,22 +3366,22 @@ function ShareModal({ accent, guestUrl, coupleUrl, onClose, data }: { accent: st
           <a href={`https://wa.me/?text=${encodeURIComponent(guestUrl)}`} target="_blank" rel="noopener noreferrer"
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '11px 20px', borderRadius: 9, background: '#25D366', color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 600, marginTop: 4 }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.855L0 24l6.335-1.51A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.37l-.36-.213-3.727.888.925-3.63-.234-.374A9.778 9.778 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182c5.42 0 9.818 4.398 9.818 9.818 0 5.42-4.398 9.818-9.818 9.818z"/></svg>
-            Partager sur WhatsApp
+            {t.fairepart.shareOnWhatsApp}
           </a>
         </div>
 
         {/* Section 2 — Message pré-écrit */}
         <div style={{ marginBottom: 24 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Message pré-écrit</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>{t.fairepart.sharePreWrittenMsg}</div>
           <textarea value={message} onChange={e => setMessage(e.target.value)} rows={12}
             style={{ width: '100%', padding: '12px 14px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 13, color: '#374151', lineHeight: 1.7, resize: 'vertical', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
-          <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 12 }}>Vous pouvez personnaliser ce message</div>
+          <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 12 }}>{t.fairepart.shareCustomizeMsg}</div>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <CopyTextRow text={message} accent={accent} />
             <a href={`https://wa.me/?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer"
               style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', borderRadius: 8, background: '#25D366', color: 'white', textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.855L0 24l6.335-1.51A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.37l-.36-.213-3.727.888.925-3.63-.234-.374A9.778 9.778 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182c5.42 0 9.818 4.398 9.818 9.818 0 5.42-4.398 9.818-9.818 9.818z"/></svg>
-              Envoyer sur WhatsApp
+              {t.fairepart.shareSendOnWhatsApp}
             </a>
           </div>
         </div>
@@ -3371,7 +3389,7 @@ function ShareModal({ accent, guestUrl, coupleUrl, onClose, data }: { accent: st
         {/* Section 3 — Lien mariés */}
         <div style={{ padding: '16px 18px', background: '#f0fdf4', borderRadius: 12 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>{t.fairepart.shareCoupleLink}</div>
-          <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 12 }}>Gardez ce lien pour accéder à vos RSVP</div>
+          <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 12 }}>{t.fairepart.shareKeepLink}</div>
           <CopyLinkRow label="" url={coupleUrl} accent="#22c55e" />
         </div>
       </div>
@@ -3425,40 +3443,40 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
     <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
       <div style={{ background: 'white', width: '100%', maxWidth: 640, borderRadius: '16px 16px 0 0', maxHeight: '88vh', overflowY: 'auto', padding: '24px 24px 40px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <h2 style={{ margin: 0, fontFamily: 'var(--font-playfair-display)', fontSize: 20, color: theme.texte }}>Personnalisation</h2>
+          <h2 style={{ margin: 0, fontFamily: 'var(--font-playfair-display)', fontSize: 20, color: theme.texte }}>{t.fairepart.zoneStyleLabel}</h2>
           <button type="button" onClick={onClose} style={{ ...BTN, background: 'none', border: 'none', fontSize: 22, color: '#9ca3af', padding: 0 }}>✕</button>
         </div>
 
         {/* Tabs */}
         <div style={{ display: 'flex', gap: 4, marginBottom: 24, padding: 4, background: '#fdf5e4', borderRadius: 10 }}>
-          <button type="button" onClick={() => setTab('texte')} style={tabBtn(tab === 'texte')}>✏️ Texte</button>
-          <button type="button" onClick={() => setTab('style')} style={tabBtn(tab === 'style')}>🎨 Style</button>
+          <button type="button" onClick={() => setTab('texte')} style={tabBtn(tab === 'texte')}>{`✏️ ${t.fairepart.textEditTabText}`}</button>
+          <button type="button" onClick={() => setTab('style')} style={tabBtn(tab === 'style')}>{`🎨 ${t.fairepart.textEditTabStyle}`}</button>
         </div>
 
         {/* TAB TEXTE */}
         {tab === 'texte' && (
           <div>
             {ceremonies.map((c, i) => {
-              const name = c.type === 'Autre' ? (c.customName || 'Événement') : c.type
+              const name = c.type === 'Autre' ? (c.customName || t.fairepart.cardAutreDefaultEvent) : c.type
               return (
                 <div key={i} style={{ marginBottom: 24, paddingBottom: 20, borderBottom: i < ceremonies.length - 1 ? `1px solid ${theme.accent}33` : 'none' }}>
                   <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: theme.accent, marginBottom: 12 }}>{name}</div>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Titre</label>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>{t.fairepart.textEditTitreLabel}</label>
                   <input value={localText[`ceremony_${i}_titre`] ?? ''} onChange={e => setText(`ceremony_${i}_titre`, e.target.value)} placeholder={name}
                     style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box', marginBottom: 12 }} />
                   {c.type === 'Cérémonie religieuse / Houppa' && (
                     <>
-                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>« Ont la joie de... »</label>
-                      <textarea value={localText[`ceremony_${i}_joie`] ?? ''} onChange={e => setText(`ceremony_${i}_joie`, e.target.value)} placeholder="Ont la joie de vous faire part du mariage de leurs enfants"
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>{t.fairepart.textEditJoyLabel}</label>
+                      <textarea value={localText[`ceremony_${i}_joie`] ?? ''} onChange={e => setText(`ceremony_${i}_joie`, e.target.value)} placeholder={t.fairepart.textEditJoyPlaceholder}
                         style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 56, marginBottom: 12 }} />
-                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>« Et seraient honorés de votre présence »</label>
-                      <textarea value={localText[`ceremony_${i}_honore`] ?? ''} onChange={e => setText(`ceremony_${i}_honore`, e.target.value)} placeholder="Et seraient honorés de votre présence"
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>{t.fairepart.textEditHonoreLabel}</label>
+                      <textarea value={localText[`ceremony_${i}_honore`] ?? ''} onChange={e => setText(`ceremony_${i}_honore`, e.target.value)} placeholder={t.fairepart.textEditHonorePlaceholder}
                         style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 56, marginBottom: 12 }} />
                     </>
                   )}
                   {c.type !== 'Mairie' && c.type !== 'Cérémonie religieuse / Houppa' && (
                     <>
-                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Phrase d&apos;invitation</label>
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>{t.fairepart.textEditInvitationLabel}</label>
                       <textarea
                         value={localText[`ceremony_${i}_invitation`] ?? ''}
                         onChange={e => setText(`ceremony_${i}_invitation`, e.target.value)}
@@ -3466,11 +3484,11 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
                         style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 70, marginBottom: 12 }}
                       />
                       <p style={{ fontSize: 11, color: '#9ca3af', fontStyle: 'italic', marginTop: -6, marginBottom: 12 }}>
-                        Laissez vide pour utiliser le texte par défaut adapté à ce type d&apos;événement.
+                        {t.fairepart.textEditInvitationHelp}
                       </p>
                     </>
                   )}
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Lieu</label>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>{t.fairepart.textEditLieuLabel}</label>
                   <input value={localText[`ceremony_${i}_lieu`] ?? ''} onChange={e => setText(`ceremony_${i}_lieu`, e.target.value)} placeholder={c.lieu || t.fairepart.placeholderVenueName}
                     style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box' }} />
                 </div>
@@ -3483,7 +3501,7 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
         {tab === 'style' && (
           <div>
             <p style={{ fontSize: 12, color: '#6a5040', marginBottom: 20, lineHeight: 1.6, background: '#fdf5e4', padding: 12, borderRadius: 8 }}>
-              💡 Personnalisez chaque zone de votre faire-part. Les changements s&apos;appliquent à toutes les cérémonies.
+              {`💡 ${t.fairepart.textEditStyleSub}`}
             </p>
 
             {TEXT_ZONES.map(zone => {
@@ -3491,20 +3509,20 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
               return (
                 <div key={zone} style={{ marginBottom: 20, padding: 16, border: `1.5px solid ${theme.accent}33`, borderRadius: 12, background: '#fdf8f9' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                    <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: theme.accent, fontWeight: 600 }}>{ZONE_LABELS[zone]}</div>
-                    <button type="button" onClick={() => resetZone(zone)} style={{ ...BTN, background: 'none', border: 'none', color: '#9ca3af', fontSize: 11, textDecoration: 'underline' }}>Réinitialiser</button>
+                    <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: theme.accent, fontWeight: 600 }}>{t.fairepart.zones[zone] ?? zone}</div>
+                    <button type="button" onClick={() => resetZone(zone)} style={{ ...BTN, background: 'none', border: 'none', color: '#9ca3af', fontSize: 11, textDecoration: 'underline' }}>{t.fairepart.cropReset}</button>
                   </div>
 
                   {/* Police */}
-                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Police</label>
+                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>{t.fairepart.zoneFont}</label>
                   <select value={z.fontFamily ?? ''} onChange={e => setZoneStyle(zone, { fontFamily: e.target.value })}
                     style={{ width: '100%', padding: '8px 10px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 13, background: 'white', marginBottom: 12, color: '#4a3728' }}>
-                    <option value="">Par défaut (thème)</option>
+                    <option value="">{t.fairepart.zoneFontDefault}</option>
                     {FONT_OPTIONS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
                   </select>
 
                   {/* Couleur */}
-                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Couleur</label>
+                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>{t.fairepart.zoneColor}</label>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
                     {localizedColors.map(c => {
                       const sel = (z.color ?? '') === c.value
@@ -3525,9 +3543,9 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
                   </div>
 
                   {/* Taille */}
-                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Taille</label>
+                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>{t.fairepart.zoneSize}</label>
                   <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
-                    {[{ v: 0.8, l: 'Petit' }, { v: 1, l: 'Normal' }, { v: 1.2, l: 'Grand' }].map(opt => {
+                    {[{ v: 0.8, l: t.fairepart.zoneSizeSmall }, { v: 1, l: t.fairepart.zoneSizeNormal }, { v: 1.2, l: t.fairepart.zoneSizeLarge }].map(opt => {
                       const sel = (z.sizeScale ?? 1) === opt.v
                       return (
                         <button key={opt.v} type="button" onClick={() => setZoneStyle(zone, { sizeScale: opt.v })} style={{
@@ -3547,13 +3565,13 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
                       border: `2px solid ${z.bold ? theme.accent : '#fecdd3'}`,
                       background: z.bold ? `${theme.accent}18` : 'white',
                       color: z.bold ? theme.accent : '#4a3728',
-                    }}>𝐁 Gras</button>
+                    }}>{`𝐁 ${t.fairepart.zoneBold}`}</button>
                     <button type="button" onClick={() => setZoneStyle(zone, { italic: !z.italic })} style={{
                       ...BTN, flex: 1, padding: '8px', borderRadius: 8, fontSize: 13, fontStyle: 'italic',
                       border: `2px solid ${z.italic ? theme.accent : '#fecdd3'}`,
                       background: z.italic ? `${theme.accent}18` : 'white',
                       color: z.italic ? theme.accent : '#4a3728',
-                    }}>𝐼 Italique</button>
+                    }}>{`𝐼 ${t.fairepart.zoneItalic}`}</button>
                   </div>
                 </div>
               )
@@ -3563,7 +3581,7 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
 
         <button type="button" onClick={() => { onApply(localText); onApplyStyles(localStyles); onClose() }}
           style={{ ...BTN, width: '100%', padding: '14px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 15, fontWeight: 700, letterSpacing: 1, marginTop: 8 }}>
-          ✓ Appliquer
+          {`✓ ${t.fairepart.textEditApply}`}
         </button>
       </div>
     </div>
@@ -4373,12 +4391,13 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
   const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
   const monoColor = data.monogrammeColor || G
-  const parents1 = fmtParentsLines(data.famille1PerePrenom, data.famille1PereNom, data.famille1MerePrenom, data.famille1MereNom)
-  const parents2 = fmtParentsLines(data.famille2PerePrenom, data.famille2PereNom, data.famille2MerePrenom, data.famille2MereNom)
-  const gpPa1 = fmtGpCouple(data.famille1GpPaPerePrenom, data.famille1GpPaPereNom, data.famille1GpPaMerePrenom, data.famille1GpPaMereNom)
-  const gpMa1 = fmtGpCouple(data.famille1GpMaPerePrenom, data.famille1GpMaPereNom, data.famille1GpMaMerePrenom, data.famille1GpMaMereNom)
-  const gpPa2 = fmtGpCouple(data.famille2GpPaPerePrenom, data.famille2GpPaPereNom, data.famille2GpPaMerePrenom, data.famille2GpPaMereNom)
-  const gpMa2 = fmtGpCouple(data.famille2GpMaPerePrenom, data.famille2GpMaPereNom, data.famille2GpMaMerePrenom, data.famille2GpMaMereNom)
+  const titles = { mr: t.fairepart.mr, mrs: t.fairepart.mrs, mrAndMrs: t.fairepart.mrAndMrs }
+  const parents1 = fmtParentsLines(data.famille1PerePrenom, data.famille1PereNom, data.famille1MerePrenom, data.famille1MereNom, titles)
+  const parents2 = fmtParentsLines(data.famille2PerePrenom, data.famille2PereNom, data.famille2MerePrenom, data.famille2MereNom, titles)
+  const gpPa1 = fmtGpCouple(data.famille1GpPaPerePrenom, data.famille1GpPaPereNom, data.famille1GpPaMerePrenom, data.famille1GpPaMereNom, titles)
+  const gpMa1 = fmtGpCouple(data.famille1GpMaPerePrenom, data.famille1GpMaPereNom, data.famille1GpMaMerePrenom, data.famille1GpMaMereNom, titles)
+  const gpPa2 = fmtGpCouple(data.famille2GpPaPerePrenom, data.famille2GpPaPereNom, data.famille2GpPaMerePrenom, data.famille2GpPaMereNom, titles)
+  const gpMa2 = fmtGpCouple(data.famille2GpMaPerePrenom, data.famille2GpMaPereNom, data.famille2GpMaMerePrenom, data.famille2GpMaMereNom, titles)
   const hasGp = !!(gpPa1 || gpMa1 || gpPa2 || gpMa2)
   // Date affichée sur la page d'accueil : priorité à l'override manuel, 
 // sinon la cérémonie religieuse/Houppa, sinon la première date
@@ -4682,11 +4701,11 @@ const firstDate = sorted[0]?.date
                       {/* Phrase narrative selon le type */}
                       {ceremony.type === 'Mairie' ? (
                         <>
-                          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78 }}>se diront</div>
-                          <div style={{ fontFamily: FS, fontSize: 'clamp(48px,12vw,80px)', color: G, textAlign: 'center', lineHeight: 1, marginBottom: 28 }}>« Oui »</div>
+                          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78 }}>{t.fairepart.cardSeDiront}</div>
+                          <div style={{ fontFamily: FS, fontSize: 'clamp(48px,12vw,80px)', color: G, textAlign: 'center', lineHeight: 1, marginBottom: 28 }}>{t.fairepart.cardOui}</div>
                         </>
                       ) : ceremony.type === 'Cérémonie religieuse / Houppa' ? (
-                        <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginBottom: 28, opacity: 0.78 }, 'narratif', data.zoneStyles)}>{ov[`ceremony_${i}_honore`] || 'Et seraient honorés de votre présence'}</div>
+                        <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginBottom: 28, opacity: 0.78 }, 'narratif', data.zoneStyles)}>{ov[`ceremony_${i}_honore`] || t.fairepart.cardHonore}</div>
                       ) : (
                         // Pour tous les autres types : phrase mise en page avec NOMS en valeur
                         <div style={{ marginBottom: 28 }}>
@@ -4698,7 +4717,7 @@ const firstDate = sorted[0]?.date
                           ) : (
                             // Sinon → mise en page élégante avec NOMS en valeur
                             <div style={applyZoneStyle({ padding: '0 8px' }, 'narratif', data.zoneStyles)}>
-                              {renderInvitationPhrase(ceremony, data, G, TEXT)}
+                              {renderInvitationPhrase(ceremony, data, G, TEXT, t.fairepart)}
                             </div>
                           )}
                         </div>
@@ -4735,7 +4754,7 @@ const firstDate = sorted[0]?.date
                       {ceremony.adresse && <div style={{ fontFamily: FC, fontSize: 13, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.6, marginBottom: 20 }}>{ceremony.adresse}</div>}
                       {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
                         <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, textAlign: 'center', marginBottom: 16, borderTop: `1px solid ${G}22`, paddingTop: 14 }}>
-                          <div style={{ fontWeight: 700 }}>La cérémonie sera suivie de {ceremony.evenementSuivantNom}</div>
+                          <div style={{ fontWeight: 700 }}>{t.fairepart.eventFollowedBy} {ceremony.evenementSuivantNom}</div>
                           {ceremony.evenementSuivantAdresse && <div style={{ fontSize: 12, opacity: 0.75, marginTop: 4 }}>{ceremony.evenementSuivantAdresse}</div>}
                         </div>
                       )}
@@ -5089,7 +5108,7 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
   const inputStyle: React.CSSProperties = { width: '100%', padding: '11px 14px', borderRadius: 8, border: `1.5px solid ${GOLD}33`, fontSize: 15, fontFamily: 'var(--font-cormorant-garamond)', outline: 'none', background: '#fdf8f9', boxSizing: 'border-box' }
 
   const checkPromo = async () => {
-    if (!promoInput.trim() || !promoEmail.trim()) { setError('Veuillez renseigner votre code promo et votre email.'); return }
+    if (!promoInput.trim() || !promoEmail.trim()) { setError(t.fairepart.accessGateFillFields); return }
     setChecking(true); setError(null)
     try {
       const res = await fetch('/api/check-promo', {
@@ -5109,17 +5128,17 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
           setShowPasswordStep(true)
         }
       } else {
-        setError(d.reason || 'Code promo invalide ou expiré.')
+        setError(d.reason || t.fairepart.promoError)
       }
-    } catch { setError('Erreur réseau. Réessayez.') }
+    } catch { setError(t.fairepart.accessGateNetworkError) }
     finally { setChecking(false) }
   }
 
   const handleSetPassword = async (e: React.FormEvent) => {
     e.preventDefault()
     setPwError(null)
-    if (pwInput.length < 8) { setPwError('Le mot de passe doit contenir au moins 8 caractères.'); return }
-    if (pwInput !== pwConfirm) { setPwError('Les mots de passe ne correspondent pas.'); return }
+    if (pwInput.length < 8) { setPwError(t.fairepart.accessGatePasswordMin); return }
+    if (pwInput !== pwConfirm) { setPwError(t.fairepart.accessGatePasswordMismatch); return }
     setPwLoading(true)
     try {
       const res = await fetch('/api/auth/set-password', {
@@ -5131,9 +5150,9 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
         onGranted()
       } else {
         const data = await res.json()
-        setPwError(data.error || 'Erreur. Réessayez.')
+        setPwError(data.error || t.fairepart.accessGateGenericError)
       }
-    } catch { setPwError('Erreur serveur.') }
+    } catch { setPwError(t.fairepart.accessGateServerError) }
     finally { setPwLoading(false) }
   }
 
@@ -5482,7 +5501,7 @@ export default function FairePartPage() {
         if (res.ok) {
           setServerSavedAt(new Date())
         } else if (res.status === 401) {
-          showToast('Session expirée — reconnectez-vous pour sauvegarder sur le serveur', 'error')
+          showToast(t.fairepart.sessionExpired, 'error')
         }
       } catch { /* ignore */ }
       setServerSaving(false)

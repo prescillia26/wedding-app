@@ -322,6 +322,149 @@ export interface FairepartDict {
   invitationLabel: string
   photoUploadLabel: string
   photoDeleteLabel: string
+  // Family title formatting (A)
+  mr: string
+  mrs: string
+  mrAndMrs: string
+  // Invitation phrases (B)
+  inviteFamilies: string
+  inviteWillBeDelightedToInviteYou: string
+  inviteYouAreInvitedTo: string
+  inviteShabbatHatanOf: string
+  inviteHenneIntro: string
+  inviteHenneOf: string
+  inviteHenneTradition: string
+  inviteCocktailIntro: string
+  inviteCocktailCelebrate: string
+  inviteSoireeIntro: string
+  inviteSoireeAllNight: string
+  inviteBoatPartyIntro: string
+  inviteBoatPartySea: string
+  inviteAutreJoin: string
+  inviteAutreFor: string
+  inviteAutreDefaultEvent: string
+  // Photo section (C)
+  photoSectionTitle: string
+  photoSectionHelp: string
+  photoUploading: string
+  photoClickToAdd: string
+  photoCropClose: string
+  photoCropBtn: string
+  photoCropTitle: string
+  cropDragHelp: string
+  cropDezoom: string
+  cropZoom: string
+  cropNormal: string
+  cropReset: string
+  cropValidate: string
+  // Music section (D)
+  musicDownloadMp3: string
+  musicUploaded: string
+  musicDelete: string
+  musicUploadInProgress: string
+  musicClickToUpload: string
+  musicFormatHelp: string
+  musicUploadError: string
+  musicNetworkError: string
+  // Email section
+  emailSectionTitle: string
+  emailSectionHelp: string
+  // RSVP confirmation (F)
+  rsvpThankYou: string
+  rsvpAlreadyRespondedMsg: string
+  rsvpCoupleReceivedResponse: string
+  rsvpClose: string
+  rsvpThankYouName: string
+  rsvpNotMeBtn: string
+  // Share/WhatsApp section (G)
+  shareReadyTitle: string
+  shareOnWhatsApp: string
+  shareSendOnWhatsApp: string
+  sharePreWrittenMsg: string
+  shareCustomizeMsg: string
+  shareCopyMsg: string
+  shareCopyBtn: string
+  shareKeepLink: string
+  // WhatsApp message template (G)
+  whatsappDearFriends: string
+  whatsappInviteText: string
+  whatsappCelebrateText: string
+  whatsappFindInvitation: string
+  whatsappConfirmPresence: string
+  whatsappSeeYouSoon: string
+  whatsappSoon: string
+  whatsappOn: string
+  whatsappOnDates: string
+  whatsappAnd: string
+  whatsappDefaultName1: string
+  whatsappDefaultName2: string
+  // AccessGate error messages (H)
+  accessGateFillFields: string
+  accessGateNetworkError: string
+  accessGateServerError: string
+  accessGateGenericError: string
+  accessGatePasswordMin: string
+  accessGatePasswordMismatch: string
+  // Session expired toast (I) - already exists as sessionExpired
+  // Event note (J)
+  eventNoteLabel: string
+  eventNotePlaceholder: string
+  eventFollowedBy: string
+  afterEventPlaceholder: string
+  // Memorial
+  memorialCustomPlaceholder: string
+  memorialAddName: string
+  memorialNamePlaceholder: string
+  memorialDeleteName: string
+  // Transport/accommodation placeholders
+  transportPlaceholder: string
+  accommodationPlaceholder: string
+  // Card components (E)
+  cardHouppaAndSoiree: string
+  cardReligiousAndSoiree: string
+  cardLaHouppa: string
+  cardLaMairie: string
+  cardLeHenne: string
+  cardShabbatHatan: string
+  cardSeDiront: string
+  cardOui: string
+  cardFollowedByReception: string
+  cardHonore: string
+  cardHenneInvite: string
+  cardAutreJoin: string
+  cardAutreFor: string
+  cardAutreDefaultEvent: string
+  cardMairieFollowedBy: string
+  cardItineraire: string
+  cardCreatedWith: string
+  // ZONE_LABELS / FONT / COLOR - already have zones dict
+  // Ornament
+  ornamentNone: string
+  // TextEditModal labels
+  textEditTitle: string
+  textEditJoyLabel: string
+  textEditJoyPlaceholder: string
+  textEditHonoreLabel: string
+  textEditHonorePlaceholder: string
+  textEditInvitationLabel: string
+  textEditInvitationHelp: string
+  textEditLieuLabel: string
+  textEditTitreLabel: string
+  // Zone style labels
+  zoneFont: string
+  zoneFontDefault: string
+  zoneColor: string
+  zoneSize: string
+  zoneSizeSmall: string
+  zoneSizeNormal: string
+  zoneSizeLarge: string
+  zoneBold: string
+  zoneItalic: string
+  // TextEdit tabs
+  textEditTabText: string
+  textEditTabStyle: string
+  textEditApply: string
+  textEditStyleSub: string
 }
 
 export interface PlanTableDict {
