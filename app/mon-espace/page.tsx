@@ -157,7 +157,7 @@ export default function MonEspacePage() {
               Créez votre premier faire-part de mariage digital
             </p>
             <a
-              href="/paiement"
+              href="/faire-part"
               style={{
                 display: 'inline-block', padding: '14px 32px', borderRadius: 9999,
                 background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`,
@@ -166,7 +166,7 @@ export default function MonEspacePage() {
                 boxShadow: `0 6px 24px ${GOLD}44`,
               }}
             >
-              Créer votre faire-part — 69€
+              Créer votre faire-part
             </a>
           </div>
         ) : (
