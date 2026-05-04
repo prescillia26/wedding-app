@@ -5273,10 +5273,8 @@ export default function FairePartPage() {
     const r = params.get('role')
     const urlCode = params.get('code')
 
-    // Mode dev : bypass code d'accès
-    const devParam = params.get('dev')
-    const isDevBypass = devParam === 'lovit2026' || (devParam === 'true' && process.env.NODE_ENV === 'development')
-    if (isDevBypass) {
+    // Mode dev : bypass code d'accès (uniquement en développement local)
+    if (params.get('dev') === 'true' && process.env.NODE_ENV === 'development') {
       setAccessGranted(true)
       setCheckingAccess(false)
       return
