@@ -2245,8 +2245,8 @@ function LogoOrMonogram({ data, theme }: { data: FormData; theme: ThemeObj }) {
 }
 
 function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercle' }: { initial1: string; initial2: string; color: string; size?: number; style?: string }) {
-  const a = initial1 || 'A'
-  const b = initial2 || 'B'
+  const a = (initial1 || 'A').toUpperCase()
+  const b = (initial2 || 'B').toUpperCase()
   const GV = 'var(--font-great-vibes)'
   const CG = 'var(--font-cormorant-garamond)'
   const fs = Math.round(size * 0.52)
