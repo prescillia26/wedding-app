@@ -5451,11 +5451,18 @@ export default function FairePartPage() {
     try {
       const draft = localStorage.getItem('wedding-draft')
       if (draft) {
-        setFormData(JSON.parse(draft) as FormData)
-        setHasDraft(false)
-        setShowCards(true)
+        const parsed = JSON.parse(draft)
+        if (parsed && typeof parsed === 'object' && parsed.marie1Prenom !== undefined) {
+          setFormData(parsed as FormData)
+          setHasDraft(false)
+          setShowCards(true)
+        } else {
+          localStorage.removeItem('wedding-draft')
+        }
       }
-    } catch { /* ignore */ }
+    } catch {
+      localStorage.removeItem('wedding-draft')
+    }
   }, [])
 
   const next = useCallback(() => {
