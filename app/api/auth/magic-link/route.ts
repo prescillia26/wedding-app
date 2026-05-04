@@ -12,6 +12,14 @@ export async function POST(request: Request) {
 
     const normalizedEmail = email.toLowerCase().trim()
 
+    // Rate limiting : 5 demandes par minute par email
+    const rlKey = `ratelimit:magic:${normalizedEmail}`
+    const rlAttempts = await redis.get<number>(rlKey) ?? 0
+    if (rlAttempts >= 5) {
+      return Response.json({ ok: true }) // Ne pas révéler le rate limit
+    }
+    await redis.set(rlKey, rlAttempts + 1, { ex: 60 })
+
     // Vérifier que l'utilisateur existe
     const user = await redis.get<User>(`user:${normalizedEmail}`)
     if (!user) {

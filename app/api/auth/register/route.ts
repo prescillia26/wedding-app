@@ -12,6 +12,14 @@ export async function POST(request: Request) {
 
     const normalizedEmail = email.toLowerCase().trim()
 
+    // Rate limiting : 5 inscriptions par minute par email
+    const rlKey = `ratelimit:register:${normalizedEmail}`
+    const rlAttempts = await redis.get<number>(rlKey) ?? 0
+    if (rlAttempts >= 5) {
+      return Response.json({ error: 'Trop de tentatives. Réessayez dans une minute.' }, { status: 429 })
+    }
+    await redis.set(rlKey, rlAttempts + 1, { ex: 60 })
+
     if (password.length < 8) {
       return Response.json({ error: 'Le mot de passe doit contenir au moins 8 caractères' }, { status: 400 })
     }

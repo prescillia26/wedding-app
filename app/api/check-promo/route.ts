@@ -30,6 +30,14 @@ export async function POST(request: Request) {
     if (!normalized) return Response.json({ valid: false, reason: 'Code manquant' })
     if (!normalizedEmail) return Response.json({ valid: false, reason: 'Email manquant' })
 
+    // Rate limiting : 10 tentatives par minute par email
+    const rlKey = `ratelimit:promo:${normalizedEmail}`
+    const rlAttempts = await redis.get<number>(rlKey) ?? 0
+    if (rlAttempts >= 10) {
+      return Response.json({ valid: false, reason: 'Trop de tentatives. Réessayez dans une minute.' }, { status: 429 })
+    }
+    await redis.set(rlKey, rlAttempts + 1, { ex: 60 })
+
     const data = await redis.get<PromoEntry>(`promo:${normalized}`)
     if (!data) return Response.json({ valid: false, reason: 'Code promo invalide' })
 
