@@ -2250,26 +2250,24 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
   const GV = 'var(--font-great-vibes)'
   const CG = 'var(--font-cormorant-garamond)'
   const fs = Math.round(size * 0.52)
-  // RÈGLE : ZÉRO position:absolute sur le texte, ZÉRO hauteur fixe.
-  // Tout en flexbox = les jambages sont TOUJOURS dans le flux.
-
-  // Padding pour les fioritures de Great Vibes (les boucles des majuscules dépassent la boîte du texte)
-  const pad = Math.round(fs * 0.15)
+  // Great Vibes : les fioritures des majuscules (J, P, Q, Y…) dépassent la boîte CSS.
+  // On ajoute du padding sur chaque span + letter-spacing pour éviter tout clipping.
+  const gv: React.CSSProperties = { fontFamily: GV, fontSize: fs, color, padding: '0.1em 0.2em' }
 
   // ── Style 1 : Entrelacé Luxe ──────────────────────────────────────────────
   if (style === 'cercle') return (
-    <div style={{ display: 'inline-flex', alignItems: 'baseline', padding: `0 ${pad}px` }}>
-      <span style={{ fontFamily: GV, fontSize: fs, color, position: 'relative', zIndex: 2 }}>{a}</span>
-      <span style={{ fontFamily: GV, fontSize: fs, color, opacity: 0.72, marginLeft: Math.round(fs * -0.35), position: 'relative', zIndex: 1 }}>{b}</span>
+    <div style={{ display: 'inline-flex', alignItems: 'baseline' }}>
+      <span style={{ ...gv, position: 'relative', zIndex: 2 }}>{a}</span>
+      <span style={{ ...gv, opacity: 0.72, marginLeft: Math.round(fs * -0.35), position: 'relative', zIndex: 1 }}>{b}</span>
     </div>
   )
 
   // ── Style 2 : Calligraphie Pure ───────────────────────────────────────────
   if (style === 'enlace') return (
-    <div style={{ display: 'inline-flex', alignItems: 'baseline', padding: `0 ${pad}px` }}>
-      <span style={{ fontFamily: GV, fontSize: fs, color }}>{a}</span>
+    <div style={{ display: 'inline-flex', alignItems: 'baseline' }}>
+      <span style={gv}>{a}</span>
       <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: Math.round(fs * 0.45), color, opacity: 0.55, margin: `0 ${Math.round(fs * 0.06)}px` }}>&</span>
-      <span style={{ fontFamily: GV, fontSize: fs, color }}>{b}</span>
+      <span style={gv}>{b}</span>
     </div>
   )
 
@@ -2281,13 +2279,13 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
     const sw1 = Math.max(0.5, d * 0.005), sw2 = Math.max(0.3, d * 0.003)
     const sfs = Math.round(fs * 0.84)
     return (
-      <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: `${Math.round(d * 0.15)}px ${Math.round(d * 0.2)}px` }}>
+      <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
         <svg style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', pointerEvents: 'none' }} width={d} height={d} viewBox={`0 0 ${d} ${d}`} xmlns="http://www.w3.org/2000/svg">
           <circle cx={cx} cy={cy} r={r1} fill="none" stroke={color} strokeWidth={sw1} opacity="0.35" />
           <circle cx={cx} cy={cy} r={r2} fill="none" stroke={color} strokeWidth={sw2} opacity="0.2" />
         </svg>
-        <span style={{ fontFamily: GV, fontSize: sfs, color, position: 'relative', zIndex: 1 }}>{a}</span>
-        <span style={{ fontFamily: GV, fontSize: sfs, color, opacity: 0.72, marginLeft: Math.round(sfs * -0.1), position: 'relative', zIndex: 1 }}>{b}</span>
+        <span style={{ ...gv, fontSize: sfs, position: 'relative', zIndex: 1 }}>{a}</span>
+        <span style={{ ...gv, fontSize: sfs, opacity: 0.72, marginLeft: Math.round(sfs * -0.1), position: 'relative', zIndex: 1 }}>{b}</span>
       </div>
     )
   }
@@ -2296,10 +2294,10 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
   if (style === 'branches') {
     const lfs = Math.round(fs * 0.9)
     return (
-      <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', padding: `0 ${pad}px` }}>
-        <span style={{ fontFamily: GV, fontSize: lfs, color, textAlign: 'center' }}>{a}</span>
+      <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}>
+        <span style={{ ...gv, fontSize: lfs, textAlign: 'center' }}>{a}</span>
         <div style={{ width: 1, height: Math.max(6, Math.round(size * 0.05)), background: color, opacity: 0.45, margin: `${Math.round(lfs * -0.15)}px 0` }} />
-        <span style={{ fontFamily: GV, fontSize: lfs, color, opacity: 0.78, textAlign: 'center' }}>{b}</span>
+        <span style={{ ...gv, fontSize: lfs, opacity: 0.78, textAlign: 'center' }}>{b}</span>
       </div>
     )
   }
@@ -2330,9 +2328,9 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
         <circle cx={ornW*0.5} cy={ornH*0.58} r={rDot} fill={color} opacity="0.45"/>
         <circle cx={ornW*0.96} cy={ornH*0.82} r={rDot} fill={color} opacity="0.45"/>
       </svg>
-      <div style={{ display: 'inline-flex', alignItems: 'baseline', padding: `0 ${pad}px` }}>
-        <span style={{ fontFamily: GV, fontSize: fs, color, position: 'relative', zIndex: 2 }}>{a}</span>
-        <span style={{ fontFamily: GV, fontSize: fs, color, opacity: 0.72, marginLeft: Math.round(fs * -0.35), position: 'relative', zIndex: 1 }}>{b}</span>
+      <div style={{ display: 'inline-flex', alignItems: 'baseline' }}>
+        <span style={{ ...gv, position: 'relative', zIndex: 2 }}>{a}</span>
+        <span style={{ ...gv, opacity: 0.72, marginLeft: Math.round(fs * -0.35), position: 'relative', zIndex: 1 }}>{b}</span>
       </div>
       <svg width={ornW} height={ornH} viewBox={`0 0 ${ornW} ${ornH}`} xmlns="http://www.w3.org/2000/svg">
         <path d={`M${ornW*0.04},${ornH*0.18} Q${ornW*0.25},${ornH*0.94} ${ornW*0.5},${ornH*0.42} Q${ornW*0.75},${ornH*0.94} ${ornW*0.96},${ornH*0.18}`} fill="none" stroke={color} strokeWidth="0.9" opacity="0.5" strokeLinecap="round"/>
