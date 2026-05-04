@@ -1571,14 +1571,10 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       <div style={{ marginBottom: 24 }}>
         <Label>{t.fairepart.monogramStyleLabel}</Label>
         <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>{t.fairepart.monogramPreviewHint}</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 14 }}>
           {([
             { key: 'cercle',      label: t.fairepart.monogramStyles.cercle },
-            { key: 'enlace',      label: t.fairepart.monogramStyles.enlace },
-            { key: 'couronne',    label: t.fairepart.monogramStyles.couronne },
-            { key: 'branches',    label: t.fairepart.monogramStyles.branches },
             { key: 'losange',     label: t.fairepart.monogramStyles.losange },
-            { key: 'minimaliste', label: t.fairepart.monogramStyles.minimaliste },
           ] as { key: string; label: string }[]).map(opt => {
             const sel = (data.monogrammeStyle || 'cercle') === opt.key
             const previewColor = data.monogrammeColor || '#C9A84C'
