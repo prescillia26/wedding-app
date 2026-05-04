@@ -324,6 +324,20 @@ function fmtParentsLines(pPrenom: string, pNom: string, mPrenom: string, mNom: s
   return []
 }
 
+/** Retourne un textShadow adapté pour la lisibilité selon le thème */
+function readableShadow(theme: ThemeObj, hasPhotoBg = false): string {
+  if (theme.dark) {
+    // Thème sombre : halo sombre discret pour renforcer le texte clair
+    return '0 1px 4px rgba(0,0,0,0.6), 0 0 12px rgba(0,0,0,0.3)'
+  }
+  if (hasPhotoBg) {
+    // Photo de fond avec overlay blanc : halo blanc fort
+    return '0 1px 3px rgba(255,255,255,0.95), 0 0 10px rgba(255,255,255,0.8)'
+  }
+  // Thème clair sans photo : halo blanc subtil pour la profondeur
+  return '0 1px 2px rgba(255,255,255,0.8), 0 0 6px rgba(255,255,255,0.4)'
+}
+
 // Audio pré-démarré pendant le clic "Générer" pour contourner la politique autoplay
 let _pendingAudio: HTMLAudioElement | null = null
 
@@ -4429,10 +4443,10 @@ const firstDate = sorted[0]?.date
             <span style={{ color: introTextColor, fontSize: 10, opacity: 0.7 }}>◆</span>
             <div style={{ flex: 1, height: 0.5, background: introTextColor, opacity: 0.4 }} />
           </div>
-          <div style={{ fontFamily: FS, fontSize: 'clamp(30px,8vw,46px)', color: introTextColor, marginBottom: 16, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.2, textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.4)' : 'none' }}>
+          <div style={{ fontFamily: FS, fontSize: 'clamp(30px,8vw,46px)', color: introTextColor, marginBottom: 16, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.2, textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.5), 0 0 20px rgba(0,0,0,0.3)' : readableShadow(theme) }}>
             {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
           </div>
-          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: introTextColor, marginBottom: 36, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.35)' : 'none' }}>
+          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: introTextColor, marginBottom: 36, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.4), 0 0 16px rgba(0,0,0,0.25)' : readableShadow(theme) }}>
             ont le plaisir de vous convier à leur mariage
           </div>
           <button onClick={handleDiscover} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '14px 40px', fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', boxShadow: `0 4px 20px ${G}44`, animation: 'sharedFadeIn 1s 0.7s ease forwards', opacity: 0 } as React.CSSProperties}>
@@ -4565,14 +4579,14 @@ const firstDate = sorted[0]?.date
                     <>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={firstPhoto} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', pointerEvents: 'none', zIndex: 0 }} />
-                      <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.82)', pointerEvents: 'none', zIndex: 0 }} />
+                      <div style={{ position: 'absolute', inset: 0, background: theme.dark ? `${theme.fond}e0` : 'rgba(255,255,255,0.82)', pointerEvents: 'none', zIndex: 0 }} />
                     </>
                   ) : (
                     <>
                       {i % 2 === 0 ? <><OrnTR /><OrnBL /></> : <><OrnTL /><OrnBR /></>}
                     </>
                   )}
-                  <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: '0 1px 3px rgba(255,255,255,0.95), 0 0 8px rgba(255,255,255,0.7)' }}>
+                  <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg) }}>
                     {data.mariageJuif && (
                       <div style={{ position: 'absolute', top: 18, right: 22, fontSize: 16, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, zIndex: 5, opacity: 0.85, letterSpacing: 1 }}>בס״ד</div>
                     )}
