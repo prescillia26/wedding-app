@@ -901,6 +901,7 @@ function StyleAccueilSelector({ data, onChange }: { data: FormData; onChange: (d
 // ── PhotoSection : upload + recadrage interactif ──────────────────────────────
 
 function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
+  const { t } = useT()
   const [cropIdx, setCropIdx] = useState<number | null>(null)
   const [uploading, setUploading] = useState(false)
   const photos = data.photosFond ?? []
@@ -926,7 +927,7 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
       onChange({ photosFond: newPhotos, photoFond: newPhotos[0] ?? '', photosData: newData, presentationStyle: 'page-unique' })
       setCropIdx(photos.length)
     } catch {
-      showToast('Erreur lors de l\'upload de la photo', 'error')
+      showToast(t.fairepart.errorUploadPhoto, 'error')
     } finally {
       setUploading(false)
     }
@@ -1306,7 +1307,7 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    if (file.size > 5 * 1024 * 1024) { showToast('Le fichier est trop lourd (max 5 Mo)', 'error'); return }
+    if (file.size > 5 * 1024 * 1024) { showToast(t.fairepart.errorFileTooLarge, 'error'); return }
     setUploading(true)
     try {
       // Supprimer le fond côté client avant upload
@@ -1322,7 +1323,7 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
         const pngUrl = json.secure_url.replace(/\.\w+$/, '.png')
         onChange({ customLogoUrl: pngUrl })
       }
-    } catch { showToast('Erreur lors de l\'upload du logo', 'error') }
+    } catch { showToast(t.fairepart.errorUploadLogo, 'error') }
     finally { setUploading(false) }
     e.target.value = ''
   }
@@ -2470,6 +2471,7 @@ interface RSVPEntry {
 }
 
 function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: { accent: string; onClose: () => void; mariee1: string; mariee2: string; shareId: string | null; ceremonies: Ceremony[] }) {
+  const { t } = useT()
   const getCeremonyName = (c: Ceremony) => c.type === 'Autre' ? (c.customName || 'Événement') : c.type
 
   // 🔒 Détection si déjà répondu (localStorage)
@@ -2534,7 +2536,7 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
       }
       setSent(true)
     } catch {
-      showToast('Erreur lors de l\'envoi du RSVP', 'error')
+      showToast(t.fairepart.errorRsvp, 'error')
     } finally {
       setLoading(false)
     }
@@ -2583,7 +2585,7 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
             Merci {nom.split(' ')[0]} !
           </div>
           <p style={{ fontSize: 15, color: '#6a5040', lineHeight: 1.7 }}>
-            Les mariés ont bien reçu votre réponse.
+            {t.fairepart.rsvpSent}
           </p>
           <button onClick={onClose} style={{ ...BTN, marginTop: 24, padding: '12px 32px', borderRadius: 9999, background: accent, color: 'white', border: 'none', fontSize: 14, fontWeight: 600 }}>Fermer</button>
         </div>
@@ -2608,8 +2610,8 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
           <>
             <div style={{ fontSize: 12, color: '#9ca3af', textAlign: 'center', marginBottom: 20, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Étape 1 / 3 — Vos coordonnées</div>
             <div style={{ marginBottom: 18 }}>
-              <Label>Prénom et nom *</Label>
-              <input value={nom} onChange={e => setNom(e.target.value)} placeholder="Marie Dupont" style={S.input} />
+              <Label>{t.fairepart.rsvpName} *</Label>
+              <input value={nom} onChange={e => setNom(e.target.value)} placeholder={t.fairepart.rsvpNamePlaceholder} style={S.input} />
             </div>
             <div style={{ marginBottom: 28 }}>
               <Label>Email (optionnel)</Label>
@@ -2638,18 +2640,18 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
                       border: `2px solid ${r.present === true ? accent : '#fecdd3'}`,
                       background: r.present === true ? accent : 'white',
                       color: r.present === true ? 'white' : '#4a3728',
-                    }}>Présent ✓</button>
+                    }}>{t.fairepart.rsvpPresent} ✓</button>
                     <button type="button" onClick={() => setPresent(i, false)} style={{
                       ...BTN, padding: '10px 8px', borderRadius: 9, fontSize: 13, fontWeight: 600,
                       border: `2px solid ${r.present === false ? '#fb7185' : '#fecdd3'}`,
                       background: r.present === false ? '#fb7185' : 'white',
                       color: r.present === false ? 'white' : '#4a3728',
-                    }}>Absent ✗</button>
+                    }}>{t.fairepart.rsvpAbsent} ✗</button>
                   </div>
                   {r.present === true && (
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4 }}>
-                        <span style={{ fontSize: 12, color: '#6a5040' }}>Nb de personnes :</span>
+                        <span style={{ fontSize: 12, color: '#6a5040' }}>{t.fairepart.rsvpNbPersons} :</span>
                         <button type="button" onClick={() => setNbPersonnes(i, -1)} style={{ ...BTN, width: 28, height: 28, borderRadius: 9999, border: `1.5px solid ${accent}44`, background: 'white', color: accent, fontWeight: 700, fontSize: 16, padding: 0 }}>−</button>
                         <span style={{ fontSize: 15, fontWeight: 700, color: accent, minWidth: 20, textAlign: 'center' }}>{r.nbPersonnes}</span>
                         <button type="button" onClick={() => setNbPersonnes(i, 1)} style={{ ...BTN, width: 28, height: 28, borderRadius: 9999, border: `1.5px solid ${accent}44`, background: 'white', color: accent, fontWeight: 700, fontSize: 16, padding: 0 }}>+</button>
@@ -2690,7 +2692,7 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
               <textarea
                 value={message}
                 onChange={e => e.target.value.length <= 300 && setMessage(e.target.value)}
-                placeholder="Avec toute notre affection..."
+                placeholder={t.fairepart.rsvpMessagePlaceholder}
                 rows={4}
                 style={{ ...S.input, resize: 'vertical', lineHeight: 1.6 } as React.CSSProperties}
               />
@@ -2703,7 +2705,7 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
                 background: `linear-gradient(135deg, ${accent}, ${accent}cc)`,
                 color: 'white', fontSize: 15, fontWeight: 700,
                 boxShadow: `0 6px 20px ${accent}44`,
-              }}>{loading ? 'Envoi...' : 'Envoyer ma réponse'}</button>
+              }}>{loading ? t.fairepart.rsvpSending : t.fairepart.rsvpSend}</button>
             </div>
           </>
         )}
@@ -2712,6 +2714,7 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
   )
 }
 function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: string; onClose: () => void; shareId: string | null; ceremonies: Ceremony[] }) {
+  const { t } = useT()
   const [entries, setEntries] = useState<RSVPEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [views, setViews] = useState<{ timestamp: string; pays: string }[]>([])
@@ -2824,7 +2827,7 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
       <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)' }} />
       <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: 32, width: '100%', maxWidth: 700, maxHeight: '85vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
         <button onClick={onClose} style={{ ...BTN, position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 20, color: '#9ca3af' }}>✕</button>
-        <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: accent, textAlign: 'center', marginBottom: 16 }}>Réponses RSVP</div>
+        <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: accent, textAlign: 'center', marginBottom: 16 }}>{t.fairepart.rsvpListTitle}</div>
 
         {views.length > 0 && (
           <div style={{ background: '#f0f9ff', borderRadius: 10, padding: '12px 16px', marginBottom: 16 }}>
@@ -2848,16 +2851,16 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
               <div style={{ borderRadius: 12, padding: '16px 20px', background: `${accent}12`, textAlign: 'center' }}>
                 <div style={{ fontSize: 28, fontWeight: 800, color: accent }}>{entries.length}</div>
-                <div style={{ fontSize: 12, color: '#6a5040', marginTop: 2 }}>Réponse{entries.length > 1 ? 's' : ''} reçue{entries.length > 1 ? 's' : ''}</div>
+                <div style={{ fontSize: 12, color: '#6a5040', marginTop: 2 }}>{t.fairepart.rsvpTotal}</div>
               </div>
               <div style={{ borderRadius: 12, padding: '16px 20px', background: '#f0fdf4', textAlign: 'center' }}>
                 <div style={{ fontSize: 28, fontWeight: 800, color: '#22c55e' }}>{totalPersonnes}</div>
-                <div style={{ fontSize: 12, color: '#6a5040', marginTop: 2 }}>Personne{totalPersonnes > 1 ? 's' : ''} présente{totalPersonnes > 1 ? 's' : ''}</div>
+                <div style={{ fontSize: 12, color: '#6a5040', marginTop: 2 }}>{t.fairepart.rsvpPersonsPresent}</div>
               </div>
             </div>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 20 }}>
               <button onClick={downloadExcel} style={{ ...BTN, padding: '10px 24px', borderRadius: 9999, background: '#16a34a', color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: '0 4px 14px rgba(22,163,74,0.35)' }}>
-                📊 Télécharger Excel
+                📊 {t.fairepart.rsvpDownloadExcel}
               </button>
               <button onClick={downloadCSV} style={{ ...BTN, padding: '10px 24px', borderRadius: 9999, background: '#22c55e', color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: '0 4px 14px rgba(34,197,94,0.35)' }}>
                 Télécharger CSV
@@ -2875,7 +2878,7 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
           {loading ? (
             <div style={{ textAlign: 'center', color: '#9ca3af', padding: 32 }}>Chargement...</div>
           ) : entries.length === 0 ? (
-            <div style={{ textAlign: 'center', color: '#9ca3af', padding: 32, fontStyle: 'italic' }}>Aucune réponse pour le moment</div>
+            <div style={{ textAlign: 'center', color: '#9ca3af', padding: 32, fontStyle: 'italic' }}>{t.fairepart.rsvpNoResponses}</div>
           ) : (
             ceremonies.map((c, ci) => {
               const nomEvt = getCeremonyName(c)
@@ -2935,7 +2938,7 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
                     <tfoot>
                       <tr style={{ borderTop: `2px solid ${accent}33`, background: `${accent}08` }}>
                         <td colSpan={2} style={{ padding: '10px', color: '#4a3728', fontWeight: 700, fontSize: 13 }}>
-                          Total présents : <span style={{ color: accent, fontSize: 15 }}>{totalPresentsEvt}</span>
+                          {t.fairepart.rsvpConfirmed} : <span style={{ color: accent, fontSize: 15 }}>{totalPresentsEvt}</span>
                         </td>
                         <td style={{ padding: '10px', textAlign: 'center', color: accent, fontWeight: 700, fontSize: 15 }}>{totalNb}</td>
                         <td colSpan={2} />
@@ -3075,6 +3078,7 @@ function AudioPlayer({ musicUrl, accent, playRef }: { musicUrl: string; accent: 
 // ── Splash + Music ─────────────────────────────────────────────────────────────
 
 function SplashScreen({ data, theme, onDone, isShared, onStartMusic }: { data: FormData; theme: ThemeObj; onDone: () => void; isShared: boolean; onStartMusic?: () => void }) {
+  const { t } = useT()
   const [out, setOut] = useState(false)
   const [vis, setVis] = useState(0)
   const firstDate = sortByDate(data.ceremonies)[0]?.date
@@ -3140,7 +3144,7 @@ function SplashScreen({ data, theme, onDone, isShared, onStartMusic }: { data: F
             onTouchEnd={e => { e.preventDefault(); handleDiscover() }}
             style={{ ...BTN, padding: '16px 44px', border: `1px solid ${theme.accent}`, borderRadius: 9999, background: 'transparent', color: theme.accent, fontSize: 16, fontFamily: 'var(--font-playfair-display)', letterSpacing: '0.06em' }}
           >
-            Ouvrir votre invitation ✦
+            {t.fairepart.openInvitation}
           </button>
         </div>
       )}
@@ -3236,6 +3240,7 @@ function MusicPlayer({ youtubeUrl, accent }: { youtubeUrl: string; accent: strin
 // ── ShareModal ────────────────────────────────────────────────────────────────
 
 function CopyLinkRow({ label, url, accent }: { label: string; url: string; accent: string }) {
+  const { t } = useT()
   const [copied, setCopied] = useState(false)
   const copy = () => {
     navigator.clipboard.writeText(url).catch(() => {
@@ -3255,7 +3260,7 @@ function CopyLinkRow({ label, url, accent }: { label: string; url: string; accen
       <div style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>{label}</div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <input readOnly value={url} onFocus={e => e.target.select()} style={{ flex: 1, fontSize: 11, color: '#4a3728', background: '#fdf8f9', border: `1px solid ${accent}33`, borderRadius: 6, padding: '8px 10px', outline: 'none' }} />
-        <button onClick={copy} style={{ ...BTN, padding: '8px 14px', borderRadius: 6, background: copied ? '#22c55e' : accent, color: 'white', border: 'none', fontSize: 12, whiteSpace: 'nowrap', transition: 'background 0.2s' }}>{copied ? '✓' : 'Copier'}</button>
+        <button onClick={copy} style={{ ...BTN, padding: '8px 14px', borderRadius: 6, background: copied ? '#22c55e' : accent, color: 'white', border: 'none', fontSize: 12, whiteSpace: 'nowrap', transition: 'background 0.2s' }}>{copied ? `✓ ${t.fairepart.shareCopied}` : 'Copier'}</button>
       </div>
     </div>
   )
@@ -3308,6 +3313,7 @@ ${p1} & ${p2} 💍`
 }
 
 function CopyTextRow({ text, accent }: { text: string; accent: string }) {
+  const { t } = useT()
   const [copied, setCopied] = useState(false)
   const copy = () => {
     navigator.clipboard.writeText(text).catch(() => {
@@ -3320,12 +3326,13 @@ function CopyTextRow({ text, accent }: { text: string; accent: string }) {
   }
   return (
     <button onClick={copy} style={{ ...BTN, padding: '10px 20px', borderRadius: 8, background: copied ? '#22c55e' : accent, color: 'white', border: 'none', fontSize: 13, fontWeight: 600 }}>
-      {copied ? '✓ Copié' : 'Copier le message'}
+      {copied ? `✓ ${t.fairepart.shareCopied}` : 'Copier le message'}
     </button>
   )
 }
 
 function ShareModal({ accent, guestUrl, coupleUrl, onClose, data }: { accent: string; guestUrl: string; coupleUrl: string; onClose: () => void; data: FormData }) {
+  const { t } = useT()
   const [message, setMessage] = useState(() => buildWhatsAppMessage(data, guestUrl))
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
@@ -3337,7 +3344,7 @@ function ShareModal({ accent, guestUrl, coupleUrl, onClose, data }: { accent: st
 
         {/* Section 1 — Lien invités */}
         <div style={{ marginBottom: 24 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Lien à partager à vos invités</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>{t.fairepart.shareGuestLink}</div>
           <CopyLinkRow label="" url={guestUrl} accent={accent} />
           <a href={`https://wa.me/?text=${encodeURIComponent(guestUrl)}`} target="_blank" rel="noopener noreferrer"
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '11px 20px', borderRadius: 9, background: '#25D366', color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 600, marginTop: 4 }}>
@@ -3364,7 +3371,7 @@ function ShareModal({ accent, guestUrl, coupleUrl, onClose, data }: { accent: st
 
         {/* Section 3 — Lien mariés */}
         <div style={{ padding: '16px 18px', background: '#f0fdf4', borderRadius: 12 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Votre lien personnel</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>{t.fairepart.shareCoupleLink}</div>
           <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 12 }}>Gardez ce lien pour accéder à vos RSVP</div>
           <CopyLinkRow label="" url={coupleUrl} accent="#22c55e" />
         </div>
@@ -3914,6 +3921,7 @@ interface SharedPageContentProps {
 // ── 💌 ENVELOPPE ──────────────────────────────────────────────────────────────
 // ── 💌 ENVELOPPE INTERACTIVE ─────────────────────────────────────────────────
 function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeObj; onDone: () => void }) {
+  const { t } = useT()
   const [clique, setClique] = useState(false)
   const [rabatOuvert, setRabatOuvert] = useState(false)
   const [carteVisible, setCarteVisible] = useState(false)
@@ -4012,7 +4020,7 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
       {/* Bouton */}
       {!clique && (
         <button onClick={handleOpen} style={{ ...BTN, marginTop: 36, padding: '14px 40px', border: `1.5px solid ${theme.accent}`, borderRadius: 9999, background: 'transparent', color: theme.accent, fontFamily: 'var(--font-playfair-display)', fontSize: 13, fontWeight: 600, letterSpacing: 3, animation: 'btnPulse 2s ease infinite' }}>
-          Ouvrir votre invitation ✦
+          {t.fairepart.openInvitation}
         </button>
       )}
     </div>
@@ -4656,7 +4664,7 @@ const firstDate = sorted[0]?.date
                           </div>
                         </div>
                         <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 24, lineHeight: 1.9, opacity: 0.82 }, 'narratif', data.zoneStyles)}>
-                          {ov[`ceremony_${i}_joie`] || (hasGp ? 'ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'ont la joie de vous faire part du mariage de leurs enfants')}
+                          {ov[`ceremony_${i}_joie`] || (hasGp ? t.fairepart.joyMessageGp : t.fairepart.joyMessage)}
                         </div>
                       </AnimSection>
                     )}
@@ -4721,7 +4729,7 @@ const firstDate = sorted[0]?.date
                         )
                       })()}
                       {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 15, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 8, opacity: 0.8 }}>{hebrewDate}</div>}
-                      {ceremony.heure && <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 17, color: TEXT, textAlign: 'center', marginBottom: 18, opacity: 0.82 }, 'dateHeure', data.zoneStyles)}>{formatHeure(ceremony.heure)} précises</div>}
+                      {ceremony.heure && <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 17, color: TEXT, textAlign: 'center', marginBottom: 18, opacity: 0.82 }, 'dateHeure', data.zoneStyles)}>{formatHeure(ceremony.heure)} {t.fairepart.precises}</div>}
                       {(ov[`ceremony_${i}_lieu`] || ceremony.lieu) && <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', lineHeight: 1.6, marginBottom: 4 }, 'lieu', data.zoneStyles)}>{ceremony.type === 'Mairie' ? conjonctionLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu) : formatLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu)}</div>}
                       {ceremony.adresse && <div style={{ fontFamily: FC, fontSize: 13, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.6, marginBottom: 20 }}>{ceremony.adresse}</div>}
                       {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
@@ -4946,7 +4954,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
       setShareModalOpen(true)
     } catch (err) {
       void err
-      showToast('Erreur lors du partage', 'error')
+      showToast(t.fairepart.errorShare, 'error')
     } finally {
       setSharing(false)
       setSharingStatus('')
