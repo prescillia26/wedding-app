@@ -446,13 +446,20 @@ function formatDateFrCap(dateStr: string): string {
   return `Le ${cap(w)} ${day} ${cap(m)} ${y}`
 }
 
-function formatHeure(h: string): string {
+function formatHeure(h: string, locale = 'fr'): string {
   if (!h) return ''
-  return 'À ' + h.replace(':', 'H')
+  if (locale === 'en') {
+    const [hh, mm] = h.split(':').map(Number)
+    const ampm = hh >= 12 ? 'PM' : 'AM'
+    const h12 = hh % 12 || 12
+    return `${h12}:${String(mm).padStart(2, '0')} ${ampm}`
+  }
+  return h.replace(':', 'h')
 }
 
-function formatLieu(lieu: string): string {
+function formatLieu(lieu: string, locale = 'fr'): string {
   if (!lieu) return ''
+  if (locale === 'en') return `At ${lieu}`
   const l = lieu.toLowerCase()
   if (l.includes('salon') || l.includes('salle')) return `Dans les salons ${lieu}`
   if (l.includes('château') || l.includes('chateau')) return `Au château ${lieu}`
@@ -460,8 +467,9 @@ function formatLieu(lieu: string): string {
   return `À ${lieu}`
 }
 
-function conjonctionLieu(lieu: string): string {
+function conjonctionLieu(lieu: string, locale = 'fr'): string {
   if (!lieu) return ''
+  if (locale === 'en') return `at ${lieu}`
   const t = lieu.trim()
   const low = t.toLowerCase()
   if (low.startsWith('le ')) return `au ${t.slice(3)}`
@@ -4351,7 +4359,7 @@ function EnveloppeAnimation({ data, theme, onDone }: { data: FormData; theme: Th
 
 // ── ItineraireButtons : Google Maps + Waze avec design luxe ───────────────────
 function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute }: SharedPageContentProps) {
-  const { t } = useT()
+  const { t, locale } = useT()
   const contentRef = useRef<HTMLDivElement>(null)
   const [currentCeremonyIdx, setCurrentCeremonyIdx] = useState(0)
   const [, setContainerWidth] = useState(360)
@@ -4538,7 +4546,7 @@ const firstDate = sorted[0]?.date
       textAlign: 'center',
       animation: 'prenomAppear 1.2s ease 1.2s forwards',
     }}>
-      {new Date(dateAccueil).toLocaleDateString('fr-FR', { weekday: 'long' })}
+      {new Date(dateAccueil).toLocaleDateString(locale === 'en' ? 'en-US' : 'fr-FR', { weekday: 'long' })}
     </div>
   </>
 )}
@@ -4699,7 +4707,7 @@ const firstDate = sorted[0]?.date
                       <LineSep />
                       {ceremony.date && (() => {
                         const d = new Date(ceremony.date + 'T12:00:00')
-                        const parts = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).formatToParts(d)
+                        const parts = new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).formatToParts(d)
                         const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
                         const jourSemaine = cap(parts.find(p => p.type === 'weekday')?.value || '')
                         const jour = parts.find(p => p.type === 'day')?.value || ''
@@ -4721,8 +4729,8 @@ const firstDate = sorted[0]?.date
                         )
                       })()}
                       {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 15, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 8, opacity: 0.8 }}>{hebrewDate}</div>}
-                      {ceremony.heure && <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 17, color: TEXT, textAlign: 'center', marginBottom: 18, opacity: 0.82 }, 'dateHeure', data.zoneStyles)}>{formatHeure(ceremony.heure)}</div>}
-                      {(ov[`ceremony_${i}_lieu`] || ceremony.lieu) && <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', lineHeight: 1.6, marginBottom: 4 }, 'lieu', data.zoneStyles)}>{ceremony.type === 'Mairie' ? conjonctionLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu) : formatLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu)}</div>}
+                      {ceremony.heure && <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 17, color: TEXT, textAlign: 'center', marginBottom: 18, opacity: 0.82 }, 'dateHeure', data.zoneStyles)}>{formatHeure(ceremony.heure, locale)}</div>}
+                      {(ov[`ceremony_${i}_lieu`] || ceremony.lieu) && <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', lineHeight: 1.6, marginBottom: 4 }, 'lieu', data.zoneStyles)}>{ceremony.type === 'Mairie' ? conjonctionLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu, locale) : formatLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu, locale)}</div>}
                       {ceremony.adresse && <div style={{ fontFamily: FC, fontSize: 13, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.6, marginBottom: 20 }}>{ceremony.adresse}</div>}
                       {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
                         <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, textAlign: 'center', marginBottom: 16, borderTop: `1px solid ${G}22`, paddingTop: 14 }}>
