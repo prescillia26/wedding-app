@@ -10,6 +10,7 @@ export interface User {
   needsPassword: boolean
   createdAt: string
   faireparts: string[]
+  locale?: string
 }
 
 export interface Session {

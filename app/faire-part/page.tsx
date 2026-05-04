@@ -5094,7 +5094,7 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
       const res = await fetch('/api/check-promo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: promoInput, email: promoEmail }),
+        body: JSON.stringify({ code: promoInput, email: promoEmail, locale: typeof window !== 'undefined' ? localStorage.getItem('lovit-lang') || 'fr' : 'fr' }),
       })
       const d = await res.json()
       if (d.valid && d.accessCode) {

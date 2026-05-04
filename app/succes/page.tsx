@@ -14,7 +14,7 @@ const inputStyle: React.CSSProperties = {
 }
 
 export default function SuccesPage() {
-  const { t } = useT()
+  const { t, locale } = useT()
   const s = t.success
   const a = t.auth
   const c = t.common
@@ -35,7 +35,7 @@ export default function SuccesPage() {
     const sessionId = params.get('session_id')
     if (!sessionId) { setError(s.errorMissing); setLoading(false); return }
 
-    fetch(`/api/verify-payment?session_id=${sessionId}`)
+    fetch(`/api/verify-payment?session_id=${sessionId}&locale=${locale}`)
       .then(r => r.json())
       .then(async d => {
         if (d.error) { setError(d.error); return }

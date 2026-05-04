@@ -8,7 +8,7 @@ const GOLD = '#C9A84C'
 const CREAM = '#fff8ed'
 
 export default function ConnexionPage() {
-  const { t } = useT()
+  const { t, locale } = useT()
   const a = t.auth
   const c = t.common
 
@@ -90,7 +90,7 @@ export default function ConnexionPage() {
                     await fetch('/api/auth/magic-link', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ email }),
+                      body: JSON.stringify({ email, locale }),
                     })
                     setMagicLinkSent(true)
                     setSendingMagicLink(false)

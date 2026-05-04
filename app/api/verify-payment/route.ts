@@ -2,17 +2,25 @@ import Stripe from 'stripe'
 import { redis } from '@/lib/redis'
 import { createSession, type User } from '@/lib/auth'
 import { Resend } from 'resend'
+import { getEmailT, emailLayout, emailButton, emailSecondaryLink } from '@/lib/email-templates'
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!)
 }
 
 function generateCode(): string {
-  // Exclut 0/O et 1/I pour éviter confusions
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
   let code = ''
   for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)]
   return code
+}
+
+function detectLocale(request: Request): string {
+  const url = new URL(request.url)
+  const paramLocale = url.searchParams.get('locale')
+  if (paramLocale === 'en' || paramLocale === 'fr') return paramLocale
+  const accept = request.headers.get('accept-language') || ''
+  return accept.toLowerCase().startsWith('en') ? 'en' : 'fr'
 }
 
 export async function GET(request: Request) {
@@ -21,7 +29,6 @@ export async function GET(request: Request) {
     const sessionId = searchParams.get('session_id')
     if (!sessionId) return Response.json({ error: 'session_id manquant' }, { status: 400 })
 
-    // Idempotence : si déjà généré pour cette session, retourner le même code
     const existingCode = await redis.get<string>(`stripe-session:${sessionId}`)
     if (existingCode) {
       const data = await redis.get<Record<string, string>>(`access:${existingCode}`)
@@ -33,7 +40,6 @@ export async function GET(request: Request) {
       return Response.json({ error: 'Paiement non complété' }, { status: 402 })
     }
 
-    // Générer un code unique
     let code = generateCode()
     let attempts = 0
     while ((await redis.exists(`access:${code}`)) && attempts < 10) {
@@ -45,90 +51,60 @@ export async function GET(request: Request) {
     const email = session.customer_details?.email || ''
     const entry = { pack, email, sessionId, date: new Date().toISOString() }
 
-    // Stocker 1 an
     await redis.set(`access:${code}`, entry, { ex: 60 * 60 * 24 * 365 })
     await redis.set(`stripe-session:${sessionId}`, code, { ex: 60 * 60 * 24 * 365 })
 
-    // ✅ Création automatique du compte utilisateur
+    const locale = detectLocale(request)
+
     if (email) {
       const normalizedEmail = email.toLowerCase().trim()
       const existingUser = await redis.get<User>(`user:${normalizedEmail}`)
 
       if (!existingUser) {
-        // Créer un nouveau compte sans mot de passe
         const user: User = {
           email: normalizedEmail,
           passwordHash: null,
           needsPassword: true,
           createdAt: new Date().toISOString(),
           faireparts: [],
+          locale,
         }
         await redis.set(`user:${normalizedEmail}`, user)
+      } else if (!existingUser.locale) {
+        await redis.set(`user:${normalizedEmail}`, { ...existingUser, locale })
       }
 
-      // Créer une session automatiquement pour le couple
       await createSession(normalizedEmail)
 
-      // Générer un magic link pour connexion future
       const magicToken = crypto.randomUUID() + crypto.randomUUID()
       await redis.set(`magic:${magicToken}`, {
         email: normalizedEmail,
-        expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24h pour le 1er lien
+        expiresAt: Date.now() + 24 * 60 * 60 * 1000,
         used: false,
       }, { ex: 86400 })
 
-      // Envoyer l'email de bienvenue
       if (process.env.RESEND_API_KEY) {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://getlovit.fr'
         const magicUrl = `${baseUrl}/auth/verify?token=${magicToken}`
         const passwordUrl = `${baseUrl}/auth/definir-mot-de-passe?token=${magicToken}`
         const resend = new Resend(process.env.RESEND_API_KEY)
+        const et = getEmailT(locale)
+
+        const body = `
+          <p style="font-size:16px;color:#4a3728;margin:0 0 8px;line-height:1.6;">${et.welcome.thanks}</p>
+          <p style="font-size:15px;color:#4a3728;margin:0 0 28px;line-height:1.6;">${et.welcome.body}</p>
+          ${emailButton(magicUrl, et.welcome.cta)}
+          <p style="font-size:13px;color:#8a7860;margin:0 0 20px;line-height:1.7;text-align:center;">${et.welcome.ctaSub}</p>
+          <div style="border-top:1px solid #f0e6d3;margin:24px 0;padding-top:16px;text-align:center;">
+            ${emailSecondaryLink(passwordUrl, et.welcome.passwordLink)}
+          </div>
+        `
 
         await resend.emails.send({
           from: 'Lov\'it <noreply@getlovit.fr>',
           to: normalizedEmail,
-          subject: 'Bienvenue sur Lov\'it — Votre faire-part vous attend !',
-          html: `
-            <!DOCTYPE html>
-            <html>
-            <body style="margin:0;padding:0;background:#fff8ed;font-family:Georgia,serif;">
-              <div style="max-width:560px;margin:40px auto;background:white;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.08);">
-                <div style="background:linear-gradient(135deg,#C9A84C,#e8c96a);padding:32px;text-align:center;">
-                  <h1 style="margin:0;font-size:28px;font-weight:300;color:white;letter-spacing:0.06em;">Lov'it</h1>
-                  <p style="margin:8px 0 0;font-size:14px;color:rgba(255,255,255,0.85);">Bienvenue !</p>
-                </div>
-                <div style="padding:32px;">
-                  <p style="font-size:16px;color:#4a3728;margin:0 0 8px;line-height:1.6;">
-                    Merci pour votre achat !
-                  </p>
-                  <p style="font-size:15px;color:#4a3728;margin:0 0 28px;line-height:1.6;">
-                    Votre faire-part digital est prêt à être créé. Cliquez sur le bouton ci-dessous pour accéder à votre espace et commencer la personnalisation.
-                  </p>
-
-                  <div style="text-align:center;margin:28px 0;">
-                    <a href="${magicUrl}" style="display:inline-block;padding:16px 40px;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:white;text-decoration:none;border-radius:9999px;font-size:15px;font-weight:700;letter-spacing:0.06em;box-shadow:0 4px 16px rgba(201,168,76,0.35);">
-                      ACCÉDER À MON ESPACE
-                    </a>
-                  </div>
-
-                  <p style="font-size:13px;color:#8a7860;margin:0 0 20px;line-height:1.7;text-align:center;">
-                    Ce lien vous connectera automatiquement.<br>
-                    Vous pourrez ensuite définir un mot de passe pour vous reconnecter facilement depuis n'importe quel appareil.
-                  </p>
-
-                  <div style="border-top:1px solid #f0e6d3;margin:24px 0;padding-top:16px;text-align:center;">
-                    <a href="${passwordUrl}" style="font-size:13px;color:#C9A84C;text-decoration:underline;">
-                      Définir votre mot de passe directement
-                    </a>
-                  </div>
-                </div>
-                <div style="padding:16px 32px;border-top:1px solid #f0e6d3;text-align:center;">
-                  <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.6;">Avec amour,<br>L'équipe Lov'it</p>
-                </div>
-              </div>
-            </body>
-            </html>
-          `,
+          subject: et.welcome.subject,
+          html: emailLayout(et.welcome.headerSub, body, locale),
         })
       }
     }

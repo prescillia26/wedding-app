@@ -7,7 +7,7 @@ const GOLD = '#C9A84C'
 const CREAM = '#fff8ed'
 
 export default function MotDePasseOubliePage() {
-  const { t } = useT()
+  const { t, locale } = useT()
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -22,7 +22,7 @@ export default function MotDePasseOubliePage() {
       const res = await fetch('/api/auth/magic-link', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, locale }),
       })
       const data = await res.json()
 
