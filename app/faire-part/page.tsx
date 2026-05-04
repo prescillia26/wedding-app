@@ -2252,23 +2252,23 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
   // ── Style 1 : Entrelacé Luxe ──────────────────────────────────────────────
   if (style === 'cercle') {
     const w = Math.round(fs * 1.55)
-    const h = Math.round(fs * 1.75)
+    const h = Math.round(fs * 2.0)
     const bX = Math.round(fs * 0.52)
     const bY = Math.round(fs * 0.14)
     return (
-      <div style={{ position: 'relative', display: 'inline-block', width: w, height: h, overflow: 'visible' }}>
-        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: fs, color, lineHeight: 1.4, position: 'absolute', top: 0, left: 0, zIndex: 2 }}>{a}</span>
-        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: fs, color, lineHeight: 1.4, position: 'absolute', top: 0, left: 0, transform: `translateX(${bX}px) translateY(${bY}px)`, opacity: 0.72, zIndex: 1 }}>{b}</span>
+      <div style={{ position: 'relative', display: 'inline-block', width: w, height: h }}>
+        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: fs, color, lineHeight: 1.5, position: 'absolute', top: 0, left: 0, zIndex: 2 }}>{a}</span>
+        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: fs, color, lineHeight: 1.5, position: 'absolute', top: 0, left: 0, transform: `translateX(${bX}px) translateY(${bY}px)`, opacity: 0.72, zIndex: 1 }}>{b}</span>
       </div>
     )
   }
 
   // ── Style 2 : Calligraphie Pure ───────────────────────────────────────────
   if (style === 'enlace') return (
-    <div style={{ display: 'inline-flex', alignItems: 'baseline', overflow: 'visible', paddingBottom: Math.round(fs * 0.15) }}>
-      <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: fs, color, lineHeight: 1.45, letterSpacing: -Math.round(fs * 0.04) }}>{a}</span>
+    <div style={{ display: 'inline-flex', alignItems: 'baseline', paddingBottom: Math.round(fs * 0.25) }}>
+      <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: fs, color, lineHeight: 1.5, letterSpacing: -Math.round(fs * 0.04) }}>{a}</span>
       <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: Math.round(fs * 0.45), color, opacity: 0.55, lineHeight: 1, margin: `0 ${Math.round(fs * 0.06)}px` }}>&</span>
-      <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: fs, color, lineHeight: 1.45, letterSpacing: -Math.round(fs * 0.04) }}>{b}</span>
+      <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: fs, color, lineHeight: 1.5, letterSpacing: -Math.round(fs * 0.04) }}>{b}</span>
     </div>
   )
 
@@ -2280,13 +2280,13 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
     const r1 = d / 2 - 2, r2 = d / 2 - Math.round(d * 0.07)
     const sw1 = Math.max(0.5, d * 0.005), sw2 = Math.max(0.3, d * 0.003)
     return (
-      <div style={{ position: 'relative', display: 'inline-flex', width: d, height: d, alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'visible' }}>
-        <svg style={{ position: 'absolute', top: 0, left: 0, overflow: 'visible' }} width={d} height={d} viewBox={`0 0 ${d} ${d}`} xmlns="http://www.w3.org/2000/svg">
+      <div style={{ position: 'relative', display: 'inline-flex', width: d, height: d, alignItems: 'center', justifyContent: 'center', flexShrink: 0, paddingBottom: Math.round(d * 0.12) }}>
+        <svg style={{ position: 'absolute', top: 0, left: 0 }} width={d} height={d} viewBox={`0 0 ${d} ${d}`} xmlns="http://www.w3.org/2000/svg">
           <circle cx={cx} cy={cy} r={r1} fill="none" stroke={color} strokeWidth={sw1} opacity="0.35" />
           <circle cx={cx} cy={cy} r={r2} fill="none" stroke={color} strokeWidth={sw2} opacity="0.2" />
         </svg>
-        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: Math.round(fs * 0.84), color, lineHeight: 1.4, position: 'relative', zIndex: 2 }}>{a}</span>
-        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: Math.round(fs * 0.84), color, lineHeight: 1.4, marginLeft: -Math.round(fs * 0.08), opacity: 0.72, transform: 'translateY(8%)', display: 'inline-block', position: 'relative', zIndex: 1 }}>{b}</span>
+        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: Math.round(fs * 0.84), color, lineHeight: 1.5, position: 'relative', zIndex: 2 }}>{a}</span>
+        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: Math.round(fs * 0.84), color, lineHeight: 1.5, marginLeft: -Math.round(fs * 0.08), opacity: 0.72, transform: 'translateY(8%)', display: 'inline-block', position: 'relative', zIndex: 1 }}>{b}</span>
       </div>
     )
   }
@@ -2297,10 +2297,10 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
     const letterFs = Math.round(fs * 0.9)
     const overlap = Math.round(letterFs * 0.18)
     return (
-      <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 0, overflow: 'visible', paddingBottom: Math.round(letterFs * 0.15) }}>
-        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: letterFs, color, lineHeight: 1.4, position: 'relative', zIndex: 2 }}>{a}</span>
+      <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 0, paddingBottom: Math.round(letterFs * 0.25) }}>
+        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: letterFs, color, lineHeight: 1.5, position: 'relative', zIndex: 2 }}>{a}</span>
         <div style={{ width: 1, height: Math.max(6, Math.round(size * 0.05)), background: color, opacity: 0.45, marginTop: -overlap, marginBottom: -overlap, position: 'relative', zIndex: 3 }} />
-        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: letterFs, color, lineHeight: 1.4, opacity: 0.78, position: 'relative', zIndex: 1 }}>{b}</span>
+        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: letterFs, color, lineHeight: 1.5, opacity: 0.78, position: 'relative', zIndex: 1 }}>{b}</span>
       </div>
     )
   }
@@ -2331,9 +2331,9 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
         <circle cx={ornW*0.5} cy={ornH*0.58} r={rDot} fill={color} opacity="0.45"/>
         <circle cx={ornW*0.96} cy={ornH*0.82} r={rDot} fill={color} opacity="0.45"/>
       </svg>
-      <div style={{ position: 'relative', display: 'inline-block', width: Math.round(fs * 1.55), height: Math.round(fs * 1.75), overflow: 'visible' }}>
-        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: fs, color, lineHeight: 1.4, position: 'absolute', top: 0, left: 0, zIndex: 2 }}>{a}</span>
-        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: fs, color, lineHeight: 1.4, position: 'absolute', top: 0, left: 0, transform: `translateX(${bX6}px) translateY(${bY6}px)`, opacity: 0.72, zIndex: 1 }}>{b}</span>
+      <div style={{ position: 'relative', display: 'inline-block', width: Math.round(fs * 1.55), height: Math.round(fs * 2.0) }}>
+        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: fs, color, lineHeight: 1.5, position: 'absolute', top: 0, left: 0, zIndex: 2 }}>{a}</span>
+        <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: fs, color, lineHeight: 1.5, position: 'absolute', top: 0, left: 0, transform: `translateX(${bX6}px) translateY(${bY6}px)`, opacity: 0.72, zIndex: 1 }}>{b}</span>
       </div>
       <svg width={ornW} height={ornH} viewBox={`0 0 ${ornW} ${ornH}`} xmlns="http://www.w3.org/2000/svg">
         <path d={`M${ornW*0.04},${ornH*0.18} Q${ornW*0.25},${ornH*0.94} ${ornW*0.5},${ornH*0.42} Q${ornW*0.75},${ornH*0.94} ${ornW*0.96},${ornH*0.18}`} fill="none" stroke={color} strokeWidth="0.9" opacity="0.5" strokeLinecap="round"/>
