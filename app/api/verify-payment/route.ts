@@ -95,41 +95,35 @@ export async function GET(request: Request) {
               <div style="max-width:560px;margin:40px auto;background:white;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.08);">
                 <div style="background:linear-gradient(135deg,#C9A84C,#e8c96a);padding:32px;text-align:center;">
                   <h1 style="margin:0;font-size:28px;font-weight:300;color:white;letter-spacing:0.06em;">Lov'it</h1>
-                  <p style="margin:8px 0 0;font-size:14px;color:rgba(255,255,255,0.85);">Paiement confirmé</p>
+                  <p style="margin:8px 0 0;font-size:14px;color:rgba(255,255,255,0.85);">Bienvenue !</p>
                 </div>
                 <div style="padding:32px;">
-                  <p style="font-size:16px;color:#4a3728;margin:0 0 20px;line-height:1.6;">
-                    Merci pour votre achat ! Votre faire-part digital est prêt à être créé.
+                  <p style="font-size:16px;color:#4a3728;margin:0 0 8px;line-height:1.6;">
+                    Merci pour votre achat !
+                  </p>
+                  <p style="font-size:15px;color:#4a3728;margin:0 0 28px;line-height:1.6;">
+                    Votre faire-part digital est prêt à être créé. Cliquez sur le bouton ci-dessous pour accéder à votre espace et commencer la personnalisation.
                   </p>
 
-                  <div style="background:#fff8ed;border-radius:12px;padding:20px;margin-bottom:24px;text-align:center;">
-                    <div style="font-size:11px;color:#C9A84C;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">Votre code d'accès</div>
-                    <div style="font-size:32px;font-weight:700;color:#C9A84C;letter-spacing:0.2em;">${code}</div>
-                  </div>
-
-                  <p style="font-size:14px;color:#4a3728;margin:0 0 24px;line-height:1.6;">
-                    Pour accéder à votre espace depuis n'importe quel appareil, définissez votre mot de passe :
-                  </p>
-
-                  <div style="text-align:center;margin:24px 0;">
-                    <a href="${passwordUrl}" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:white;text-decoration:none;border-radius:9999px;font-size:14px;font-weight:700;letter-spacing:0.05em;">
-                      Définir mon mot de passe
+                  <div style="text-align:center;margin:28px 0;">
+                    <a href="${magicUrl}" style="display:inline-block;padding:16px 40px;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:white;text-decoration:none;border-radius:9999px;font-size:15px;font-weight:700;letter-spacing:0.06em;box-shadow:0 4px 16px rgba(201,168,76,0.35);">
+                      ACCÉDER À MON ESPACE
                     </a>
                   </div>
 
-                  <div style="border-top:1px solid #f0e6d3;margin:24px 0;padding-top:20px;">
-                    <p style="font-size:13px;color:#8a7860;margin:0 0 12px;">
-                      Vous pouvez aussi vous connecter directement avec ce lien magique :
-                    </p>
-                    <div style="text-align:center;">
-                      <a href="${magicUrl}" style="font-size:13px;color:#C9A84C;text-decoration:underline;">
-                        Me connecter sans mot de passe
-                      </a>
-                    </div>
+                  <p style="font-size:13px;color:#8a7860;margin:0 0 20px;line-height:1.7;text-align:center;">
+                    Ce lien vous connectera automatiquement.<br>
+                    Vous pourrez ensuite définir un mot de passe pour vous reconnecter facilement depuis n'importe quel appareil.
+                  </p>
+
+                  <div style="border-top:1px solid #f0e6d3;margin:24px 0;padding-top:16px;text-align:center;">
+                    <a href="${passwordUrl}" style="font-size:13px;color:#C9A84C;text-decoration:underline;">
+                      Définir mon mot de passe directement
+                    </a>
                   </div>
                 </div>
                 <div style="padding:16px 32px;border-top:1px solid #f0e6d3;text-align:center;">
-                  <p style="margin:0;font-size:11px;color:#9ca3af;">Lov'it — Faire-parts de mariage digitaux</p>
+                  <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.6;">Avec amour,<br>L'équipe Lov'it</p>
                 </div>
               </div>
             </body>
