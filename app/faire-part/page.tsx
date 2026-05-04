@@ -330,18 +330,22 @@ function fmtParentsLines(pPrenom: string, pNom: string, mPrenom: string, mNom: s
   return []
 }
 
-/** Retourne un textShadow adapté pour la lisibilité selon le thème */
-function readableShadow(theme: ThemeObj, hasPhotoBg = false): string {
+/** Retourne un textShadow adapté pour la lisibilité selon le thème et le fond */
+function readableShadow(theme: ThemeObj, hasPhotoBg = false, hasFrame = false): string {
   if (theme.dark) {
-    // Thème sombre : halo sombre discret pour renforcer le texte clair
-    return '0 1px 4px rgba(0,0,0,0.6), 0 0 12px rgba(0,0,0,0.3)'
+    // Thème sombre : double halo — glow clair autour du texte clair pour le détacher du fond
+    return '0 0 8px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.9)'
   }
   if (hasPhotoBg) {
-    // Photo de fond avec overlay blanc : halo blanc fort
-    return '0 1px 3px rgba(255,255,255,0.95), 0 0 10px rgba(255,255,255,0.8)'
+    // Photo de fond avec overlay : halo blanc épais pour contraste
+    return '0 1px 3px rgba(255,255,255,0.95), 0 0 12px rgba(255,255,255,0.9), 0 0 24px rgba(255,255,255,0.6)'
+  }
+  if (hasFrame) {
+    // Cadre décoratif (peut être chargé visuellement) : halo blanc pour détacher le texte
+    return '0 0 6px rgba(255,255,255,0.9), 0 0 14px rgba(255,255,255,0.7), 0 1px 2px rgba(255,255,255,0.95)'
   }
   // Thème clair sans photo : halo blanc subtil pour la profondeur
-  return '0 1px 2px rgba(255,255,255,0.8), 0 0 6px rgba(255,255,255,0.4)'
+  return '0 1px 2px rgba(255,255,255,0.8), 0 0 8px rgba(255,255,255,0.5)'
 }
 
 // Audio pré-démarré pendant le clic "Générer" pour contourner la politique autoplay
@@ -374,6 +378,7 @@ function applyTextEffect(effet?: string, accentColor?: string): React.CSSPropert
       WebkitBackgroundClip: 'text',
       WebkitTextFillColor: 'transparent',
       backgroundClip: 'text',
+      filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4)) drop-shadow(0 0 8px rgba(255,255,255,0.5))',
     }
   }
   if (effet === 'aquarelle') {
@@ -1718,7 +1723,11 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
       )}
       <OrnementCorner url={ornUrl} corner="top-right" size={130} />
       <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
-      <div style={{ position: 'relative', zIndex: 10, paddingTop: `${framePaddingV}%`, paddingBottom: `${framePaddingV}%`, paddingLeft: `${framePaddingH}%`, paddingRight: `${framePaddingH}%`, textAlign: 'center', opacity: textOpacity, background: undefined, borderRadius: undefined, }}>
+      {/* Zone texte avec voile blanc semi-transparent derrière pour garantir la lisibilité sur cadres chargés */}
+      <div style={{ position: 'relative', zIndex: 10, paddingTop: `${framePaddingV}%`, paddingBottom: `${framePaddingV}%`, paddingLeft: `${framePaddingH}%`, paddingRight: `${framePaddingH}%`, textAlign: 'center', opacity: textOpacity }}>
+        {hasFrame && (
+          <div style={{ position: 'absolute', inset: '8%', background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: -1 }} />
+        )}
         {children}
       </div>
     </div>
@@ -3816,12 +3825,12 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
           }}
         />
       )}
-      {/* Voile sombre en bas pour la lisibilité du texte */}
+      {/* Voile sombre couvrant tout l'écran pour la lisibilité du texte sur n'importe quelle photo */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0) 100%)',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.2) 70%, rgba(0,0,0,0.15) 100%)',
           zIndex: 1,
           pointerEvents: 'none',
         }}
@@ -4478,10 +4487,10 @@ const firstDate = sorted[0]?.date
             <span style={{ color: introTextColor, fontSize: 10, opacity: 0.7 }}>◆</span>
             <div style={{ flex: 1, height: 0.5, background: introTextColor, opacity: 0.4 }} />
           </div>
-          <div style={{ fontFamily: FS, fontSize: 'clamp(30px,8vw,46px)', color: introTextColor, marginBottom: 16, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.2, textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.5), 0 0 20px rgba(0,0,0,0.3)' : readableShadow(theme) }}>
+          <div style={{ fontFamily: FS, fontSize: 'clamp(30px,8vw,46px)', color: introTextColor, marginBottom: 16, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.2, textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : readableShadow(theme) }}>
             {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
           </div>
-          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: introTextColor, marginBottom: 36, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.4), 0 0 16px rgba(0,0,0,0.25)' : readableShadow(theme) }}>
+          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: introTextColor, marginBottom: 36, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}>
             {t.fairepart.pleaseJoin}
           </div>
           <button onClick={handleDiscover} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '14px 40px', fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', boxShadow: `0 4px 20px ${G}44`, animation: 'sharedFadeIn 1s 0.7s ease forwards', opacity: 0 } as React.CSSProperties}>
@@ -4621,7 +4630,7 @@ const firstDate = sorted[0]?.date
                       {i % 2 === 0 ? <><OrnTR /><OrnBL /></> : <><OrnTL /><OrnBR /></>}
                     </>
                   )}
-                  <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: hasFrame ? 'none' : readableShadow(theme, usePhotoBg) }}>
+                  <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame) }}>
                     {data.mariageJuif && (
                       <div style={{ position: 'absolute', top: 18, right: 22, fontSize: 16, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, zIndex: 5, opacity: 0.85, letterSpacing: 1 }}>בס״ד</div>
                     )}
