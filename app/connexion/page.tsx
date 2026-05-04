@@ -46,7 +46,7 @@ export default function ConnexionPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(160deg, ${CREAM} 0%, #fff5f7 50%, ${CREAM} 100%)`, padding: 24 }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(160deg, ${CREAM} 0%, #fffaf4 50%, ${CREAM} 100%)`, padding: 24 }}>
       <div style={{ width: '100%', maxWidth: 420 }}>
         {/* En-tête */}
         <div style={{ textAlign: 'center', marginBottom: 36 }}>

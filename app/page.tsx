@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 
 const GOLD = '#C9A84C'
-const CREAM = '#faf8f5'
+const CREAM = '#fff8ed'
 const DARK = '#2d2416'
 const TEXT = '#4a3728'
 const LIGHT_GOLD = '#f5edda'

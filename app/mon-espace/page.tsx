@@ -70,7 +70,7 @@ export default function MonEspacePage() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(160deg, ${CREAM} 0%, #fff5f7 50%, ${CREAM} 100%)` }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(160deg, ${CREAM} 0%, #fffaf4 50%, ${CREAM} 100%)` }}>
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: GOLD }}>Chargement…</div>
       </div>
     )
@@ -81,7 +81,7 @@ export default function MonEspacePage() {
   const firstPrenom = data.faireparts[0]?.marie1Prenom || data.email.split('@')[0]
 
   return (
-    <div style={{ minHeight: '100vh', background: `linear-gradient(160deg, ${CREAM} 0%, #fff5f7 50%, ${CREAM} 100%)`, padding: '32px 16px 64px' }}>
+    <div style={{ minHeight: '100vh', background: `linear-gradient(160deg, ${CREAM} 0%, #fffaf4 50%, ${CREAM} 100%)`, padding: '32px 16px 64px' }}>
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 40, flexWrap: 'wrap', gap: 16 }}>

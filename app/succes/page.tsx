@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 
 const GOLD = '#C9A84C'
-const CREAM = '#fdf0f3'
+const CREAM = '#fff8ed'
 
 const inputStyle: React.CSSProperties = {
   width: '100%', padding: '12px 16px', borderRadius: 12,
@@ -92,7 +92,7 @@ export default function SuccesPage() {
   )
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(160deg, ${CREAM} 0%, #fff5f7 50%, ${CREAM} 100%)`, padding: 24 }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(160deg, ${CREAM} 0%, #fffaf4 50%, ${CREAM} 100%)`, padding: 24 }}>
       <div style={{ textAlign: 'center', maxWidth: 540 }}>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: `${GOLD}99`, letterSpacing: 4, textTransform: 'uppercase', marginBottom: 12 }}>
           Paiement confirmé

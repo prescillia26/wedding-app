@@ -5124,7 +5124,7 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
   // Pendant la validation auto, affiche un loader doré (pas le formulaire)
   if (autoChecking) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fdf0f3 0%, #fff5f7 50%, #fdf0f3 100%)' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fff8ed 0%, #fffaf4 50%, #fff8ed 100%)' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: GOLD, marginBottom: 8 }}>Lov&apos;it</div>
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: '#6a5040' }}>Activation de votre accès…</div>
@@ -5135,7 +5135,7 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
   // Étape 2 : définir mot de passe après code promo validé
   if (showPasswordStep) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fdf0f3 0%, #fff5f7 50%, #fdf0f3 100%)', padding: 24 }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fff8ed 0%, #fffaf4 50%, #fff8ed 100%)', padding: 24 }}>
         <div style={{ textAlign: 'center', maxWidth: 440, width: '100%' }}>
           <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: GOLD, marginBottom: 4 }}>Lov&apos;it</div>
           <div style={{ width: 50, height: 1, background: GOLD, opacity: 0.3, margin: '0 auto 32px' }} />
@@ -5189,7 +5189,7 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
 
   // Étape 1 : code promo + email
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fdf0f3 0%, #fff5f7 50%, #fdf0f3 100%)', padding: 24 }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fff8ed 0%, #fffaf4 50%, #fff8ed 100%)', padding: 24 }}>
       <div style={{ textAlign: 'center', maxWidth: 440, width: '100%' }}>
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: GOLD, marginBottom: 4 }}>Lov&apos;it</div>
         <div style={{ width: 50, height: 1, background: GOLD, opacity: 0.3, margin: '0 auto 32px' }} />
@@ -5502,7 +5502,7 @@ export default function FairePartPage() {
 
   // Vérification en cours
   if (checkingAccess) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fdf0f3 0%, #fff5f7 50%, #fdf0f3 100%)' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fff8ed 0%, #fffaf4 50%, #fff8ed 100%)' }}>
       <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: '#C9A84C' }}>Chargement…</div>
     </div>
   )
@@ -5513,7 +5513,7 @@ export default function FairePartPage() {
   if (showCards) return <CardsView data={formData} onEdit={() => { try { localStorage.setItem('wedding-draft', JSON.stringify(formData)) } catch { /* ignore */ } setShowCards(false); setStep(1) }} onReset={() => { setFormData(defaultFormData); setShowCards(false); setStep(1); try { localStorage.removeItem('wedding-draft') } catch { /* ignore */ } }} isShared={isShared} role={role} onUpdate={update} />
 
   if (loadingShare) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fdf0f3 0%, #fff5f7 50%, #fdf0f3 100%)' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fff8ed 0%, #fffaf4 50%, #fff8ed 100%)' }}>
       <div style={{ textAlign: 'center' }}>
         <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 28, color: '#C9A84C', marginBottom: 16 }}>Chargement…</div>
         <div style={{ width: 40, height: 1, background: '#C9A84C', opacity: 0.4, margin: '0 auto' }} />
@@ -5522,7 +5522,7 @@ export default function FairePartPage() {
   )
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '48px 16px', background: 'linear-gradient(160deg, #fdf0f3 0%, #fff5f7 50%, #fdf0f3 100%)' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '48px 16px', background: 'linear-gradient(160deg, #fff8ed 0%, #fffaf4 50%, #fff8ed 100%)' }}>
       <div style={{ textAlign: 'center', marginBottom: 36 }}>
         <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(201,168,76,0.65)', fontWeight: 600, marginBottom: 10 }}>Invitation de mariage</p>
         {savedAt && (

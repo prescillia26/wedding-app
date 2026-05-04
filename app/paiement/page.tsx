@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 const GOLD = '#C9A84C'
-const CREAM = '#fdf0f3'
+const CREAM = '#fff8ed'
 const DARK = '#2d1f14'
 const TEXT = '#6a5040'
 
@@ -11,7 +11,7 @@ const LAUNCH_FEATURES = [
   'Design élégant et personnalisable',
   'Photos carrousel, musique, compte à rebours',
   'Dashboard RSVP complet + export Excel',
-  'Modifications illimitées pendant 1 an',
+  'Modifications illimitées — valable à vie',
   'Lien de partage WhatsApp optimisé',
 ]
 
@@ -107,7 +107,7 @@ export default function PaiementPage() {
             </span>
           </div>
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: TEXT, marginTop: 4 }}>
-            paiement unique · accès pendant 1 an
+            paiement unique · valable à vie
           </div>
         </div>
 
@@ -157,7 +157,7 @@ export default function PaiementPage() {
           {[
             { icon: '🔒', text: 'Paiement sécurisé Stripe' },
             { icon: '✨', text: 'Accès immédiat' },
-            { icon: '💌', text: 'Code envoyé par email' },
+            { icon: '✅', text: 'Satisfait ou remboursé sous 7 jours' },
           ].map(({ icon, text }) => (
             <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: TEXT }}>
               <span>{icon}</span><span>{text}</span>
