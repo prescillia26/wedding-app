@@ -5262,7 +5262,7 @@ export default function FairePartPage() {
   // Auth & sauvegarde serveur
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [userFaireparts, setUserFaireparts] = useState<string[]>([])
-  const [userFairepartsInfo, setUserFairepartsInfo] = useState<{ shareId: string; marie1Prenom: string; marie2Prenom: string }[]>([])
+  const [userFairepartsInfo, setUserFairepartsInfo] = useState<{ shareId: string; marie1Prenom: string; marie2Prenom: string; ceremonies: { type: string }[] }[]>([])
   const [activeFairepartId, setActiveFairepartId] = useState<string | null>(null)
   const [serverSavedAt, setServerSavedAt] = useState<Date | null>(null)
   const [serverSaving, setServerSaving] = useState(false)
@@ -5408,8 +5408,8 @@ export default function FairePartPage() {
             if (dashRes.ok) {
               const dashData = await dashRes.json()
               if (!cancelled && dashData.faireparts) {
-                setUserFairepartsInfo(dashData.faireparts.map((fp: { shareId: string; marie1Prenom: string; marie2Prenom: string }) => ({
-                  shareId: fp.shareId, marie1Prenom: fp.marie1Prenom, marie2Prenom: fp.marie2Prenom,
+                setUserFairepartsInfo(dashData.faireparts.map((fp: { shareId: string; marie1Prenom: string; marie2Prenom: string; ceremonies: { type: string }[] }) => ({
+                  shareId: fp.shareId, marie1Prenom: fp.marie1Prenom, marie2Prenom: fp.marie2Prenom, ceremonies: fp.ceremonies ?? [],
                 })))
               }
             }
@@ -5573,29 +5573,28 @@ export default function FairePartPage() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '48px 16px', background: 'linear-gradient(160deg, #fff8ed 0%, #fffaf4 50%, #fff8ed 100%)' }}>
       {/* Barre de navigation entre faire-parts */}
       {userFairepartsInfo.length > 1 && (
-        <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap', justifyContent: 'center' }}>
-          {userFairepartsInfo.map(fp => {
+        <div style={{ display: 'flex', gap: 6, marginBottom: 20, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
+          {userFairepartsInfo.map((fp, idx) => {
             const isActive = fp.shareId === activeFairepartId
-            const label = (fp.marie1Prenom && fp.marie2Prenom) ? `${fp.marie1Prenom} & ${fp.marie2Prenom}` : `Faire-part ${userFairepartsInfo.indexOf(fp) + 1}`
+            const events = fp.ceremonies.map(c => c.type.replace('Cérémonie religieuse / ', '')).join(', ')
+            const label = events || `Faire-part ${idx + 1}`
             return (
               <button key={fp.shareId} onClick={() => !isActive && switchFairepart(fp.shareId)} style={{
                 cursor: isActive ? 'default' : 'pointer',
-                padding: '8px 18px', borderRadius: 9999, fontSize: 12, fontWeight: 600,
-                fontFamily: 'var(--font-playfair-display)', letterSpacing: '0.03em',
-                background: isActive ? 'linear-gradient(135deg, #C9A84C, #e8c96a)' : 'white',
-                color: isActive ? 'white' : '#C9A84C',
-                border: isActive ? 'none' : '1.5px solid #C9A84C',
-                boxShadow: isActive ? '0 2px 12px rgba(201,168,76,0.3)' : 'none',
+                padding: '6px 14px', borderRadius: 9999, fontSize: 11, fontWeight: isActive ? 700 : 500,
+                fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic',
+                background: isActive ? '#C9A84C' : 'white',
+                color: isActive ? 'white' : '#8a7860',
+                border: isActive ? 'none' : '1px solid #e5d5c5',
               }}>
                 {label}
               </button>
             )
           })}
+          <span style={{ color: '#d1d5db', fontSize: 10 }}>·</span>
           <a href="/mon-espace" style={{
-            padding: '8px 14px', borderRadius: 9999, fontSize: 11, fontWeight: 500,
-            fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic',
-            color: '#8a7860', textDecoration: 'none', border: '1px solid #e5d5c5',
-            display: 'flex', alignItems: 'center',
+            fontSize: 11, fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic',
+            color: '#C9A84C', textDecoration: 'none',
           }}>
             Votre espace
           </a>
