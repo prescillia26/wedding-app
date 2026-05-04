@@ -5000,7 +5000,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
           <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>📋 RSVP</button>
         )}
         <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>✏️ Texte</button>
-        <button onClick={onReset} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: '1.5px solid #fecdd3', background: 'transparent', color: '#fb7185', fontSize: 13, fontWeight: 600 }}>Nouveau</button>
+        <a href="/paiement" style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: '1.5px solid #e5d5c5', background: 'transparent', color: '#8a7860', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>+ Nouveau</a>
       </div>
       {rsvpOpen && (
         <RSVPModal accent={theme.accent} onClose={() => setRsvpOpen(false)} mariee1={data.marie1Prenom} mariee2={data.marie2Prenom} shareId={lastShareId} ceremonies={sorted} />
@@ -5571,10 +5571,10 @@ export default function FairePartPage() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '48px 16px', background: 'linear-gradient(160deg, #fff8ed 0%, #fffaf4 50%, #fff8ed 100%)' }}>
-      {/* Barre de navigation entre faire-parts */}
-      {userFairepartsInfo.length > 1 && (
+      {/* Barre de navigation */}
+      {userEmail && (
         <div style={{ display: 'flex', gap: 6, marginBottom: 20, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
-          {userFairepartsInfo.map((fp, idx) => {
+          {userFairepartsInfo.length > 1 && userFairepartsInfo.map((fp, idx) => {
             const isActive = fp.shareId === activeFairepartId
             const events = fp.ceremonies.map(c => c.type.replace('Cérémonie religieuse / ', '')).join(', ')
             const label = events || `Faire-part ${idx + 1}`
@@ -5591,12 +5591,20 @@ export default function FairePartPage() {
               </button>
             )
           })}
-          <span style={{ color: '#d1d5db', fontSize: 10 }}>·</span>
+          {userFairepartsInfo.length > 1 && <span style={{ color: '#d1d5db', fontSize: 10 }}>·</span>}
           <a href="/mon-espace" style={{
-            fontSize: 11, fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic',
-            color: '#C9A84C', textDecoration: 'none',
+            padding: '6px 14px', borderRadius: 9999, fontSize: 11,
+            fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic',
+            color: '#8a7860', textDecoration: 'none', border: '1px solid #e5d5c5',
           }}>
             Votre espace
+          </a>
+          <a href="/paiement" style={{
+            padding: '6px 14px', borderRadius: 9999, fontSize: 11,
+            fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic',
+            color: '#C9A84C', textDecoration: 'none', border: '1px solid #C9A84C44',
+          }}>
+            + Nouveau faire-part
           </a>
         </div>
       )}
