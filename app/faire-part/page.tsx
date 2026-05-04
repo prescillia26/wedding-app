@@ -813,11 +813,12 @@ function Step2({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
 // ── IllustrationCoupleSelector : choix de l'illustration aquarelle ────────────
 
 function IllustrationCoupleSelector({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
+  const { t } = useT()
   const selected = data.illustrationCoupleId
   return (
     <div style={{ marginBottom: 16 }}>
       <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#4a3728', marginBottom: 12 }}>
-        🎨 Choisissez votre illustration
+        🎨 {t.fairepart.illustrationLabel}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
         {ILLUSTRATIONS_COUPLES.map(illu => {
@@ -849,7 +850,7 @@ function IllustrationCoupleSelector({ data, onChange }: { data: FormData; onChan
         })}
       </div>
       <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 8, fontStyle: 'italic' }}>
-        Cette illustration remplacera votre monogramme sur la page d&apos;accueil du faire-part.
+        {t.fairepart.illustrationReplacesMonogram}
       </div>
     </div>
   )
@@ -1421,13 +1422,13 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#4a3728', marginBottom: 24 }}>{t.fairepart.step4Title}</h2>
 
       <div style={{ marginBottom: 24 }}>
-        <Label>Format</Label>
+        <Label>{t.fairepart.presentationLabel}</Label>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
           {([
             {
               key: 'page-unique' as PresentationStyle,
-              label: 'Page unique',
-              desc: 'Défilement fluide',
+              label: t.fairepart.presentationOptions['page-unique'],
+              desc: t.fairepart.presentationDescriptions['page-unique'],
               icon: (
                 <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
                   <rect x="6" y="4" width="24" height="28" rx="2" stroke="currentColor" strokeWidth="1.5"/>
@@ -1440,8 +1441,8 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             },
             {
               key: 'cartes-scrollables' as PresentationStyle,
-              label: 'Cartes scroll',
-              desc: 'Cartes enchaînées',
+              label: t.fairepart.presentationOptions['cartes-scrollables'],
+              desc: t.fairepart.presentationDescriptions['cartes-scrollables'],
               icon: (
                 <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
                   <rect x="5" y="3" width="22" height="12" rx="2" stroke="currentColor" strokeWidth="1.5"/>
@@ -1453,8 +1454,8 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             },
             {
               key: 'cartes-separees' as PresentationStyle,
-              label: 'Cartes séparées',
-              desc: 'Une carte à la fois',
+              label: t.fairepart.presentationOptions['cartes-separees'],
+              desc: t.fairepart.presentationDescriptions['cartes-separees'],
               icon: (
                 <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
                   <rect x="4" y="6" width="20" height="24" rx="2" stroke="currentColor" strokeWidth="1.5"/>
@@ -1530,19 +1531,9 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         </div>
       </div>
 <div style={{ marginBottom: 24 }}>
-  <Label>Animation des textes</Label>
+  <Label>{t.fairepart.animationTextLabel}</Label>
   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-    {([
-      { key: 'fade',        label: '✨ Fondu' },
-      { key: 'slide-up',   label: '⬆️ Monte' },
-      { key: 'rideau',     label: '🎞️ Rideau' },
-      { key: 'brille',     label: '💫 Brillance' },
-      { key: 'deplie',     label: '📜 Déplie' },
-      { key: 'flou',       label: '🌫️ Flou' },
-      { key: 'slide-left', label: '⬅️ De droite' },
-      { key: 'zoom',       label: '🔍 Zoom' },
-      { key: 'flip',       label: '🔄 Flip' },
-    ] as {key:string;label:string}[]).map(opt => {
+    {(Object.entries(t.fairepart.animationTextOptions).map(([key, label]) => ({ key, label }))).map(opt => {
       const sel = (data.animationStyle || 'slide-up') === opt.key
       return (
         <button key={opt.key} type="button" onClick={() => onChange({ animationStyle: opt.key })} style={{
@@ -1558,15 +1549,15 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       {/* ── Monogramme ── */}
       <div style={{ marginBottom: 24 }}>
         <Label>{t.fairepart.monogramStyleLabel}</Label>
-        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>Aperçu avec vos initiales en temps réel</p>
+        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>{t.fairepart.monogramPreviewHint}</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 14 }}>
           {([
-            { key: 'cercle',      label: 'Entrelacé Luxe' },
-            { key: 'enlace',      label: 'Calligraphie Pure' },
-            { key: 'couronne',    label: 'Cercle Élégant' },
-            { key: 'branches',    label: 'Vertical Luxe' },
-            { key: 'losange',     label: 'Minimaliste Chic' },
-            { key: 'minimaliste', label: 'Baroque' },
+            { key: 'cercle',      label: t.fairepart.monogramStyles.cercle },
+            { key: 'enlace',      label: t.fairepart.monogramStyles.enlace },
+            { key: 'couronne',    label: t.fairepart.monogramStyles.couronne },
+            { key: 'branches',    label: t.fairepart.monogramStyles.branches },
+            { key: 'losange',     label: t.fairepart.monogramStyles.losange },
+            { key: 'minimaliste', label: t.fairepart.monogramStyles.minimaliste },
           ] as { key: string; label: string }[]).map(opt => {
             const sel = (data.monogrammeStyle || 'cercle') === opt.key
             const previewColor = data.monogrammeColor || '#C9A84C'
@@ -1593,12 +1584,12 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         <Label>{t.fairepart.monogramColorLabel}</Label>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
           {([
-            { value: '',        label: 'Thème',    swatch: '#C9A84C' },
-            { value: '#C9A84C', label: 'Doré',     swatch: '#C9A84C' },
-            { value: '#9e9e9e', label: 'Argent',   swatch: '#9e9e9e' },
-            { value: '#d4829a', label: 'Rose',     swatch: '#d4829a' },
-            { value: '#8b0000', label: 'Bordeaux', swatch: '#8b0000' },
-            { value: '#1a1a1a', label: 'Noir',     swatch: '#1a1a1a' },
+            { value: '',        label: t.fairepart.colorOptions[''] || 'Theme',       swatch: '#C9A84C' },
+            { value: '#C9A84C', label: t.fairepart.colorOptions['#C9A84C'] || 'Gold', swatch: '#C9A84C' },
+            { value: '#9e9e9e', label: t.fairepart.colorOptions['#9e9e9e'] || 'Silver', swatch: '#9e9e9e' },
+            { value: '#d4829a', label: t.fairepart.colorOptions['#d4829a'] || 'Pink',   swatch: '#d4829a' },
+            { value: '#8b0000', label: t.fairepart.colorOptions['#8b0000'] || 'Burgundy', swatch: '#8b0000' },
+            { value: '#1a1a1a', label: t.fairepart.colorOptions['#1a1a1a'] || 'Black',  swatch: '#1a1a1a' },
           ] as { value: string; label: string; swatch: string }[]).map(opt => {
             const sel = (data.monogrammeColor ?? '') === opt.value
             return (
@@ -3388,9 +3379,11 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
   onClose: () => void
   theme: ThemeObj
 }) {
+  const { t } = useT()
   const [tab, setTab] = useState<'texte' | 'style'>('texte')
   const [localText, setLocalText] = useState<Record<string, string>>(textOverrides)
   const [localStyles, setLocalStyles] = useState<ZoneStyles>(zoneStyles ?? {})
+  const localizedColors = COLOR_OPTIONS.map(c => ({ ...c, label: t.fairepart.colorOptions[c.value] || c.label }))
   const setText = (k: string, v: string) => {
     setLocalText(prev => {
       const next = { ...prev, [k]: v }
@@ -3505,10 +3498,10 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
                   {/* Couleur */}
                   <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Couleur</label>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
-                    {COLOR_OPTIONS.map(c => {
+                    {localizedColors.map(c => {
                       const sel = (z.color ?? '') === c.value
                       return (
-                        <button key={c.label} type="button" onClick={() => setZoneStyle(zone, { color: c.value })} 
+                        <button key={c.label} type="button" onClick={() => setZoneStyle(zone, { color: c.value })}
                           title={c.label}
                           style={{
                             ...BTN,

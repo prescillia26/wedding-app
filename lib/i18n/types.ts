@@ -225,6 +225,11 @@ export interface FairepartDict {
   logoColor: string
   animationLabel: string
   animationOptions: Record<string, string>
+  animationTextLabel: string
+  animationTextOptions: Record<string, string>
+  monogramPreviewHint: string
+  illustrationReplacesMonogram: string
+  presentationDescriptions: Record<string, string>
   effectLabel: string
   effectOptions: Record<string, string>
   zoneStyleLabel: string
