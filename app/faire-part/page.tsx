@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { showToast } from '../components/Toast'
+import { useT } from '@/lib/i18n'
 
 
 type Theme = 'rose-fleuri' | 'ivoire-or' | 'bleu-floral' | 'champetre' | 'blanc-gris' | 'noir-blanc' | 'chocolat' | 'bordeaux' | 'bordeaux-nuit' | 'fuchsia' | 'marine-or' | 'menthe'
@@ -654,7 +655,8 @@ function Field({ label, value, onChange, placeholder, type = 'text' }: {
 }
 
 function ProgressBar({ step }: { step: number }) {
-  const steps = ['Les mariés', 'Les familles', 'Cérémonies', 'Style']
+  const { t } = useT()
+  const steps = [t.fairepart.step1Title, t.fairepart.step2Title, t.fairepart.step3Title, t.fairepart.step4Title]
   return (
     <div style={{ marginBottom: 32 }}>
       <div style={{ position: 'relative', display: 'flex', alignItems: 'center', marginBottom: 10 }}>
@@ -691,16 +693,17 @@ function ProgressBar({ step }: { step: number }) {
 }
 
 function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
+  const { t } = useT()
   return (
     <div>
-      <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#4a3728', marginBottom: 24 }}>Les mariés</h2>
+      <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#4a3728', marginBottom: 24 }}>{t.fairepart.step1Title}</h2>
       <div style={{ background: '#fdf8f9', borderRadius: 12, padding: 20, marginBottom: 16 }}>
-        <div style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Marié·e 1</div>
+        <div style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>{t.fairepart.person1}</div>
         <div style={{ display: 'flex', gap: 12 }}>
-          <Field label="Prénom" value={data.marie1Prenom} onChange={v => onChange({ marie1Prenom: v })} placeholder="Sophie" />
-          <Field label="Nom" value={data.marie1Nom} onChange={v => onChange({ marie1Nom: v })} placeholder="Martin" />
+          <Field label={t.fairepart.firstName} value={data.marie1Prenom} onChange={v => onChange({ marie1Prenom: v })} placeholder="Sophie" />
+          <Field label={t.fairepart.lastName} value={data.marie1Nom} onChange={v => onChange({ marie1Nom: v })} placeholder="Martin" />
         </div>
-        <Field label="2ème prénom (optionnel)" value={data.marie1Prenom2} onChange={v => onChange({ marie1Prenom2: v })} placeholder="Marie" />
+        <Field label={`${t.fairepart.secondName} (optionnel)`} value={data.marie1Prenom2} onChange={v => onChange({ marie1Prenom2: v })} placeholder="Marie" />
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '16px 0' }}>
         <div style={{ flex: 1, height: 1, background: '#fecdd3' }} />
@@ -708,15 +711,15 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         <div style={{ flex: 1, height: 1, background: '#fecdd3' }} />
       </div>
       <div style={{ background: '#fdf8f9', borderRadius: 12, padding: 20 }}>
-        <div style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Marié·e 2</div>
+        <div style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>{t.fairepart.person2}</div>
         <div style={{ display: 'flex', gap: 12 }}>
-          <Field label="Prénom" value={data.marie2Prenom} onChange={v => onChange({ marie2Prenom: v })} placeholder="Thomas" />
-          <Field label="Nom" value={data.marie2Nom} onChange={v => onChange({ marie2Nom: v })} placeholder="Dupont" />
+          <Field label={t.fairepart.firstName} value={data.marie2Prenom} onChange={v => onChange({ marie2Prenom: v })} placeholder="Thomas" />
+          <Field label={t.fairepart.lastName} value={data.marie2Nom} onChange={v => onChange({ marie2Nom: v })} placeholder="Dupont" />
         </div>
-        <Field label="2ème prénom (optionnel)" value={data.marie2Prenom2} onChange={v => onChange({ marie2Prenom2: v })} placeholder="David" />
+        <Field label={`${t.fairepart.secondName} (optionnel)`} value={data.marie2Prenom2} onChange={v => onChange({ marie2Prenom2: v })} placeholder="David" />
       </div>
       <div style={{ marginTop: 20, padding: 16, background: '#fdf8f9', borderRadius: 12 }}>
-  <Label>Votre lien personnalisé (optionnel)</Label>
+  <Label>{t.fairepart.customLink} (optionnel)</Label>
   <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Ex: sarah-et-david → lovit.fr/sarah-et-david</p>
   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
     <span style={{ fontSize: 12, color: '#9ca3af', whiteSpace: 'nowrap' }}>lovit.fr/</span>
@@ -757,27 +760,28 @@ function GpGroupFields({ label, data, onChange, perePrenom, pereNom, merePrenom,
 }
 
 function Step2({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
+  const { t } = useT()
   const cols: Array<{ title: string; gps: GpGroupDef[]; pereKey: keyof FormData; pereNomKey: keyof FormData; mereKey: keyof FormData; mereNomKey: keyof FormData }> = [
     {
-      title: data.marie1Prenom || 'Marié·e 1',
+      title: data.marie1Prenom || t.fairepart.person1,
       gps: [
-        { label: 'GP paternels', perePrenom: 'famille1GpPaPerePrenom', pereNom: 'famille1GpPaPereNom', merePrenom: 'famille1GpPaMerePrenom', mereNom: 'famille1GpPaMereNom' },
-        { label: 'GP maternels', perePrenom: 'famille1GpMaPerePrenom', pereNom: 'famille1GpMaPereNom', merePrenom: 'famille1GpMaMerePrenom', mereNom: 'famille1GpMaMereNom' },
+        { label: t.fairepart.gpPaternal, perePrenom: 'famille1GpPaPerePrenom', pereNom: 'famille1GpPaPereNom', merePrenom: 'famille1GpPaMerePrenom', mereNom: 'famille1GpPaMereNom' },
+        { label: t.fairepart.gpMaternal, perePrenom: 'famille1GpMaPerePrenom', pereNom: 'famille1GpMaPereNom', merePrenom: 'famille1GpMaMerePrenom', mereNom: 'famille1GpMaMereNom' },
       ],
       pereKey: 'famille1PerePrenom', pereNomKey: 'famille1PereNom', mereKey: 'famille1MerePrenom', mereNomKey: 'famille1MereNom',
     },
     {
-      title: data.marie2Prenom || 'Marié·e 2',
+      title: data.marie2Prenom || t.fairepart.person2,
       gps: [
-        { label: 'GP paternels', perePrenom: 'famille2GpPaPerePrenom', pereNom: 'famille2GpPaPereNom', merePrenom: 'famille2GpPaMerePrenom', mereNom: 'famille2GpPaMereNom' },
-        { label: 'GP maternels', perePrenom: 'famille2GpMaPerePrenom', pereNom: 'famille2GpMaPereNom', merePrenom: 'famille2GpMaMerePrenom', mereNom: 'famille2GpMaMereNom' },
+        { label: t.fairepart.gpPaternal, perePrenom: 'famille2GpPaPerePrenom', pereNom: 'famille2GpPaPereNom', merePrenom: 'famille2GpPaMerePrenom', mereNom: 'famille2GpPaMereNom' },
+        { label: t.fairepart.gpMaternal, perePrenom: 'famille2GpMaPerePrenom', pereNom: 'famille2GpMaPereNom', merePrenom: 'famille2GpMaMerePrenom', mereNom: 'famille2GpMaMereNom' },
       ],
       pereKey: 'famille2PerePrenom', pereNomKey: 'famille2PereNom', mereKey: 'famille2MerePrenom', mereNomKey: 'famille2MereNom',
     },
   ]
   return (
     <div>
-      <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#4a3728', marginBottom: 24 }}>Les familles</h2>
+      <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#4a3728', marginBottom: 24 }}>{t.fairepart.step2Title}</h2>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         {cols.map((col, ci) => (
           <div key={ci}>
@@ -786,17 +790,17 @@ function Step2({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
               <GpGroupFields key={g.label + ci} {...g} data={data} onChange={onChange} />
             ))}
             <div style={{ marginBottom: 14 }}>
-              <Label>Père</Label>
+              <Label>{t.fairepart.fatherLabel}</Label>
               <div style={{ display: 'flex', gap: 6 }}>
-                <input type="text" value={data[col.pereKey] as string} placeholder="Prénom" onChange={e => onChange({ [col.pereKey]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1 }} />
-                <input type="text" value={data[col.pereNomKey] as string} placeholder="Nom" onChange={e => onChange({ [col.pereNomKey]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1 }} />
+                <input type="text" value={data[col.pereKey] as string} placeholder={t.fairepart.firstName} onChange={e => onChange({ [col.pereKey]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1 }} />
+                <input type="text" value={data[col.pereNomKey] as string} placeholder={t.fairepart.lastName} onChange={e => onChange({ [col.pereNomKey]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1 }} />
               </div>
             </div>
             <div style={{ marginBottom: 14 }}>
-              <Label>Mère</Label>
+              <Label>{t.fairepart.motherLabel}</Label>
               <div style={{ display: 'flex', gap: 6 }}>
-                <input type="text" value={data[col.mereKey] as string} placeholder="Prénom" onChange={e => onChange({ [col.mereKey]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1 }} />
-                <input type="text" value={data[col.mereNomKey] as string} placeholder="Nom" onChange={e => onChange({ [col.mereNomKey]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1 }} />
+                <input type="text" value={data[col.mereKey] as string} placeholder={t.fairepart.firstName} onChange={e => onChange({ [col.mereKey]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1 }} />
+                <input type="text" value={data[col.mereNomKey] as string} placeholder={t.fairepart.lastName} onChange={e => onChange({ [col.mereNomKey]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1 }} />
               </div>
             </div>
           </div>
@@ -854,6 +858,7 @@ function IllustrationCoupleSelector({ data, onChange }: { data: FormData; onChan
 // ── StyleAccueilSelector : photo / monogramme / illustration ──────────────────
 
 function StyleAccueilSelector({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
+  const { t } = useT()
   const style = data.styleAccueil || 'photo'
   const options: Array<{ id: 'photo' | 'monogramme' | 'illustration'; label: string; emoji: string }> = [
     { id: 'photo', label: 'Photos', emoji: '📸' },
@@ -862,7 +867,7 @@ function StyleAccueilSelector({ data, onChange }: { data: FormData; onChange: (d
   return (
     <div style={{ marginBottom: 16 }}>
       <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#4a3728', marginBottom: 12 }}>
-        Style de la page d&apos;accueil
+        {t.fairepart.accueilStyleLabel}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginBottom: 12 }}>
         {options.map(opt => {
@@ -1258,6 +1263,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
 }
 
 function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, accent }: { logoUrl?: string; logoSize?: number; logoColor?: string; onChange: (d: Partial<FormData>) => void; accent: string }) {
+  const { t } = useT()
   const [uploading, setUploading] = useState(false)
 
   const removeBackground = (file: File): Promise<Blob> => {
@@ -1341,12 +1347,12 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
 
         {/* Réglages avancés */}
         <div style={{ marginTop: 16, padding: '14px 16px', border: '1px solid #e5d5c5', borderRadius: 12, background: '#fefcf8', textAlign: 'left' }}>
-          <p style={{ fontSize: 11, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Réglages avancés</p>
+          <p style={{ fontSize: 11, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>{t.fairepart.logoAdvanced}</p>
 
           {/* Taille */}
           <div style={{ marginBottom: 14 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-              <span style={{ fontSize: 12, color: '#4a3728' }}>Taille</span>
+              <span style={{ fontSize: 12, color: '#4a3728' }}>{t.fairepart.logoSize}</span>
               <span style={{ fontSize: 11, color: '#9ca3af' }}>{logoSize}%</span>
             </div>
             <input type="range" min={50} max={150} step={5} value={logoSize} onChange={e => onChange({ customLogoSize: Number(e.target.value) })} style={{ width: '100%', accentColor: accent }} />
@@ -1354,7 +1360,7 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
 
           {/* Couleur */}
           <div>
-            <span style={{ fontSize: 12, color: '#4a3728', display: 'block', marginBottom: 8 }}>Couleur</span>
+            <span style={{ fontSize: 12, color: '#4a3728', display: 'block', marginBottom: 8 }}>{t.fairepart.logoColor}</span>
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
               {LOGO_COLORS.map(opt => {
                 const sel = logoColor === opt.value
@@ -1380,7 +1386,7 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
 
         <div style={{ marginTop: 10 }}>
           <button type="button" onClick={() => onChange({ customLogoUrl: '', customLogoSize: 100, customLogoColor: '' })} style={{ cursor: 'pointer', background: 'transparent', border: `1px solid #fecdd3`, borderRadius: 9999, padding: '6px 16px', fontSize: 11, color: '#fb7185', fontWeight: 600 }}>
-            Supprimer mon logo
+            {t.fairepart.logoDelete}
           </button>
         </div>
       </div>
@@ -1396,7 +1402,7 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
         fontSize: 13, color: accent, fontWeight: 600,
         opacity: uploading ? 0.6 : 1,
       }}>
-        <span>{uploading ? 'Upload en cours…' : 'Importer mon propre logo'}</span>
+        <span>{uploading ? 'Upload en cours…' : t.fairepart.logoUpload}</span>
         <input type="file" accept="image/png,image/jpg,image/jpeg" onChange={handleLogoUpload} style={{ display: 'none' }} disabled={uploading} />
       </label>
       <p style={{ fontSize: 10, color: '#9ca3af', marginTop: 8, fontStyle: 'italic', lineHeight: 1.5 }}>
@@ -1408,9 +1414,10 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
 }
 
 function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
+  const { t } = useT()
   return (
     <div>
-      <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#4a3728', marginBottom: 24 }}>Style & options</h2>
+      <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#4a3728', marginBottom: 24 }}>{t.fairepart.step4Title}</h2>
 
       <div style={{ marginBottom: 24 }}>
         <Label>Format</Label>
@@ -1549,7 +1556,7 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
 </div>
       {/* ── Monogramme ── */}
       <div style={{ marginBottom: 24 }}>
-        <Label>Style du monogramme</Label>
+        <Label>{t.fairepart.monogramStyleLabel}</Label>
         <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>Aperçu avec vos initiales en temps réel</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 14 }}>
           {([
@@ -1582,7 +1589,7 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             )
           })}
         </div>
-        <Label>Couleur du monogramme</Label>
+        <Label>{t.fairepart.monogramColorLabel}</Label>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
           {([
             { value: '',        label: 'Thème',    swatch: '#C9A84C' },
@@ -1618,10 +1625,10 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
 
       <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 14, border: '1px solid #fecdd3', borderRadius: 10, cursor: 'pointer', marginBottom: 20, fontSize: 14, color: '#4a3728' }}>
         <input type="checkbox" checked={data.mariageJuif} onChange={e => onChange({ mariageJuif: e.target.checked })} />
-        Mariage juif ✡
+        {t.fairepart.jewishWedding}
       </label>
       <div style={{ marginBottom: 20 }}>
-        <Label>Musique de fond — Fichier MP3</Label>
+        <Label>{t.fairepart.musicLabel}</Label>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
           <p style={{ fontSize: 11, color: '#9ca3af', margin: 0, flex: 1 }}>Convertissez votre chanson en MP3, puis uploadez-la ici</p>
           <a href="https://yt2mp3.gs" target="_blank" rel="noopener noreferrer" style={{
@@ -4344,6 +4351,7 @@ function EnveloppeAnimation({ data, theme, onDone }: { data: FormData; theme: Th
 
 // ── ItineraireButtons : Google Maps + Waze avec design luxe ───────────────────
 function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute }: SharedPageContentProps) {
+  const { t } = useT()
   const contentRef = useRef<HTMLDivElement>(null)
   const [currentCeremonyIdx, setCurrentCeremonyIdx] = useState(0)
   const [, setContainerWidth] = useState(360)
@@ -4446,10 +4454,10 @@ const firstDate = sorted[0]?.date
             {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
           </div>
           <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: introTextColor, marginBottom: 36, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.4), 0 0 16px rgba(0,0,0,0.25)' : readableShadow(theme) }}>
-            ont le plaisir de vous convier à leur mariage
+            {t.fairepart.pleaseJoin}
           </div>
           <button onClick={handleDiscover} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '14px 40px', fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', boxShadow: `0 4px 20px ${G}44`, animation: 'sharedFadeIn 1s 0.7s ease forwards', opacity: 0 } as React.CSSProperties}>
-            DÉCOUVRIR VOTRE INVITATION
+            {t.fairepart.discoverInvitation}
           </button>
         </div>
         </div>
@@ -4465,7 +4473,7 @@ const firstDate = sorted[0]?.date
             <AnimSection animStyle={anim}>
               {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 14, color: G, direction: 'rtl', textAlign: 'right', marginBottom: 16 }}>בס״ד</div>}
               <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: G, textAlign: 'center', letterSpacing: 1, marginBottom: 14 }}>
-                Le Mariage de
+                {t.fairepart.weddingOf}
               </div>
               <LineSep />
             </AnimSection>
@@ -4795,7 +4803,7 @@ const firstDate = sorted[0]?.date
         {role === 'guest' && (
           <section style={{ paddingTop: 60, paddingBottom: 52, borderBottom: `1px solid ${G}1a` }}>
             <AnimSection animStyle={anim}>
-              <div style={{ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>VOTRE RÉPONSE</div>
+              <div style={{ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>{t.fairepart.yourResponse}</div>
               <OrnSep />
               <div style={{ border: `1px solid ${G}33`, borderRadius: 4, padding: '32px 24px', textAlign: 'center' }}>
                 <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, marginBottom: 28, lineHeight: 1.8, opacity: 0.85 }}>
@@ -4851,6 +4859,7 @@ const firstDate = sorted[0]?.date
 
 // ── CardsView ─────────────────────────────────────────────────────────────────
 function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: FormData; onEdit: () => void; onReset: () => void; isShared: boolean; role: string | null; onUpdate?: (d: Partial<FormData>) => void }) {
+  const { t } = useT()
   const theme = THEMES[data.style]
   const sorted = sortByDate(data.ceremonies)
   const [rsvpOpen, setRsvpOpen] = useState(false)
@@ -4962,9 +4971,9 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         />
         {role === 'couple' && (
           <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button onClick={onEdit} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>Modifier</button>
-            <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>✏️ Texte</button>
-            <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{sharing ? (sharingStatus || 'Chargement...') : '🔗 Partager'}</button>
+            <button onClick={onEdit} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>{t.fairepart.editBtn}</button>
+            <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>{t.fairepart.textBtn}</button>
+            <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{sharing ? (sharingStatus || 'Chargement...') : t.common.share}</button>
             {lastShareId && (
               <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>📋 RSVP</button>
             )}
@@ -5010,16 +5019,16 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         onToggleYtMute={toggleYtMute}
       />
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
-        <button onClick={onEdit} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>Modifier</button>
-        <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{sharing ? (sharingStatus || 'Chargement...') : '🔗 Partager'}</button>
+        <button onClick={onEdit} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>{t.fairepart.editBtn}</button>
+        <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{sharing ? (sharingStatus || 'Chargement...') : t.common.share}</button>
         {lastShareId && (
           <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>📋 RSVP</button>
         )}
-        <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>✏️ Texte</button>
+        <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>{t.fairepart.textBtn}</button>
         {lastShareId && (
-          <a href={`/plan-table?shareId=${lastShareId}`} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>🪑 Tables</a>
+          <a href={`/plan-table?shareId=${lastShareId}`} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>{t.fairepart.tablesBtn}</a>
         )}
-        <a href="/paiement" style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: '1.5px solid #e5d5c5', background: 'transparent', color: '#8a7860', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>+ Nouveau</a>
+        <a href="/paiement" style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: '1.5px solid #e5d5c5', background: 'transparent', color: '#8a7860', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>{t.fairepart.newBtn}</a>
       </div>
       {rsvpOpen && (
         <RSVPModal accent={theme.accent} onClose={() => setRsvpOpen(false)} mariee1={data.marie1Prenom} mariee2={data.marie2Prenom} shareId={lastShareId} ceremonies={sorted} />
@@ -5052,6 +5061,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
 
 function AccessGate({ onGranted }: { onGranted: () => void }) {
   const GOLD = '#C9A84C'
+  const { t } = useT()
   // ✅ Auto-validation si code dans l'URL (après paiement réussi)
   const [autoCheckDone, setAutoCheckDone] = useState(false)
   const [autoChecking, setAutoChecking] = useState(true)
@@ -5219,7 +5229,7 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
         <div style={{ background: 'white', borderRadius: 20, padding: '36px 32px', boxShadow: '0 12px 48px rgba(201,168,76,0.12)', border: `1px solid ${GOLD}22`, marginBottom: 20, textAlign: 'left' }}>
           <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 20, color: '#2d1f14', marginBottom: 6, textAlign: 'center' }}>Accéder à votre faire-part</div>
           <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#6a5040', marginBottom: 24, textAlign: 'center' }}>
-            Entrez votre code promo et votre email
+            {t.fairepart.promoTitle}
           </p>
 
           <div style={{ marginBottom: 12 }}>
@@ -5284,6 +5294,7 @@ export default function FairePartPage() {
   const [serverSavedAt, setServerSavedAt] = useState<Date | null>(null)
   const [serverSaving, setServerSaving] = useState(false)
   const serverSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const { t } = useT()
   // Prevents double-firing when both onTouchEnd and onClick trigger
   const lastTap = useRef(0)
 
@@ -5561,19 +5572,19 @@ export default function FairePartPage() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '48px 16px', background: 'linear-gradient(160deg, #fff8ed 0%, #fffaf4 50%, #fff8ed 100%)' }}>
       <div style={{ textAlign: 'center', marginBottom: 36 }}>
-        <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(201,168,76,0.65)', fontWeight: 600, marginBottom: 10 }}>Invitation de mariage</p>
+        <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(201,168,76,0.65)', fontWeight: 600, marginBottom: 10 }}>{t.fairepart.invitationLabel}</p>
         {savedAt && (
           <div style={{ fontSize: 11, color: '#7a9e6e', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', marginBottom: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
             <span style={{ fontSize: 13 }}>✓</span>
-            Sauvegardé automatiquement à {savedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+            {t.fairepart.savedAt.replace('{time}', savedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }))}
           </div>
         )}
         {userEmail && (
           <div style={{ fontSize: 11, color: serverSaving ? '#C9A84C' : '#7a9e6e', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
             {serverSaving ? (
-              <>Sauvegarde sur le serveur…</>
+              <>{t.fairepart.savingServer}</>
             ) : serverSavedAt ? (
-              <><span style={{ fontSize: 13 }}>☁</span> Sauvegardé sur le serveur à {serverSavedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</>
+              <><span style={{ fontSize: 13 }}>☁</span> {t.fairepart.savedServer.replace('{time}', serverSavedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }))}</>
             ) : null}
           </div>
         )}
@@ -5583,7 +5594,7 @@ export default function FairePartPage() {
               ✓ Votre travail est sauvegardé sur cet appareil
             </div>
             <button onClick={resumeDraft} style={{ ...BTN, padding: '14px 32px', borderRadius: 9999, background: 'linear-gradient(135deg, #C9A84C, #e8c96a)', color: 'white', border: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 4px 16px rgba(201,168,76,0.35)' }}>
-              Reprendre votre faire-part →
+              {t.fairepart.resumeDraft}
             </button>
             <button
               onClick={() => {
@@ -5625,7 +5636,7 @@ export default function FairePartPage() {
             onTouchEnd={onTouchNext}
             style={{ ...BTN, flex: 1, padding: '18px 0', borderRadius: 9999, border: 'none', background: step === 4 ? 'linear-gradient(135deg, #C9A84C, #e8c96a)' : 'linear-gradient(135deg, #fb7185, #f43f5e)', color: 'white', fontSize: 14, fontWeight: 700, boxShadow: '0 6px 20px rgba(251,113,133,0.35)' }}
           >
-            {step === 4 ? 'Générer ✦' : 'Suivant →'}
+            {step === 4 ? t.fairepart.generateBtn : 'Suivant →'}
           </button>
         </div>
       </div>
