@@ -4682,12 +4682,12 @@ const firstDate = sorted[0]?.date
                         return (
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '24px 0' }}>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-                              <div style={{ textAlign: 'right' }}>
-                                <div style={{ borderBottom: `1px solid ${G}`, paddingBottom: 4, letterSpacing: 3, fontSize: 11, color: G }}>{jourSemaine.toUpperCase()}</div>
+                              <div style={{ width: 80, textAlign: 'right' }}>
+                                <div style={{ borderBottom: `1px solid ${G}`, paddingBottom: 4, letterSpacing: 3, fontSize: 11, color: G, display: 'inline-block' }}>{jourSemaine.toUpperCase()}</div>
                               </div>
                               <div style={{ border: `1.5px solid ${G}`, borderRadius: 4, padding: '8px 16px', fontSize: 36, fontFamily: FP, color: G, fontWeight: 600, minWidth: 60, textAlign: 'center' }}>{jour}</div>
-                              <div style={{ textAlign: 'left' }}>
-                                <div style={{ borderBottom: `1px solid ${G}`, paddingBottom: 4, letterSpacing: 3, fontSize: 11, color: G }}>{mois.toUpperCase()}</div>
+                              <div style={{ width: 80, textAlign: 'left' }}>
+                                <div style={{ borderBottom: `1px solid ${G}`, paddingBottom: 4, letterSpacing: 3, fontSize: 11, color: G, display: 'inline-block' }}>{mois.toUpperCase()}</div>
                               </div>
                             </div>
                             <div style={{ fontSize: 11, color: TEXT, letterSpacing: 2, marginTop: 6 }}>{annee}</div>
