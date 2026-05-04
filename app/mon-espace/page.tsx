@@ -86,7 +86,7 @@ export default function MonEspacePage() {
       localStorage.removeItem('lovit_share_id')
       localStorage.removeItem('lovit_user_email')
     } catch { /* ignore */ }
-    window.location.href = '/connexion'
+    window.location.href = '/'
   }
 
   if (loading) {

@@ -14,10 +14,16 @@ export async function POST(request: Request) {
     // Vérifier la propriété si c'est une mise à jour (fixedId fourni)
     const session = await getSession()
     if (fixedId) {
-      // Vérifier si ce faire-part a un owner
       const existing = await redis.get<Record<string, unknown>>(fixedId)
-      if (existing?.ownerEmail && session?.email !== existing.ownerEmail) {
-        return Response.json({ error: 'Accès non autorisé' }, { status: 403 })
+      if (existing) {
+        // Si le faire-part a un owner, seul cet owner peut le modifier
+        if (existing.ownerEmail && session?.email !== existing.ownerEmail) {
+          return Response.json({ error: 'Accès non autorisé' }, { status: 403 })
+        }
+        // Si pas d'owner mais un utilisateur connecté, on lui attribue
+        if (!existing.ownerEmail && session?.email) {
+          shareData.ownerEmail = session.email
+        }
       }
     }
 

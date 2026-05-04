@@ -5437,6 +5437,8 @@ export default function FairePartPage() {
         })
         if (res.ok) {
           setServerSavedAt(new Date())
+        } else if (res.status === 401) {
+          showToast('Session expirée — reconnectez-vous pour sauvegarder sur le serveur', 'error')
         }
       } catch { /* ignore */ }
       setServerSaving(false)
