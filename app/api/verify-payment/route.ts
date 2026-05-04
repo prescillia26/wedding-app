@@ -118,7 +118,7 @@ export async function GET(request: Request) {
 
                   <div style="border-top:1px solid #f0e6d3;margin:24px 0;padding-top:16px;text-align:center;">
                     <a href="${passwordUrl}" style="font-size:13px;color:#C9A84C;text-decoration:underline;">
-                      Définir mon mot de passe directement
+                      Définir votre mot de passe directement
                     </a>
                   </div>
                 </div>

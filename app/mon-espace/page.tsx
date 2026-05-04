@@ -145,7 +145,7 @@ export default function MonEspacePage() {
                 boxShadow: `0 6px 24px ${GOLD}44`,
               }}
             >
-              Créer mon faire-part — 69€
+              Créer votre faire-part — 69€
             </a>
           </div>
         ) : (

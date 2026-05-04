@@ -149,7 +149,7 @@ export default function ConnexionPage() {
               boxShadow: `0 6px 24px ${GOLD}44`,
             }}
           >
-            {loading ? 'Connexion…' : 'Me connecter'}
+            {loading ? 'Connexion…' : 'Se connecter'}
           </button>
         </form>
 
@@ -158,7 +158,7 @@ export default function ConnexionPage() {
           <p style={{ fontSize: 14, color: '#8a7860', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic' }}>
             Pas encore de compte ?{' '}
             <a href="/paiement" style={{ color: GOLD, fontWeight: 600, textDecoration: 'none' }}>
-              Créer mon faire-part
+              Créer votre faire-part
             </a>
           </p>
         </div>

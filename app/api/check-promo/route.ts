@@ -133,7 +133,7 @@ export async function POST(request: Request) {
 
                 <div style="text-align:center;margin:24px 0;">
                   <a href="${passwordUrl}" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:white;text-decoration:none;border-radius:9999px;font-size:14px;font-weight:700;letter-spacing:0.05em;">
-                    Définir mon mot de passe
+                    Définir votre mot de passe
                   </a>
                 </div>
 
@@ -143,7 +143,7 @@ export async function POST(request: Request) {
                   </p>
                   <div style="text-align:center;">
                     <a href="${magicUrl}" style="font-size:13px;color:#C9A84C;text-decoration:underline;">
-                      Me connecter sans mot de passe
+                      Se connecter sans mot de passe
                     </a>
                   </div>
                 </div>

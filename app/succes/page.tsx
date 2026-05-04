@@ -164,7 +164,7 @@ export default function SuccesPage() {
                 boxShadow: `0 6px 24px ${GOLD}44`,
               }}
             >
-              {pwLoading ? 'Création…' : 'Créer mon compte'}
+              {pwLoading ? 'Création…' : 'Créer votre compte'}
             </button>
           </form>
         ) : (
@@ -189,7 +189,7 @@ export default function SuccesPage() {
             boxShadow: `0 8px 28px ${GOLD}55`,
           }}
         >
-          Créer mon faire-part →
+          Créer votre faire-part →
         </a>
 
         <div style={{ marginTop: 16 }}>
@@ -197,7 +197,7 @@ export default function SuccesPage() {
             href="/mon-espace"
             style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: GOLD, textDecoration: 'underline' }}
           >
-            Aller à mon espace
+            Aller à votre espace
           </a>
         </div>
       </div>

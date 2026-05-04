@@ -205,7 +205,7 @@ export default function PaiementPage() {
       <div style={{ textAlign: 'center', marginTop: 48 }}>
         <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af' }}>
           Déjà un compte ?{' '}
-          <a href="/connexion" style={{ color: GOLD, textDecoration: 'underline' }}>Me connecter</a>
+          <a href="/connexion" style={{ color: GOLD, textDecoration: 'underline' }}>Se connecter</a>
         </p>
       </div>
 

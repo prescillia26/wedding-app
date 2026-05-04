@@ -98,8 +98,8 @@ export default function Home() {
           Créez en 5 minutes, partagez par WhatsApp, recevez les RSVP en temps réel.
         </p>
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 64 }}>
-          <a href="/paiement" style={S.btnPrimary}>Créer mon faire-part</a>
-          <a href="/connexion" style={S.btnOutline}>Accéder à mon espace</a>
+          <a href="/paiement" style={S.btnPrimary}>Créer votre faire-part</a>
+          <a href="/connexion" style={S.btnOutline}>Accéder à votre espace</a>
         </div>
         {/* Aperçu carte */}
         <div style={{ maxWidth: 420, margin: '0 auto', transform: 'rotate(-1.5deg)', boxShadow: '0 24px 80px rgba(0,0,0,0.14)', borderRadius: 16, overflow: 'hidden' }}>
@@ -268,7 +268,7 @@ export default function Home() {
           <p style={{ ...S.sectionSub, marginBottom: 40 }}>Tout ce que vous devez savoir avant de commencer.</p>
           {[
             { q: 'Mes invités ont-ils besoin de télécharger une application ?', a: 'Non, aucune application à télécharger. Vos invités ouvrent simplement le lien depuis leur téléphone ou ordinateur. C\'est instantané et accessible depuis n\'importe quel appareil.' },
-            { q: 'Puis-je modifier mon faire-part après l\'avoir partagé ?', a: 'Oui, vous pouvez modifier votre faire-part à tout moment depuis votre interface créateur. Les changements sont appliqués immédiatement sur le lien partagé.' },
+            { q: 'Puis-je modifier notre faire-part après l\'avoir partagé ?', a: 'Oui, vous pouvez modifier votre faire-part à tout moment depuis votre interface créateur. Les changements sont appliqués immédiatement sur le lien partagé.' },
             { q: 'Comment je reçois les RSVP de mes invités ?', a: 'Vous recevez un email élégant à chaque réponse RSVP. Vous avez aussi accès à un tableau de bord complet avec toutes les réponses, exportable en CSV.' },
             { q: 'Est-ce que ça marche pour les mariages juifs et orientaux ?', a: 'Absolument ! Lov\'it propose un mode mariage juif avec l\'houppa, la date hébraïque, la mention בס״ד, et un thème Oriental spécialement conçu pour sublimer ces cérémonies.' },
             { q: 'Que se passe-t-il si mes photos sont trop lourdes ?', a: 'Lov\'it compresse automatiquement vos photos pour garantir un chargement rapide tout en préservant la qualité visuelle. Vous pouvez uploader jusqu\'à 5 photos en carrousel.' },

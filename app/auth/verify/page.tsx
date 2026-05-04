@@ -83,7 +83,7 @@ export default function VerifyPage() {
                   fontFamily: 'var(--font-playfair-display)',
                 }}
               >
-                Me connecter
+                Se connecter
               </a>
               <a
                 href="/auth/mot-de-passe-oublie"

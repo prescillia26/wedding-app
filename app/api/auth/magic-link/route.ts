@@ -53,7 +53,7 @@ export async function POST(request: Request) {
                 </p>
                 <div style="text-align:center;margin:32px 0;">
                   <a href="${magicUrl}" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:white;text-decoration:none;border-radius:9999px;font-size:14px;font-weight:700;letter-spacing:0.05em;">
-                    Me connecter
+                    Se connecter
                   </a>
                 </div>
                 <p style="font-size:12px;color:#9ca3af;margin:20px 0 0;text-align:center;">

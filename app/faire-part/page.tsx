@@ -3115,7 +3115,7 @@ function SplashScreen({ data, theme, onDone, isShared, onStartMusic }: { data: F
             onTouchEnd={e => { e.preventDefault(); handleDiscover() }}
             style={{ ...BTN, padding: '16px 44px', border: `1px solid ${theme.accent}`, borderRadius: 9999, background: 'transparent', color: theme.accent, fontSize: 16, fontFamily: 'var(--font-playfair-display)', letterSpacing: '0.06em' }}
           >
-            Ouvrir mon invitation ✦
+            Ouvrir votre invitation ✦
           </button>
         </div>
       )}
@@ -3987,7 +3987,7 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
       {/* Bouton */}
       {!clique && (
         <button onClick={handleOpen} style={{ ...BTN, marginTop: 36, padding: '14px 40px', border: `1.5px solid ${theme.accent}`, borderRadius: 9999, background: 'transparent', color: theme.accent, fontFamily: 'var(--font-playfair-display)', fontSize: 13, fontWeight: 600, letterSpacing: 3, animation: 'btnPulse 2s ease infinite' }}>
-          Ouvrir mon invitation ✦
+          Ouvrir votre invitation ✦
         </button>
       )}
     </div>
@@ -4302,7 +4302,7 @@ function AnimParchemin({ data, theme, onDone }: { data: FormData; theme: ThemeOb
             {/* Bouton découvrir en bas du parchemin */}
             <div style={{ animation: 'parchTextIn 0.6s ease 2.8s forwards', opacity: 0 }}>
               <button onClick={handleOpen} style={{ ...BTN, padding: '12px 32px', border: `1.5px solid ${theme.accent}`, borderRadius: 9999, background: 'transparent', color: theme.accent, fontFamily: 'var(--font-playfair-display)', fontSize: 11, fontWeight: 600, letterSpacing: 3 }}>
-                Découvrir mon invitation ✦
+                Découvrir votre invitation ✦
               </button>
             </div>
           </div>
@@ -4431,7 +4431,7 @@ const firstDate = sorted[0]?.date
             ont le plaisir de vous convier à leur mariage
           </div>
           <button onClick={handleDiscover} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '14px 40px', fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', boxShadow: `0 4px 20px ${G}44`, animation: 'sharedFadeIn 1s 0.7s ease forwards', opacity: 0 } as React.CSSProperties}>
-            DÉCOUVRIR TON INVITATION
+            DÉCOUVRIR VOTRE INVITATION
           </button>
         </div>
         </div>
@@ -5178,7 +5178,7 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
               disabled={pwLoading}
               style={{ width: '100%', padding: '14px', borderRadius: 9999, border: 'none', cursor: pwLoading ? 'not-allowed' : 'pointer', background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`, color: 'white', fontFamily: 'var(--font-playfair-display)', fontSize: 15, fontWeight: 700, letterSpacing: '0.05em', boxShadow: `0 6px 24px ${GOLD}44` }}
             >
-              {pwLoading ? 'Création…' : 'Créer mon compte et commencer'}
+              {pwLoading ? 'Création…' : 'Créer votre compte et commencer'}
             </button>
           </form>
 
@@ -5196,7 +5196,7 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
 
         {/* Formulaire principal : code promo + email */}
         <div style={{ background: 'white', borderRadius: 20, padding: '36px 32px', boxShadow: '0 12px 48px rgba(201,168,76,0.12)', border: `1px solid ${GOLD}22`, marginBottom: 20, textAlign: 'left' }}>
-          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 20, color: '#2d1f14', marginBottom: 6, textAlign: 'center' }}>Accéder à mon faire-part</div>
+          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 20, color: '#2d1f14', marginBottom: 6, textAlign: 'center' }}>Accéder à votre faire-part</div>
           <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#6a5040', marginBottom: 24, textAlign: 'center' }}>
             Entrez votre code promo et votre email
           </p>
@@ -5227,7 +5227,7 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
             disabled={checking}
             style={{ width: '100%', padding: '14px', borderRadius: 9999, border: 'none', cursor: checking ? 'not-allowed' : 'pointer', background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`, color: 'white', fontFamily: 'var(--font-playfair-display)', fontSize: 15, fontWeight: 700, letterSpacing: '0.05em', boxShadow: `0 6px 24px ${GOLD}44` }}
           >
-            {checking ? 'Vérification…' : 'Accéder à mon faire-part'}
+            {checking ? 'Vérification…' : 'Accéder à votre faire-part'}
           </button>
 
           {error && <p style={{ marginTop: 14, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 15, color: '#ef4444', textAlign: 'center' }}>{error}</p>}
@@ -5235,10 +5235,10 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
 
         <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
           <a href="/connexion" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: GOLD, textDecoration: 'underline' }}>
-            Déjà un compte ? Me connecter
+            Déjà un compte ? Se connecter
           </a>
           <a href="/paiement" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', textDecoration: 'underline' }}>
-            Pas encore de compte ? Créer mon faire-part →
+            Pas encore de compte ? Créer votre faire-part →
           </a>
         </div>
       </div>
@@ -5539,7 +5539,7 @@ export default function FairePartPage() {
               ✓ Votre travail est sauvegardé sur cet appareil
             </div>
             <button onClick={resumeDraft} style={{ ...BTN, padding: '14px 32px', borderRadius: 9999, background: 'linear-gradient(135deg, #C9A84C, #e8c96a)', color: 'white', border: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 4px 16px rgba(201,168,76,0.35)' }}>
-              Reprendre mon faire-part →
+              Reprendre votre faire-part →
             </button>
             <button
               onClick={() => {

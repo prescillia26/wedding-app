@@ -182,7 +182,7 @@ export default function DefinirMotDePassePage() {
                 boxShadow: `0 6px 24px ${GOLD}44`,
               }}
             >
-              {loading ? 'Enregistrement…' : 'Définir mon mot de passe'}
+              {loading ? 'Enregistrement…' : 'Définir votre mot de passe'}
             </button>
           </form>
         )}
