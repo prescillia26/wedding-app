@@ -708,10 +708,10 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       <div style={{ background: '#fdf8f9', borderRadius: 12, padding: 20, marginBottom: 16 }}>
         <div style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>{t.fairepart.person1}</div>
         <div style={{ display: 'flex', gap: 12 }}>
-          <Field label={t.fairepart.firstName} value={data.marie1Prenom} onChange={v => onChange({ marie1Prenom: v })} placeholder="Sophie" />
-          <Field label={t.fairepart.lastName} value={data.marie1Nom} onChange={v => onChange({ marie1Nom: v })} placeholder="Martin" />
+          <Field label={t.fairepart.firstName} value={data.marie1Prenom} onChange={v => onChange({ marie1Prenom: v })} placeholder={t.fairepart.placeholderFirstName1} />
+          <Field label={t.fairepart.lastName} value={data.marie1Nom} onChange={v => onChange({ marie1Nom: v })} placeholder={t.fairepart.placeholderLastName1} />
         </div>
-        <Field label={`${t.fairepart.secondName} (optionnel)`} value={data.marie1Prenom2} onChange={v => onChange({ marie1Prenom2: v })} placeholder="Marie" />
+        <Field label={t.fairepart.secondName} value={data.marie1Prenom2} onChange={v => onChange({ marie1Prenom2: v })} placeholder="" />
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '16px 0' }}>
         <div style={{ flex: 1, height: 1, background: '#fecdd3' }} />
@@ -721,10 +721,10 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       <div style={{ background: '#fdf8f9', borderRadius: 12, padding: 20 }}>
         <div style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>{t.fairepart.person2}</div>
         <div style={{ display: 'flex', gap: 12 }}>
-          <Field label={t.fairepart.firstName} value={data.marie2Prenom} onChange={v => onChange({ marie2Prenom: v })} placeholder="Thomas" />
-          <Field label={t.fairepart.lastName} value={data.marie2Nom} onChange={v => onChange({ marie2Nom: v })} placeholder="Dupont" />
+          <Field label={t.fairepart.firstName} value={data.marie2Prenom} onChange={v => onChange({ marie2Prenom: v })} placeholder={t.fairepart.placeholderFirstName2} />
+          <Field label={t.fairepart.lastName} value={data.marie2Nom} onChange={v => onChange({ marie2Nom: v })} placeholder={t.fairepart.placeholderLastName2} />
         </div>
-        <Field label={`${t.fairepart.secondName} (optionnel)`} value={data.marie2Prenom2} onChange={v => onChange({ marie2Prenom2: v })} placeholder="David" />
+        <Field label={t.fairepart.secondName} value={data.marie2Prenom2} onChange={v => onChange({ marie2Prenom2: v })} placeholder="" />
       </div>
       <div style={{ marginTop: 20, padding: 16, background: '#fdf8f9', borderRadius: 12 }}>
   <Label>{t.fairepart.customLink} (optionnel)</Label>
@@ -751,17 +751,18 @@ type GpGroupDef = {
 }
 
 function GpGroupFields({ label, data, onChange, perePrenom, pereNom, merePrenom, mereNom }: GpGroupDef & { data: FormData; onChange: (d: Partial<FormData>) => void }) {
+  const { t } = useT()
   return (
     <div style={{ marginBottom: 14 }}>
       <Label>{label}</Label>
-      <div style={{ fontSize: 10, color: '#C9A84C99', marginTop: -6, marginBottom: 6 }}>Grand-père puis grand-mère (optionnels)</div>
+      <div style={{ fontSize: 10, color: '#C9A84C99', marginTop: -6, marginBottom: 6 }}>{t.fairepart.gpHelp}</div>
       <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-        <input type="text" value={data[perePrenom] as string} placeholder="Prénom GP" onChange={e => onChange({ [perePrenom]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1, fontSize: 11 }} />
-        <input type="text" value={data[pereNom] as string} placeholder="Nom GP" onChange={e => onChange({ [pereNom]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1, fontSize: 11 }} />
+        <input type="text" value={data[perePrenom] as string} placeholder={t.fairepart.placeholderGpFirstName} onChange={e => onChange({ [perePrenom]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1, fontSize: 11 }} />
+        <input type="text" value={data[pereNom] as string} placeholder={t.fairepart.placeholderGpLastName} onChange={e => onChange({ [pereNom]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1, fontSize: 11 }} />
       </div>
       <div style={{ display: 'flex', gap: 6 }}>
-        <input type="text" value={data[merePrenom] as string} placeholder="Prénom GM" onChange={e => onChange({ [merePrenom]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1, fontSize: 11 }} />
-        <input type="text" value={data[mereNom] as string} placeholder="Nom GM" onChange={e => onChange({ [mereNom]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1, fontSize: 11 }} />
+        <input type="text" value={data[merePrenom] as string} placeholder={t.fairepart.placeholderGmFirstName} onChange={e => onChange({ [merePrenom]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1, fontSize: 11 }} />
+        <input type="text" value={data[mereNom] as string} placeholder={t.fairepart.placeholderGmLastName} onChange={e => onChange({ [mereNom]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1, fontSize: 11 }} />
       </div>
     </div>
   )
@@ -1110,7 +1111,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             ))}
           </div>
           {c.type === 'Autre' && <Field label={t.fairepart.customEventName} value={c.customName} onChange={v => update(i, { customName: v })} />}
-          <Field label={t.fairepart.venue} value={c.lieu} onChange={v => update(i, { lieu: v })} placeholder="Château de Vincennes" />
+          <Field label={t.fairepart.venue} value={c.lieu} onChange={v => update(i, { lieu: v })} placeholder={t.fairepart.placeholderVenue} />
           <Field label={t.fairepart.address} value={c.adresse} onChange={v => update(i, { adresse: v })} />
           <div style={{ display: 'flex', gap: 12 }}>
             <Field label={t.fairepart.date} value={c.date} onChange={v => update(i, { date: v })} type="date" />
@@ -2658,7 +2659,7 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
                         <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
                           {Array.from({ length: r.nbPersonnes - 1 }).map((_, j) => (
                             <input key={j} type="text"
-                              placeholder={`Prénom personne ${j + 2}`}
+                              placeholder={`${t.fairepart.placeholderCompanion} ${j + 2}`}
                               value={accompagnants[i]?.[j] ?? ''}
                               onChange={e => {
                                 const u = { ...accompagnants }
@@ -3116,7 +3117,7 @@ function SplashScreen({ data, theme, onDone, isShared, onStartMusic }: { data: F
       {/* Phrase touchante — vue partagée uniquement */}
       {isShared && (
         <div style={{ ...fade(2), fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: theme.accent, textAlign: 'center', marginTop: 20, letterSpacing: '0.02em' }}>
-          vous invitent à partager leur bonheur
+          {t.fairepart.inviteShareJoy}
         </div>
       )}
 
@@ -3470,7 +3471,7 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
                     </>
                   )}
                   <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Lieu</label>
-                  <input value={localText[`ceremony_${i}_lieu`] ?? ''} onChange={e => setText(`ceremony_${i}_lieu`, e.target.value)} placeholder={c.lieu || 'Nom du lieu'}
+                  <input value={localText[`ceremony_${i}_lieu`] ?? ''} onChange={e => setText(`ceremony_${i}_lieu`, e.target.value)} placeholder={c.lieu || t.fairepart.placeholderVenueName}
                     style={{ width: '100%', padding: '10px 12px', border: '1px solid #fecdd3', borderRadius: 8, fontSize: 14, color: '#4a3728', outline: 'none', boxSizing: 'border-box' }} />
                 </div>
               )
@@ -4575,9 +4576,9 @@ const firstDate = sorted[0]?.date
         {(data.presentationStyle === 'cartes-separees' ? [sorted[currentCeremonyIdx]].filter(Boolean) : sorted).map((ceremony, i) => {
           const realIdx = data.presentationStyle === 'cartes-separees' ? currentCeremonyIdx : i
           const typeTitle: Record<string, string> = {
-            'Mairie': 'LA MAIRIE', 'Cérémonie religieuse / Houppa': data.mariageJuif ? 'LA HOUPPA' : 'LA CÉRÉMONIE',
-            'Shabbat Hatan': 'SHABBAT HATAN', 'Henné': 'LE HENNÉ', 'Cocktail': 'LE COCKTAIL',
-            'Soirée': 'LA SOIRÉE', 'Boat Party': 'BOAT PARTY',
+            'Mairie': t.fairepart.cardTitles['Mairie'], 'Cérémonie religieuse / Houppa': data.mariageJuif ? t.fairepart.cardTitles['Cérémonie religieuse / Houppa'] : t.fairepart.cardTitles['Cérémonie'],
+            'Shabbat Hatan': t.fairepart.cardTitles['Shabbat Hatan'], 'Henné': t.fairepart.cardTitles['Henné'], 'Cocktail': t.fairepart.cardTitles['Cocktail'],
+            'Soirée': t.fairepart.cardTitles['Soirée'], 'Boat Party': t.fairepart.cardTitles['Boat Party'],
           }
           const title = typeTitle[ceremony.type] || (ceremony.customName?.toUpperCase() || ceremony.type.toUpperCase())
           const hebrewDate = getHebrewDate(ceremony.date)
@@ -4767,17 +4768,17 @@ const firstDate = sorted[0]?.date
                             <div style={{ width: 24, height: 0.5, background: G, opacity: 0.4 }} />
                           </div>
                           <div style={{ fontFamily: FP, fontSize: 10, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 20, opacity: 0.7 }}>
-                            Infos pratiques
+                            {t.fairepart.infoPratiques}
                           </div>
                           {ceremony.transport && (
                             <div style={{ marginBottom: ceremony.hebergement ? 18 : 0, textAlign: 'center' }}>
-                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: G, marginBottom: 6, fontWeight: 600 }}>🚌 Transport</div>
+                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: G, marginBottom: 6, fontWeight: 600 }}>{t.fairepart.transportIcon}</div>
                               <div style={{ fontFamily: FC, fontSize: 13, color: TEXT, lineHeight: 1.7, whiteSpace: 'pre-wrap', opacity: 0.9 }}><Linkify text={ceremony.transport} color={G} /></div>
                             </div>
                           )}
                           {ceremony.hebergement && (
                             <div style={{ textAlign: 'center' }}>
-                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: G, marginBottom: 6, fontWeight: 600 }}>🏨 Hébergement</div>
+                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: G, marginBottom: 6, fontWeight: 600 }}>{t.fairepart.hebergementIcon}</div>
                               <div style={{ fontFamily: FC, fontSize: 13, color: TEXT, lineHeight: 1.7, whiteSpace: 'pre-wrap', opacity: 0.9 }}><Linkify text={ceremony.hebergement} color={G} /></div>
                             </div>
                           )}
@@ -4815,7 +4816,7 @@ const firstDate = sorted[0]?.date
               <OrnSep />
               <div style={{ border: `1px solid ${G}33`, borderRadius: 4, padding: '32px 24px', textAlign: 'center' }}>
                 <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, marginBottom: 28, lineHeight: 1.8, opacity: 0.85 }}>
-                  Nous vous serions reconnaissants de bien vouloir nous faire part de votre réponse
+                  {t.fairepart.rsvpInviteText}
                 </div>
                 <button onClick={onRsvpOpen} style={{ ...BTN, background: `linear-gradient(135deg,${G},${G}cc)`, color: 'white', border: 'none', borderRadius: 2, padding: '14px 48px', fontFamily: FP, fontSize: 12, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase' as const, boxShadow: `0 4px 20px ${G}44` }}>
                   RSVP

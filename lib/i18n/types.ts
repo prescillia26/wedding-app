@@ -173,6 +173,18 @@ export interface FairepartDict {
   gpPaternal: string
   gpMaternal: string
   gpHelp: string
+  // Placeholders
+  placeholderFirstName1: string
+  placeholderLastName1: string
+  placeholderFirstName2: string
+  placeholderLastName2: string
+  placeholderGpFirstName: string
+  placeholderGpLastName: string
+  placeholderGmFirstName: string
+  placeholderGmLastName: string
+  placeholderVenue: string
+  placeholderVenueName: string
+  placeholderCompanion: string
   // Step 3
   step3Title: string
   ceremonyTypes: Record<string, string>
@@ -288,6 +300,13 @@ export interface FairepartDict {
   joyMessageGp: string
   kolSasson: string
   precises: string
+  // Ceremony card titles
+  cardTitles: Record<string, string>
+  rsvpInviteText: string
+  infoPratiques: string
+  transportIcon: string
+  hebergementIcon: string
+  inviteShareJoy: string
   // Buttons bar
   editBtn: string
   textBtn: string
