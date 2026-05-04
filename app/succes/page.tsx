@@ -32,11 +32,23 @@ export default function SuccesPage() {
 
     fetch(`/api/verify-payment?session_id=${sessionId}`)
       .then(r => r.json())
-      .then(d => {
+      .then(async d => {
         if (d.error) { setError(d.error); return }
         setCode(d.code)
         setPack(d.pack)
         try { sessionStorage.setItem('lovit_access_code', d.code) } catch { /* ignore */ }
+
+        // Si l'utilisateur a déjà un mdp (2ème achat), skip le formulaire
+        try {
+          const meRes = await fetch('/api/auth/me')
+          if (meRes.ok) {
+            const me = await meRes.json()
+            if (!me.needsPassword) {
+              setPwDone(true)
+              setTimeout(() => { window.location.href = `/faire-part?code=${d.code}` }, 1500)
+            }
+          }
+        } catch { /* ignore */ }
       })
       .catch(() => setError('Erreur de vérification. Contactez-nous.'))
       .finally(() => setLoading(false))
