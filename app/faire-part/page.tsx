@@ -1585,20 +1585,20 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
             const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
             return (
-              <button key={opt.key} type="button" onClick={() => onChange({ monogrammeStyle: opt.key })} style={{
-                ...BTN,
+              <div key={opt.key} role="button" tabIndex={0} onClick={() => onChange({ monogrammeStyle: opt.key })} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onChange({ monogrammeStyle: opt.key }) }} style={{
+                cursor: 'pointer',
                 padding: '12px 6px 8px',
                 borderRadius: 10,
                 border: `2px solid ${sel ? '#C9A84C' : '#fecdd3'}`,
                 background: sel ? '#fdf5e4' : 'white',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', gap: 6,
-                minHeight: 130,
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6,
+                minHeight: 130, overflow: 'visible',
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, minHeight: 90 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, minHeight: 90, overflow: 'visible' }}>
                   <MonogramByStyle initial1={i1} initial2={i2} color={previewColor} size={80} style={opt.key} />
                 </div>
                 <span style={{ fontSize: 9, color: sel ? '#C9A84C' : '#6a5040', fontWeight: sel ? 700 : 400, textAlign: 'center', lineHeight: 1.3 }}>{opt.label}</span>
-              </button>
+              </div>
             )
           })}
         </div>
@@ -2247,102 +2247,109 @@ function LogoOrMonogram({ data, theme }: { data: FormData; theme: ThemeObj }) {
 function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercle' }: { initial1: string; initial2: string; color: string; size?: number; style?: string }) {
   const a = initial1 || 'A'
   const b = initial2 || 'B'
-  const GV = 'var(--font-great-vibes)'
-  const CG = 'var(--font-cormorant-garamond)'
+  const fs = Math.round(size * 0.52)
+  // Wrapper commun : taille fixe, overflow visible, tout est contenu visuellement via transform scale
+  const wrap = (children: React.ReactNode, w: number, h: number): React.ReactElement => (
+    <div style={{ width: w, height: h, position: 'relative', overflow: 'visible', flexShrink: 0 }}>{children}</div>
+  )
+  // Style commun pour les lettres Great Vibes — taille très grande avec scale pour que les jambages soient dans le flux
+  const gvStyle = (fontSize: number, extra?: React.CSSProperties): React.CSSProperties => ({
+    fontFamily: 'var(--font-great-vibes)', fontSize, color, display: 'block', whiteSpace: 'nowrap' as const, ...extra
+  })
 
-  // ── Style 1 : Entrelacé Luxe — SVG pur ─────────────────────────────────────
+  // ── Style 1 : Entrelacé Luxe ──────────────────────────────────────────────
   if (style === 'cercle') {
-    const w = size, h = size
-    const fs = Math.round(size * 0.55)
-    return (
-      <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} xmlns="http://www.w3.org/2000/svg">
-        <text x={w * 0.22} y={h * 0.58} style={{ fontFamily: GV, fontSize: fs }} fill={color}>{a}</text>
-        <text x={w * 0.48} y={h * 0.68} style={{ fontFamily: GV, fontSize: fs }} fill={color} opacity="0.72">{b}</text>
-      </svg>
+    return wrap(
+      <>
+        <span style={{ ...gvStyle(fs), position: 'absolute', left: '10%', top: '8%', zIndex: 2 }}>{a}</span>
+        <span style={{ ...gvStyle(fs, { opacity: 0.72 }), position: 'absolute', left: '38%', top: '20%', zIndex: 1 }}>{b}</span>
+      </>,
+      Math.round(size * 0.85), Math.round(size * 0.85)
     )
   }
 
   // ── Style 2 : Calligraphie Pure ───────────────────────────────────────────
   if (style === 'enlace') {
-    const w = size * 1.6, h = size
-    const fs = Math.round(size * 0.52)
-    const ampFs = Math.round(fs * 0.45)
-    return (
-      <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} xmlns="http://www.w3.org/2000/svg">
-        <text x={w * 0.05} y={h * 0.6} style={{ fontFamily: GV, fontSize: fs }} fill={color}>{a}</text>
-        <text x={w * 0.40} y={h * 0.6} style={{ fontFamily: CG, fontStyle: 'italic', fontSize: ampFs }} fill={color} opacity="0.55">&amp;</text>
-        <text x={w * 0.52} y={h * 0.6} style={{ fontFamily: GV, fontSize: fs }} fill={color}>{b}</text>
-      </svg>
+    return wrap(
+      <div style={{ position: 'absolute', left: '50%', top: '12%', transform: 'translateX(-50%)', display: 'flex', alignItems: 'baseline', whiteSpace: 'nowrap' }}>
+        <span style={gvStyle(fs)}>{a}</span>
+        <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: Math.round(fs * 0.45), color, opacity: 0.55, margin: `0 ${Math.round(fs * 0.06)}px` }}>&</span>
+        <span style={gvStyle(fs)}>{b}</span>
+      </div>,
+      Math.round(size * 1.5), Math.round(size * 0.85)
     )
   }
 
-  // ── Style 3 : Cercle Élégant — SVG pur ──────────────────────────────────
+  // ── Style 3 : Cercle Élégant ──────────────────────────────────────────────
   if (style === 'couronne') {
     const d = size
     const cx = d / 2, cy = d / 2
     const r1 = d / 2 - 2, r2 = d / 2 - Math.round(d * 0.07)
     const sw1 = Math.max(0.5, d * 0.005), sw2 = Math.max(0.3, d * 0.003)
-    const fs = Math.round(size * 0.42)
-    return (
-      <svg width={d} height={d} viewBox={`0 0 ${d} ${d}`} xmlns="http://www.w3.org/2000/svg">
-        <circle cx={cx} cy={cy} r={r1} fill="none" stroke={color} strokeWidth={sw1} opacity="0.35" />
-        <circle cx={cx} cy={cy} r={r2} fill="none" stroke={color} strokeWidth={sw2} opacity="0.2" />
-        <text x={cx * 0.72} y={cy * 1.1} style={{ fontFamily: GV, fontSize: fs }} fill={color}>{a}</text>
-        <text x={cx * 1.0} y={cy * 1.2} style={{ fontFamily: GV, fontSize: fs }} fill={color} opacity="0.72">{b}</text>
-      </svg>
+    const sfs = Math.round(fs * 0.84)
+    return wrap(
+      <>
+        <svg style={{ position: 'absolute', top: 0, left: 0 }} width={d} height={d} viewBox={`0 0 ${d} ${d}`} xmlns="http://www.w3.org/2000/svg">
+          <circle cx={cx} cy={cy} r={r1} fill="none" stroke={color} strokeWidth={sw1} opacity="0.35" />
+          <circle cx={cx} cy={cy} r={r2} fill="none" stroke={color} strokeWidth={sw2} opacity="0.2" />
+        </svg>
+        <span style={{ ...gvStyle(sfs), position: 'absolute', left: '24%', top: '22%', zIndex: 2 }}>{a}</span>
+        <span style={{ ...gvStyle(sfs, { opacity: 0.72 }), position: 'absolute', left: '42%', top: '30%', zIndex: 1 }}>{b}</span>
+      </>,
+      d, d
     )
   }
 
-  // ── Style 4 : Vertical Luxe — SVG pur ──────────────────────────────────
+  // ── Style 4 : Vertical Luxe ───────────────────────────────────────────────
   if (style === 'branches') {
-    const w = size * 0.7, h = size * 1.2
-    const fs = Math.round(size * 0.46)
-    const mid = h * 0.50
-    return (
-      <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} xmlns="http://www.w3.org/2000/svg">
-        <text x={w / 2} y={mid - fs * 0.12} textAnchor="middle" style={{ fontFamily: GV, fontSize: fs }} fill={color}>{a}</text>
-        <line x1={w * 0.38} y1={mid} x2={w * 0.62} y2={mid} stroke={color} strokeWidth="1" opacity="0.45" />
-        <text x={w / 2} y={mid + fs * 0.85} textAnchor="middle" style={{ fontFamily: GV, fontSize: fs }} fill={color} opacity="0.78">{b}</text>
-      </svg>
+    const letterFs = Math.round(fs * 0.9)
+    return wrap(
+      <>
+        <span style={{ ...gvStyle(letterFs), position: 'absolute', left: '50%', top: '2%', transform: 'translateX(-50%)', textAlign: 'center', zIndex: 2 }}>{a}</span>
+        <div style={{ position: 'absolute', left: '50%', top: '48%', transform: 'translateX(-50%)', width: 1, height: Math.max(6, Math.round(size * 0.05)), background: color, opacity: 0.45, zIndex: 3 }} />
+        <span style={{ ...gvStyle(letterFs, { opacity: 0.78 }), position: 'absolute', left: '50%', top: '46%', transform: 'translateX(-50%)', textAlign: 'center', zIndex: 1 }}>{b}</span>
+      </>,
+      Math.round(size * 0.7), Math.round(size * 1.15)
     )
   }
 
   // ── Style 5 : Minimaliste Chic ────────────────────────────────────────────
   if (style === 'losange') {
-    const w = size * 1.2, h = size * 0.7
-    const fs = Math.round(size * 0.50)
-    return (
-      <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} xmlns="http://www.w3.org/2000/svg">
-        <text x={w * 0.30} y={h * 0.60} textAnchor="middle" style={{ fontFamily: CG, fontStyle: 'italic', fontSize: fs, fontWeight: 300 }} fill={color}>{a}</text>
-        <text x={w * 0.70} y={h * 0.60} textAnchor="middle" style={{ fontFamily: CG, fontStyle: 'italic', fontSize: fs, fontWeight: 300 }} fill={color}>{b}</text>
-        <line x1={w * 0.14} y1={h * 0.82} x2={w * 0.86} y2={h * 0.82} stroke={color} strokeWidth="0.5" opacity="0.35" />
-      </svg>
+    const cgFs = Math.round(fs * 0.96)
+    return wrap(
+      <>
+        <div style={{ position: 'absolute', left: '50%', top: '10%', transform: 'translateX(-50%)', display: 'flex', alignItems: 'baseline', gap: Math.round(fs * 0.22), whiteSpace: 'nowrap' }}>
+          <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: cgFs, color, fontStyle: 'italic', fontWeight: 300, letterSpacing: Math.round(fs * 0.04) }}>{a}</span>
+          <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: cgFs, color, fontStyle: 'italic', fontWeight: 300, letterSpacing: Math.round(fs * 0.04) }}>{b}</span>
+        </div>
+        <div style={{ position: 'absolute', left: '14%', right: '14%', top: '72%', height: 0.5, background: color, opacity: 0.35 }} />
+      </>,
+      Math.round(size * 1.1), Math.round(size * 0.65)
     )
   }
 
-  // ── Style 6 : Baroque — SVG pur ────────────────────────────────────────
-  const w = size, h = size
-  const fs = Math.round(size * 0.55)
-  const ornH = Math.round(h * 0.12)
-  const ornTop = h * 0.10
-  const ornBot = h * 0.88
+  // ── Style 6 : Baroque ────────────────────────────────────────────────────
+  const ornW = Math.round(size * 0.9)
+  const ornH = Math.round(size * 0.14)
   const rDot = Math.max(1.5, size * 0.016)
-  return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} xmlns="http://www.w3.org/2000/svg">
-      {/* Ornement haut */}
-      <path d={`M${w*0.08},${ornTop+ornH*0.82} Q${w*0.29},${ornTop+ornH*0.06} ${w*0.5},${ornTop+ornH*0.58} Q${w*0.71},${ornTop+ornH*0.06} ${w*0.92},${ornTop+ornH*0.82}`} fill="none" stroke={color} strokeWidth="0.9" opacity="0.5" strokeLinecap="round"/>
-      <circle cx={w*0.08} cy={ornTop+ornH*0.82} r={rDot} fill={color} opacity="0.45"/>
-      <circle cx={w*0.5} cy={ornTop+ornH*0.58} r={rDot} fill={color} opacity="0.45"/>
-      <circle cx={w*0.92} cy={ornTop+ornH*0.82} r={rDot} fill={color} opacity="0.45"/>
-      {/* Initiales */}
-      <text x={w * 0.22} y={h * 0.58} style={{ fontFamily: GV, fontSize: fs }} fill={color}>{a}</text>
-      <text x={w * 0.48} y={h * 0.68} style={{ fontFamily: GV, fontSize: fs }} fill={color} opacity="0.72">{b}</text>
-      {/* Ornement bas */}
-      <path d={`M${w*0.08},${ornBot+ornH*0.18} Q${w*0.29},${ornBot+ornH*0.94} ${w*0.5},${ornBot+ornH*0.42} Q${w*0.71},${ornBot+ornH*0.94} ${w*0.92},${ornBot+ornH*0.18}`} fill="none" stroke={color} strokeWidth="0.9" opacity="0.5" strokeLinecap="round"/>
-      <circle cx={w*0.08} cy={ornBot+ornH*0.18} r={rDot} fill={color} opacity="0.45"/>
-      <circle cx={w*0.5} cy={ornBot+ornH*0.42} r={rDot} fill={color} opacity="0.45"/>
-      <circle cx={w*0.92} cy={ornBot+ornH*0.18} r={rDot} fill={color} opacity="0.45"/>
-    </svg>
+  return wrap(
+    <>
+      <svg style={{ position: 'absolute', top: '2%', left: '50%', transform: 'translateX(-50%)' }} width={ornW} height={ornH} viewBox={`0 0 ${ornW} ${ornH}`} xmlns="http://www.w3.org/2000/svg">
+        <path d={`M${ornW*0.04},${ornH*0.82} Q${ornW*0.25},${ornH*0.06} ${ornW*0.5},${ornH*0.58} Q${ornW*0.75},${ornH*0.06} ${ornW*0.96},${ornH*0.82}`} fill="none" stroke={color} strokeWidth="0.9" opacity="0.5" strokeLinecap="round"/>
+        <circle cx={ornW*0.04} cy={ornH*0.82} r={rDot} fill={color} opacity="0.45"/>
+        <circle cx={ornW*0.5} cy={ornH*0.58} r={rDot} fill={color} opacity="0.45"/>
+        <circle cx={ornW*0.96} cy={ornH*0.82} r={rDot} fill={color} opacity="0.45"/>
+      </svg>
+      <span style={{ ...gvStyle(fs), position: 'absolute', left: '16%', top: '20%', zIndex: 2 }}>{a}</span>
+      <span style={{ ...gvStyle(fs, { opacity: 0.72 }), position: 'absolute', left: '42%', top: '32%', zIndex: 1 }}>{b}</span>
+      <svg style={{ position: 'absolute', bottom: '2%', left: '50%', transform: 'translateX(-50%)' }} width={ornW} height={ornH} viewBox={`0 0 ${ornW} ${ornH}`} xmlns="http://www.w3.org/2000/svg">
+        <path d={`M${ornW*0.04},${ornH*0.18} Q${ornW*0.25},${ornH*0.94} ${ornW*0.5},${ornH*0.42} Q${ornW*0.75},${ornH*0.94} ${ornW*0.96},${ornH*0.18}`} fill="none" stroke={color} strokeWidth="0.9" opacity="0.5" strokeLinecap="round"/>
+        <circle cx={ornW*0.04} cy={ornH*0.18} r={rDot} fill={color} opacity="0.45"/>
+        <circle cx={ornW*0.5} cy={ornH*0.42} r={rDot} fill={color} opacity="0.45"/>
+        <circle cx={ornW*0.96} cy={ornH*0.18} r={rDot} fill={color} opacity="0.45"/>
+      </svg>
+    </>,
+    size, size
   )
 }
 
