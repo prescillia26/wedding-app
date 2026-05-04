@@ -149,7 +149,7 @@ export default function PaiementPage() {
 
         {/* Urgence */}
         <div style={{ textAlign: 'center', marginTop: 20, fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: TEXT }}>
-          ⏳ Offre réservée aux <strong style={{ fontStyle: 'normal', color: GOLD }}>50 premières mariées</strong>
+          ⏳ Offre réservée aux <strong style={{ fontStyle: 'normal', color: GOLD }}>50 premiers couples</strong>
         </div>
 
         {/* Réassurance */}

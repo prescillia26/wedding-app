@@ -66,7 +66,7 @@ export async function GET(request: Request) {
         await redis.set(`user:${normalizedEmail}`, user)
       }
 
-      // Créer une session automatiquement pour la mariée
+      // Créer une session automatiquement pour le couple
       await createSession(normalizedEmail)
 
       // Générer un magic link pour connexion future

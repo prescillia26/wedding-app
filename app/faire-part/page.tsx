@@ -3701,7 +3701,7 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
 
   if (valid.length === 0) return null
 
-  // Récupère le crop manuel pour la photo courante (si la mariée a recadré)
+  // Récupère le crop manuel pour la photo courante (si recadrée manuellement)
   const crop = photosData?.[idx]
   const hasCustomCrop = crop && (crop.cropX !== 0 || crop.cropY !== 0 || (crop.cropScale && crop.cropScale !== 1))
 
@@ -3713,7 +3713,7 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
   return (
     <>
       {hasCustomCrop ? (
-        // ── Mode crop manuel : la mariée a recadré sa photo ──────────────
+        // ── Mode crop manuel : photo recadrée manuellement ──────────────
         <div
           style={{
             position: 'absolute',
@@ -5436,7 +5436,7 @@ export default function FairePartPage() {
     setFormData(p => {
       const next = { ...p, ...u }
       // ✅ AUTO-SAVE : à chaque modification, on sauvegarde dans le navigateur
-      // pour que la mariée ne perde JAMAIS son travail si elle ferme l'onglet
+      // pour ne JAMAIS perdre le travail si l'onglet est fermé
       try {
         localStorage.setItem('wedding-draft', JSON.stringify(next))
         setSavedAt(new Date())

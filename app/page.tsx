@@ -203,13 +203,13 @@ export default function Home() {
       {/* ── TÉMOIGNAGES ── */}
       <div ref={testimonials.ref} style={{ ...testimonials.style, background: LIGHT_GOLD }}>
         <div style={S.section}>
-          <div style={S.sectionTitle}>Elles nous ont fait confiance</div>
+          <div style={S.sectionTitle}>Ils nous ont fait confiance</div>
           <p style={S.sectionSub}>Des centaines de couples ont dit oui à Lov&apos;it.</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 28 }}>
             {[
               { name: 'Chloé & Maxime', city: 'Paris', text: 'Nos invités ont adoré ! Plusieurs nous ont dit que c\'était le plus beau faire-part qu\'ils avaient reçu. Le RSVP intégré nous a sauvé des heures de relances !' },
               { name: 'Sarah & Younes', city: 'Marseille', text: 'Le thème oriental était parfait pour notre mariage. En 10 minutes tout était prêt. Merci Lov\'it pour ce souvenir numérique que nos parents ont précieusement gardé.' },
-              { name: 'Émilie & Romain', city: 'Lyon', text: 'Simple, rapide et vraiment très élégant. On a reçu 80% de réponses RSVP en 48h ! Je recommande à toutes les futures mariées.' },
+              { name: 'Émilie & Romain', city: 'Lyon', text: 'Simple, rapide et vraiment très élégant. On a reçu 80% de réponses RSVP en 48h ! Je recommande à tous les futurs mariés.' },
             ].map(({ name, city, text }) => (
               <div key={name} style={{ background: 'white', borderRadius: 16, padding: '32px 28px', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: `1px solid ${GOLD}22` }}>
                 <div style={{ color: GOLD, fontSize: 22, marginBottom: 14, letterSpacing: 2 }}>✦✦✦✦✦</div>
