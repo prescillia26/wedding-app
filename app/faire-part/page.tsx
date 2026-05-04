@@ -122,7 +122,6 @@ const FRAMES: { id: string; label: string; url: string | null }[] = [
   { id: 'frame-95', label: '🌸 Floral 95', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878845/95_w9natp.png' },
   { id: 'frame-96', label: '🌸 Floral 96', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878838/96_bauksw.png' },
   { id: 'frame-97', label: '🌸 Floral 97', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878845/97_dcccon.png' },
-  { id: 'frame-98', label: '🌸 Floral 98', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878848/98_jau9vb.png' },
   { id: 'frame-99', label: '🌸 Floral 99', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878852/99_webyut.png' },
   { id: 'frame-100', label: '🌸 Floral 100', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878852/100_kzuxzq.png' },
   { id: 'frame-101', label: '🌸 Floral 101', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878850/101_s1bjjf.png' },
