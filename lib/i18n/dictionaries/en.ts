@@ -3,6 +3,9 @@ import type { Dictionary } from '../types'
 const en: Dictionary = {
   common: {
     siteTitle: "Lov'it",
+    price: '$79',
+    priceBefore: '$199',
+    priceCurrency: '$',
     loading: 'Loading…',
     saving: 'Saving…',
     saved: 'Saved',
@@ -55,7 +58,7 @@ const en: Dictionary = {
     themesSub: 'From classic gold to rustic chic, find the style that suits you.',
     themeNames: { classic: 'Classic Gold', country: 'Rustic Chic', oriental: 'Oriental' },
     features: 'Everything included',
-    featuresSub: 'No hidden fees, no subscription. Everything for $69.',
+    featuresSub: 'No hidden fees, no subscription. Everything for $79.',
     featuresList: [
       { icon: '💌', title: 'Built-in RSVP', desc: 'Your guests confirm with one click. You get an email for each response.' },
       { icon: '🎵', title: 'Background music', desc: 'YouTube or MP3: your song greets your guests as they open the invitation.' },
@@ -140,7 +143,7 @@ const en: Dictionary = {
     tablePlan: 'Seating chart',
     setPassword: 'Set a password',
     newFairepart: 'Create a new invitation',
-    newFairepartPrice: 'Create a new invitation — $69',
+    newFairepartPrice: 'Create a new invitation — $79',
   },
 
   payment: {
@@ -156,7 +159,7 @@ const en: Dictionary = {
     ],
     urgency: 'Offer reserved for the',
     urgencyCouples: 'first 50 couples',
-    cta: 'Reserve your access — $69',
+    cta: 'Reserve your access — $79',
     trust: {
       secure: 'Secure payment via Stripe',
       instant: 'Instant access',

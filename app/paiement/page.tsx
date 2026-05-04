@@ -96,10 +96,10 @@ export default function PaiementPage() {
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
           <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 14 }}>
             <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 28, fontWeight: 400, color: '#aaa', textDecoration: 'line-through' }}>
-              149€
+              {t.common.priceBefore}
             </span>
             <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(64px, 12vw, 84px)', fontWeight: 700, color: GOLD, lineHeight: 1 }}>
-              69€
+              {t.common.price}
             </span>
           </div>
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: TEXT, marginTop: 4 }}>

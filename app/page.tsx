@@ -125,7 +125,7 @@ export default function Home() {
         <div style={{ margin: '32px auto 40px', maxWidth: 400 }}>
           <div style={{ marginBottom: 16 }}>
             <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 16, color: '#9ca3af', textDecoration: 'line-through', marginRight: 8 }}>{h.priceBefore}</span>
-            <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 36, color: DARK, fontWeight: 700 }}>69€</span>
+            <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 36, color: DARK, fontWeight: 700 }}>{c.price}</span>
             <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: TEXT, marginLeft: 6 }}>{c.singlePayment}</span>
           </div>
           <a href={ctaHref} style={{ ...S.btnPrimary, display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontSize: 16 }}>
@@ -212,7 +212,7 @@ export default function Home() {
           </div>
           <div style={{ textAlign: 'center', marginTop: 48 }}>
             <a href={ctaHref} style={S.btnPrimary}>
-              {isLoggedIn ? c.createYourFairepart : `${c.startNow} — 69€`}
+              {isLoggedIn ? c.createYourFairepart : `${c.startNow} — ${c.price}`}
             </a>
           </div>
         </div>
@@ -245,8 +245,7 @@ export default function Home() {
             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: GOLD, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>{h.pricingLabel}</div>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 4, marginBottom: 4 }}>
               <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 22, color: '#9ca3af', textDecoration: 'line-through', marginTop: 12, marginRight: 4 }}>{h.priceBefore}</span>
-              <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 72, color: DARK, lineHeight: 1, fontWeight: 700 }}>69</span>
-              <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 24, color: TEXT, marginTop: 8 }}>€</span>
+              <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 72, color: DARK, lineHeight: 1, fontWeight: 700 }}>{c.price}</span>
             </div>
             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 16, color: TEXT, marginBottom: 28 }}>{c.singlePayment} — {c.lifetimeAccess}</div>
             <div style={{ textAlign: 'left', marginBottom: 32 }}>
@@ -285,7 +284,7 @@ export default function Home() {
           {h.ctaSub}
         </p>
         <a href={ctaHref} style={S.btnPrimary}>
-          {isLoggedIn ? c.yourSpace : `${c.createYourFairepart} — 69€`}
+          {isLoggedIn ? c.yourSpace : `${c.createYourFairepart} — ${c.price}`}
         </a>
       </div>
 

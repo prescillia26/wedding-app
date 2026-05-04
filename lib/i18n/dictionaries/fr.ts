@@ -3,6 +3,9 @@ import type { Dictionary } from '../types'
 const fr: Dictionary = {
   common: {
     siteTitle: "Lov'it",
+    price: '69€',
+    priceBefore: '149€',
+    priceCurrency: '€',
     loading: 'Chargement…',
     saving: 'Sauvegarde…',
     saved: 'Sauvegardé',

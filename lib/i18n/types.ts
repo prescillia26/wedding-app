@@ -2,6 +2,9 @@ export type Locale = 'fr' | 'en'
 
 export interface CommonDict {
   siteTitle: string
+  price: string
+  priceBefore: string
+  priceCurrency: string
   loading: string
   saving: string
   saved: string
