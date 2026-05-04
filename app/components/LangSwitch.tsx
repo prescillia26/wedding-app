@@ -5,7 +5,7 @@ import { useT } from '@/lib/i18n'
 
 const LANGS = [
   { code: 'fr' as const, flag: '🇫🇷', label: 'Français' },
-  { code: 'en' as const, flag: '🇬🇧', label: 'English' },
+  { code: 'en' as const, flag: '🇺🇸', label: 'English' },
 ]
 
 export function LangSwitch({ color = '#C9A84C' }: { color?: string }) {
