@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
+import { useT } from '@/lib/i18n'
 
 const GOLD = '#C9A84C'
 const CREAM = '#faf8f5'
@@ -33,12 +34,13 @@ function initTables(): TableData[] {
 // ── Guest view (read-only) ──────────────────────────────────────────────────
 
 function GuestView({ tables }: { tables: TableData[] }) {
+  const { t } = useT()
   const allAssigned = tables.flatMap(t => t.invites.map(nom => ({ nom, table: t.nom })))
   return (
     <div style={{ background: CREAM, minHeight: '100vh', padding: '40px 24px', fontFamily: 'var(--font-cormorant-garamond)' }}>
       <div style={{ maxWidth: 680, margin: '0 auto' }}>
-        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: GOLD, textAlign: 'center', marginBottom: 4 }}>Plan de table</div>
-        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', marginBottom: 40 }}>Retrouvez votre table ci-dessous</div>
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: GOLD, textAlign: 'center', marginBottom: 4 }}>{t.planTable.guestViewTitle}</div>
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', marginBottom: 40 }}>{t.planTable.guestViewSub}</div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 20 }}>
           {tables.filter(t => t.invites.length > 0).map(table => (
             <div key={table.id} style={{ background: 'white', borderRadius: 16, padding: '24px 20px', boxShadow: '0 4px 20px rgba(0,0,0,0.07)', border: `1px solid ${GOLD}33` }}>
@@ -59,7 +61,7 @@ function GuestView({ tables }: { tables: TableData[] }) {
           ))}
         </div>
         {allAssigned.length === 0 && (
-          <div style={{ textAlign: 'center', color: '#9ca3af', fontStyle: 'italic', marginTop: 60 }}>Le plan de table n'est pas encore disponible.</div>
+          <div style={{ textAlign: 'center', color: '#9ca3af', fontStyle: 'italic', marginTop: 60 }}>{t.planTable.notAvailable}</div>
         )}
       </div>
     </div>
@@ -69,6 +71,7 @@ function GuestView({ tables }: { tables: TableData[] }) {
 // ── Editor view ─────────────────────────────────────────────────────────────
 
 export default function PlanTablePage() {
+  const { t } = useT()
   const [shareId, setShareId] = useState<string | null>(null)
   const [isGuest, setIsGuest] = useState(false)
   const [guests, setGuests] = useState<string[]>([])
@@ -197,12 +200,12 @@ export default function PlanTablePage() {
   const [autoMaxPerTable, setAutoMaxPerTable] = useState(8)
 
   const TABLE_NAME_THEMES: { label: string; names: string[] }[] = [
-    { label: '🌸 Fleurs', names: ['Rose', 'Pivoine', 'Jasmin', 'Orchidée', 'Lilas', 'Camélia', 'Magnolia', 'Dahlia', 'Iris', 'Tulipe', 'Hortensia', 'Lavande', 'Freesia', 'Amaryllis', 'Lys'] },
-    { label: '🌍 Villes', names: ['Paris', 'Rome', 'Barcelone', 'Lisbonne', 'Marrakech', 'Tokyo', 'New York', 'Athènes', 'Jérusalem', 'Venise', 'Florence', 'Londres', 'Prague', 'Amsterdam', 'Santorini'] },
-    { label: '✈️ Voyages', names: ['Bali', 'Toscane', 'Mykonos', 'Maldives', 'Seychelles', 'Amalfi', 'Capri', 'Zanzibar', 'Tahiti', 'Bora Bora', 'Hawaï', 'Dubrovnik', 'Majorque', 'Sardaigne', 'Corfou'] },
-    { label: '💎 Pierres', names: ['Diamant', 'Émeraude', 'Rubis', 'Saphir', 'Perle', 'Améthyste', 'Topaze', 'Opale', 'Jade', 'Grenat', 'Cristal', 'Agate', 'Onyx', 'Quartz', 'Turquoise'] },
-    { label: '🎵 Musique', names: ['Adagio', 'Allegro', 'Sérénade', 'Valse', 'Nocturne', 'Mélodie', 'Harmonie', 'Symphonie', 'Ballade', 'Bolero', 'Sonate', 'Prelude', 'Cantate', 'Aria', 'Rondo'] },
-    { label: '⭐ Étoiles', names: ['Sirius', 'Véga', 'Altaïr', 'Polaris', 'Cassiopée', 'Orion', 'Andromède', 'Lyra', 'Pégase', 'Antarès', 'Bételgeuse', 'Rigel', 'Aldébaran', 'Arcturus', 'Capella'] },
+    { label: `🌸 ${t.planTable.themeFlowers}`, names: ['Rose', 'Pivoine', 'Jasmin', 'Orchidée', 'Lilas', 'Camélia', 'Magnolia', 'Dahlia', 'Iris', 'Tulipe', 'Hortensia', 'Lavande', 'Freesia', 'Amaryllis', 'Lys'] },
+    { label: `🌍 ${t.planTable.themeCities}`, names: ['Paris', 'Rome', 'Barcelone', 'Lisbonne', 'Marrakech', 'Tokyo', 'New York', 'Athènes', 'Jérusalem', 'Venise', 'Florence', 'Londres', 'Prague', 'Amsterdam', 'Santorini'] },
+    { label: `✈️ ${t.planTable.themeTravel}`, names: ['Bali', 'Toscane', 'Mykonos', 'Maldives', 'Seychelles', 'Amalfi', 'Capri', 'Zanzibar', 'Tahiti', 'Bora Bora', 'Hawaï', 'Dubrovnik', 'Majorque', 'Sardaigne', 'Corfou'] },
+    { label: `💎 ${t.planTable.themeGems}`, names: ['Diamant', 'Émeraude', 'Rubis', 'Saphir', 'Perle', 'Améthyste', 'Topaze', 'Opale', 'Jade', 'Grenat', 'Cristal', 'Agate', 'Onyx', 'Quartz', 'Turquoise'] },
+    { label: `🎵 ${t.planTable.themeMusic}`, names: ['Adagio', 'Allegro', 'Sérénade', 'Valse', 'Nocturne', 'Mélodie', 'Harmonie', 'Symphonie', 'Ballade', 'Bolero', 'Sonate', 'Prelude', 'Cantate', 'Aria', 'Rondo'] },
+    { label: `⭐ ${t.planTable.themeStars}`, names: ['Sirius', 'Véga', 'Altaïr', 'Polaris', 'Cassiopée', 'Orion', 'Andromède', 'Lyra', 'Pégase', 'Antarès', 'Bételgeuse', 'Rigel', 'Aldébaran', 'Arcturus', 'Capella'] },
   ]
 
   const generateRandomPlan = () => {
@@ -240,7 +243,7 @@ export default function PlanTablePage() {
 
   if (loading) return (
     <div style={{ background: CREAM, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-cormorant-garamond)', fontSize: 18, color: GOLD }}>
-      Chargement…
+      {t.common.loading}
     </div>
   )
 
@@ -257,21 +260,21 @@ export default function PlanTablePage() {
       {/* Header */}
       <div style={{ background: 'white', borderBottom: `1px solid ${GOLD}33`, padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
         <div>
-          <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 36, color: GOLD, lineHeight: 1 }}>Plan de table</div>
-          <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 2 }}>{guests.length} invités · {tables.length} tables · {unassigned.length} non placés</div>
+          <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 36, color: GOLD, lineHeight: 1 }}>{t.planTable.title}</div>
+          <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 2 }}>{guests.length} {t.planTable.guests} · {tables.length} {t.planTable.tables} · {unassigned.length} {t.planTable.unassigned}</div>
         </div>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <button onClick={() => setShowAutoPanel(p => !p)} style={{ ...BTN, padding: '9px 18px', borderRadius: 9999, border: `1px solid ${GOLD}`, background: showAutoPanel ? `${GOLD}15` : 'transparent', color: GOLD, fontSize: 13 }}>
-            🎲 Auto
+            🎲 {t.planTable.autoBtn}
           </button>
           <button onClick={addTable} style={{ ...BTN, padding: '9px 18px', borderRadius: 9999, border: `1px solid ${GOLD}`, background: 'transparent', color: GOLD, fontSize: 13 }}>
-            + Table
+            + {t.planTable.addTable}
           </button>
           <button onClick={copyGuestLink} style={{ ...BTN, padding: '9px 18px', borderRadius: 9999, border: `1px solid ${GOLD}`, background: 'transparent', color: GOLD, fontSize: 13 }}>
-            {copyDone ? '✓ Lien copié !' : '🔗 Partager'}
+            {copyDone ? `✓ ${t.common.linkCopied}` : `🔗 ${t.planTable.shareGuests}`}
           </button>
           <button onClick={savePlan} disabled={saving} style={{ ...BTN, padding: '9px 20px', borderRadius: 9999, background: saved ? '#22c55e' : `linear-gradient(135deg,${GOLD},#e8c96a)`, color: 'white', border: 'none', fontSize: 13, fontWeight: 700 }}>
-            {saving ? 'Sauvegarde…' : saved ? '✓ Sauvegardé !' : '💾 Sauvegarder'}
+            {saving ? t.planTable.saving : saved ? `✓ ${t.planTable.savedOk}` : `💾 ${t.planTable.save}`}
           </button>
         </div>
       </div>
@@ -283,17 +286,17 @@ export default function PlanTablePage() {
             {/* Config tables */}
             <div style={{ display: 'flex', gap: 16, alignItems: 'flex-end' }}>
               <div>
-                <label style={{ fontSize: 11, color: '#9ca3af', display: 'block', marginBottom: 4 }}>Nb tables</label>
+                <label style={{ fontSize: 11, color: '#9ca3af', display: 'block', marginBottom: 4 }}>{t.planTable.nbTables}</label>
                 <input type="number" min={1} max={30} value={autoNbTables} onChange={e => setAutoNbTables(Number(e.target.value))}
                   style={{ width: 60, padding: '6px 8px', borderRadius: 8, border: `1px solid ${GOLD}44`, fontSize: 14, textAlign: 'center' }} />
               </div>
               <div>
-                <label style={{ fontSize: 11, color: '#9ca3af', display: 'block', marginBottom: 4 }}>Places/table</label>
+                <label style={{ fontSize: 11, color: '#9ca3af', display: 'block', marginBottom: 4 }}>{t.planTable.placesPerTable}</label>
                 <input type="number" min={4} max={15} value={autoMaxPerTable} onChange={e => setAutoMaxPerTable(Number(e.target.value))}
                   style={{ width: 60, padding: '6px 8px', borderRadius: 8, border: `1px solid ${GOLD}44`, fontSize: 14, textAlign: 'center' }} />
               </div>
               <button onClick={generateRandomPlan} style={{ ...BTN, padding: '8px 20px', borderRadius: 9999, background: `linear-gradient(135deg,${GOLD},#e8c96a)`, color: 'white', border: 'none', fontSize: 13, fontWeight: 700 }}>
-                🎲 Générer
+                🎲 {t.planTable.generateBtn}
               </button>
             </div>
 
@@ -302,7 +305,7 @@ export default function PlanTablePage() {
 
             {/* Noms de tables */}
             <div>
-              <label style={{ fontSize: 11, color: '#9ca3af', display: 'block', marginBottom: 6 }}>Noms de tables</label>
+              <label style={{ fontSize: 11, color: '#9ca3af', display: 'block', marginBottom: 6 }}>{t.planTable.tableNames}</label>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 {TABLE_NAME_THEMES.map(theme => (
                   <button key={theme.label} onClick={() => applyTableNames(theme.names)} style={{ ...BTN, padding: '5px 12px', borderRadius: 9999, border: `1px solid ${GOLD}44`, background: 'transparent', color: TEXT, fontSize: 12 }}>
@@ -313,7 +316,7 @@ export default function PlanTablePage() {
             </div>
           </div>
           <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 8, fontStyle: 'italic' }}>
-            {guests.length} invités → {autoNbTables} tables × {autoMaxPerTable} places = {autoNbTables * autoMaxPerTable} places ({autoNbTables * autoMaxPerTable >= guests.length ? '✓ suffisant' : `⚠ manque ${guests.length - autoNbTables * autoMaxPerTable} places`})
+            {guests.length} {t.planTable.guests} → {autoNbTables} {t.planTable.tables} × {autoMaxPerTable} places = {autoNbTables * autoMaxPerTable} places ({autoNbTables * autoMaxPerTable >= guests.length ? `✓ ${t.planTable.sufficient}` : `⚠ ${t.planTable.missing} ${guests.length - autoNbTables * autoMaxPerTable} places`})
           </div>
         </div>
       )}
@@ -325,8 +328,8 @@ export default function PlanTablePage() {
           {/* Guest list */}
           <div style={{ width: 220, flexShrink: 0, background: 'white', borderRight: `1px solid ${GOLD}22`, display: 'flex', flexDirection: 'column', height: 'calc(100vh - 73px)' }}>
             <div style={{ padding: '14px 16px 10px', borderBottom: `1px solid ${GOLD}22` }}>
-              <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 13, color: TEXT, letterSpacing: 1, textTransform: 'uppercase' }}>À placer</div>
-              <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 2 }}>{unassigned.length} invité{unassigned.length !== 1 ? 's' : ''}</div>
+              <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 13, color: TEXT, letterSpacing: 1, textTransform: 'uppercase' }}>{t.planTable.subtitle}</div>
+              <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 2 }}>{unassigned.length} {t.planTable.guests}</div>
             </div>
             <Droppable droppableId="guest-list">
               {(provided, snapshot) => (
@@ -336,7 +339,7 @@ export default function PlanTablePage() {
                   style={{ flex: 1, overflowY: 'auto', padding: '8px 10px', background: snapshot.isDraggingOver ? `${GOLD}08` : 'white', transition: 'background 0.2s', minHeight: 40 }}
                 >
                   {unassigned.length === 0 && !snapshot.isDraggingOver && (
-                    <div style={{ fontSize: 13, color: '#9ca3af', fontStyle: 'italic', textAlign: 'center', marginTop: 24 }}>Tous placés ✓</div>
+                    <div style={{ fontSize: 13, color: '#9ca3af', fontStyle: 'italic', textAlign: 'center', marginTop: 24 }}>{t.planTable.allPlaced} ✓</div>
                   )}
                   {unassigned.map((nom, index) => (
                     <Draggable key={nom} draggableId={nom} index={index}>
@@ -387,12 +390,12 @@ export default function PlanTablePage() {
                           style={{ width: '100%', border: 'none', borderBottom: `1px solid ${GOLD}`, outline: 'none', fontFamily: 'var(--font-playfair-display)', fontSize: 14, color: TEXT, background: 'transparent', padding: '2px 0' }}
                         />
                       ) : (
-                        <div onClick={() => setEditingTable(table.id)} style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 14, color: TEXT, cursor: 'text', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title="Cliquer pour renommer">
+                        <div onClick={() => setEditingTable(table.id)} style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 14, color: TEXT, cursor: 'text', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={t.planTable.rename}>
                           {table.nom}
                         </div>
                       )}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
-                        <span style={{ fontSize: 10, color: '#9ca3af' }}>max</span>
+                        <span style={{ fontSize: 10, color: '#9ca3af' }}>{t.planTable.max}</span>
                         <select value={table.maxPersonnes} onChange={e => updateTableMax(table.id, Number(e.target.value))}
                           style={{ fontSize: 11, color: '#9ca3af', border: 'none', outline: 'none', background: 'transparent', cursor: 'pointer', padding: 0 }}>
                           {[6, 7, 8, 9, 10, 11, 12].map(n => <option key={n} value={n}>{n}</option>)}
@@ -411,10 +414,10 @@ export default function PlanTablePage() {
                         style={{ padding: '8px 10px', minHeight: 52, background: snapshot.isDraggingOver && !isFull ? `${GOLD}10` : 'white', transition: 'background 0.2s' }}
                       >
                         {table.invites.length === 0 && !snapshot.isDraggingOver && (
-                          <div style={{ fontSize: 12, color: '#d1d5db', fontStyle: 'italic', textAlign: 'center', padding: '10px 0' }}>Glisser des invités ici</div>
+                          <div style={{ fontSize: 12, color: '#d1d5db', fontStyle: 'italic', textAlign: 'center', padding: '10px 0' }}>{t.planTable.dragHere}</div>
                         )}
                         {isFull && !snapshot.isDraggingOver && table.invites.length > 0 && (
-                          <div style={{ fontSize: 11, color: GOLD, textAlign: 'center', marginBottom: 4, fontWeight: 600 }}>Table complète</div>
+                          <div style={{ fontSize: 11, color: GOLD, textAlign: 'center', marginBottom: 4, fontWeight: 600 }}>{t.planTable.tableFull}</div>
                         )}
                         {table.invites.map((nom, i) => (
                           <Draggable key={nom} draggableId={nom} index={i}>

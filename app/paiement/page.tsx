@@ -1,19 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import { useT } from '@/lib/i18n'
+import { LangSwitch } from '../components/LangSwitch'
 
 const GOLD = '#C9A84C'
 const CREAM = '#fff8ed'
 const DARK = '#2d1f14'
 const TEXT = '#6a5040'
-
-const LAUNCH_FEATURES = [
-  'Design élégant et personnalisable',
-  'Photos carrousel, musique, compte à rebours',
-  'Dashboard RSVP complet + export Excel',
-  'Modifications illimitées — valable à vie',
-  'Lien de partage WhatsApp optimisé',
-]
 
 const UPCOMING_PACKS = [
   { titre: 'Essentiel', prix: 79, features: ['1 faire-part', "Jusqu'à 3 événements", 'RSVP basique'] },
@@ -34,6 +28,7 @@ function CheckIcon({ color, big }: { color: string; big?: boolean }) {
 export default function PaiementPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { t } = useT()
 
   const startCheckout = async () => {
     setLoading(true)
@@ -58,6 +53,7 @@ export default function PaiementPage() {
 
       {/* En-tête */}
       <div style={{ textAlign: 'center', marginBottom: 48 }}>
+        <LangSwitch />
         <a href="/" style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 42, color: GOLD, textDecoration: 'none', display: 'block', marginBottom: 4 }}>Lov&apos;it</a>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: `${GOLD}99`, letterSpacing: 4, textTransform: 'uppercase' }}>
           faire-parts de mariage digitaux
@@ -83,16 +79,16 @@ export default function PaiementPage() {
           letterSpacing: '0.1em', whiteSpace: 'nowrap',
           boxShadow: `0 6px 20px ${GOLD}66`,
         }}>
-          ✨ OFFRE DE LANCEMENT
+          {t.payment.launchOffer}
         </div>
 
         {/* Titre */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(42px, 8vw, 58px)', color: GOLD, lineHeight: 1, marginBottom: 8 }}>
-            Votre faire-part
+            {t.payment.title}
           </div>
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: TEXT }}>
-            digital, élégant, sur-mesure
+            {t.payment.subtitle}
           </div>
         </div>
 
@@ -107,7 +103,7 @@ export default function PaiementPage() {
             </span>
           </div>
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: TEXT, marginTop: 4 }}>
-            paiement unique · valable à vie
+            {t.common.singlePayment} · {t.common.lifetimeAccess}
           </div>
         </div>
 
@@ -117,7 +113,7 @@ export default function PaiementPage() {
             Tout inclus
           </div>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            {LAUNCH_FEATURES.map(f => (
+            {t.payment.features.map((f: string) => (
               <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 14, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 17, color: DARK, lineHeight: 1.5 }}>
                 <CheckIcon color={GOLD} big />
                 {f}
@@ -140,7 +136,7 @@ export default function PaiementPage() {
             transition: 'transform 0.15s, box-shadow 0.15s',
           }}
         >
-          {loading ? 'Redirection…' : 'Réserver mon accès 69€ →'}
+          {loading ? 'Redirection…' : t.payment.cta}
         </button>
 
         {error && (
@@ -149,15 +145,15 @@ export default function PaiementPage() {
 
         {/* Urgence */}
         <div style={{ textAlign: 'center', marginTop: 20, fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: TEXT }}>
-          ⏳ Offre réservée aux <strong style={{ fontStyle: 'normal', color: GOLD }}>50 premiers couples</strong>
+          ⏳ {t.payment.urgency} <strong style={{ fontStyle: 'normal', color: GOLD }}>{t.payment.urgencyCouples}</strong>
         </div>
 
         {/* Réassurance */}
         <div style={{ display: 'flex', justifyContent: 'center', gap: 24, flexWrap: 'wrap', marginTop: 24, paddingTop: 24, borderTop: `1px solid ${GOLD}22` }}>
           {[
-            { icon: '🔒', text: 'Paiement sécurisé Stripe' },
-            { icon: '✨', text: 'Accès immédiat' },
-            { icon: '✅', text: 'Satisfait ou remboursé sous 7 jours' },
+            { icon: '🔒', text: t.payment.trust.secure },
+            { icon: '✨', text: t.payment.trust.instant },
+            { icon: '✅', text: t.payment.trust.guarantee },
           ].map(({ icon, text }) => (
             <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: TEXT }}>
               <span>{icon}</span><span>{text}</span>
@@ -170,10 +166,10 @@ export default function PaiementPage() {
       <div style={{ maxWidth: 800, margin: '80px auto 0' }}>
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>
-            Après la période de lancement
+            {t.payment.futureTitle}
           </div>
           <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 24, color: DARK, fontWeight: 400 }}>
-            Les tarifs standards reviendront à :
+            {t.payment.futureSub}
           </div>
         </div>
 
@@ -204,8 +200,8 @@ export default function PaiementPage() {
       {/* Lien connexion */}
       <div style={{ textAlign: 'center', marginTop: 48 }}>
         <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af' }}>
-          Déjà un compte ?{' '}
-          <a href="/connexion" style={{ color: GOLD, textDecoration: 'underline' }}>Se connecter</a>
+          {t.payment.alreadyAccount}{' '}
+          <a href="/connexion" style={{ color: GOLD, textDecoration: 'underline' }}>{t.common.login}</a>
         </p>
       </div>
 
@@ -213,8 +209,8 @@ export default function PaiementPage() {
       <div style={{ textAlign: 'center', marginTop: 64 }}>
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 28, color: `${GOLD}66`, marginBottom: 8 }}>Lov&apos;it</div>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 8 }}>
-          <a href="/mentions-legales" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: '#8a7860', textDecoration: 'none' }}>Mentions légales</a>
-          <a href="mailto:contact@getlovit.fr" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: '#8a7860', textDecoration: 'none' }}>Contact</a>
+          <a href="/mentions-legales" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: '#8a7860', textDecoration: 'none' }}>{t.common.legalNotice}</a>
+          <a href="mailto:contact@getlovit.fr" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: '#8a7860', textDecoration: 'none' }}>{t.common.contact}</a>
         </div>
         <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 12, color: '#c4b5a0', margin: 0 }}>
           © 2026 Lov&apos;it — faire-parts de mariage digitaux
