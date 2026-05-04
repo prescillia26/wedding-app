@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { showToast } from '../components/Toast'
 
 const GOLD = '#C9A84C'
 const CREAM = '#fff8ed'
@@ -267,7 +268,7 @@ function FairepartCardComponent({ fp }: { fp: FairepartCard }) {
           <button
             onClick={() => {
               const url = `${window.location.origin}${shareUrl}`
-              navigator.clipboard.writeText(url).then(() => alert('Lien copié !'))
+              navigator.clipboard.writeText(url).then(() => showToast('Lien copié !'))
             }}
             style={{
               flex: 1, textAlign: 'center', padding: '10px 12px', borderRadius: 9999,

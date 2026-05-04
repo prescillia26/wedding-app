@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { showToast } from '../components/Toast'
 
 
 type Theme = 'rose-fleuri' | 'ivoire-or' | 'bleu-floral' | 'champetre' | 'blanc-gris' | 'noir-blanc' | 'chocolat' | 'bordeaux' | 'bordeaux-nuit' | 'fuchsia' | 'marine-or' | 'menthe'
@@ -901,7 +902,7 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
       onChange({ photosFond: newPhotos, photoFond: newPhotos[0] ?? '', photosData: newData, presentationStyle: 'page-unique' })
       setCropIdx(photos.length)
     } catch {
-      alert('Erreur upload photo')
+      showToast('Erreur lors de l\'upload de la photo', 'error')
     } finally {
       setUploading(false)
     }
@@ -1280,7 +1281,7 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    if (file.size > 5 * 1024 * 1024) { alert('Le fichier est trop lourd (max 5 Mo)'); return }
+    if (file.size > 5 * 1024 * 1024) { showToast('Le fichier est trop lourd (max 5 Mo)', 'error'); return }
     setUploading(true)
     try {
       // Supprimer le fond côté client avant upload
@@ -1296,7 +1297,7 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
         const pngUrl = json.secure_url.replace(/\.\w+$/, '.png')
         onChange({ customLogoUrl: pngUrl })
       }
-    } catch { alert('Erreur lors de l\'upload du logo') }
+    } catch { showToast('Erreur lors de l\'upload du logo', 'error') }
     finally { setUploading(false) }
     e.target.value = ''
   }
@@ -2509,7 +2510,7 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
       }
       setSent(true)
     } catch {
-      alert("Erreur lors de l'envoi")
+      showToast('Erreur lors de l\'envoi du RSVP', 'error')
     } finally {
       setLoading(false)
     }
@@ -4919,7 +4920,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
       setShareModalOpen(true)
     } catch (err) {
       void err
-      alert('Erreur : ' + (err instanceof Error ? err.message : String(err)))
+      showToast('Erreur lors du partage', 'error')
     } finally {
       setSharing(false)
       setSharingStatus('')
