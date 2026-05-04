@@ -28,7 +28,7 @@ function CheckIcon({ color, big }: { color: string; big?: boolean }) {
 export default function PaiementPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const { t } = useT()
+  const { t, locale } = useT()
 
   const startCheckout = async () => {
     setLoading(true)
@@ -37,7 +37,7 @@ export default function PaiementPage() {
       const res = await fetch('/api/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pack: 'premium' }),  // ← toujours premium pour l'offre de lancement
+        body: JSON.stringify({ pack: 'premium', locale }),
       })
       const { url, error: err } = await res.json()
       if (err || !url) throw new Error(err || 'Erreur')

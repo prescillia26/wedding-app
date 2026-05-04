@@ -13,26 +13,27 @@ const PACKS: Record<string, { amount: number; name: string }> = {
 
 export async function POST(request: Request) {
   try {
-    const { pack } = await request.json() as { pack: string }
+    const { pack, locale } = await request.json() as { pack: string; locale?: string }
     const selected = PACKS[pack]
     if (!selected) return Response.json({ error: 'Pack invalide' }, { status: 400 })
 
     const origin = request.headers.get('origin') || 'https://getlovit.fr'
+    const isEN = locale === 'en'
 
     const session = await getStripe().checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
-      locale: 'fr',
+      locale: isEN ? 'en' : 'fr',
       line_items: [{
         price_data: {
-          currency: 'eur',
-          product_data: { name: selected.name },
-          unit_amount: selected.amount,
+          currency: isEN ? 'usd' : 'eur',
+          product_data: { name: isEN ? "Lov'it — Launch offer" : selected.name },
+          unit_amount: isEN ? 7900 : selected.amount,  // $79 USD ou 69€ EUR
         },
         quantity: 1,
       }],
       allow_promotion_codes: true,
-      metadata: { pack },
+      metadata: { pack, locale: locale || 'fr' },
       success_url: `${origin}/succes?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/paiement`,
     })
