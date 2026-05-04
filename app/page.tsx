@@ -283,13 +283,14 @@ export default function Home() {
           Fait avec ❤️ pour les plus beaux jours de votre vie
         </div>
         <div style={{ display: 'flex', gap: 24, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 24 }}>
-          <a href="/connexion" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: `rgba(255,255,255,0.6)`, textDecoration: 'none' }}>Mon espace</a>
+          <a href="/connexion" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: `rgba(255,255,255,0.6)`, textDecoration: 'none' }}>Votre espace</a>
           <a href="/paiement" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: `rgba(255,255,255,0.6)`, textDecoration: 'none' }}>Tarif</a>
           <a href="/mentions-legales" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: `rgba(255,255,255,0.6)`, textDecoration: 'none' }}>Mentions légales</a>
+          <a href="mailto:contact@getlovit.fr" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: `rgba(255,255,255,0.6)`, textDecoration: 'none' }}>Contact</a>
         </div>
         <Separator />
         <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: `rgba(255,255,255,0.35)`, marginTop: 28, marginBottom: 0 }}>
-          © 2025 Lov&apos;it — Tous droits réservés
+          © 2026 Lov&apos;it — Tous droits réservés
         </p>
       </footer>
     </div>
