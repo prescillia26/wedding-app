@@ -100,7 +100,7 @@ export default function PaiementPage() {
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
           <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 14 }}>
             <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 28, fontWeight: 400, color: '#aaa', textDecoration: 'line-through' }}>
-              129€
+              149€
             </span>
             <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(64px, 12vw, 84px)', fontWeight: 700, color: GOLD, lineHeight: 1 }}>
               69€
