@@ -4721,7 +4721,7 @@ const firstDate = sorted[0]?.date
                         )
                       })()}
                       {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 15, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 8, opacity: 0.8 }}>{hebrewDate}</div>}
-                      {ceremony.heure && <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 17, color: TEXT, textAlign: 'center', marginBottom: 18, opacity: 0.82 }, 'dateHeure', data.zoneStyles)}>{formatHeure(ceremony.heure)} {t.fairepart.precises}</div>}
+                      {ceremony.heure && <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 17, color: TEXT, textAlign: 'center', marginBottom: 18, opacity: 0.82 }, 'dateHeure', data.zoneStyles)}>{formatHeure(ceremony.heure)}</div>}
                       {(ov[`ceremony_${i}_lieu`] || ceremony.lieu) && <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', lineHeight: 1.6, marginBottom: 4 }, 'lieu', data.zoneStyles)}>{ceremony.type === 'Mairie' ? conjonctionLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu) : formatLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu)}</div>}
                       {ceremony.adresse && <div style={{ fontFamily: FC, fontSize: 13, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.6, marginBottom: 20 }}>{ceremony.adresse}</div>}
                       {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
