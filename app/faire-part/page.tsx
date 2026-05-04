@@ -5262,6 +5262,8 @@ export default function FairePartPage() {
   // Auth & sauvegarde serveur
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [userFaireparts, setUserFaireparts] = useState<string[]>([])
+  const [userFairepartsInfo, setUserFairepartsInfo] = useState<{ shareId: string; marie1Prenom: string; marie2Prenom: string }[]>([])
+  const [activeFairepartId, setActiveFairepartId] = useState<string | null>(null)
   const [serverSavedAt, setServerSavedAt] = useState<Date | null>(null)
   const [serverSaving, setServerSaving] = useState(false)
   const serverSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -5397,19 +5399,30 @@ export default function FairePartPage() {
           localStorage.setItem('lovit_user_email', data.email)
         } catch { /* ignore */ }
 
-        // Si connecté et qu'on a des faire-parts, tenter de charger le brouillon serveur
+        // Si connecté et qu'on a des faire-parts, charger les infos + le dernier brouillon
         const faireparts: string[] = data.faireparts ?? []
         if (faireparts.length > 0) {
+          // Charger les prénoms de chaque faire-part pour la barre de navigation
+          try {
+            const dashRes = await fetch('/api/auth/dashboard')
+            if (dashRes.ok) {
+              const dashData = await dashRes.json()
+              if (!cancelled && dashData.faireparts) {
+                setUserFairepartsInfo(dashData.faireparts.map((fp: { shareId: string; marie1Prenom: string; marie2Prenom: string }) => ({
+                  shareId: fp.shareId, marie1Prenom: fp.marie1Prenom, marie2Prenom: fp.marie2Prenom,
+                })))
+              }
+            }
+          } catch { /* ignore */ }
+
           // Charger le dernier faire-part
           const shareId = faireparts[faireparts.length - 1]
+          setActiveFairepartId(shareId)
           try {
             const draftRes = await fetch(`/api/get-draft?shareId=${shareId}`)
             if (draftRes.ok) {
               const draftData = await draftRes.json()
               if (!cancelled && draftData.formData) {
-                // Le brouillon serveur a la priorité sur le localStorage
-                // sauf si le localStorage est plus récent (on ne peut pas le savoir,
-                // donc on privilégie le serveur)
                 setFormData(draftData.formData as FormData)
                 setHasDraft(true)
                 setAccessGranted(true)
@@ -5483,6 +5496,23 @@ export default function FairePartPage() {
     }
   }, [])
 
+  const switchFairepart = useCallback(async (shareId: string) => {
+    try {
+      const res = await fetch(`/api/get-share?id=${shareId}`)
+      if (!res.ok) return
+      const d = await res.json()
+      if (d.photosFond?.length && d.photosData?.length) {
+        d.photosData = d.photosData.map((c: { cropX?: number; cropY?: number; cropScale?: number }, i: number) => ({ ...c, url: d.photosFond[i] ?? '' }))
+      }
+      setFormData(d)
+      setActiveFairepartId(shareId)
+      setShowCards(false)
+      setStep(1)
+      try { localStorage.setItem('lovit_share_id', shareId) } catch { /* ignore */ }
+      try { localStorage.setItem('wedding-draft', JSON.stringify(d)) } catch { /* ignore */ }
+    } catch { /* ignore */ }
+  }, [])
+
   const next = useCallback(() => {
     if (step < 4) setStep(s => s + 1)
     else {
@@ -5541,6 +5571,36 @@ export default function FairePartPage() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '48px 16px', background: 'linear-gradient(160deg, #fff8ed 0%, #fffaf4 50%, #fff8ed 100%)' }}>
+      {/* Barre de navigation entre faire-parts */}
+      {userFairepartsInfo.length > 1 && (
+        <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap', justifyContent: 'center' }}>
+          {userFairepartsInfo.map(fp => {
+            const isActive = fp.shareId === activeFairepartId
+            const label = (fp.marie1Prenom && fp.marie2Prenom) ? `${fp.marie1Prenom} & ${fp.marie2Prenom}` : `Faire-part ${userFairepartsInfo.indexOf(fp) + 1}`
+            return (
+              <button key={fp.shareId} onClick={() => !isActive && switchFairepart(fp.shareId)} style={{
+                cursor: isActive ? 'default' : 'pointer',
+                padding: '8px 18px', borderRadius: 9999, fontSize: 12, fontWeight: 600,
+                fontFamily: 'var(--font-playfair-display)', letterSpacing: '0.03em',
+                background: isActive ? 'linear-gradient(135deg, #C9A84C, #e8c96a)' : 'white',
+                color: isActive ? 'white' : '#C9A84C',
+                border: isActive ? 'none' : '1.5px solid #C9A84C',
+                boxShadow: isActive ? '0 2px 12px rgba(201,168,76,0.3)' : 'none',
+              }}>
+                {label}
+              </button>
+            )
+          })}
+          <a href="/mon-espace" style={{
+            padding: '8px 14px', borderRadius: 9999, fontSize: 11, fontWeight: 500,
+            fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic',
+            color: '#8a7860', textDecoration: 'none', border: '1px solid #e5d5c5',
+            display: 'flex', alignItems: 'center',
+          }}>
+            Votre espace
+          </a>
+        </div>
+      )}
       <div style={{ textAlign: 'center', marginBottom: 36 }}>
         <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(201,168,76,0.65)', fontWeight: 600, marginBottom: 10 }}>Invitation de mariage</p>
         {savedAt && (
