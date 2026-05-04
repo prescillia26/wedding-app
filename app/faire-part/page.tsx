@@ -2253,9 +2253,12 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
   // RÈGLE : ZÉRO position:absolute sur le texte, ZÉRO hauteur fixe.
   // Tout en flexbox = les jambages sont TOUJOURS dans le flux.
 
+  // Padding pour les fioritures de Great Vibes (les boucles des majuscules dépassent la boîte du texte)
+  const pad = Math.round(fs * 0.15)
+
   // ── Style 1 : Entrelacé Luxe ──────────────────────────────────────────────
   if (style === 'cercle') return (
-    <div style={{ display: 'inline-flex', alignItems: 'baseline' }}>
+    <div style={{ display: 'inline-flex', alignItems: 'baseline', padding: `0 ${pad}px` }}>
       <span style={{ fontFamily: GV, fontSize: fs, color, position: 'relative', zIndex: 2 }}>{a}</span>
       <span style={{ fontFamily: GV, fontSize: fs, color, opacity: 0.72, marginLeft: Math.round(fs * -0.35), position: 'relative', zIndex: 1 }}>{b}</span>
     </div>
@@ -2263,7 +2266,7 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
 
   // ── Style 2 : Calligraphie Pure ───────────────────────────────────────────
   if (style === 'enlace') return (
-    <div style={{ display: 'inline-flex', alignItems: 'baseline' }}>
+    <div style={{ display: 'inline-flex', alignItems: 'baseline', padding: `0 ${pad}px` }}>
       <span style={{ fontFamily: GV, fontSize: fs, color }}>{a}</span>
       <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: Math.round(fs * 0.45), color, opacity: 0.55, margin: `0 ${Math.round(fs * 0.06)}px` }}>&</span>
       <span style={{ fontFamily: GV, fontSize: fs, color }}>{b}</span>
@@ -2278,7 +2281,7 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
     const sw1 = Math.max(0.5, d * 0.005), sw2 = Math.max(0.3, d * 0.003)
     const sfs = Math.round(fs * 0.84)
     return (
-      <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: d, minHeight: d }}>
+      <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: `${Math.round(d * 0.15)}px ${Math.round(d * 0.2)}px` }}>
         <svg style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', pointerEvents: 'none' }} width={d} height={d} viewBox={`0 0 ${d} ${d}`} xmlns="http://www.w3.org/2000/svg">
           <circle cx={cx} cy={cy} r={r1} fill="none" stroke={color} strokeWidth={sw1} opacity="0.35" />
           <circle cx={cx} cy={cy} r={r2} fill="none" stroke={color} strokeWidth={sw2} opacity="0.2" />
@@ -2293,7 +2296,7 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
   if (style === 'branches') {
     const lfs = Math.round(fs * 0.9)
     return (
-      <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', padding: `0 ${pad}px` }}>
         <span style={{ fontFamily: GV, fontSize: lfs, color, textAlign: 'center' }}>{a}</span>
         <div style={{ width: 1, height: Math.max(6, Math.round(size * 0.05)), background: color, opacity: 0.45, margin: `${Math.round(lfs * -0.15)}px 0` }} />
         <span style={{ fontFamily: GV, fontSize: lfs, color, opacity: 0.78, textAlign: 'center' }}>{b}</span>
@@ -2327,7 +2330,7 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
         <circle cx={ornW*0.5} cy={ornH*0.58} r={rDot} fill={color} opacity="0.45"/>
         <circle cx={ornW*0.96} cy={ornH*0.82} r={rDot} fill={color} opacity="0.45"/>
       </svg>
-      <div style={{ display: 'inline-flex', alignItems: 'baseline' }}>
+      <div style={{ display: 'inline-flex', alignItems: 'baseline', padding: `0 ${pad}px` }}>
         <span style={{ fontFamily: GV, fontSize: fs, color, position: 'relative', zIndex: 2 }}>{a}</span>
         <span style={{ fontFamily: GV, fontSize: fs, color, opacity: 0.72, marginLeft: Math.round(fs * -0.35), position: 'relative', zIndex: 1 }}>{b}</span>
       </div>
