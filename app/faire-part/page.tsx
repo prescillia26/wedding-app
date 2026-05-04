@@ -5380,6 +5380,10 @@ export default function FairePartPage() {
         setUserEmail(data.email)
         setUserFaireparts(data.faireparts ?? [])
 
+        // Utilisateur connecté = a payé → accès au formulaire
+        setAccessGranted(true)
+        setCheckingAccess(false)
+
         // Vérifier que le localStorage appartient au compte connecté
         try {
           const storedEmail = localStorage.getItem('lovit_user_email')

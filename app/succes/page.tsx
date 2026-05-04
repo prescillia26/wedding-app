@@ -64,6 +64,8 @@ export default function SuccesPage() {
       })
       if (res.ok) {
         setPwDone(true)
+        // Rediriger directement vers le formulaire de création
+        setTimeout(() => { window.location.href = `/faire-part?code=${code}` }, 1500)
       } else {
         const data = await res.json()
         setPwError(data.error || 'Erreur lors de la création du mot de passe.')
@@ -174,7 +176,7 @@ export default function SuccesPage() {
               Compte créé avec succès !
             </div>
             <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', margin: 0 }}>
-              Vous pourrez vous reconnecter avec votre email et mot de passe.
+              Redirection vers votre faire-part…
             </p>
           </div>
         )}

@@ -67,6 +67,10 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 }
 
 export default function Home() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  useEffect(() => {
+    fetch('/api/auth/me').then(r => { if (r.ok) setIsLoggedIn(true) }).catch(() => {})
+  }, [])
   const hero = useFadeIn()
   const problem = useFadeIn()
   const howItWorks = useFadeIn()
@@ -98,8 +102,17 @@ export default function Home() {
           Créez en 5 minutes, partagez par WhatsApp, recevez les RSVP en temps réel.
         </p>
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 64 }}>
-          <a href="/paiement" style={S.btnPrimary}>Créer votre faire-part</a>
-          <a href="/connexion" style={S.btnOutline}>Accéder à votre espace</a>
+          {isLoggedIn ? (
+            <>
+              <a href="/mon-espace" style={S.btnPrimary}>Accéder à votre espace</a>
+              <a href="/faire-part" style={S.btnOutline}>Créer votre faire-part</a>
+            </>
+          ) : (
+            <>
+              <a href="/paiement" style={S.btnPrimary}>Créer votre faire-part</a>
+              <a href="/connexion" style={S.btnOutline}>Se connecter</a>
+            </>
+          )}
         </div>
         {/* Aperçu carte */}
         <div style={{ maxWidth: 420, margin: '0 auto', transform: 'rotate(-1.5deg)', boxShadow: '0 24px 80px rgba(0,0,0,0.14)', borderRadius: 16, overflow: 'hidden' }}>
