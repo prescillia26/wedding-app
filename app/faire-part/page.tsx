@@ -1592,9 +1592,9 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                 border: `2px solid ${sel ? '#C9A84C' : '#fecdd3'}`,
                 background: sel ? '#fdf5e4' : 'white',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', gap: 6,
-                minHeight: 110, overflow: 'hidden',
+                minHeight: 130,
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, minHeight: 80 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, minHeight: 90 }}>
                   <MonogramByStyle initial1={i1} initial2={i2} color={previewColor} size={80} style={opt.key} />
                 </div>
                 <span style={{ fontSize: 9, color: sel ? '#C9A84C' : '#6a5040', fontWeight: sel ? 700 : 400, textAlign: 'center', lineHeight: 1.3 }}>{opt.label}</span>
