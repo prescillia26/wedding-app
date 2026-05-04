@@ -2252,9 +2252,9 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
   const fs = Math.round(size * 0.52)
   // Great Vibes : les fioritures des majuscules (J, P, Q, Y…) dépassent la boîte CSS.
   // On ajoute du padding sur chaque span + letter-spacing pour éviter tout clipping.
-  const gv: React.CSSProperties = { fontFamily: GV, fontSize: fs, color, padding: '0.1em 0.2em' }
-  // Le "&" calligraphique entre les initiales
-  const ampersand = <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: Math.round(fs * 0.45), color, opacity: 0.55, margin: `0 ${Math.round(fs * 0.06)}px` }}>&</span>
+  const gv: React.CSSProperties = { fontFamily: GV, fontSize: fs, color, padding: '0 0.08em', lineHeight: 1.1 }
+  // Le "&" calligraphique entre les initiales — serré contre les lettres
+  const ampersand = <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: Math.round(fs * 0.4), color, opacity: 0.5, margin: '0 1px', lineHeight: 1 }}>&</span>
 
   // ── Style 1 : Entrelacé Luxe ──────────────────────────────────────────────
   if (style === 'cercle') return (
@@ -2281,7 +2281,7 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
     const r1 = d / 2 - 2, r2 = d / 2 - Math.round(d * 0.07)
     const sw1 = Math.max(0.5, d * 0.005), sw2 = Math.max(0.3, d * 0.003)
     const sfs = Math.round(fs * 0.84)
-    const ampSmall = <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: Math.round(sfs * 0.45), color, opacity: 0.55, margin: `0 ${Math.round(sfs * 0.06)}px` }}>&</span>
+    const ampSmall = <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: Math.round(sfs * 0.4), color, opacity: 0.5, margin: '0 1px', lineHeight: 1 }}>&</span>
     return (
       <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
         <svg style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', pointerEvents: 'none' }} width={d} height={d} viewBox={`0 0 ${d} ${d}`} xmlns="http://www.w3.org/2000/svg">
@@ -2299,10 +2299,10 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
   if (style === 'branches') {
     const lfs = Math.round(fs * 0.9)
     return (
-      <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}>
-        <span style={{ ...gv, fontSize: lfs, textAlign: 'center' }}>{a}</span>
-        <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: Math.round(lfs * 0.4), color, opacity: 0.45 }}>&</span>
-        <span style={{ ...gv, fontSize: lfs, opacity: 0.78, textAlign: 'center' }}>{b}</span>
+      <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
+        <span style={{ ...gv, fontSize: lfs, textAlign: 'center', marginBottom: Math.round(lfs * -0.2) }}>{a}</span>
+        <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: Math.round(lfs * 0.35), color, opacity: 0.45, lineHeight: 1, margin: `${Math.round(lfs * -0.05)}px 0` }}>&</span>
+        <span style={{ ...gv, fontSize: lfs, opacity: 0.78, textAlign: 'center', marginTop: Math.round(lfs * -0.2) }}>{b}</span>
       </div>
     )
   }
@@ -2312,9 +2312,9 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
     const cfs = Math.round(fs * 0.96)
     return (
       <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: Math.round(size * 0.04) }}>
-        <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: Math.round(fs * 0.12) }}>
+        <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: Math.round(fs * 0.06) }}>
           <span style={{ fontFamily: CG, fontSize: cfs, color, fontStyle: 'italic', fontWeight: 300, letterSpacing: Math.round(fs * 0.04) }}>{a}</span>
-          <span style={{ fontFamily: CG, fontSize: Math.round(cfs * 0.5), color, fontStyle: 'italic', fontWeight: 300, opacity: 0.5 }}>&</span>
+          <span style={{ fontFamily: CG, fontSize: Math.round(cfs * 0.45), color, fontStyle: 'italic', fontWeight: 300, opacity: 0.45 }}>&</span>
           <span style={{ fontFamily: CG, fontSize: cfs, color, fontStyle: 'italic', fontWeight: 300, letterSpacing: Math.round(fs * 0.04) }}>{b}</span>
         </div>
         <div style={{ width: Math.round(size * 0.72), height: 0.5, background: color, opacity: 0.35 }} />
