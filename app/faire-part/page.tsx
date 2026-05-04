@@ -5382,6 +5382,18 @@ export default function FairePartPage() {
         setUserEmail(data.email)
         setUserFaireparts(data.faireparts ?? [])
 
+        // Vérifier que le localStorage appartient au compte connecté
+        try {
+          const storedEmail = localStorage.getItem('lovit_user_email')
+          if (storedEmail && storedEmail !== data.email) {
+            // Autre compte → nettoyer le localStorage
+            localStorage.removeItem('wedding-draft')
+            localStorage.removeItem('lovit_access_code')
+            localStorage.removeItem('lovit_share_id')
+          }
+          localStorage.setItem('lovit_user_email', data.email)
+        } catch { /* ignore */ }
+
         // Si connecté et qu'on a des faire-parts, tenter de charger le brouillon serveur
         const faireparts: string[] = data.faireparts ?? []
         if (faireparts.length > 0) {

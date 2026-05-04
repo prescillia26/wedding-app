@@ -58,7 +58,21 @@ export default function MonEspacePage() {
         }
         return res.json()
       })
-      .then(d => { if (d) setData(d) })
+      .then(d => {
+        if (d) {
+          setData(d)
+          // Vérifier que le localStorage appartient au compte connecté
+          try {
+            const storedEmail = localStorage.getItem('lovit_user_email')
+            if (storedEmail && storedEmail !== d.email) {
+              localStorage.removeItem('wedding-draft')
+              localStorage.removeItem('lovit_access_code')
+              localStorage.removeItem('lovit_share_id')
+            }
+            localStorage.setItem('lovit_user_email', d.email)
+          } catch { /* ignore */ }
+        }
+      })
       .catch(() => { window.location.href = '/connexion' })
       .finally(() => setLoading(false))
   }, [])
@@ -66,6 +80,12 @@ export default function MonEspacePage() {
   const handleLogout = async () => {
     setLoggingOut(true)
     await fetch('/api/auth/logout', { method: 'POST' })
+    try {
+      localStorage.removeItem('wedding-draft')
+      localStorage.removeItem('lovit_access_code')
+      localStorage.removeItem('lovit_share_id')
+      localStorage.removeItem('lovit_user_email')
+    } catch { /* ignore */ }
     window.location.href = '/connexion'
   }
 
