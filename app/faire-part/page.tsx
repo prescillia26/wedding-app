@@ -4902,7 +4902,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
       }
 
       const existingId = (() => { try { return localStorage.getItem('lovit_share_id') } catch { return null } })()
-      console.log('slug envoyé:', dataToSend.slug)
+      // slug envoyé
       const res = await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...dataToSend, fixedId: existingId }) })
       const json = await res.json()
       if (!json.id) throw new Error('Pas d\'id retourné : ' + JSON.stringify(json))
@@ -4918,7 +4918,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
       setCoupleUrl(base + '&role=couple')
       setShareModalOpen(true)
     } catch (err) {
-      console.error('handleShare erreur:', err)
+      void err
       alert('Erreur : ' + (err instanceof Error ? err.message : String(err)))
     } finally {
       setSharing(false)

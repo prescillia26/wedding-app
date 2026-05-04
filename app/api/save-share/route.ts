@@ -55,7 +55,6 @@ export async function POST(request: Request) {
 
     return Response.json({ id, slug: shareData.slug || null })
   } catch (err) {
-    console.error('save-share error:', err)
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

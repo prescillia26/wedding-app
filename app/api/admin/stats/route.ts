@@ -81,7 +81,6 @@ export async function GET(request: Request) {
       clients,
     })
   } catch (err) {
-    console.error('admin/stats error:', err)
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

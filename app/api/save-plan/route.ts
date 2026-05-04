@@ -12,7 +12,6 @@ export async function POST(request: Request) {
     await redis.set(`plan:${shareId}`, tables)
     return Response.json({ ok: true })
   } catch (err) {
-    console.error('save-plan error:', err)
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

@@ -38,7 +38,6 @@ export async function GET(request: Request) {
 
     return Response.json({ ok: true, email: magic.email })
   } catch (err) {
-    console.error('verify error:', err)
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

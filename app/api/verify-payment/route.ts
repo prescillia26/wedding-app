@@ -135,7 +135,6 @@ export async function GET(request: Request) {
 
     return Response.json({ code, pack, email })
   } catch (err) {
-    console.error('verify-payment error:', err)
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

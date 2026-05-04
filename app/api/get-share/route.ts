@@ -18,7 +18,6 @@ export async function GET(request: Request) {
     }
     return Response.json(data)
   } catch (err) {
-    console.error('get-share error:', err)
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

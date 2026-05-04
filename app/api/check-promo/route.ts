@@ -165,7 +165,6 @@ export async function POST(request: Request) {
       returning: !!data.usedAt,
     })
   } catch (err) {
-    console.error('check-promo error:', err)
     return Response.json({ valid: false, reason: 'Erreur serveur' }, { status: 500 })
   }
 }

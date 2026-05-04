@@ -14,7 +14,6 @@ export async function GET() {
       createdAt: user.createdAt,
     })
   } catch (err) {
-    console.error('me error:', err)
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

@@ -56,7 +56,6 @@ export async function GET() {
       faireparts,
     })
   } catch (err) {
-    console.error('dashboard error:', err)
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

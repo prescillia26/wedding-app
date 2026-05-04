@@ -69,7 +69,6 @@ export async function POST(request: Request) {
 
     return Response.json({ ok: true })
   } catch (err) {
-    console.error('magic-link error:', err)
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

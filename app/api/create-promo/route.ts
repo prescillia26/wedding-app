@@ -36,7 +36,6 @@ export async function POST(request: Request) {
 
     return Response.json({ success: true, code: normalized })
   } catch (err) {
-    console.error('create-promo error:', err)
     return Response.json({ success: false, error: 'Erreur serveur' }, { status: 500 })
   }
 }

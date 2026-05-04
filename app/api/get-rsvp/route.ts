@@ -15,7 +15,6 @@ export async function GET(request: Request) {
     const entries = await redis.get<unknown[]>(key) ?? []
     return Response.json(entries)
   } catch (err) {
-    console.error('get-rsvp error:', err)
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

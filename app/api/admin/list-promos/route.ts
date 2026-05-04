@@ -30,7 +30,6 @@ export async function GET(request: Request) {
 
     return Response.json(promos)
   } catch (err) {
-    console.error('admin/list-promos error:', err)
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

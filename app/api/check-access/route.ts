@@ -19,7 +19,6 @@ export async function GET(request: Request) {
     if (!data) return Response.json({ valid: false, reason: 'Code invalide' })
     return Response.json({ valid: true })
   } catch (err) {
-    console.error('check-access GET error:', err)
     return Response.json({ valid: false, reason: 'Erreur serveur' }, { status: 500 })
   }
 }
@@ -35,7 +34,6 @@ export async function POST(request: Request) {
 
     return Response.json({ valid: true })
   } catch (err) {
-    console.error('check-access POST error:', err)
     return Response.json({ valid: false, reason: 'Erreur serveur' }, { status: 500 })
   }
 }

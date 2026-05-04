@@ -27,7 +27,6 @@ export async function GET(request: Request) {
 
     return Response.json({ formData: draft.formData })
   } catch (err) {
-    console.error('get-draft error:', err)
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

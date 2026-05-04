@@ -61,7 +61,6 @@ Critères d'analyse :
 
     return NextResponse.json(safe)
   } catch (error) {
-    console.error('Analyze frame error:', error)
     return NextResponse.json({ framePaddingV: 20, framePaddingH: 16, textBg: 0.5, frameOpacity: 1 })
   }
 }

@@ -13,7 +13,6 @@ export async function GET(request: Request) {
     const views = await redis.get<{ timestamp: string; pays: string }[]>(`views:${shareId}`) ?? []
     return Response.json(views)
   } catch (err) {
-    console.error('get-views error:', err)
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

@@ -27,7 +27,6 @@ export async function POST(request: Request) {
 
     return Response.json({ ok: true })
   } catch (err) {
-    console.error('set-password error:', err)
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

@@ -12,7 +12,6 @@ export async function GET(request: Request) {
     const plan = await redis.get(`plan:${shareId}`) ?? []
     return Response.json(plan)
   } catch (err) {
-    console.error('get-plan error:', err)
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

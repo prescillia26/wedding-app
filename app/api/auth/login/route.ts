@@ -47,7 +47,6 @@ export async function POST(request: Request) {
 
     return Response.json({ ok: true, email: normalizedEmail })
   } catch (err) {
-    console.error('login error:', err)
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }
