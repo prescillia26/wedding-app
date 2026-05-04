@@ -4586,7 +4586,7 @@ const firstDate = sorted[0]?.date
                       {i % 2 === 0 ? <><OrnTR /><OrnBL /></> : <><OrnTL /><OrnBR /></>}
                     </>
                   )}
-                  <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg || hasFrame), ...(hasFrame ? { background: `rgba(255,255,255,${data.textBg ?? 0.5})`, borderRadius: 8, padding: '24px 16px', margin: '0 4%' } : {}) }}>
+                  <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: hasFrame ? '0 0 6px rgba(255,255,255,1), 0 0 12px rgba(255,255,255,0.9), 0 0 24px rgba(255,255,255,0.6)' : readableShadow(theme, usePhotoBg) }}>
                     {data.mariageJuif && (
                       <div style={{ position: 'absolute', top: 18, right: 22, fontSize: 16, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, zIndex: 5, opacity: 0.85, letterSpacing: 1 }}>בס״ד</div>
                     )}
