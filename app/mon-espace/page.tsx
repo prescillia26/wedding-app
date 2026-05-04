@@ -312,6 +312,18 @@ function FairepartCardComponent({ fp }: { fp: FairepartCard }) {
           >
             Voir RSVP
           </a>
+          <a
+            href={`/plan-table?shareId=${fp.shareId}`}
+            style={{
+              flex: 1, textAlign: 'center', padding: '10px 12px', borderRadius: 9999,
+              background: 'transparent', border: '1px solid #d1d5db',
+              color: '#6b7280', textDecoration: 'none', fontSize: 12, fontWeight: 600,
+              fontFamily: 'var(--font-playfair-display)',
+              minWidth: 80,
+            }}
+          >
+            Plan de table
+          </a>
         </div>
       </div>
     </div>

@@ -104,7 +104,6 @@ const FRAMES: { id: string; label: string; url: string | null }[] = [
   { id: 'frame-09', label: '🌻 Cadre Champêtre', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785415/46_g1yqw8.png' },
   { id: 'frame-10', label: '🌸 Fleurs Roses Coins', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785414/45_roarfa.png' },
   { id: 'frame-30', label: '🌹 Floral 18', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778825/18_ushe4t.png' },
-  { id: 'frame-32', label: '🌷 Floral 16', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778821/16_cibjrt.png' },
   { id: 'frame-34', label: '🌻 Floral 14', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778816/14_bzmmdm.png' },
   { id: 'frame-55', label: '🌸 Floral 55', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857011/55_l7xahl.png' },
   { id: 'frame-56', label: '🌸 Floral 56', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857012/56_siwk5j.png' },
@@ -4616,20 +4615,17 @@ const firstDate = sorted[0]?.date
                     )}
                     {(parents1.length > 0 || parents2.length > 0) && ceremony.type === 'Cérémonie religieuse / Houppa' && (
                       <AnimSection animStyle={anim} delay={150}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 16px', marginBottom: 12, textAlign: 'center' }}>
-                          {/* Ligne 1 : Parents */}
-                          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{parents1[0] || '\u00A0'}</div>
-                          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{parents2[0] || '\u00A0'}</div>
-                          {/* Ligne 2 : Grands-parents paternels */}
-                          {(gpPa1 || gpPa2) && <>
-                            <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{gpPa1 || '\u00A0'}</div>
-                            <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{gpPa2 || '\u00A0'}</div>
-                          </>}
-                          {/* Ligne 3 : Grands-parents maternels */}
-                          {(gpMa1 || gpMa2) && <>
-                            <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{gpMa1 || '\u00A0'}</div>
-                            <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{gpMa2 || '\u00A0'}</div>
-                          </>}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 12, textAlign: 'center' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {gpPa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{gpPa1}</div>}
+                            {gpMa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{gpMa1}</div>}
+                            {parents1.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{l}</div>)}
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {gpPa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{gpPa2}</div>}
+                            {gpMa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{gpMa2}</div>}
+                            {parents2.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{l}</div>)}
+                          </div>
                         </div>
                         <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 24, lineHeight: 1.9, opacity: 0.82 }, 'narratif', data.zoneStyles)}>
                           {ov[`ceremony_${i}_joie`] || (hasGp ? 'ont la joie de vous faire part du mariage de leurs petits-enfants et enfants' : 'ont la joie de vous faire part du mariage de leurs enfants')}
@@ -5000,6 +4996,9 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
           <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>📋 RSVP</button>
         )}
         <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>✏️ Texte</button>
+        {lastShareId && (
+          <a href={`/plan-table?shareId=${lastShareId}`} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>🪑 Tables</a>
+        )}
         <a href="/paiement" style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: '1.5px solid #e5d5c5', background: 'transparent', color: '#8a7860', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>+ Nouveau</a>
       </div>
       {rsvpOpen && (
@@ -5262,8 +5261,6 @@ export default function FairePartPage() {
   // Auth & sauvegarde serveur
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [userFaireparts, setUserFaireparts] = useState<string[]>([])
-  const [userFairepartsInfo, setUserFairepartsInfo] = useState<{ shareId: string; marie1Prenom: string; marie2Prenom: string; ceremonies: { type: string }[] }[]>([])
-  const [activeFairepartId, setActiveFairepartId] = useState<string | null>(null)
   const [serverSavedAt, setServerSavedAt] = useState<Date | null>(null)
   const [serverSaving, setServerSaving] = useState(false)
   const serverSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -5399,30 +5396,19 @@ export default function FairePartPage() {
           localStorage.setItem('lovit_user_email', data.email)
         } catch { /* ignore */ }
 
-        // Si connecté et qu'on a des faire-parts, charger les infos + le dernier brouillon
+        // Si connecté et qu'on a des faire-parts, tenter de charger le brouillon serveur
         const faireparts: string[] = data.faireparts ?? []
         if (faireparts.length > 0) {
-          // Charger les prénoms de chaque faire-part pour la barre de navigation
-          try {
-            const dashRes = await fetch('/api/auth/dashboard')
-            if (dashRes.ok) {
-              const dashData = await dashRes.json()
-              if (!cancelled && dashData.faireparts) {
-                setUserFairepartsInfo(dashData.faireparts.map((fp: { shareId: string; marie1Prenom: string; marie2Prenom: string; ceremonies: { type: string }[] }) => ({
-                  shareId: fp.shareId, marie1Prenom: fp.marie1Prenom, marie2Prenom: fp.marie2Prenom, ceremonies: fp.ceremonies ?? [],
-                })))
-              }
-            }
-          } catch { /* ignore */ }
-
           // Charger le dernier faire-part
           const shareId = faireparts[faireparts.length - 1]
-          setActiveFairepartId(shareId)
           try {
             const draftRes = await fetch(`/api/get-draft?shareId=${shareId}`)
             if (draftRes.ok) {
               const draftData = await draftRes.json()
               if (!cancelled && draftData.formData) {
+                // Le brouillon serveur a la priorité sur le localStorage
+                // sauf si le localStorage est plus récent (on ne peut pas le savoir,
+                // donc on privilégie le serveur)
                 setFormData(draftData.formData as FormData)
                 setHasDraft(true)
                 setAccessGranted(true)
@@ -5496,23 +5482,6 @@ export default function FairePartPage() {
     }
   }, [])
 
-  const switchFairepart = useCallback(async (shareId: string) => {
-    try {
-      const res = await fetch(`/api/get-share?id=${shareId}`)
-      if (!res.ok) return
-      const d = await res.json()
-      if (d.photosFond?.length && d.photosData?.length) {
-        d.photosData = d.photosData.map((c: { cropX?: number; cropY?: number; cropScale?: number }, i: number) => ({ ...c, url: d.photosFond[i] ?? '' }))
-      }
-      setFormData(d)
-      setActiveFairepartId(shareId)
-      setShowCards(false)
-      setStep(1)
-      try { localStorage.setItem('lovit_share_id', shareId) } catch { /* ignore */ }
-      try { localStorage.setItem('wedding-draft', JSON.stringify(d)) } catch { /* ignore */ }
-    } catch { /* ignore */ }
-  }, [])
-
   const next = useCallback(() => {
     if (step < 4) setStep(s => s + 1)
     else {
@@ -5571,43 +5540,6 @@ export default function FairePartPage() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '48px 16px', background: 'linear-gradient(160deg, #fff8ed 0%, #fffaf4 50%, #fff8ed 100%)' }}>
-      {/* Barre de navigation */}
-      {userEmail && (
-        <div style={{ display: 'flex', gap: 6, marginBottom: 20, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
-          {userFairepartsInfo.length > 1 && userFairepartsInfo.map((fp, idx) => {
-            const isActive = fp.shareId === activeFairepartId
-            const events = fp.ceremonies.map(c => c.type.replace('Cérémonie religieuse / ', '')).join(', ')
-            const label = events || `Faire-part ${idx + 1}`
-            return (
-              <button key={fp.shareId} onClick={() => !isActive && switchFairepart(fp.shareId)} style={{
-                cursor: isActive ? 'default' : 'pointer',
-                padding: '6px 14px', borderRadius: 9999, fontSize: 11, fontWeight: isActive ? 700 : 500,
-                fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic',
-                background: isActive ? '#C9A84C' : 'white',
-                color: isActive ? 'white' : '#8a7860',
-                border: isActive ? 'none' : '1px solid #e5d5c5',
-              }}>
-                {label}
-              </button>
-            )
-          })}
-          {userFairepartsInfo.length > 1 && <span style={{ color: '#d1d5db', fontSize: 10 }}>·</span>}
-          <a href="/mon-espace" style={{
-            padding: '6px 14px', borderRadius: 9999, fontSize: 11,
-            fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic',
-            color: '#8a7860', textDecoration: 'none', border: '1px solid #e5d5c5',
-          }}>
-            Votre espace
-          </a>
-          <a href="/paiement" style={{
-            padding: '6px 14px', borderRadius: 9999, fontSize: 11,
-            fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic',
-            color: '#C9A84C', textDecoration: 'none', border: '1px solid #C9A84C44',
-          }}>
-            + Nouveau faire-part
-          </a>
-        </div>
-      )}
       <div style={{ textAlign: 'center', marginBottom: 36 }}>
         <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(201,168,76,0.65)', fontWeight: 600, marginBottom: 10 }}>Invitation de mariage</p>
         {savedAt && (

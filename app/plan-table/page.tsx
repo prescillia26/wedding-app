@@ -10,7 +10,7 @@ const BTN: React.CSSProperties = { cursor: 'pointer', touchAction: 'manipulation
 
 interface RSVPEntry {
   nom: string
-  reponses?: { present: boolean; nbPersonnes: number }[]
+  reponses?: { present: boolean; nbPersonnes: number; accompagnants?: string[] }[]
 }
 
 interface TableData {
@@ -95,9 +95,22 @@ export default function PlanTablePage() {
           fetch(`/api/get-plan?shareId=${id}`).then(r => r.json()),
         ])
         const entries: RSVPEntry[] = Array.isArray(rsvpRes) ? rsvpRes : []
-        const presentGuests = entries
-          .filter(e => e.reponses?.some(r => r.present))
-          .map(e => e.nom)
+        const presentGuests: string[] = []
+        for (const e of entries) {
+          const isPresent = e.reponses?.some(r => r.present)
+          if (!isPresent) continue
+          presentGuests.push(e.nom)
+          // Ajouter les accompagnants (+1) avec leurs noms
+          for (const r of (e.reponses ?? [])) {
+            if (r.present && r.accompagnants) {
+              for (const acc of r.accompagnants) {
+                if (acc.trim() && !presentGuests.includes(acc.trim())) {
+                  presentGuests.push(acc.trim())
+                }
+              }
+            }
+          }
+        }
         setGuests(presentGuests)
 
         const savedTables: TableData[] = Array.isArray(planRes) && planRes.length > 0 ? planRes : initTables()
