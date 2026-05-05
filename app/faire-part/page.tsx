@@ -1094,7 +1094,7 @@ function ImageCropper({ src, onCrop, onPreview }: { src: string; onCrop: (positi
 }
 
 function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
-  const { t } = useT()
+  const { t, locale } = useT()
   const update = (i: number, u: Partial<Ceremony>) =>
     onChange({ ceremonies: data.ceremonies.map((c, idx) => idx === i ? { ...c, ...u } : c) })
   const add = () => data.ceremonies.length < 6 && onChange({ ceremonies: [...data.ceremonies, { ...defaultCeremony, type: 'Soirée' }] })
@@ -1179,6 +1179,9 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                   rows={3}
                   style={{ ...S.input, resize: 'vertical', minHeight: 70, fontFamily: 'inherit', fontSize: 13 }}
                 />
+                <p style={{ fontSize: 10, color: '#9ca3af', marginTop: 4 }}>
+                  {locale === 'en' ? 'Paste a link (https://...) and it will be clickable for your guests.' : 'Collez un lien (https://...) et il sera cliquable pour vos invités.'}
+                </p>
               </div>
             )}
           </div>
@@ -1945,17 +1948,28 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
             <div style={{ height: 1, background: theme.accent, opacity: 0.35, marginTop: 12 }} />
           </div>
         )}
+        {/* Grands-parents alignés — espace vide si un côté manque */}
+        {hasGp && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, marginBottom: 4, alignItems: 'start' }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: theme.accent, lineHeight: 2 }}>
+              <div style={{ visibility: gpPa1 ? 'visible' : 'hidden' }}>{gpPa1 || '\u00A0'}</div>
+              <div style={{ visibility: gpMa1 ? 'visible' : 'hidden' }}>{gpMa1 || '\u00A0'}</div>
+            </div>
+            <div style={{ width: 1, background: theme.accent, opacity: 0.3, alignSelf: 'stretch', minHeight: 20 }} />
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: theme.accent, textAlign: 'right', lineHeight: 2 }}>
+              <div style={{ visibility: gpPa2 ? 'visible' : 'hidden' }}>{gpPa2 || '\u00A0'}</div>
+              <div style={{ visibility: gpMa2 ? 'visible' : 'hidden' }}>{gpMa2 || '\u00A0'}</div>
+            </div>
+          </div>
+        )}
+        {/* Parents toujours alignés */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, marginBottom: 24, alignItems: 'start' }}>
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: theme.accent, lineHeight: 2 }}>
             {parents1.map((l, i) => <div key={i}>{l}</div>)}
-            {gpPa1 && <div>{gpPa1}</div>}
-            {gpMa1 && <div>{gpMa1}</div>}
           </div>
           <div style={{ width: 1, background: theme.accent, opacity: 0.3, alignSelf: 'stretch', minHeight: 40 }} />
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: theme.accent, textAlign: 'right', lineHeight: 2 }}>
             {parents2.map((l, i) => <div key={i}>{l}</div>)}
-            {gpPa2 && <div>{gpPa2}</div>}
-            {gpMa2 && <div>{gpMa2}</div>}
           </div>
         </div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, textAlign: 'center', color: theme.texte, marginBottom: 24, lineHeight: 1.5 }}>
@@ -2174,17 +2188,28 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{t.fairepart.cardShabbatHatan}</div>
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ textAlign: 'center', fontSize: 22, letterSpacing: '0.4em', color: theme.accent, marginBottom: 24 }}>✡ ✦ ✡</div>
+        {/* Grands-parents alignés — espace vide si un côté manque */}
+        {hasGp && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, marginBottom: 4, alignItems: 'start' }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: theme.accent, lineHeight: 2 }}>
+              <div style={{ visibility: gpPa1 ? 'visible' : 'hidden' }}>{gpPa1 || '\u00A0'}</div>
+              <div style={{ visibility: gpMa1 ? 'visible' : 'hidden' }}>{gpMa1 || '\u00A0'}</div>
+            </div>
+            <div style={{ width: 1, background: theme.accent, opacity: 0.3, alignSelf: 'stretch', minHeight: 20 }} />
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: theme.accent, textAlign: 'right', lineHeight: 2 }}>
+              <div style={{ visibility: gpPa2 ? 'visible' : 'hidden' }}>{gpPa2 || '\u00A0'}</div>
+              <div style={{ visibility: gpMa2 ? 'visible' : 'hidden' }}>{gpMa2 || '\u00A0'}</div>
+            </div>
+          </div>
+        )}
+        {/* Parents toujours alignés */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, marginBottom: 24, alignItems: 'start' }}>
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: theme.accent, lineHeight: 2 }}>
             {parents1.map((l, i) => <div key={i}>{l}</div>)}
-            {gpPa1 && <div>{gpPa1}</div>}
-            {gpMa1 && <div>{gpMa1}</div>}
           </div>
           <div style={{ width: 1, background: theme.accent, opacity: 0.3, alignSelf: 'stretch', minHeight: 40 }} />
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: theme.accent, textAlign: 'right', lineHeight: 2 }}>
             {parents2.map((l, i) => <div key={i}>{l}</div>)}
-            {gpPa2 && <div>{gpPa2}</div>}
-            {gpMa2 && <div>{gpMa2}</div>}
           </div>
         </div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, textAlign: 'center', color: theme.texte, marginBottom: 24, lineHeight: 1.5 }}>
@@ -4313,10 +4338,13 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
                   <div style={{ position: 'absolute', top: 10, left: 18, width: 28, height: 16, borderRadius: '50%', background: 'rgba(255,255,255,0.28)', filter: 'blur(6px)', pointerEvents: 'none' }} />
                   {/* Petit reflet secondaire */}
                   <div style={{ position: 'absolute', bottom: 16, right: 20, width: 10, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', filter: 'blur(3px)', pointerEvents: 'none' }} />
-                  {/* Initiales gravées avec effet embossé */}
-                  <span style={{ fontFamily: GV, fontSize: 26, color: 'rgba(255,255,255,0.9)', textShadow: `0 2px 1px rgba(0,0,0,0.35), 0 -1px 0 rgba(255,255,255,0.2), 0 0 8px rgba(255,255,255,0.15)`, letterSpacing: 2, position: 'relative', zIndex: 1 }}>
-                    {i1}&{i2}
-                  </span>
+                  {/* Monogramme ou logo sur le sceau */}
+                  <div style={{ position: 'relative', zIndex: 1, filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.3))' }}>
+                    {data.customLogoUrl
+                      ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor || 'rgba(255,255,255,0.9)'} size={40} />
+                      : <MonogramByStyle initial1={i1} initial2={i2} color="rgba(255,255,255,0.9)" size={40} style={data.monogrammeStyle || 'cercle'} />
+                    }
+                  </div>
                 </div>
               )}
               {/* Sceau qui se brise (phase 1) */}
@@ -4939,15 +4967,25 @@ const firstDate = sorted[0]?.date
                     )}
                     {(parents1.length > 0 || parents2.length > 0) && ceremony.type === 'Cérémonie religieuse / Houppa' && (
                       <AnimSection animStyle={anim} delay={150}>
+                        {/* Grands-parents — alignés : espace vide si un côté manque */}
+                        {hasGp && (
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 8, textAlign: 'center' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5, minHeight: gpPa1 || gpPa2 ? 'auto' : 0, visibility: gpPa1 ? 'visible' : 'hidden' }}>{gpPa1 || '\u00A0'}</div>
+                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5, visibility: gpMa1 ? 'visible' : 'hidden' }}>{gpMa1 || '\u00A0'}</div>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5, visibility: gpPa2 ? 'visible' : 'hidden' }}>{gpPa2 || '\u00A0'}</div>
+                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5, visibility: gpMa2 ? 'visible' : 'hidden' }}>{gpMa2 || '\u00A0'}</div>
+                            </div>
+                          </div>
+                        )}
+                        {/* Parents — toujours alignés */}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 12, textAlign: 'center' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {gpPa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{gpPa1}</div>}
-                            {gpMa1 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{gpMa1}</div>}
                             {parents1.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{l}</div>)}
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {gpPa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{gpPa2}</div>}
-                            {gpMa2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{gpMa2}</div>}
                             {parents2.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{l}</div>)}
                           </div>
                         </div>
