@@ -4447,11 +4447,6 @@ function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareI
   const gpPa2 = fmtGpCouple(data.famille2GpPaPerePrenom, data.famille2GpPaPereNom, data.famille2GpPaMerePrenom, data.famille2GpPaMereNom, titles)
   const gpMa2 = fmtGpCouple(data.famille2GpMaPerePrenom, data.famille2GpMaPereNom, data.famille2GpMaMerePrenom, data.famille2GpMaMereNom, titles)
   const hasGp = !!(gpPa1 || gpMa1 || gpPa2 || gpMa2)
-  // Date affichée sur la page d'accueil : priorité à l'override manuel, 
-// sinon la cérémonie religieuse/Houppa, sinon la première date
-const dateAccueil = data.dateAccueilOverride 
-  || sorted.find(c => c.type === 'Cérémonie religieuse / Houppa')?.date
-  || sorted[0]?.date
 const firstDate = sorted[0]?.date
 
   const hasIntroPhoto = (data.photosFond?.length ?? 0) > 0 || !!data.photoFond
@@ -4533,117 +4528,26 @@ const firstDate = sorted[0]?.date
           <div style={{ fontFamily: FS, fontSize: 'clamp(30px,8vw,46px)', color: introTextColor, marginBottom: 16, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.2, textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : readableShadow(theme) }}>
             {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
           </div>
-          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: introTextColor, marginBottom: 36, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}>
+          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: introTextColor, marginBottom: 20, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}>
             {t.fairepart.pleaseJoin}
           </div>
-          <button onClick={handleDiscover} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '14px 40px', fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', boxShadow: `0 4px 20px ${G}44`, animation: 'sharedFadeIn 1s 0.7s ease forwards', opacity: 0 } as React.CSSProperties}>
+          {/* Compte à rebours intégré dans l'accueil */}
+          {firstDate && (
+            <div style={{ marginBottom: 28, animation: 'sharedFadeIn 1s 0.65s ease forwards', opacity: 0 }}>
+              <Countdown targetDate={firstDate} accent={hasIntroPhoto ? 'rgba(255,255,255,0.9)' : G} />
+            </div>
+          )}
+          <button onClick={handleDiscover} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '14px 40px', fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', boxShadow: `0 4px 20px ${G}44`, animation: 'sharedFadeIn 1s 0.8s ease forwards', opacity: 0 } as React.CSSProperties}>
             {t.fairepart.discoverInvitation}
           </button>
         </div>
         </div>
       </div>
 
-      {/* CONTENU PRINCIPAL */}
+      {/* CONTENU PRINCIPAL — directement les événements */}
       <div ref={contentRef} style={{ maxWidth: 480, margin: '0 auto', padding: '0 0 80px' }}>
 
-        {/* SECTION 2 : Intro */}
-        <section style={{ paddingTop: 96, paddingBottom: 96, position: 'relative', borderBottom: `1px solid ${G}1a`, overflow: 'visible' }}>
-          {!hasFrame && <><OrnTL /><OrnBR /></>}
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <AnimSection animStyle={anim}>
-              {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 14, color: G, direction: 'rtl', textAlign: 'right', marginBottom: 16 }}>בס״ד</div>}
-              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: G, textAlign: 'center', letterSpacing: 1, marginBottom: 14 }}>
-                {t.fairepart.weddingOf}
-              </div>
-              <LineSep />
-            </AnimSection>
-            <AnimSection animStyle={anim} delay={150}>
-              <style>{`@keyframes prenomAppear{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}`}</style>
-              <div style={{ position: 'relative', textAlign: 'center', marginBottom: 8 }}>
-                {data.marie1PrenomHebreu && (
-                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'serif', fontSize: 'clamp(44px,11vw,70px)', color: G, direction: 'rtl', opacity: 0.12, zIndex: 0, pointerEvents: 'none', userSelect: 'none' }}>
-                    {data.marie1PrenomHebreu}
-                  </div>
-                )}
-                <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, lineHeight: 1.1, position: 'relative', zIndex: 1, opacity: 0, animation: 'prenomAppear 1.2s ease 0.3s forwards' }, 'prenoms', data.zoneStyles)}>
-                  {data.marie1Prenom || 'Prénom'}
-                </div>
-              </div>
-              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 24, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.7 }}>&</div>
-              <div style={{ position: 'relative', textAlign: 'center', marginBottom: 24 }}>
-                {data.marie2PrenomHebreu && (
-                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'serif', fontSize: 'clamp(44px,11vw,70px)', color: G, direction: 'rtl', opacity: 0.12, zIndex: 0, pointerEvents: 'none', userSelect: 'none' }}>
-                    {data.marie2PrenomHebreu}
-                  </div>
-                )}
-                <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(40px,10vw,60px)', color: G, lineHeight: 1.1, position: 'relative', zIndex: 1, opacity: 0, animation: 'prenomAppear 1.2s ease 0.7s forwards' }, 'prenoms', data.zoneStyles)}>
-                  {data.marie2Prenom || 'Prénom'}
-                </div>
-              </div>
-              {data.mariageJuif && (data.marie1Prenom2 || data.marie2Prenom2) && (
-                <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 16 }}>
-                  {data.marie1Prenom2 && <div style={{ fontFamily: 'serif', fontSize: 22, color: G, direction: 'rtl' }}>{data.marie1Prenom2}</div>}
-                  {data.marie2Prenom2 && <div style={{ fontFamily: 'serif', fontSize: 22, color: G, direction: 'rtl' }}>{data.marie2Prenom2}</div>}
-                </div>
-              )}
-              
-              {/* ✨ NOUVEAU — Date en grand + jour de la semaine */}
-{dateAccueil && (
-  <>
-    <div style={{ width: 40, height: '0.5px', background: G, opacity: 0.4, margin: '24px auto 20px' }} />
-    <div style={applyZoneStyle({ 
-      fontFamily: FP, 
-      fontSize: 'clamp(22px,6vw,28px)', 
-      color: G, 
-      letterSpacing: 3, 
-      fontWeight: 300,
-      textAlign: 'center',
-      opacity: 0,
-      animation: 'prenomAppear 1.2s ease 1s forwards',
-    }, 'dateHeure', data.zoneStyles)}>
-      {new Date(dateAccueil).toLocaleDateString('fr-FR', { 
-        day: '2-digit', 
-        month: '2-digit', 
-        year: 'numeric' 
-      }).replace(/\//g, ' · ')}
-    </div>
-    <div style={{ 
-      fontFamily: FP, 
-      fontSize: 10, 
-      color: G, 
-      marginTop: 8,
-      letterSpacing: 3,
-      textTransform: 'uppercase',
-      opacity: 0.7,
-      textAlign: 'center',
-      animation: 'prenomAppear 1.2s ease 1.2s forwards',
-    }}>
-      {new Date(dateAccueil).toLocaleDateString(locale === 'en' ? 'en-US' : 'fr-FR', { weekday: 'long' })}
-    </div>
-  </>
-)}
-            </AnimSection>
-          </div>
-        </section>
-
-        {/* SECTION 3 : Compte à rebours */}
-        {firstDate && (
-          <section style={{ paddingTop: 56, paddingBottom: 48, textAlign: 'center', borderBottom: `1px solid ${G}1a`, position: 'relative' }}>
-            <AnimSection animStyle={anim}>
-              <div style={{ fontFamily: FP, fontSize: 11, letterSpacing: 4, textTransform: 'uppercase', color: G, marginBottom: 6 }}>PRÉPAREZ-VOUS !</div>
-              <div style={{ fontSize: 22, marginBottom: 24 }}>💍</div>
-            </AnimSection>
-            <AnimSection animStyle={anim} delay={150}>
-              <Countdown targetDate={firstDate} accent={G} />
-            </AnimSection>
-            <AnimSection animStyle={anim} delay={300}>
-              <div style={{ marginTop: 28, fontSize: 18, color: G, opacity: 0.45, animation: 'sharedBounce 1.5s infinite ease-in-out' }}>↓</div>
-              <style>{`@keyframes sharedBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}`}</style>
-            </AnimSection>
-          </section>
-        )}
-
-        {/* SECTION 4 : Cérémonies */}
+        {/* Cérémonies */}
         {(data.presentationStyle === 'cartes-separees' ? [sorted[currentCeremonyIdx]].filter(Boolean) : sorted).map((ceremony, i) => {
           const realIdx = data.presentationStyle === 'cartes-separees' ? currentCeremonyIdx : i
           const typeTitle: Record<string, string> = {
