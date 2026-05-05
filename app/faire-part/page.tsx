@@ -4190,12 +4190,19 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
   const envBgDark = theme.dark ? '#1a1208' : `color-mix(in srgb, ${fond} 82%, #000)`
   const textColor = theme.dark ? '#e0d0c0' : `color-mix(in srgb, ${a} 70%, #000)`
 
-  // Ornement SVG floral pour les coins
+  // Ornement SVG floral élaboré pour les coins
   const cornerOrn = (rot: string) => (
-    <svg width="50" height="50" viewBox="0 0 50 50" style={{ transform: rot, opacity: 0.12 }}>
-      <path d="M5,45 Q5,20 20,10 Q10,25 15,35 Q20,15 35,5 Q25,20 30,30 Q35,10 45,5" fill="none" stroke={a} strokeWidth="0.8" strokeLinecap="round" />
-      <circle cx="20" cy="10" r="1.5" fill={a} opacity="0.4" />
-      <circle cx="35" cy="5" r="1" fill={a} opacity="0.3" />
+    <svg width="65" height="65" viewBox="0 0 65 65" style={{ transform: rot, opacity: 0.15 }}>
+      <path d="M3,62 C3,35 15,20 30,10" fill="none" stroke={a} strokeWidth="0.6" strokeLinecap="round" />
+      <path d="M3,62 C10,45 25,35 40,28" fill="none" stroke={a} strokeWidth="0.5" strokeLinecap="round" />
+      <path d="M3,62 C20,55 35,42 48,25" fill="none" stroke={a} strokeWidth="0.4" strokeLinecap="round" />
+      <path d="M15,50 Q20,40 18,30 Q22,38 28,35" fill="none" stroke={a} strokeWidth="0.5" />
+      <path d="M25,55 Q32,45 30,35 Q35,42 40,38" fill="none" stroke={a} strokeWidth="0.4" />
+      <circle cx="30" cy="10" r="2" fill={a} opacity="0.25" />
+      <circle cx="40" cy="28" r="1.5" fill={a} opacity="0.2" />
+      <circle cx="48" cy="25" r="1" fill={a} opacity="0.15" />
+      <circle cx="18" cy="30" r="1.2" fill={a} opacity="0.2" />
+      <path d="M28,12 Q32,8 36,12 Q32,16 28,12Z" fill={a} opacity="0.08" />
     </svg>
   )
 
@@ -4237,34 +4244,43 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
           <div style={{
             position: 'relative', width: '100%', height: 480,
             background: `linear-gradient(160deg, ${envBg} 0%, ${envBgDark} 100%)`,
-            borderRadius: 12,
-            boxShadow: `0 32px 64px rgba(0,0,0,0.18), 0 16px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.12)`,
-            border: `1px solid ${a}12`,
+            borderRadius: 14,
+            boxShadow: `0 40px 80px rgba(0,0,0,0.20), 0 20px 40px rgba(0,0,0,0.10), 0 0 0 1px ${a}15, inset 0 1px 0 rgba(255,255,255,0.15)`,
             overflow: 'hidden',
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             padding: '120px 30px 40px',
           }}>
+            {/* Bordure dorée intérieure */}
+            <div style={{ position: 'absolute', inset: 6, borderRadius: 10, border: `0.5px solid ${a}20`, pointerEvents: 'none', zIndex: 1 }} />
+
             {/* Texture papier */}
-            <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.035, pointerEvents: 'none' }}>
-              <filter id="paperTex"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" /><feComposite in="SourceGraphic" operator="in" /></filter>
+            <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.03, pointerEvents: 'none' }}>
+              <filter id="paperTex"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="5" /><feComposite in="SourceGraphic" operator="in" /></filter>
               <rect width="100%" height="100%" filter="url(#paperTex)" />
             </svg>
 
-            {/* Ornements coins */}
-            <div style={{ position: 'absolute', top: 10, left: 10 }}>{cornerOrn('rotate(0)')}</div>
-            <div style={{ position: 'absolute', top: 10, right: 10 }}>{cornerOrn('rotate(90deg)')}</div>
-            <div style={{ position: 'absolute', bottom: 10, left: 10 }}>{cornerOrn('rotate(-90deg)')}</div>
-            <div style={{ position: 'absolute', bottom: 10, right: 10 }}>{cornerOrn('rotate(180deg)')}</div>
+            {/* Liner intérieur subtil (dégradé couleur thème) */}
+            <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, ${a}05 0%, transparent 30%, transparent 70%, ${a}05 100%)`, pointerEvents: 'none' }} />
 
-            {/* Filigrane central subtil */}
-            <svg style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', opacity: 0.04, pointerEvents: 'none' }} width="200" height="200" viewBox="0 0 200 200">
-              <circle cx="100" cy="100" r="90" fill="none" stroke={a} strokeWidth="0.3" />
-              <circle cx="100" cy="100" r="75" fill="none" stroke={a} strokeWidth="0.2" />
-              <path d="M100,15 Q130,50 100,100 Q70,50 100,15" fill="none" stroke={a} strokeWidth="0.3" />
-              <path d="M100,185 Q130,150 100,100 Q70,150 100,185" fill="none" stroke={a} strokeWidth="0.3" />
-              <path d="M15,100 Q50,130 100,100 Q50,70 15,100" fill="none" stroke={a} strokeWidth="0.3" />
-              <path d="M185,100 Q150,130 100,100 Q150,70 185,100" fill="none" stroke={a} strokeWidth="0.3" />
-            </svg>
+            {/* Ornements coins — plus grands */}
+            <div style={{ position: 'absolute', top: 8, left: 8, zIndex: 1 }}>{cornerOrn('rotate(0)')}</div>
+            <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}>{cornerOrn('scaleX(-1)')}</div>
+            <div style={{ position: 'absolute', bottom: 8, left: 8, zIndex: 1 }}>{cornerOrn('scaleY(-1)')}</div>
+            <div style={{ position: 'absolute', bottom: 8, right: 8, zIndex: 1 }}>{cornerOrn('scale(-1)')}</div>
+
+            {/* Séparateur horizontal haut */}
+            <div style={{ position: 'absolute', top: 70, left: 30, right: 30, display: 'flex', alignItems: 'center', gap: 8, zIndex: 1 }}>
+              <div style={{ flex: 1, height: '0.5px', background: a, opacity: 0.1 }} />
+              <svg width="12" height="12" viewBox="0 0 12 12" style={{ opacity: 0.15 }}><path d="M6,0 L8,4 L12,6 L8,8 L6,12 L4,8 L0,6 L4,4Z" fill={a} /></svg>
+              <div style={{ flex: 1, height: '0.5px', background: a, opacity: 0.1 }} />
+            </div>
+
+            {/* Séparateur horizontal bas */}
+            <div style={{ position: 'absolute', bottom: 60, left: 30, right: 30, display: 'flex', alignItems: 'center', gap: 8, zIndex: 1 }}>
+              <div style={{ flex: 1, height: '0.5px', background: a, opacity: 0.1 }} />
+              <svg width="12" height="12" viewBox="0 0 12 12" style={{ opacity: 0.15 }}><path d="M6,0 L8,4 L12,6 L8,8 L6,12 L4,8 L0,6 L4,4Z" fill={a} /></svg>
+              <div style={{ flex: 1, height: '0.5px', background: a, opacity: 0.1 }} />
+            </div>
 
             {/* ── EN HAUT : Prénoms en calligraphie ── */}
             <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', marginBottom: 32 }}>
@@ -4277,40 +4293,45 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
               </div>
             </div>
 
-            {/* ── AU CENTRE : Sceau de cire ── */}
-            <div style={{ position: 'relative', zIndex: 2, marginBottom: 32 }}>
+            {/* ── AU CENTRE : Sceau de cire luxe ── */}
+            <div style={{ position: 'relative', zIndex: 2, marginBottom: 28 }}>
               {/* Sceau intact (phase 0) */}
               {phase < 1 && (
                 <div style={{
-                  width: 72, height: 72, borderRadius: '50%',
-                  background: `radial-gradient(ellipse at 40% 35%, ${a}ff, ${a}cc, ${a}88)`,
-                  boxShadow: `0 6px 24px ${a}55, 0 2px 6px rgba(0,0,0,0.25), inset 0 2px 4px rgba(255,255,255,0.2), inset 0 -2px 6px rgba(0,0,0,0.2)`,
+                  width: 88, height: 88, borderRadius: '50%',
+                  background: `radial-gradient(ellipse at 38% 32%, ${a}ff 0%, ${a}dd 40%, ${a}99 80%, ${a}77 100%)`,
+                  boxShadow: `0 8px 28px ${a}55, 0 3px 8px rgba(0,0,0,0.3), inset 0 3px 6px rgba(255,255,255,0.25), inset 0 -3px 8px rgba(0,0,0,0.25)`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   position: 'relative',
                 }}>
-                  {/* Bordure texturée du sceau */}
-                  <div style={{ position: 'absolute', inset: -3, borderRadius: '50%', border: `3px solid ${a}44`, background: 'transparent' }} />
-                  {/* Reflet lumineux */}
-                  <div style={{ position: 'absolute', top: 8, left: 14, width: 22, height: 14, borderRadius: '50%', background: 'rgba(255,255,255,0.22)', filter: 'blur(5px)', pointerEvents: 'none' }} />
-                  {/* Initiales gravées */}
-                  <span style={{ fontFamily: GV, fontSize: 22, color: 'rgba(255,255,255,0.88)', textShadow: `0 1px 0 rgba(0,0,0,0.3), 0 -1px 0 rgba(255,255,255,0.15)`, letterSpacing: 1 }}>
+                  {/* Bord extérieur irrégulier (texture cire) */}
+                  <div style={{ position: 'absolute', inset: -4, borderRadius: '50%', border: `4px solid ${a}33`, background: 'transparent' }} />
+                  <div style={{ position: 'absolute', inset: -1, borderRadius: '50%', border: `1px solid ${a}55` }} />
+                  {/* Cercle intérieur gravé */}
+                  <div style={{ position: 'absolute', inset: 10, borderRadius: '50%', border: `0.5px solid rgba(255,255,255,0.15)` }} />
+                  {/* Reflet lumineux principal */}
+                  <div style={{ position: 'absolute', top: 10, left: 18, width: 28, height: 16, borderRadius: '50%', background: 'rgba(255,255,255,0.28)', filter: 'blur(6px)', pointerEvents: 'none' }} />
+                  {/* Petit reflet secondaire */}
+                  <div style={{ position: 'absolute', bottom: 16, right: 20, width: 10, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', filter: 'blur(3px)', pointerEvents: 'none' }} />
+                  {/* Initiales gravées avec effet embossé */}
+                  <span style={{ fontFamily: GV, fontSize: 26, color: 'rgba(255,255,255,0.9)', textShadow: `0 2px 1px rgba(0,0,0,0.35), 0 -1px 0 rgba(255,255,255,0.2), 0 0 8px rgba(255,255,255,0.15)`, letterSpacing: 2, position: 'relative', zIndex: 1 }}>
                     {i1}&{i2}
                   </span>
                 </div>
               )}
               {/* Sceau qui se brise (phase 1) */}
               {phase === 1 && (
-                <div style={{ width: 72, height: 72, position: 'relative', display: 'flex' }}>
+                <div style={{ width: 88, height: 88, position: 'relative', display: 'flex' }}>
                   <div style={{
-                    width: 36, height: 72, borderRadius: '72px 0 0 72px',
-                    background: `radial-gradient(ellipse at 70% 35%, ${a}ff, ${a}88)`,
-                    boxShadow: `0 4px 12px ${a}44`,
+                    width: 44, height: 88, borderRadius: '88px 0 0 88px',
+                    background: `radial-gradient(ellipse at 70% 35%, ${a}ff, ${a}77)`,
+                    boxShadow: `0 6px 16px ${a}44`,
                     animation: 'sealBreakL 0.7s cubic-bezier(0.4,0,1,1) forwards',
                   }} />
                   <div style={{
-                    width: 36, height: 72, borderRadius: '0 72px 72px 0',
-                    background: `radial-gradient(ellipse at 30% 35%, ${a}ff, ${a}88)`,
-                    boxShadow: `0 4px 12px ${a}44`,
+                    width: 44, height: 88, borderRadius: '0 88px 88px 0',
+                    background: `radial-gradient(ellipse at 30% 35%, ${a}ff, ${a}77)`,
+                    boxShadow: `0 6px 16px ${a}44`,
                     animation: 'sealBreakR 0.7s cubic-bezier(0.4,0,1,1) forwards',
                   }} />
                 </div>
