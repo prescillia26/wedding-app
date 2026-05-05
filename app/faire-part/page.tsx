@@ -5064,7 +5064,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
   const [coupleUrl, setCoupleUrl] = useState<string | null>(null)
   const [sharing, setSharing] = useState(false)
   const [sharingStatus, setSharingStatus] = useState('')
-  const [enveloppeFinie, setEnveloppeFinie] = useState(data.introAnimation === 'none' || !isShared)
+  const [enveloppeFinie, setEnveloppeFinie] = useState(data.introAnimation === 'none')
 
   const startYoutubeMusic = useCallback((videoId: string) => {
     if (ytIframeRef.current) return
@@ -5193,6 +5193,10 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         )}
       </div>
     )
+  }
+
+  if (!enveloppeFinie) {
+    return <EnveloppeAnimation data={data} theme={theme} onDone={() => setEnveloppeFinie(true)} />
   }
 
   return (
