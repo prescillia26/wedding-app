@@ -3360,6 +3360,31 @@ function CopyTextRow({ text, accent }: { text: string; accent: string }) {
 function ShareModal({ accent, guestUrl, coupleUrl, onClose, data }: { accent: string; guestUrl: string; coupleUrl: string; onClose: () => void; data: FormData }) {
   const { t, locale } = useT()
   const [message, setMessage] = useState(() => buildWhatsAppMessage(data, guestUrl, t.fairepart, locale))
+  const sorted = sortByDate(data.ceremonies)
+  const [customLinks, setCustomLinks] = useState<{ name: string; events: number[] }[]>([])
+  const [showCustom, setShowCustom] = useState(false)
+  const [newLinkName, setNewLinkName] = useState('')
+  const [newLinkEvents, setNewLinkEvents] = useState<number[]>([])
+
+  const typeTitle: Record<string, string> = {
+    'Mairie': t.fairepart.cardTitles['Mairie'], 'Cérémonie religieuse / Houppa': t.fairepart.cardTitles['Cérémonie religieuse / Houppa'],
+    'Shabbat Hatan': t.fairepart.cardTitles['Shabbat Hatan'], 'Henné': t.fairepart.cardTitles['Henné'],
+    'Cocktail': t.fairepart.cardTitles['Cocktail'], 'Soirée': t.fairepart.cardTitles['Soirée'], 'Boat Party': t.fairepart.cardTitles['Boat Party'],
+  }
+  const getCName = (c: Ceremony) => typeTitle[c.type] || c.customName || c.type
+
+  const buildCustomUrl = (events: number[]) => {
+    const sep = guestUrl.includes('?') ? '&' : '?'
+    return `${guestUrl}${sep}events=${events.join(',')}`
+  }
+
+  const addCustomLink = () => {
+    if (newLinkEvents.length === 0) return
+    setCustomLinks(prev => [...prev, { name: newLinkName || newLinkEvents.map(i => getCName(sorted[i])).join(' + '), events: newLinkEvents }])
+    setNewLinkName('')
+    setNewLinkEvents([])
+  }
+
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)' }} />
@@ -3368,7 +3393,7 @@ function ShareModal({ accent, guestUrl, coupleUrl, onClose, data }: { accent: st
 
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: accent, textAlign: 'center', marginBottom: 28 }}>{t.fairepart.shareReadyTitle}</div>
 
-        {/* Section 1 — Lien invités */}
+        {/* Section 1 — Lien invités (tous les événements) */}
         <div style={{ marginBottom: 24 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>{t.fairepart.shareGuestLink}</div>
           <CopyLinkRow label="" url={guestUrl} accent={accent} />
@@ -3395,7 +3420,59 @@ function ShareModal({ accent, guestUrl, coupleUrl, onClose, data }: { accent: st
           </div>
         </div>
 
-        {/* Section 3 — Lien mariés */}
+        {/* Section 3 — Liens personnalisés par événement */}
+        {sorted.length >= 2 && (
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>
+              {locale === 'en' ? 'Custom links by event' : 'Liens personnalisés par événement'}
+            </div>
+            <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 12 }}>
+              {locale === 'en' ? 'Create different links with only the events you want to share with each group of guests.' : 'Créez des liens différents avec seulement les événements que vous souhaitez partager à chaque groupe d\'invités.'}
+            </div>
+
+            {/* Liens déjà créés */}
+            {customLinks.map((link, li) => (
+              <div key={li} style={{ marginBottom: 10, padding: '10px 14px', background: '#fdf8f0', borderRadius: 10, border: `1px solid ${accent}22` }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: accent, marginBottom: 6 }}>{link.name}</div>
+                <CopyLinkRow label="" url={buildCustomUrl(link.events)} accent={accent} />
+                <button onClick={() => setCustomLinks(prev => prev.filter((_, i) => i !== li))} style={{ ...BTN, background: 'none', border: 'none', fontSize: 11, color: '#9ca3af', padding: '4px 0', cursor: 'pointer', marginTop: 4 }}>
+                  {locale === 'en' ? 'Remove' : 'Supprimer'}
+                </button>
+              </div>
+            ))}
+
+            {/* Créer un nouveau lien */}
+            {!showCustom ? (
+              <button onClick={() => setShowCustom(true)} style={{ ...BTN, width: '100%', padding: '10px', borderRadius: 10, border: `1.5px dashed ${accent}44`, background: 'transparent', color: accent, fontSize: 13, fontWeight: 500, cursor: 'pointer' }}>
+                + {locale === 'en' ? 'Create a custom link' : 'Créer un lien personnalisé'}
+              </button>
+            ) : (
+              <div style={{ padding: '14px', background: '#fafafa', borderRadius: 10, border: '1px solid #e5e7eb' }}>
+                <input value={newLinkName} onChange={e => setNewLinkName(e.target.value)} placeholder={locale === 'en' ? 'Link name (optional)' : 'Nom du lien (optionnel)'} style={{ width: '100%', padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 13, marginBottom: 10, boxSizing: 'border-box', outline: 'none' }} />
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 8 }}>
+                  {locale === 'en' ? 'Select events to include:' : 'Sélectionner les événements à inclure :'}
+                </div>
+                {sorted.map((c, i) => (
+                  <label key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', fontSize: 13, color: '#374151', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={newLinkEvents.includes(i)} onChange={e => { if (e.target.checked) setNewLinkEvents(prev => [...prev, i]); else setNewLinkEvents(prev => prev.filter(x => x !== i)) }} style={{ accentColor: accent }} />
+                    {getCName(c)}
+                    {c.date && <span style={{ fontSize: 11, color: '#9ca3af', marginLeft: 4 }}>({new Date(c.date + 'T12:00:00').toLocaleDateString(locale === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'short' })})</span>}
+                  </label>
+                ))}
+                <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                  <button onClick={addCustomLink} disabled={newLinkEvents.length === 0} style={{ ...BTN, flex: 1, padding: '8px', borderRadius: 8, border: 'none', background: newLinkEvents.length > 0 ? accent : '#e5e7eb', color: 'white', fontSize: 13, fontWeight: 600, cursor: newLinkEvents.length > 0 ? 'pointer' : 'default' }}>
+                    {locale === 'en' ? 'Create' : 'Créer'}
+                  </button>
+                  <button onClick={() => { setShowCustom(false); setNewLinkEvents([]); setNewLinkName('') }} style={{ ...BTN, padding: '8px 16px', borderRadius: 8, border: '1px solid #e5e7eb', background: 'white', color: '#6b7280', fontSize: 13, cursor: 'pointer' }}>
+                    {locale === 'en' ? 'Cancel' : 'Annuler'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Section 4 — Lien mariés */}
         <div style={{ padding: '16px 18px', background: '#f0fdf4', borderRadius: 12 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>{t.fairepart.shareCoupleLink}</div>
           <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 12 }}>{t.fairepart.shareKeepLink}</div>
@@ -4425,11 +4502,20 @@ function EnveloppeAnimation({ data, theme, onDone }: { data: FormData; theme: Th
 }
 
 // ── ItineraireButtons : Google Maps + Waze avec design luxe ───────────────────
-function SharedPageContent({ data, theme, sorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute }: SharedPageContentProps) {
+function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute }: SharedPageContentProps) {
   const { t, locale } = useT()
   const contentRef = useRef<HTMLDivElement>(null)
   const [currentCeremonyIdx, setCurrentCeremonyIdx] = useState(0)
   const [, setContainerWidth] = useState(360)
+
+  // Filtrage des cérémonies par paramètre URL ?events=0,2
+  const sorted = (() => {
+    if (typeof window === 'undefined') return allSorted
+    const eventsParam = new URLSearchParams(window.location.search).get('events')
+    if (!eventsParam) return allSorted
+    const indices = eventsParam.split(',').map(Number).filter(i => !isNaN(i) && i >= 0 && i < allSorted.length)
+    return indices.length > 0 ? indices.map(i => allSorted[i]) : allSorted
+  })()
   const G = theme.accent
   const TEXT = theme.texte
   const FS = 'var(--font-great-vibes)'
