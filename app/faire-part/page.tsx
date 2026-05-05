@@ -4162,10 +4162,11 @@ interface SharedPageContentProps {
   ytMuted: boolean; onToggleYtMute: () => void
 }
 // ── 💌 ENVELOPPE PREMIUM — style The Digital Yes ────────────────────────────
-// 4 phases : apparition → sceau brise + rabat → carte sort → révélation plein écran
+// La carte qui sort de l'enveloppe EST le vrai faire-part : elle s'agrandit
+// en continu jusqu'à couvrir tout l'écran → transition invisible vers le contenu réel
 function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeObj; onDone: () => void }) {
   const { locale } = useT()
-  const [phase, setPhase] = useState(0) // 0=idle, 1=sceau+rabat, 2=carte sort, 3=carte grandit, 4=done
+  const [phase, setPhase] = useState(0) // 0=idle, 1=sceau+rabat, 2=carte sort+grandit, 3=couvre écran→done
   const a = theme.accent
   const fond = theme.fond
   const GV = 'var(--font-great-vibes)'
@@ -4174,8 +4175,10 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
   const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
   const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
   const firstDate = sortByDate(data.ceremonies)[0]?.date
+  const hasIntroPhoto = (data.photosFond?.length ?? 0) > 0 || !!data.photoFond
+  const introTextColor = hasIntroPhoto ? 'rgba(255,255,255,0.95)' : a
+  const monoColor = data.monogrammeColor || a
 
-  // Skip si prefers-reduced-motion
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) onDone()
   }, [onDone])
@@ -4183,13 +4186,11 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
   const handleOpen = () => {
     if (phase > 0) return
     setPhase(1)                           // sceau brise + rabat ouvre
-    setTimeout(() => setPhase(2), 1000)   // carte commence à sortir
-    setTimeout(() => setPhase(3), 3000)   // carte s'agrandit plein écran
-    setTimeout(() => setPhase(4), 4200)   // transition vers faire-part
-    setTimeout(() => onDone(), 4800)
+    setTimeout(() => setPhase(2), 900)    // carte sort et grandit en continu
+    setTimeout(() => setPhase(3), 4000)   // la carte couvre l'écran → onDone
+    setTimeout(() => onDone(), 4500)
   }
 
-  // Couleur enveloppe adaptée au thème
   const envColor = theme.dark ? '#2a2018' : fond
   const envColorDark = theme.dark ? '#1a1008' : `color-mix(in srgb, ${fond} 85%, #000)`
 
@@ -4199,28 +4200,13 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
       background: `radial-gradient(ellipse at 50% 40%, ${a}0d 0%, ${fond} 70%)`,
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
       cursor: phase === 0 ? 'pointer' : 'default',
-      opacity: phase >= 4 ? 0 : 1,
-      transition: phase >= 4 ? 'opacity 0.6s ease' : 'none',
-      pointerEvents: phase >= 4 ? 'none' : 'auto',
-      perspective: 1200,
+      pointerEvents: phase >= 3 ? 'none' : 'auto',
     }}>
       <style>{`
         @keyframes envHover{0%,100%{transform:rotate(-2deg) translateY(0)}50%{transform:rotate(-1.5deg) translateY(-8px)}}
         @keyframes sealCrackL{to{transform:translateX(-14px) translateY(12px) rotate(-20deg);opacity:0}}
         @keyframes sealCrackR{to{transform:translateX(14px) translateY(14px) rotate(18deg);opacity:0}}
-        @keyframes cardEmerge{
-          0%{transform:translateY(0) scale(0.7);opacity:0}
-          20%{opacity:1}
-          100%{transform:translateY(-200px) scale(0.85);opacity:1}
-        }
-        @keyframes cardExpand{
-          0%{transform:translateY(-200px) scale(0.85)}
-          100%{transform:translateY(-50vh) scale(1.8);opacity:1}
-        }
-        @keyframes envSink{
-          0%{transform:rotate(-2deg) translateY(0);opacity:1}
-          100%{transform:rotate(-2deg) translateY(60px);opacity:0}
-        }
+        @keyframes envSink{0%{transform:rotate(-2deg) translateY(0);opacity:1}100%{transform:rotate(-2deg) translateY(60px);opacity:0}}
         @keyframes pulseTap{0%,100%{opacity:0.4}50%{opacity:0.9}}
         @keyframes staggerIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
       `}</style>
@@ -4232,7 +4218,7 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
         cursor: 'pointer', zIndex: 10, textTransform: 'uppercase',
       } as React.CSSProperties}>SKIP</button>
 
-      {/* Titre au-dessus de l'enveloppe */}
+      {/* Titre */}
       <div style={{
         marginBottom: 36, textAlign: 'center', pointerEvents: 'none',
         opacity: phase > 0 ? 0 : 1, transition: 'opacity 0.4s ease',
@@ -4249,44 +4235,70 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
 
       <div style={{ position: 'relative', width: 280, height: 380 }}>
 
-        {/* ═══ CARTE qui sort de l'enveloppe ═══ */}
+        {/* ═══ LA CARTE = le vrai contenu du faire-part qui sort et s'agrandit ═══ */}
         {phase >= 2 && (
           <div style={{
-            position: 'absolute', top: 40, left: 15, right: 15, zIndex: 5,
-            background: fond, borderRadius: 8, padding: '32px 20px', textAlign: 'center',
-            boxShadow: `0 20px 80px rgba(0,0,0,0.18), 0 8px 24px ${a}33`,
-            border: `1px solid ${a}18`,
-            animation: phase === 2
-              ? 'cardEmerge 2s cubic-bezier(0.16,1,0.3,1) forwards'
-              : phase >= 3
-              ? 'cardExpand 1.2s cubic-bezier(0.16,1,0.3,1) forwards'
-              : 'none',
-            willChange: 'transform, opacity',
+            position: 'fixed',
+            top: '50%', left: '50%',
+            width: phase === 2 ? 250 : '100vw',
+            maxWidth: phase === 2 ? 250 : 480,
+            background: fond,
+            borderRadius: phase === 2 ? 8 : 0,
+            boxShadow: phase === 2 ? `0 20px 80px rgba(0,0,0,0.2)` : 'none',
+            border: phase === 2 ? `1px solid ${a}18` : 'none',
+            transform: phase === 2 ? 'translate(-50%, -50%) scale(0.7)' : 'translate(-50%, -50%) scale(1)',
+            opacity: phase === 2 ? 0 : 1,
+            transition: 'all 2.8s cubic-bezier(0.16,1,0.3,1)',
+            zIndex: 50,
+            overflow: 'hidden',
+            minHeight: phase >= 3 ? '100vh' : 'auto',
+            padding: phase >= 3 ? 0 : '36px 24px',
+            textAlign: 'center',
+            willChange: 'transform, width, opacity, border-radius',
           }}>
-            {/* Ornement haut */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 16 }}>
-              <div style={{ width: 30, height: '0.5px', background: a, opacity: 0.3 }} />
-              <span style={{ color: a, fontSize: 8, opacity: 0.5 }}>✦</span>
-              <div style={{ width: 30, height: '0.5px', background: a, opacity: 0.3 }} />
-            </div>
-            {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 12, color: a, direction: 'rtl', marginBottom: 8, opacity: 0.7 }}>בס״ד</div>}
-            <div style={{ fontFamily: GV, fontSize: 34, color: a, lineHeight: 1.15, animation: 'staggerIn 0.6s 0.3s ease both' }}>{data.marie1Prenom}</div>
-            <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 18, color: a, opacity: 0.45, margin: '2px 0' }}>&</div>
-            <div style={{ fontFamily: GV, fontSize: 34, color: a, lineHeight: 1.15, animation: 'staggerIn 0.6s 0.5s ease both' }}>{data.marie2Prenom}</div>
-            {/* Date */}
-            {firstDate && (
-              <div style={{ marginTop: 14, animation: 'staggerIn 0.6s 0.7s ease both' }}>
-                <div style={{ width: 30, height: '0.5px', background: a, opacity: 0.25, margin: '0 auto 10px' }} />
-                <div style={{ fontFamily: FP, fontSize: 11, color: a, letterSpacing: 3, textTransform: 'uppercase', opacity: 0.7 }}>
-                  {new Date(firstDate + 'T12:00:00').toLocaleDateString(locale === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+            {/* Contenu de la carte — identique à l'écran d'accueil du faire-part */}
+            <div style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              minHeight: phase >= 3 ? '100vh' : 'auto',
+              padding: phase >= 3 ? '0 32px' : 0,
+              position: 'relative',
+            }}>
+              {/* Photo de fond si disponible */}
+              {hasIntroPhoto && phase >= 3 && (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={data.photosFond?.[0] || data.photoFond || ''} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }} />
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.1) 100%)', zIndex: 1 }} />
+                </>
+              )}
+              <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 14, color: introTextColor, direction: 'rtl', marginBottom: 16, opacity: phase >= 3 ? 1 : 0, transition: 'opacity 0.6s 0.3s ease' }}>בס״ד</div>}
+                {/* Monogramme */}
+                <div style={{ marginBottom: 16, opacity: 0, animation: 'staggerIn 0.8s 0.2s ease forwards' }}>
+                  {data.customLogoUrl
+                    ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={phase >= 3 ? 140 : 60} />
+                    : <MonogramByStyle initial1={i1} initial2={i2} color={phase >= 3 && hasIntroPhoto ? 'rgba(255,255,255,0.9)' : monoColor} size={phase >= 3 ? 140 : 60} style={data.monogrammeStyle || 'cercle'} />
+                  }
                 </div>
+                {/* Séparateur */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, opacity: 0, animation: 'staggerIn 0.6s 0.4s ease forwards' }}>
+                  <div style={{ width: 30, height: '0.5px', background: introTextColor, opacity: 0.4 }} />
+                  <span style={{ color: introTextColor, fontSize: 8, opacity: 0.5 }}>◆</span>
+                  <div style={{ width: 30, height: '0.5px', background: introTextColor, opacity: 0.4 }} />
+                </div>
+                {/* Prénoms */}
+                <div style={{ fontFamily: GV, fontSize: phase >= 3 ? 'clamp(30px,8vw,46px)' : 34, color: introTextColor, lineHeight: 1.2, opacity: 0, animation: 'staggerIn 0.8s 0.5s ease forwards', transition: 'font-size 1s ease' }}>
+                  {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
+                </div>
+                {/* Date */}
+                {firstDate && (
+                  <div style={{ marginTop: 16, opacity: 0, animation: 'staggerIn 0.6s 0.8s ease forwards' }}>
+                    <div style={{ fontFamily: FP, fontSize: 11, color: introTextColor, letterSpacing: 3, textTransform: 'uppercase', opacity: 0.7 }}>
+                      {new Date(firstDate + 'T12:00:00').toLocaleDateString(locale === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-            {/* Ornement bas */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 16 }}>
-              <div style={{ width: 30, height: '0.5px', background: a, opacity: 0.3 }} />
-              <span style={{ color: a, fontSize: 8, opacity: 0.5 }}>✦</span>
-              <div style={{ width: 30, height: '0.5px', background: a, opacity: 0.3 }} />
             </div>
           </div>
         )}
@@ -4294,11 +4306,10 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
         {/* ═══ ENVELOPPE ═══ */}
         <div style={{
           position: 'absolute', bottom: 0, left: 0, right: 0, height: 220,
-          animation: phase === 0 ? 'envHover 3.5s ease-in-out infinite' : phase >= 2 ? 'envSink 1.2s ease forwards' : 'none',
+          animation: phase === 0 ? 'envHover 3.5s ease-in-out infinite' : phase >= 2 ? 'envSink 1s ease forwards' : 'none',
           transform: 'rotate(-2deg)',
           willChange: 'transform, opacity',
         }}>
-          {/* Corps de l'enveloppe */}
           <div style={{
             position: 'relative', width: '100%', height: '100%',
             background: `linear-gradient(155deg, ${envColor} 0%, ${envColorDark} 100%)`,
@@ -4307,22 +4318,18 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
             border: `1px solid ${a}15`,
             overflow: 'hidden',
           }}>
-            {/* Texture papier SVG */}
             <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.04, pointerEvents: 'none' }}>
               <filter id="envTex"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" /><feComposite in="SourceGraphic" operator="in" /></filter>
               <rect width="100%" height="100%" filter="url(#envTex)" />
             </svg>
-            {/* V intérieur en bas (pliure) */}
             <svg style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }} viewBox="0 0 280 80" preserveAspectRatio="none">
               <path d="M0 80 L140 25 L280 80" fill={`${a}08`} stroke={`${a}12`} strokeWidth="0.5" />
             </svg>
-            {/* Monogramme watermark très subtil */}
             <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', opacity: 0.06 }}>
               <MonogramByStyle initial1={i1} initial2={i2} color={a} size={100} style={data.monogrammeStyle || 'cercle'} />
             </div>
           </div>
-
-          {/* Rabat triangulaire */}
+          {/* Rabat */}
           <div style={{
             position: 'absolute', top: -1, left: -1, right: -1, height: 120,
             transformOrigin: 'top center',
@@ -4330,73 +4337,40 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
             transition: 'transform 0.85s cubic-bezier(0.16,1,0.3,1)',
             zIndex: phase >= 1 ? -1 : 10,
             background: `linear-gradient(170deg, ${envColor} 20%, ${envColorDark})`,
-            border: `1px solid ${a}15`,
-            borderBottom: 'none',
+            border: `1px solid ${a}15`, borderBottom: 'none',
             borderRadius: '10px 10px 0 0',
             clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
             backfaceVisibility: 'hidden',
-            boxShadow: phase >= 1 ? 'none' : `0 4px 16px ${a}08`,
           } as React.CSSProperties}>
-            {/* Motif gaufré subtil sur le rabat */}
             <div style={{ position: 'absolute', top: '25%', left: '50%', transform: 'translateX(-50%)', opacity: 0.06 }}>
-              <svg width="60" height="30" viewBox="0 0 60 30">
-                <path d="M5,25 Q15,5 30,15 Q45,5 55,25" fill="none" stroke={a} strokeWidth="0.8" />
-                <circle cx="30" cy="12" r="2" fill={a} opacity="0.5" />
-              </svg>
+              <svg width="60" height="30" viewBox="0 0 60 30"><path d="M5,25 Q15,5 30,15 Q45,5 55,25" fill="none" stroke={a} strokeWidth="0.8" /><circle cx="30" cy="12" r="2" fill={a} opacity="0.5" /></svg>
             </div>
           </div>
-
-          {/* ═══ SCEAU DE CIRE 3D ═══ */}
+          {/* Sceau intact */}
           {phase < 1 && (
-            <div style={{ position: 'absolute', top: 52, left: '50%', transform: 'translateX(-50%)', zIndex: 20, display: 'flex', gap: 0 }}>
-              {/* Moitié gauche */}
-              <div style={{
-                width: 28, height: 56, borderRadius: '56px 0 0 56px',
-                background: `radial-gradient(ellipse at 65% 35%, ${a}ee, ${a}88, ${a}66)`,
-                boxShadow: `inset -2px 0 4px ${a}33, inset 0 -2px 6px rgba(0,0,0,0.2), 0 4px 16px ${a}55, 0 2px 4px rgba(0,0,0,0.2)`,
-                display: 'flex', alignItems: 'center', justifyContent: 'flex-end', overflow: 'hidden',
-              }}>
-                <span style={{ fontFamily: GV, fontSize: 16, color: 'rgba(255,255,255,0.85)', marginRight: -1, textShadow: `0 1px 2px rgba(0,0,0,0.3)` }}>{i1}</span>
+            <div style={{ position: 'absolute', top: 52, left: '50%', transform: 'translateX(-50%)', zIndex: 20, display: 'flex' }}>
+              <div style={{ width: 28, height: 56, borderRadius: '56px 0 0 56px', background: `radial-gradient(ellipse at 65% 35%, ${a}ee, ${a}88, ${a}66)`, boxShadow: `inset -2px 0 4px ${a}33, 0 4px 16px ${a}55`, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', overflow: 'hidden' }}>
+                <span style={{ fontFamily: GV, fontSize: 16, color: 'rgba(255,255,255,0.85)', marginRight: -1, textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{i1}</span>
               </div>
-              {/* Moitié droite */}
-              <div style={{
-                width: 28, height: 56, borderRadius: '0 56px 56px 0',
-                background: `radial-gradient(ellipse at 35% 35%, ${a}ee, ${a}88, ${a}66)`,
-                boxShadow: `inset 2px 0 4px ${a}33, inset 0 -2px 6px rgba(0,0,0,0.2), 0 4px 16px ${a}55, 0 2px 4px rgba(0,0,0,0.2)`,
-                display: 'flex', alignItems: 'center', justifyContent: 'flex-start', overflow: 'hidden',
-              }}>
-                <span style={{ fontFamily: GV, fontSize: 16, color: 'rgba(255,255,255,0.85)', marginLeft: -1, textShadow: `0 1px 2px rgba(0,0,0,0.3)` }}>{i2}</span>
+              <div style={{ width: 28, height: 56, borderRadius: '0 56px 56px 0', background: `radial-gradient(ellipse at 35% 35%, ${a}ee, ${a}88, ${a}66)`, boxShadow: `inset 2px 0 4px ${a}33, 0 4px 16px ${a}55`, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', overflow: 'hidden' }}>
+                <span style={{ fontFamily: GV, fontSize: 16, color: 'rgba(255,255,255,0.85)', marginLeft: -1, textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{i2}</span>
               </div>
-              {/* Highlight / reflet sur le sceau */}
               <div style={{ position: 'absolute', top: 6, left: 12, width: 16, height: 10, borderRadius: '50%', background: 'rgba(255,255,255,0.25)', filter: 'blur(4px)', pointerEvents: 'none' }} />
             </div>
           )}
-          {/* Sceau qui se brise (phase 1) */}
+          {/* Sceau qui se brise */}
           {phase === 1 && (
-            <div style={{ position: 'absolute', top: 52, left: '50%', transform: 'translateX(-50%)', zIndex: 20, display: 'flex', gap: 0 }}>
-              <div style={{
-                width: 28, height: 56, borderRadius: '56px 0 0 56px',
-                background: `radial-gradient(ellipse at 65% 35%, ${a}ee, ${a}66)`,
-                animation: 'sealCrackL 0.6s cubic-bezier(0.4,0,1,1) forwards',
-                boxShadow: `0 4px 12px ${a}44`,
-              }} />
-              <div style={{
-                width: 28, height: 56, borderRadius: '0 56px 56px 0',
-                background: `radial-gradient(ellipse at 35% 35%, ${a}ee, ${a}66)`,
-                animation: 'sealCrackR 0.6s cubic-bezier(0.4,0,1,1) forwards',
-                boxShadow: `0 4px 12px ${a}44`,
-              }} />
+            <div style={{ position: 'absolute', top: 52, left: '50%', transform: 'translateX(-50%)', zIndex: 20, display: 'flex' }}>
+              <div style={{ width: 28, height: 56, borderRadius: '56px 0 0 56px', background: `radial-gradient(ellipse at 65% 35%, ${a}ee, ${a}66)`, animation: 'sealCrackL 0.6s cubic-bezier(0.4,0,1,1) forwards' }} />
+              <div style={{ width: 28, height: 56, borderRadius: '0 56px 56px 0', background: `radial-gradient(ellipse at 35% 35%, ${a}ee, ${a}66)`, animation: 'sealCrackR 0.6s cubic-bezier(0.4,0,1,1) forwards' }} />
             </div>
           )}
         </div>
       </div>
 
-      {/* "Touchez pour découvrir" */}
+      {/* Touchez pour découvrir */}
       {phase === 0 && (
-        <div style={{
-          marginTop: 40, fontFamily: CG, fontStyle: 'italic', fontSize: 14,
-          color: a, animation: 'pulseTap 2.5s ease-in-out infinite', letterSpacing: 1.5,
-        }}>
+        <div style={{ marginTop: 40, fontFamily: CG, fontStyle: 'italic', fontSize: 14, color: a, animation: 'pulseTap 2.5s ease-in-out infinite', letterSpacing: 1.5 }}>
           {locale === 'en' ? 'Tap to discover' : 'Touchez pour découvrir'}
         </div>
       )}
