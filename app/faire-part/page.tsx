@@ -1437,7 +1437,7 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
 }
 
 function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
-  const { t } = useT()
+  const { t, locale } = useT()
   return (
     <div>
       <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#4a3728', marginBottom: 24 }}>{t.fairepart.step4Title}</h2>
@@ -1567,6 +1567,36 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
     })}
   </div>
 </div>
+      {/* ── Animation d'ouverture ── */}
+      <div style={{ marginBottom: 24 }}>
+        <Label>{locale === 'en' ? 'Opening animation' : "Animation d'ouverture"}</Label>
+        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>
+          {locale === 'en' ? 'The effect guests see when they open your invitation link.' : "L'effet que vos invités voient en ouvrant le lien."}
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
+          {([
+            { key: 'enveloppe', label: locale === 'en' ? 'Envelope' : 'Enveloppe', icon: '💌', desc: locale === 'en' ? 'Wax seal + card' : 'Sceau de cire + carte' },
+            { key: 'petales', label: locale === 'en' ? 'Petals' : 'Pétales', icon: '🌸', desc: locale === 'en' ? 'Falling petals' : 'Pétales tombants' },
+            { key: 'parchemin', label: locale === 'en' ? 'Scroll' : 'Parchemin', icon: '📜', desc: locale === 'en' ? 'Unrolling scroll' : 'Rouleau qui se déroule' },
+            { key: 'none', label: locale === 'en' ? 'None' : 'Aucune', icon: '✦', desc: locale === 'en' ? 'Direct display' : 'Affichage direct' },
+          ] as { key: string; label: string; icon: string; desc: string }[]).map(opt => {
+            const sel = (data.introAnimation || 'enveloppe') === opt.key
+            return (
+              <button key={opt.key} type="button" onClick={() => onChange({ introAnimation: opt.key })} style={{
+                ...BTN, padding: '14px 8px', borderRadius: 12, textAlign: 'center',
+                border: `2px solid ${sel ? THEMES[data.style].accent : '#fecdd3'}`,
+                background: sel ? `${THEMES[data.style].accent}12` : 'white',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+              }}>
+                <span style={{ fontSize: 22 }}>{opt.icon}</span>
+                <span style={{ fontSize: 12, fontWeight: sel ? 700 : 500, color: sel ? THEMES[data.style].accent : '#4a3728' }}>{opt.label}</span>
+                <span style={{ fontSize: 9, color: '#9ca3af' }}>{opt.desc}</span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
       {/* ── Monogramme ── */}
       <div style={{ marginBottom: 24 }}>
         <Label>{t.fairepart.monogramStyleLabel}</Label>
@@ -4582,7 +4612,8 @@ function AnimParchemin({ data, theme, onDone }: { data: FormData; theme: ThemeOb
 }
 // ── DISPATCHER ────────────────────────────────────────────────────────────────
 function EnveloppeAnimation({ data, theme, onDone }: { data: FormData; theme: ThemeObj; onDone: () => void }) {
-  const anim = data.introAnimation || 'none'
+  const anim = data.introAnimation || 'enveloppe'
+  if (anim === 'none') { onDone(); return null }
   if (anim === 'petales')   return <AnimPetales   data={data} theme={theme} onDone={onDone} />
   if (anim === 'parchemin') return <AnimParchemin data={data} theme={theme} onDone={onDone} />
   return <AnimEnveloppe data={data} theme={theme} onDone={onDone} />
