@@ -4161,12 +4161,12 @@ interface SharedPageContentProps {
   ytIframeRef: React.RefObject<HTMLIFrameElement | null>
   ytMuted: boolean; onToggleYtMute: () => void
 }
-// ── 💌 ENVELOPPE PREMIUM — style The Digital Yes ────────────────────────────
-// La carte qui sort de l'enveloppe EST le vrai faire-part : elle s'agrandit
-// en continu jusqu'à couvrir tout l'écran → transition invisible vers le contenu réel
+// ── 💌 ENVELOPPE PREMIUM ─────────────────────────────────────────────────────
+// Design : prénoms en haut, sceau au centre, "Touchez" en bas, ornements SVG
+// Transition : fade-out élégant de l'enveloppe → fade-in du faire-part (simple, pas de zoom)
 function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeObj; onDone: () => void }) {
   const { locale } = useT()
-  const [phase, setPhase] = useState(0) // 0=idle, 1=sceau+rabat, 2=carte sort+grandit, 3=couvre écran→done
+  const [phase, setPhase] = useState(0) // 0=idle, 1=sceau brise+rabat, 2=fade out→done
   const a = theme.accent
   const fond = theme.fond
   const GV = 'var(--font-great-vibes)'
@@ -4174,10 +4174,6 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
   const FP = 'var(--font-playfair-display)'
   const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
   const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
-  const firstDate = sortByDate(data.ceremonies)[0]?.date
-  const hasIntroPhoto = (data.photosFond?.length ?? 0) > 0 || !!data.photoFond
-  const introTextColor = hasIntroPhoto ? 'rgba(255,255,255,0.95)' : a
-  const monoColor = data.monogrammeColor || a
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) onDone()
@@ -4185,195 +4181,180 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
 
   const handleOpen = () => {
     if (phase > 0) return
-    setPhase(1)                           // sceau brise + rabat ouvre
-    setTimeout(() => setPhase(2), 900)    // carte sort et grandit en continu
-    setTimeout(() => setPhase(3), 4000)   // la carte couvre l'écran → onDone
-    setTimeout(() => onDone(), 4500)
+    setPhase(1)                          // sceau brise + rabat ouvre
+    setTimeout(() => setPhase(2), 1800)  // tout fade out
+    setTimeout(() => onDone(), 2600)     // terminé
   }
 
-  const envColor = theme.dark ? '#2a2018' : fond
-  const envColorDark = theme.dark ? '#1a1008' : `color-mix(in srgb, ${fond} 85%, #000)`
+  const envBg = theme.dark ? '#2a1f15' : fond
+  const envBgDark = theme.dark ? '#1a1208' : `color-mix(in srgb, ${fond} 82%, #000)`
+  const textColor = theme.dark ? '#e0d0c0' : `color-mix(in srgb, ${a} 70%, #000)`
+
+  // Ornement SVG floral pour les coins
+  const cornerOrn = (rot: string) => (
+    <svg width="50" height="50" viewBox="0 0 50 50" style={{ transform: rot, opacity: 0.12 }}>
+      <path d="M5,45 Q5,20 20,10 Q10,25 15,35 Q20,15 35,5 Q25,20 30,30 Q35,10 45,5" fill="none" stroke={a} strokeWidth="0.8" strokeLinecap="round" />
+      <circle cx="20" cy="10" r="1.5" fill={a} opacity="0.4" />
+      <circle cx="35" cy="5" r="1" fill={a} opacity="0.3" />
+    </svg>
+  )
 
   return (
     <div onClick={phase === 0 ? handleOpen : undefined} style={{
       position: 'fixed', inset: 0, zIndex: 9999,
-      background: `radial-gradient(ellipse at 50% 40%, ${a}0d 0%, ${fond} 70%)`,
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      background: `radial-gradient(ellipse at 50% 45%, ${a}0a 0%, ${fond} 65%)`,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
       cursor: phase === 0 ? 'pointer' : 'default',
-      pointerEvents: phase >= 3 ? 'none' : 'auto',
+      opacity: phase >= 2 ? 0 : 1,
+      transition: phase >= 2 ? 'opacity 0.8s ease' : 'none',
+      pointerEvents: phase >= 2 ? 'none' : 'auto',
     }}>
       <style>{`
-        @keyframes envHover{0%,100%{transform:rotate(-2deg) translateY(0)}50%{transform:rotate(-1.5deg) translateY(-8px)}}
-        @keyframes sealCrackL{to{transform:translateX(-14px) translateY(12px) rotate(-20deg);opacity:0}}
-        @keyframes sealCrackR{to{transform:translateX(14px) translateY(14px) rotate(18deg);opacity:0}}
-        @keyframes envSink{0%{transform:rotate(-2deg) translateY(0);opacity:1}100%{transform:rotate(-2deg) translateY(60px);opacity:0}}
-        @keyframes pulseTap{0%,100%{opacity:0.4}50%{opacity:0.9}}
-        @keyframes staggerIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes envFloat{0%,100%{transform:rotate(-2.5deg) translateY(0)}50%{transform:rotate(-1.8deg) translateY(-10px)}}
+        @keyframes sealBreakL{to{transform:translateX(-16px) translateY(14px) rotate(-22deg);opacity:0}}
+        @keyframes sealBreakR{to{transform:translateX(16px) translateY(16px) rotate(20deg);opacity:0}}
+        @keyframes tapPulse{0%,100%{opacity:0.45}50%{opacity:1}}
+        @keyframes envAppear{from{opacity:0;transform:rotate(-2.5deg) translateY(30px) scale(0.92)}to{opacity:1;transform:rotate(-2.5deg) translateY(0) scale(1)}}
       `}</style>
 
       {/* Skip */}
       <button onClick={e => { e.stopPropagation(); onDone() }} style={{
         position: 'absolute', top: 20, right: 20, background: 'none', border: 'none',
-        color: a, opacity: 0.35, fontSize: 11, fontFamily: FP, letterSpacing: 3,
+        color: a, opacity: 0.3, fontSize: 11, fontFamily: FP, letterSpacing: 3,
         cursor: 'pointer', zIndex: 10, textTransform: 'uppercase',
       } as React.CSSProperties}>SKIP</button>
 
-      {/* Titre */}
+      {/* ═══ ENVELOPPE ═══ */}
       <div style={{
-        marginBottom: 36, textAlign: 'center', pointerEvents: 'none',
-        opacity: phase > 0 ? 0 : 1, transition: 'opacity 0.4s ease',
-        animation: 'staggerIn 0.8s ease forwards',
+        position: 'relative', width: 300, height: 420,
+        animation: phase === 0 ? 'envFloat 3.5s ease-in-out infinite' : 'none',
+        willChange: 'transform',
       }}>
-        <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 17, color: a, letterSpacing: 2, lineHeight: 1.6 }}>
-          {locale === 'en' ? 'You have received' : 'Vous avez reçu'}
-        </div>
-        <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 17, color: a, letterSpacing: 2 }}>
-          {locale === 'en' ? 'an invitation' : 'une invitation'}
-        </div>
-        <div style={{ width: 50, height: '0.5px', background: a, opacity: 0.35, margin: '12px auto 0' }} />
-      </div>
+        {/* Apparition initiale */}
+        <div style={{ animation: 'envAppear 1s cubic-bezier(0.16,1,0.3,1) forwards' }}>
 
-      <div style={{ position: 'relative', width: 280, height: 380 }}>
-
-        {/* ═══ LA CARTE = le vrai contenu du faire-part qui sort et s'agrandit ═══ */}
-        {phase >= 2 && (
+          {/* Corps de l'enveloppe */}
           <div style={{
-            position: 'fixed',
-            top: '50%', left: '50%',
-            width: phase === 2 ? 250 : '100vw',
-            maxWidth: phase === 2 ? 250 : 480,
-            background: fond,
-            borderRadius: phase === 2 ? 8 : 0,
-            boxShadow: phase === 2 ? `0 20px 80px rgba(0,0,0,0.2)` : 'none',
-            border: phase === 2 ? `1px solid ${a}18` : 'none',
-            transform: phase === 2 ? 'translate(-50%, -50%) scale(0.7)' : 'translate(-50%, -50%) scale(1)',
-            opacity: phase === 2 ? 0 : 1,
-            transition: 'all 2.8s cubic-bezier(0.16,1,0.3,1)',
-            zIndex: 50,
+            position: 'relative', width: '100%', height: 420,
+            background: `linear-gradient(160deg, ${envBg} 0%, ${envBgDark} 100%)`,
+            borderRadius: 12,
+            boxShadow: `0 32px 64px rgba(0,0,0,0.18), 0 16px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.12)`,
+            border: `1px solid ${a}12`,
             overflow: 'hidden',
-            minHeight: phase >= 3 ? '100vh' : 'auto',
-            padding: phase >= 3 ? 0 : '36px 24px',
-            textAlign: 'center',
-            willChange: 'transform, width, opacity, border-radius',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            padding: '40px 30px',
           }}>
-            {/* Contenu de la carte — identique à l'écran d'accueil du faire-part */}
-            <div style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-              minHeight: phase >= 3 ? '100vh' : 'auto',
-              padding: phase >= 3 ? '0 32px' : 0,
-              position: 'relative',
-            }}>
-              {/* Photo de fond si disponible */}
-              {hasIntroPhoto && phase >= 3 && (
-                <>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={data.photosFond?.[0] || data.photoFond || ''} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }} />
-                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.1) 100%)', zIndex: 1 }} />
-                </>
-              )}
-              <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 14, color: introTextColor, direction: 'rtl', marginBottom: 16, opacity: phase >= 3 ? 1 : 0, transition: 'opacity 0.6s 0.3s ease' }}>בס״ד</div>}
-                {/* Monogramme */}
-                <div style={{ marginBottom: 16, opacity: 0, animation: 'staggerIn 0.8s 0.2s ease forwards' }}>
-                  {data.customLogoUrl
-                    ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={phase >= 3 ? 140 : 60} />
-                    : <MonogramByStyle initial1={i1} initial2={i2} color={phase >= 3 && hasIntroPhoto ? 'rgba(255,255,255,0.9)' : monoColor} size={phase >= 3 ? 140 : 60} style={data.monogrammeStyle || 'cercle'} />
-                  }
-                </div>
-                {/* Séparateur */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, opacity: 0, animation: 'staggerIn 0.6s 0.4s ease forwards' }}>
-                  <div style={{ width: 30, height: '0.5px', background: introTextColor, opacity: 0.4 }} />
-                  <span style={{ color: introTextColor, fontSize: 8, opacity: 0.5 }}>◆</span>
-                  <div style={{ width: 30, height: '0.5px', background: introTextColor, opacity: 0.4 }} />
-                </div>
-                {/* Prénoms */}
-                <div style={{ fontFamily: GV, fontSize: phase >= 3 ? 'clamp(30px,8vw,46px)' : 34, color: introTextColor, lineHeight: 1.2, opacity: 0, animation: 'staggerIn 0.8s 0.5s ease forwards', transition: 'font-size 1s ease' }}>
-                  {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
-                </div>
-                {/* Date */}
-                {firstDate && (
-                  <div style={{ marginTop: 16, opacity: 0, animation: 'staggerIn 0.6s 0.8s ease forwards' }}>
-                    <div style={{ fontFamily: FP, fontSize: 11, color: introTextColor, letterSpacing: 3, textTransform: 'uppercase', opacity: 0.7 }}>
-                      {new Date(firstDate + 'T12:00:00').toLocaleDateString(locale === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
-                    </div>
-                  </div>
-                )}
+            {/* Texture papier */}
+            <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.035, pointerEvents: 'none' }}>
+              <filter id="paperTex"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" /><feComposite in="SourceGraphic" operator="in" /></filter>
+              <rect width="100%" height="100%" filter="url(#paperTex)" />
+            </svg>
+
+            {/* Ornements coins */}
+            <div style={{ position: 'absolute', top: 10, left: 10 }}>{cornerOrn('rotate(0)')}</div>
+            <div style={{ position: 'absolute', top: 10, right: 10 }}>{cornerOrn('rotate(90deg)')}</div>
+            <div style={{ position: 'absolute', bottom: 10, left: 10 }}>{cornerOrn('rotate(-90deg)')}</div>
+            <div style={{ position: 'absolute', bottom: 10, right: 10 }}>{cornerOrn('rotate(180deg)')}</div>
+
+            {/* Filigrane central subtil */}
+            <svg style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', opacity: 0.04, pointerEvents: 'none' }} width="200" height="200" viewBox="0 0 200 200">
+              <circle cx="100" cy="100" r="90" fill="none" stroke={a} strokeWidth="0.3" />
+              <circle cx="100" cy="100" r="75" fill="none" stroke={a} strokeWidth="0.2" />
+              <path d="M100,15 Q130,50 100,100 Q70,50 100,15" fill="none" stroke={a} strokeWidth="0.3" />
+              <path d="M100,185 Q130,150 100,100 Q70,150 100,185" fill="none" stroke={a} strokeWidth="0.3" />
+              <path d="M15,100 Q50,130 100,100 Q50,70 15,100" fill="none" stroke={a} strokeWidth="0.3" />
+              <path d="M185,100 Q150,130 100,100 Q150,70 185,100" fill="none" stroke={a} strokeWidth="0.3" />
+            </svg>
+
+            {/* ── EN HAUT : Prénoms en calligraphie ── */}
+            <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', marginBottom: 32 }}>
+              <div style={{ fontFamily: GV, fontSize: 28, color: textColor, lineHeight: 1.3, letterSpacing: 1 }}>
+                {data.marie1Prenom || 'Prénom'}
+              </div>
+              <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 16, color: textColor, opacity: 0.5, margin: '2px 0' }}>&</div>
+              <div style={{ fontFamily: GV, fontSize: 28, color: textColor, lineHeight: 1.3, letterSpacing: 1 }}>
+                {data.marie2Prenom || 'Prénom'}
               </div>
             </div>
-          </div>
-        )}
 
-        {/* ═══ ENVELOPPE ═══ */}
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0, height: 220,
-          animation: phase === 0 ? 'envHover 3.5s ease-in-out infinite' : phase >= 2 ? 'envSink 1s ease forwards' : 'none',
-          transform: 'rotate(-2deg)',
-          willChange: 'transform, opacity',
-        }}>
-          <div style={{
-            position: 'relative', width: '100%', height: '100%',
-            background: `linear-gradient(155deg, ${envColor} 0%, ${envColorDark} 100%)`,
-            borderRadius: 10,
-            boxShadow: `0 30px 60px rgba(0,0,0,0.15), 0 15px 30px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.15)`,
-            border: `1px solid ${a}15`,
-            overflow: 'hidden',
-          }}>
-            <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.04, pointerEvents: 'none' }}>
-              <filter id="envTex"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" /><feComposite in="SourceGraphic" operator="in" /></filter>
-              <rect width="100%" height="100%" filter="url(#envTex)" />
-            </svg>
-            <svg style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }} viewBox="0 0 280 80" preserveAspectRatio="none">
-              <path d="M0 80 L140 25 L280 80" fill={`${a}08`} stroke={`${a}12`} strokeWidth="0.5" />
-            </svg>
-            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', opacity: 0.06 }}>
-              <MonogramByStyle initial1={i1} initial2={i2} color={a} size={100} style={data.monogrammeStyle || 'cercle'} />
+            {/* ── AU CENTRE : Sceau de cire ── */}
+            <div style={{ position: 'relative', zIndex: 2, marginBottom: 32 }}>
+              {/* Sceau intact (phase 0) */}
+              {phase < 1 && (
+                <div style={{
+                  width: 72, height: 72, borderRadius: '50%',
+                  background: `radial-gradient(ellipse at 40% 35%, ${a}ff, ${a}cc, ${a}88)`,
+                  boxShadow: `0 6px 24px ${a}55, 0 2px 6px rgba(0,0,0,0.25), inset 0 2px 4px rgba(255,255,255,0.2), inset 0 -2px 6px rgba(0,0,0,0.2)`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  position: 'relative',
+                }}>
+                  {/* Bordure texturée du sceau */}
+                  <div style={{ position: 'absolute', inset: -3, borderRadius: '50%', border: `3px solid ${a}44`, background: 'transparent' }} />
+                  {/* Reflet lumineux */}
+                  <div style={{ position: 'absolute', top: 8, left: 14, width: 22, height: 14, borderRadius: '50%', background: 'rgba(255,255,255,0.22)', filter: 'blur(5px)', pointerEvents: 'none' }} />
+                  {/* Initiales gravées */}
+                  <span style={{ fontFamily: GV, fontSize: 22, color: 'rgba(255,255,255,0.88)', textShadow: `0 1px 0 rgba(0,0,0,0.3), 0 -1px 0 rgba(255,255,255,0.15)`, letterSpacing: 1 }}>
+                    {i1}&{i2}
+                  </span>
+                </div>
+              )}
+              {/* Sceau qui se brise (phase 1) */}
+              {phase === 1 && (
+                <div style={{ width: 72, height: 72, position: 'relative', display: 'flex' }}>
+                  <div style={{
+                    width: 36, height: 72, borderRadius: '72px 0 0 72px',
+                    background: `radial-gradient(ellipse at 70% 35%, ${a}ff, ${a}88)`,
+                    boxShadow: `0 4px 12px ${a}44`,
+                    animation: 'sealBreakL 0.7s cubic-bezier(0.4,0,1,1) forwards',
+                  }} />
+                  <div style={{
+                    width: 36, height: 72, borderRadius: '0 72px 72px 0',
+                    background: `radial-gradient(ellipse at 30% 35%, ${a}ff, ${a}88)`,
+                    boxShadow: `0 4px 12px ${a}44`,
+                    animation: 'sealBreakR 0.7s cubic-bezier(0.4,0,1,1) forwards',
+                  }} />
+                </div>
+              )}
             </div>
+
+            {/* ── EN BAS : "Touchez pour découvrir" ── */}
+            <div style={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
+              <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 14, color: textColor, opacity: 0.65, letterSpacing: 1.5, animation: phase === 0 ? 'tapPulse 2.5s ease-in-out infinite' : 'none' }}>
+                {locale === 'en' ? 'Tap to discover' : 'Touchez pour découvrir'}
+              </div>
+            </div>
+
+            {/* V pliure en bas */}
+            <svg style={{ position: 'absolute', bottom: 0, left: 0, right: 0, pointerEvents: 'none' }} viewBox="0 0 300 60" preserveAspectRatio="none">
+              <path d="M0 60 L150 15 L300 60" fill={`${a}06`} stroke={`${a}0a`} strokeWidth="0.5" />
+            </svg>
           </div>
-          {/* Rabat */}
+
+          {/* Rabat triangulaire */}
           <div style={{
-            position: 'absolute', top: -1, left: -1, right: -1, height: 120,
+            position: 'absolute', top: -1, left: -1, right: -1, height: 130,
             transformOrigin: 'top center',
             transform: phase >= 1 ? 'perspective(800px) rotateX(-178deg)' : 'perspective(800px) rotateX(0)',
-            transition: 'transform 0.85s cubic-bezier(0.16,1,0.3,1)',
+            transition: 'transform 0.9s cubic-bezier(0.16,1,0.3,1)',
             zIndex: phase >= 1 ? -1 : 10,
-            background: `linear-gradient(170deg, ${envColor} 20%, ${envColorDark})`,
-            border: `1px solid ${a}15`, borderBottom: 'none',
-            borderRadius: '10px 10px 0 0',
+            background: `linear-gradient(170deg, ${envBg} 15%, ${envBgDark})`,
+            border: `1px solid ${a}12`, borderBottom: 'none',
+            borderRadius: '12px 12px 0 0',
             clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
             backfaceVisibility: 'hidden',
           } as React.CSSProperties}>
-            <div style={{ position: 'absolute', top: '25%', left: '50%', transform: 'translateX(-50%)', opacity: 0.06 }}>
-              <svg width="60" height="30" viewBox="0 0 60 30"><path d="M5,25 Q15,5 30,15 Q45,5 55,25" fill="none" stroke={a} strokeWidth="0.8" /><circle cx="30" cy="12" r="2" fill={a} opacity="0.5" /></svg>
+            {/* Ornement gaufré sur le rabat */}
+            <div style={{ position: 'absolute', top: '30%', left: '50%', transform: 'translateX(-50%)', opacity: 0.08 }}>
+              <svg width="80" height="35" viewBox="0 0 80 35">
+                <path d="M5,30 Q20,5 40,18 Q60,5 75,30" fill="none" stroke={a} strokeWidth="0.7" strokeLinecap="round" />
+                <circle cx="40" cy="15" r="2" fill={a} opacity="0.4" />
+                <circle cx="18" cy="14" r="1" fill={a} opacity="0.3" />
+                <circle cx="62" cy="14" r="1" fill={a} opacity="0.3" />
+              </svg>
             </div>
           </div>
-          {/* Sceau intact */}
-          {phase < 1 && (
-            <div style={{ position: 'absolute', top: 52, left: '50%', transform: 'translateX(-50%)', zIndex: 20, display: 'flex' }}>
-              <div style={{ width: 28, height: 56, borderRadius: '56px 0 0 56px', background: `radial-gradient(ellipse at 65% 35%, ${a}ee, ${a}88, ${a}66)`, boxShadow: `inset -2px 0 4px ${a}33, 0 4px 16px ${a}55`, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', overflow: 'hidden' }}>
-                <span style={{ fontFamily: GV, fontSize: 16, color: 'rgba(255,255,255,0.85)', marginRight: -1, textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{i1}</span>
-              </div>
-              <div style={{ width: 28, height: 56, borderRadius: '0 56px 56px 0', background: `radial-gradient(ellipse at 35% 35%, ${a}ee, ${a}88, ${a}66)`, boxShadow: `inset 2px 0 4px ${a}33, 0 4px 16px ${a}55`, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', overflow: 'hidden' }}>
-                <span style={{ fontFamily: GV, fontSize: 16, color: 'rgba(255,255,255,0.85)', marginLeft: -1, textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{i2}</span>
-              </div>
-              <div style={{ position: 'absolute', top: 6, left: 12, width: 16, height: 10, borderRadius: '50%', background: 'rgba(255,255,255,0.25)', filter: 'blur(4px)', pointerEvents: 'none' }} />
-            </div>
-          )}
-          {/* Sceau qui se brise */}
-          {phase === 1 && (
-            <div style={{ position: 'absolute', top: 52, left: '50%', transform: 'translateX(-50%)', zIndex: 20, display: 'flex' }}>
-              <div style={{ width: 28, height: 56, borderRadius: '56px 0 0 56px', background: `radial-gradient(ellipse at 65% 35%, ${a}ee, ${a}66)`, animation: 'sealCrackL 0.6s cubic-bezier(0.4,0,1,1) forwards' }} />
-              <div style={{ width: 28, height: 56, borderRadius: '0 56px 56px 0', background: `radial-gradient(ellipse at 35% 35%, ${a}ee, ${a}66)`, animation: 'sealCrackR 0.6s cubic-bezier(0.4,0,1,1) forwards' }} />
-            </div>
-          )}
         </div>
       </div>
-
-      {/* Touchez pour découvrir */}
-      {phase === 0 && (
-        <div style={{ marginTop: 40, fontFamily: CG, fontStyle: 'italic', fontSize: 14, color: a, animation: 'pulseTap 2.5s ease-in-out infinite', letterSpacing: 1.5 }}>
-          {locale === 'en' ? 'Tap to discover' : 'Touchez pour découvrir'}
-        </div>
-      )}
     </div>
   )
 }
