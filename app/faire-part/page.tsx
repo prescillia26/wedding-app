@@ -3928,6 +3928,45 @@ function AnimSection({ children, delay = 0, style, animStyle = 'slide-up' }: {
   )
 }
 
+// ── Menu flottant pour naviguer entre les événements ──────────────────────────
+function FloatingEventMenu({ ceremonies, accent, theme }: { ceremonies: { type: string; customName?: string }[]; accent: string; theme: ThemeObj }) {
+  const [open, setOpen] = useState(false)
+  const { t } = useT()
+  if (ceremonies.length < 2) return null
+  const typeTitle: Record<string, string> = {
+    'Mairie': t.fairepart.cardTitles['Mairie'],
+    'Cérémonie religieuse / Houppa': t.fairepart.cardTitles['Cérémonie religieuse / Houppa'],
+    'Shabbat Hatan': t.fairepart.cardTitles['Shabbat Hatan'],
+    'Henné': t.fairepart.cardTitles['Henné'],
+    'Cocktail': t.fairepart.cardTitles['Cocktail'],
+    'Soirée': t.fairepart.cardTitles['Soirée'],
+    'Boat Party': t.fairepart.cardTitles['Boat Party'],
+  }
+  return (
+    <div style={{ position: 'fixed', top: 16, right: 16, zIndex: 100 }}>
+      <button onClick={() => setOpen(!open)} style={{ width: 40, height: 40, borderRadius: '50%', border: `1.5px solid ${accent}66`, background: theme.dark ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.85)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 12px rgba(0,0,0,0.15)', color: accent, fontSize: 16, padding: 0 } as React.CSSProperties}>
+        {open ? '✕' : '☰'}
+      </button>
+      {open && (
+        <div style={{ position: 'absolute', top: 48, right: 0, background: theme.dark ? 'rgba(20,20,20,0.95)' : 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderRadius: 12, border: `1px solid ${accent}33`, boxShadow: '0 8px 32px rgba(0,0,0,0.15)', padding: '8px 0', minWidth: 180 } as React.CSSProperties}>
+          {ceremonies.map((c, i) => {
+            const name = typeTitle[c.type] || c.customName || c.type
+            return (
+              <button key={i} onClick={() => { setOpen(false); document.getElementById(`ceremony-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} style={{ display: 'block', width: '100%', padding: '10px 20px', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: theme.texte, letterSpacing: 0.5 }}>
+                {name}
+              </button>
+            )
+          })}
+          <div style={{ height: 1, background: `${accent}22`, margin: '4px 12px' }} />
+          <button onClick={() => { setOpen(false); document.getElementById('rsvp-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} style={{ display: 'block', width: '100%', padding: '10px 20px', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', fontFamily: 'var(--font-playfair-display)', fontSize: 13, fontWeight: 600, color: accent, letterSpacing: 1, textTransform: 'uppercase' }}>
+            RSVP
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── SharedPageContent : vue partagée page unique luxe ─────────────────────────
 
 function CeremonyCard({ isCard, accent, children }: { isCard: boolean; accent: string; children: React.ReactNode }) {
@@ -4465,6 +4504,7 @@ const firstDate = sorted[0]?.date
   return (
     <div style={{ backgroundColor: '#f5f0e8', minHeight: '100vh' }}>
       <div style={{ backgroundColor: theme.fond, color: TEXT, minHeight: '100vh', maxWidth: 480, margin: '0 auto', boxShadow: '0 0 40px rgba(0,0,0,0.08)' }}>
+      <FloatingEventMenu ceremonies={sorted} accent={G} theme={theme} />
       <style>{`@keyframes sharedFadeIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}`}</style>
 {/* SECTION 1 : Écran d'accueil */}
       <div style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', maxWidth: 480, margin: '0 auto', boxShadow: '0 8px 60px rgba(0,0,0,0.15)' }}>
@@ -4618,7 +4658,7 @@ const firstDate = sorted[0]?.date
           return (
             <React.Fragment key={realIdx}>
               <CeremonyCard isCard={isCard} accent={G}>
-                <section style={{ paddingTop: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingBottom: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingLeft: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: 'visible', ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
+                <section id={`ceremony-${realIdx}`} style={{ paddingTop: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingBottom: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingLeft: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: 'visible', scrollMarginTop: 60, ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
                   {hasFrame ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: data.frameOpacity ?? 1, transform: `scale(${(data.frameSize ?? 100) / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
@@ -4841,7 +4881,7 @@ const firstDate = sorted[0]?.date
 
         {/* SECTION 5 : RSVP invité */}
         {role === 'guest' && (
-          <section style={{ paddingTop: 60, paddingBottom: 52, borderBottom: `1px solid ${G}1a` }}>
+          <section id="rsvp-section" style={{ paddingTop: 60, paddingBottom: 52, borderBottom: `1px solid ${G}1a`, scrollMarginTop: 60 }}>
             <AnimSection animStyle={anim}>
               <div style={{ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>{t.fairepart.yourResponse}</div>
               <OrnSep />
