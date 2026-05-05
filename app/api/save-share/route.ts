@@ -37,6 +37,8 @@ export async function POST(request: Request) {
       shareData.ownerEmail = session.email
     }
 
+    // Timestamp pour invalider le cache des previews WhatsApp/Facebook quand les photos changent
+    shareData.ogVersion = Date.now()
     await redis.set(id, shareData, { ex: 31536000 })
 
     if (shareData.emailMaries) {

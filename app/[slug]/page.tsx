@@ -9,14 +9,14 @@ const redis = new Redis({
 })
 
 // ✅ Fonction unique qui transforme une URL Cloudinary au format OG parfait
-function toCloudinaryOgUrl(raw: string | undefined | null): string {
+function toCloudinaryOgUrl(raw: string | undefined | null, version?: number): string {
   if (!raw) return ''
   if (raw.includes('/upload/')) {
-    // g_auto = recadre automatiquement sur les visages
-    // q_auto,f_auto = optimise qualité/format pour chaque device
-    return raw.replace('/upload/', '/upload/w_1200,h_630,c_fill,g_face:center,q_auto,f_auto/')
+    const url = raw.replace('/upload/', '/upload/w_1200,h_630,c_fill,g_face:center,q_auto,f_auto/')
+    // Ajouter un paramètre de version pour invalider le cache WhatsApp/Facebook quand les photos changent
+    return version ? `${url}?v=${version}` : url
   }
-  return raw
+  return version ? `${raw}?v=${version}` : raw
 }
 
 // ✅ React cache() : évite que Redis soit appelé 2 fois par page
@@ -32,6 +32,7 @@ const getData = cache(async (slug: string) => {
     dateMariage?: string
     ville?: string
     lieu?: string
+    ogVersion?: number
   }>(shareId)
   if (!data) return null
   return { shareId, data }
@@ -76,7 +77,7 @@ export async function generateMetadata(
   const description = descParts.join(' ') + '. Découvrez les informations et confirmez votre présence.'
 
   const rawPhoto = result.data.photosFond?.[0] || result.data.photoFond
-  const ogImage = toCloudinaryOgUrl(rawPhoto)
+  const ogImage = toCloudinaryOgUrl(rawPhoto, result.data.ogVersion)
 
   return {
     title,
@@ -112,7 +113,7 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
   const result = await getData(slug)
 
   const rawPhoto = result?.data?.photosFond?.[0] || result?.data?.photoFond || ''
-  const photo = toCloudinaryOgUrl(rawPhoto)
+  const photo = toCloudinaryOgUrl(rawPhoto, result?.data?.ogVersion)
   const accent = '#C9A84C'
   const targetUrl = result?.shareId
     ? `/faire-part?share=${result.shareId}&role=guest`
