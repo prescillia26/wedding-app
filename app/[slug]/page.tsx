@@ -14,7 +14,7 @@ function toCloudinaryOgUrl(raw: string | undefined | null): string {
   if (raw.includes('/upload/')) {
     // g_auto = recadre automatiquement sur les visages
     // q_auto,f_auto = optimise qualité/format pour chaque device
-    return raw.replace('/upload/', '/upload/w_1200,h_630,c_fill,g_auto,q_auto,f_auto/')
+    return raw.replace('/upload/', '/upload/w_1200,h_630,c_fill,g_face:center,q_auto,f_auto/')
   }
   return raw
 }
