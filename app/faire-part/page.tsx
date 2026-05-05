@@ -4330,28 +4330,43 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
             </svg>
           </div>
 
-          {/* Rabat triangulaire */}
+          {/* Rabat triangulaire — s'ouvre vers l'arrière en 3D */}
           <div style={{
             position: 'absolute', top: -1, left: -1, right: -1, height: 100,
             transformOrigin: 'top center',
-            transform: phase >= 1 ? 'perspective(800px) rotateX(-178deg)' : 'perspective(800px) rotateX(0)',
-            transition: 'transform 0.9s cubic-bezier(0.16,1,0.3,1)',
-            zIndex: phase >= 1 ? -1 : 10,
-            background: `linear-gradient(170deg, ${envBg} 15%, ${envBgDark})`,
-            border: `1px solid ${a}12`, borderBottom: 'none',
-            borderRadius: '12px 12px 0 0',
-            clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
-            backfaceVisibility: 'hidden',
+            transform: phase >= 1 ? 'perspective(800px) rotateX(-160deg)' : 'perspective(800px) rotateX(0)',
+            transition: 'transform 1.2s cubic-bezier(0.16,1,0.3,1)',
+            zIndex: 10,
+            transformStyle: 'preserve-3d',
           } as React.CSSProperties}>
-            {/* Ornement gaufré sur le rabat */}
-            <div style={{ position: 'absolute', top: '30%', left: '50%', transform: 'translateX(-50%)', opacity: 0.08 }}>
-              <svg width="80" height="35" viewBox="0 0 80 35">
-                <path d="M5,30 Q20,5 40,18 Q60,5 75,30" fill="none" stroke={a} strokeWidth="0.7" strokeLinecap="round" />
-                <circle cx="40" cy="15" r="2" fill={a} opacity="0.4" />
-                <circle cx="18" cy="14" r="1" fill={a} opacity="0.3" />
-                <circle cx="62" cy="14" r="1" fill={a} opacity="0.3" />
-              </svg>
+            {/* Face avant du rabat (visible quand fermé) */}
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: `linear-gradient(170deg, ${envBg} 15%, ${envBgDark})`,
+              border: `1px solid ${a}12`, borderBottom: 'none',
+              borderRadius: '12px 12px 0 0',
+              clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
+              backfaceVisibility: 'hidden',
+            } as React.CSSProperties}>
+              <div style={{ position: 'absolute', top: '30%', left: '50%', transform: 'translateX(-50%)', opacity: 0.08 }}>
+                <svg width="80" height="35" viewBox="0 0 80 35">
+                  <path d="M5,30 Q20,5 40,18 Q60,5 75,30" fill="none" stroke={a} strokeWidth="0.7" strokeLinecap="round" />
+                  <circle cx="40" cy="15" r="2" fill={a} opacity="0.4" />
+                  <circle cx="18" cy="14" r="1" fill={a} opacity="0.3" />
+                  <circle cx="62" cy="14" r="1" fill={a} opacity="0.3" />
+                </svg>
+              </div>
             </div>
+            {/* Face arrière du rabat (visible quand ouvert) */}
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: `linear-gradient(10deg, ${envBg} 30%, ${envBgDark})`,
+              borderRadius: '12px 12px 0 0',
+              clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
+              backfaceVisibility: 'hidden',
+              transform: 'rotateX(180deg)',
+              boxShadow: `inset 0 -2px 8px rgba(0,0,0,0.08)`,
+            } as React.CSSProperties} />
           </div>
         </div>
       </div>
