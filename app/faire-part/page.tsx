@@ -463,9 +463,9 @@ function formatHeure(h: string, locale = 'fr'): string {
     const [hh, mm] = h.split(':').map(Number)
     const ampm = hh >= 12 ? 'PM' : 'AM'
     const h12 = hh % 12 || 12
-    return `${h12}:${String(mm).padStart(2, '0')} ${ampm}`
+    return `at ${h12}:${String(mm).padStart(2, '0')} ${ampm}`
   }
-  return h.replace(':', 'h')
+  return `à ${h.replace(':', 'h')}`
 }
 
 function formatLieu(lieu: string, locale = 'fr'): string {
