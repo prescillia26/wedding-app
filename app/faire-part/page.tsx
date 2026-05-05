@@ -4338,13 +4338,10 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
                   <div style={{ position: 'absolute', top: 10, left: 18, width: 28, height: 16, borderRadius: '50%', background: 'rgba(255,255,255,0.28)', filter: 'blur(6px)', pointerEvents: 'none' }} />
                   {/* Petit reflet secondaire */}
                   <div style={{ position: 'absolute', bottom: 16, right: 20, width: 10, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', filter: 'blur(3px)', pointerEvents: 'none' }} />
-                  {/* Monogramme ou logo sur le sceau */}
-                  <div style={{ position: 'relative', zIndex: 1, filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.3))' }}>
-                    {data.customLogoUrl
-                      ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor || 'rgba(255,255,255,0.9)'} size={40} />
-                      : <MonogramByStyle initial1={i1} initial2={i2} color="rgba(255,255,255,0.9)" size={40} style={data.monogrammeStyle || 'cercle'} />
-                    }
-                  </div>
+                  {/* Initiales gravées sur le sceau */}
+                  <span style={{ fontFamily: GV, fontSize: 24, color: 'rgba(255,255,255,0.9)', textShadow: '0 2px 1px rgba(0,0,0,0.35), 0 -1px 0 rgba(255,255,255,0.2)', letterSpacing: 2, position: 'relative', zIndex: 1 }}>
+                    {i1}&{i2}
+                  </span>
                 </div>
               )}
               {/* Sceau qui se brise (phase 1) */}
