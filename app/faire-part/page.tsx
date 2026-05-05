@@ -4226,7 +4226,7 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
 
       {/* ═══ ENVELOPPE ═══ */}
       <div style={{
-        position: 'relative', width: 300, height: 420,
+        position: 'relative', width: 300, height: 480,
         animation: phase === 0 ? 'envFloat 3.5s ease-in-out infinite' : 'none',
         willChange: 'transform',
       }}>
@@ -4235,14 +4235,14 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
 
           {/* Corps de l'enveloppe */}
           <div style={{
-            position: 'relative', width: '100%', height: 420,
+            position: 'relative', width: '100%', height: 480,
             background: `linear-gradient(160deg, ${envBg} 0%, ${envBgDark} 100%)`,
             borderRadius: 12,
             boxShadow: `0 32px 64px rgba(0,0,0,0.18), 0 16px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.12)`,
             border: `1px solid ${a}12`,
             overflow: 'hidden',
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            padding: '40px 30px',
+            padding: '120px 30px 40px',
           }}>
             {/* Texture papier */}
             <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.035, pointerEvents: 'none' }}>
@@ -4332,7 +4332,7 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
 
           {/* Rabat triangulaire */}
           <div style={{
-            position: 'absolute', top: -1, left: -1, right: -1, height: 130,
+            position: 'absolute', top: -1, left: -1, right: -1, height: 100,
             transformOrigin: 'top center',
             transform: phase >= 1 ? 'perspective(800px) rotateX(-178deg)' : 'perspective(800px) rotateX(0)',
             transition: 'transform 0.9s cubic-bezier(0.16,1,0.3,1)',
