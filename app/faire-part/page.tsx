@@ -1789,10 +1789,14 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
 
 function CeremoniesDivider({ themeAccent }: { themeAccent: string }) {
   return (
-    <div style={{ maxWidth: 600, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 12, padding: '20px 24px' }}>
-      <div style={{ flex: 1, height: 1, background: themeAccent, opacity: 0.3 }} />
-      <span style={{ color: themeAccent }}>✦</span>
-      <div style={{ flex: 1, height: 1, background: themeAccent, opacity: 0.3 }} />
+    <div style={{ maxWidth: 480, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 16, padding: '32px 48px' }}>
+      <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to right, transparent, ${themeAccent}30)` }} />
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <span style={{ width: 4, height: 4, borderRadius: '50%', background: themeAccent, opacity: 0.2 }} />
+        <span style={{ color: themeAccent, fontSize: 10, opacity: 0.4 }}>◆</span>
+        <span style={{ width: 4, height: 4, borderRadius: '50%', background: themeAccent, opacity: 0.2 }} />
+      </div>
+      <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to left, transparent, ${themeAccent}30)` }} />
     </div>
   )
 }
@@ -4836,17 +4840,17 @@ const firstDate = sorted[0]?.date
   const anim = data.animationStyle || 'slide-up'
 
   const OrnSep = () => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', margin: '0 auto 24px', maxWidth: 160 }}>
-      <div style={{ flex: 1, height: 0.5, background: G, opacity: 0.3 }} />
-      <span style={{ color: G, fontSize: 10, opacity: 0.7 }}>◆</span>
-      <div style={{ flex: 1, height: 0.5, background: G, opacity: 0.3 }} />
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center', margin: '0 auto 24px', maxWidth: 200 }}>
+      <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to right, transparent, ${G}40)` }} />
+      <span style={{ color: G, fontSize: 8, opacity: 0.5 }}>◆</span>
+      <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to left, transparent, ${G}40)` }} />
     </div>
   )
   const LineSep = () => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', margin: '20px auto' }}>
-      <div style={{ width: 40, height: 0.5, background: G, opacity: 0.3 }} />
-      <span style={{ color: G, fontSize: 9, opacity: 0.5 }}>✦</span>
-      <div style={{ width: 40, height: 0.5, background: G, opacity: 0.3 }} />
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', margin: '24px auto' }}>
+      <div style={{ width: 36, height: 0.5, background: `linear-gradient(to right, transparent, ${G}35)` }} />
+      {[0,1,2].map(k => <span key={k} style={{ width: 3, height: 3, borderRadius: '50%', background: G, opacity: 0.25 }} />)}
+      <div style={{ width: 36, height: 0.5, background: `linear-gradient(to left, transparent, ${G}35)` }} />
     </div>
   )
 
@@ -4872,7 +4876,12 @@ const firstDate = sorted[0]?.date
       <PersistentParticles theme={theme} style={data.style} />
       <div style={{ backgroundColor: theme.fond, color: TEXT, minHeight: '100vh', maxWidth: 480, margin: '0 auto', boxShadow: '0 0 40px rgba(0,0,0,0.08)' }}>
       <FloatingEventMenu ceremonies={sorted} accent={G} theme={theme} />
-      <style>{`@keyframes sharedFadeIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}`}</style>
+      <style>{`
+        @keyframes sharedFadeIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+        .lovit-btn{transition:all 0.25s cubic-bezier(0.22,1,0.36,1)}
+        .lovit-btn:hover{transform:translateY(-1px);filter:brightness(1.06);box-shadow:0 6px 24px rgba(0,0,0,0.12)}
+        .lovit-btn:active{transform:translateY(0);filter:brightness(0.98)}
+      `}</style>
 {/* SECTION 1 : Écran d'accueil */}
       <div style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', maxWidth: 480, margin: '0 auto', boxShadow: '0 8px 60px rgba(0,0,0,0.15)' }}>
         {/* Wrapper overflow:hidden uniquement pour le carousel photo — ne clip pas le monogramme */}
@@ -4909,7 +4918,7 @@ const firstDate = sorted[0]?.date
               <Countdown targetDate={firstDate} accent={hasIntroPhoto ? 'rgba(255,255,255,0.9)' : G} />
             </div>
           )}
-          <button onClick={handleDiscover} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '14px 40px', fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', boxShadow: `0 4px 20px ${G}44`, animation: 'sharedFadeIn 1s 0.8s ease forwards', opacity: 0 } as React.CSSProperties}>
+          <button className="lovit-btn" onClick={handleDiscover} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '14px 40px', fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', boxShadow: `0 4px 20px ${G}44`, animation: 'sharedFadeIn 1s 0.8s ease forwards', opacity: 0 } as React.CSSProperties}>
             {t.fairepart.discoverInvitation}
           </button>
         </div>
@@ -4954,7 +4963,7 @@ const firstDate = sorted[0]?.date
                       <div style={{ position: 'absolute', top: 18, right: 22, fontSize: 16, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, zIndex: 5, opacity: 0.85, letterSpacing: 1 }}>בס״ד</div>
                     )}
                     <AnimSection animStyle={anim}>
-                     <div style={applyZoneStyle({ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }, 'titres', data.zoneStyles)}>{ov[`ceremony_${i}_titre`] || title}</div>
+                     <div style={applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 16, lineHeight: 1.4 }, 'titres', data.zoneStyles)}>{ov[`ceremony_${i}_titre`] || title}</div>
                       <OrnSep />
                     </AnimSection>
                     {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
@@ -5030,9 +5039,9 @@ const firstDate = sorted[0]?.date
                       {/* Gros prénoms calligraphiés : SEULEMENT pour Houppa et Mairie */}
                       {(ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Mairie') && (
                         <>
-                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 6, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom}</div>
-                          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 20, color: TEXT, textAlign: 'center', marginBottom: 6, opacity: 0.65 }}>&</div>
-                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.1, marginBottom: 18, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom}</div>
+                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.15, marginBottom: 8, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom}</div>
+                          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 22, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.55, letterSpacing: 2 }}>&</div>
+                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.15, marginBottom: 16, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom}</div>
                         </>
                       )}
 
@@ -5072,24 +5081,24 @@ const firstDate = sorted[0]?.date
                         const mois = cap(parts.find(p => p.type === 'month')?.value || '')
                         const annee = parts.find(p => p.type === 'year')?.value || ''
                         return (
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '24px 0' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '24px 0 8px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
                               <div style={{ width: 80, textAlign: 'right' }}>
-                                <div style={{ borderBottom: `1px solid ${G}`, paddingBottom: 4, letterSpacing: 3, fontSize: 11, color: G, display: 'inline-block' }}>{jourSemaine.toUpperCase()}</div>
+                                <div style={{ fontFamily: FP, borderBottom: `1px solid ${G}44`, paddingBottom: 4, letterSpacing: 4, fontSize: 10, fontWeight: 600, color: G, display: 'inline-block', textTransform: 'uppercase' }}>{jourSemaine}</div>
                               </div>
-                              <div style={{ border: `1.5px solid ${G}`, borderRadius: 4, padding: '8px 16px', fontSize: 36, fontFamily: FP, color: G, fontWeight: 600, minWidth: 60, textAlign: 'center' }}>{jour}</div>
+                              <div style={{ border: `1.5px solid ${G}`, borderRadius: 4, padding: '10px 18px', fontSize: 40, fontFamily: FP, color: G, fontWeight: 700, minWidth: 64, textAlign: 'center', lineHeight: 1 }}>{jour}</div>
                               <div style={{ width: 80, textAlign: 'left' }}>
-                                <div style={{ borderBottom: `1px solid ${G}`, paddingBottom: 4, letterSpacing: 3, fontSize: 11, color: G, display: 'inline-block' }}>{mois.toUpperCase()}</div>
+                                <div style={{ fontFamily: FP, borderBottom: `1px solid ${G}44`, paddingBottom: 4, letterSpacing: 4, fontSize: 10, fontWeight: 600, color: G, display: 'inline-block', textTransform: 'uppercase' }}>{mois}</div>
                               </div>
                             </div>
-                            <div style={{ fontSize: 11, color: TEXT, letterSpacing: 2, marginTop: 6 }}>{annee}</div>
+                            <div style={{ fontFamily: FC, fontSize: 12, color: TEXT, letterSpacing: 3, marginTop: 8, opacity: 0.7 }}>{annee}</div>
                           </div>
                         )
                       })()}
                       {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 15, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 8, opacity: 0.8 }}>{hebrewDate}</div>}
-                      {ceremony.heure && <div style={applyZoneStyle({ fontFamily: FP, fontSize: 22, fontWeight: 500, color: G, textAlign: 'center', marginBottom: 20, letterSpacing: 2 }, 'dateHeure', data.zoneStyles)}>{formatHeure(ceremony.heure, locale)}</div>}
-                      {(ov[`ceremony_${i}_lieu`] || ceremony.lieu) && <div style={applyZoneStyle({ fontFamily: FP, fontWeight: 700, fontSize: 18, color: TEXT, textAlign: 'center', lineHeight: 1.5, marginBottom: 6 }, 'lieu', data.zoneStyles)}>{ceremony.type === 'Mairie' ? conjonctionLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu, locale) : formatLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu, locale)}</div>}
-                      {ceremony.adresse && <div style={{ fontFamily: FC, fontSize: 15, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.6, marginBottom: 22 }}>{ceremony.adresse}</div>}
+                      {ceremony.heure && <div style={applyZoneStyle({ fontFamily: FP, fontSize: 20, fontWeight: 600, color: G, textAlign: 'center', marginBottom: 24, letterSpacing: 3, lineHeight: 1.2 }, 'dateHeure', data.zoneStyles)}>{formatHeure(ceremony.heure, locale)}</div>}
+                      {(ov[`ceremony_${i}_lieu`] || ceremony.lieu) && <div style={applyZoneStyle({ fontFamily: FP, fontWeight: 700, fontSize: 19, color: TEXT, textAlign: 'center', lineHeight: 1.5, marginBottom: 8, letterSpacing: 0.5 }, 'lieu', data.zoneStyles)}>{ceremony.type === 'Mairie' ? conjonctionLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu, locale) : formatLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu, locale)}</div>}
+                      {ceremony.adresse && <div style={{ fontFamily: FC, fontSize: 14, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.65, marginBottom: 24, letterSpacing: 0.3 }}>{ceremony.adresse}</div>}
                       {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
                         <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, textAlign: 'center', marginBottom: 16, borderTop: `1px solid ${G}22`, paddingTop: 14 }}>
                           <div style={{ fontWeight: 700 }}>{t.fairepart.eventFollowedBy} {ceremony.evenementSuivantNom}</div>
@@ -5100,16 +5109,12 @@ const firstDate = sorted[0]?.date
                         <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: theme.textSecondaire, textAlign: 'center', marginBottom: 16, padding: '12px 0', borderTop: `1px solid ${G}18` }}>{ceremony.note}</div>
                       )}
                       {ceremony.adresse && (
-                        <div style={{ marginTop: 24 }}>
-                          {/* Séparateur ornemental */}
+                        <div style={{ marginTop: 32 }}>
                           <div style={{ textAlign: 'center' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 14 }}>
-                              <div style={{ width: 24, height: 0.5, background: G, opacity: 0.4 }} />
-                              <span style={{ color: G, fontSize: 10, opacity: 0.6 }}>✦</span>
-                              <div style={{ width: 24, height: 0.5, background: G, opacity: 0.4 }} />
-                            </div>
-                            <div style={{ fontFamily: FP, fontSize: 10, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, marginBottom: 14, opacity: 0.7 }}>
-                              Pour vous rendre sur place
+                            {/* Séparateur minimal avec dégradé */}
+                            <div style={{ width: 60, height: 0.5, background: `linear-gradient(to right, transparent, ${G}30, transparent)`, margin: '0 auto 16px' }} />
+                            <div style={{ fontFamily: FP, fontSize: 10, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, marginBottom: 16, opacity: 0.6 }}>
+                              {locale === 'en' ? 'Get there' : 'S\'y rendre'}
                             </div>
                             <ItineraireButtons adresse={ceremony.adresse} theme={theme} />
                           </div>
@@ -5118,13 +5123,9 @@ const firstDate = sorted[0]?.date
 
                       {/* ── Encart Infos pratiques (transport / hébergement) ── */}
                       {(ceremony.transport || ceremony.hebergement) && (
-                        <div style={{ marginTop: 32, paddingTop: 24, borderTop: `1px solid ${G}22` }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 14 }}>
-                            <div style={{ width: 24, height: 0.5, background: G, opacity: 0.4 }} />
-                            <span style={{ color: G, fontSize: 10, opacity: 0.6 }}>✦</span>
-                            <div style={{ width: 24, height: 0.5, background: G, opacity: 0.4 }} />
-                          </div>
-                          <div style={{ fontFamily: FP, fontSize: 10, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 20, opacity: 0.7 }}>
+                        <div style={{ marginTop: 32, paddingTop: 24 }}>
+                          <div style={{ width: 60, height: 0.5, background: `linear-gradient(to right, transparent, ${G}30, transparent)`, margin: '0 auto 16px' }} />
+                          <div style={{ fontFamily: FP, fontSize: 10, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 20, opacity: 0.6 }}>
                             {t.fairepart.infoPratiques}
                           </div>
                           {ceremony.transport && (
