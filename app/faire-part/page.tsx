@@ -604,17 +604,39 @@ function renderInvitationPhrase(
   }
 }
 function Linkify({ text, color }: { text: string; color: string }) {
+  // Supporte 2 formats :
+  // 1. [texte cliquable](https://url) → lien hypertexte sur le texte
+  // 2. https://url brute → lien cliquable sur l'URL
+  const mdLinkRegex = /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g
   const urlRegex = /(https?:\/\/[^\s,)]+)/g
-  const parts = text.split(urlRegex)
+
+  // D'abord traiter les liens markdown [texte](url)
+  const segments: { type: 'text' | 'mdlink' | 'url'; content: string; href?: string }[] = []
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+  while ((match = mdLinkRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) segments.push({ type: 'text', content: text.slice(lastIndex, match.index) })
+    segments.push({ type: 'mdlink', content: match[1], href: match[2] })
+    lastIndex = match.index + match[0].length
+  }
+  if (lastIndex < text.length) segments.push({ type: 'text', content: text.slice(lastIndex) })
+
   return (
     <>
-      {parts.map((part, i) =>
-        urlRegex.test(part) ? (
-          <a key={i} href={part} target="_blank" rel="noopener noreferrer" style={{ color, textDecoration: 'underline', wordBreak: 'break-all' }}>{part}</a>
-        ) : (
-          <span key={i}>{part}</span>
+      {segments.map((seg, i) => {
+        if (seg.type === 'mdlink') {
+          return <a key={i} href={seg.href} target="_blank" rel="noopener noreferrer" style={{ color, textDecoration: 'underline', fontWeight: 600 }}>{seg.content}</a>
+        }
+        // Pour les segments texte, chercher les URLs brutes
+        const parts = seg.content.split(urlRegex)
+        return parts.map((part, j) =>
+          urlRegex.test(part) ? (
+            <a key={`${i}-${j}`} href={part} target="_blank" rel="noopener noreferrer" style={{ color, textDecoration: 'underline', wordBreak: 'break-all' }}>{part}</a>
+          ) : (
+            <span key={`${i}-${j}`}>{part}</span>
+          )
         )
-      )}
+      })}
     </>
   )
 }
@@ -1180,7 +1202,9 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                   style={{ ...S.input, resize: 'vertical', minHeight: 70, fontFamily: 'inherit', fontSize: 13 }}
                 />
                 <p style={{ fontSize: 10, color: '#9ca3af', marginTop: 4 }}>
-                  {locale === 'en' ? 'Paste a link (https://...) and it will be clickable for your guests.' : 'Collez un lien (https://...) et il sera cliquable pour vos invités.'}
+                  {locale === 'en'
+                    ? 'Tip: write [Hotel Name](https://link) to make "Hotel Name" clickable. Or just paste a URL.'
+                    : 'Astuce : écrivez [Nom de l\'hôtel](https://lien) pour rendre "Nom de l\'hôtel" cliquable. Ou collez simplement un lien.'}
                 </p>
               </div>
             )}
