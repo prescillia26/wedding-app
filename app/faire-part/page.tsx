@@ -607,7 +607,7 @@ function Linkify({ text, color }: { text: string; color: string }) {
   // Supporte 2 formats :
   // 1. [texte cliquable](https://url) → lien hypertexte sur le texte
   // 2. https://url brute → lien cliquable sur l'URL
-  const mdLinkRegex = /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g
+  const mdLinkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
   const urlRegex = /(https?:\/\/[^\s,)]+)/g
 
   // D'abord traiter les liens markdown [texte](url)
@@ -616,7 +616,9 @@ function Linkify({ text, color }: { text: string; color: string }) {
   let match: RegExpExecArray | null
   while ((match = mdLinkRegex.exec(text)) !== null) {
     if (match.index > lastIndex) segments.push({ type: 'text', content: text.slice(lastIndex, match.index) })
-    segments.push({ type: 'mdlink', content: match[1], href: match[2] })
+    const rawHref = match[2]
+    const href = rawHref.match(/^https?:\/\//) ? rawHref : `https://${rawHref}`
+    segments.push({ type: 'mdlink', content: match[1], href })
     lastIndex = match.index + match[0].length
   }
   if (lastIndex < text.length) segments.push({ type: 'text', content: text.slice(lastIndex) })
