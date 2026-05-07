@@ -993,6 +993,18 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
     if (close) setCropIdx(null)
   }
 
+  const movePhoto = (idx: number, dir: -1 | 1) => {
+    const target = idx + dir
+    if (target < 0 || target >= photos.length) return
+    const newPhotos = [...photos]
+    const newData = [...photosData]
+    ;[newPhotos[idx], newPhotos[target]] = [newPhotos[target], newPhotos[idx]]
+    ;[newData[idx], newData[target]] = [newData[target], newData[idx]]
+    onChange({ photosFond: newPhotos, photoFond: newPhotos[0] ?? '', photosData: newData })
+    if (cropIdx === idx) setCropIdx(target)
+    else if (cropIdx === target) setCropIdx(idx)
+  }
+
   return (
     <div>
       <Label>{t.fairepart.photoSectionTitle}</Label>
@@ -1022,9 +1034,17 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
                     <div style={{ position: 'absolute', bottom: 2, left: 2, background: 'rgba(0,0,0,0.55)', color: 'white', fontSize: 8, borderRadius: 3, padding: '1px 4px' }}>Photo {idx + 1}</div>
                     <button type="button" onClick={() => handleDelete(idx)} style={{ ...BTN, position: 'absolute', top: 2, right: 2, background: 'white', border: 'none', borderRadius: '50%', width: 16, height: 16, fontSize: 9, color: '#fb7185', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
                   </div>
-                  <button type="button" onClick={() => setCropIdx(isCropping ? null : idx)} style={{ ...BTN, display: 'block', width: 80, marginTop: 4, padding: '4px 0', borderRadius: 6, border: `1px solid ${isCropping ? '#C9A84C' : '#fecdd3'}`, background: isCropping ? '#fdf5e4' : 'white', color: isCropping ? '#C9A84C' : '#4a3728', fontSize: 9, fontWeight: isCropping ? 700 : 400 }}>
-                    {isCropping ? t.fairepart.photoCropClose : t.fairepart.photoCropBtn}
-                  </button>
+                  <div style={{ display: 'flex', gap: 2, marginTop: 4 }}>
+                    {idx > 0 && (
+                      <button type="button" onClick={() => movePhoto(idx, -1)} style={{ ...BTN, flex: '0 0 20px', padding: '4px 0', borderRadius: 6, border: '1px solid #fecdd3', background: 'white', color: '#4a3728', fontSize: 10 }}>←</button>
+                    )}
+                    <button type="button" onClick={() => setCropIdx(isCropping ? null : idx)} style={{ ...BTN, flex: 1, padding: '4px 0', borderRadius: 6, border: `1px solid ${isCropping ? '#C9A84C' : '#fecdd3'}`, background: isCropping ? '#fdf5e4' : 'white', color: isCropping ? '#C9A84C' : '#4a3728', fontSize: 9, fontWeight: isCropping ? 700 : 400 }}>
+                      {isCropping ? t.fairepart.photoCropClose : t.fairepart.photoCropBtn}
+                    </button>
+                    {idx < photos.length - 1 && (
+                      <button type="button" onClick={() => movePhoto(idx, 1)} style={{ ...BTN, flex: '0 0 20px', padding: '4px 0', borderRadius: 6, border: '1px solid #fecdd3', background: 'white', color: '#4a3728', fontSize: 10 }}>→</button>
+                    )}
+                  </div>
                 </div>
               )
             })}
