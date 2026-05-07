@@ -250,7 +250,6 @@ interface FormData {
   customLogoUrl?: string
   customLogoSize?: number // 50-150, default 100
   customLogoColor?: string // '' = original, ou hex color
-  enveloppeImageUrl?: string
 }
 const defaultCeremony: Ceremony = {
   type: 'Cérémonie religieuse / Houppa',
@@ -1644,54 +1643,6 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           })}
         </div>
 
-        {/* ── Choix image enveloppe ── */}
-        {(data.introAnimation || 'enveloppe') === 'enveloppe' && (
-          <div style={{ marginTop: 16 }}>
-            <Label>{locale === 'en' ? 'Envelope design' : "Design de l'enveloppe"}</Label>
-            <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>
-              {locale === 'en' ? 'Choose an elegant envelope image, or keep the default style.' : "Choisissez une image d'enveloppe élégante, ou gardez le style par défaut."}
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-              {/* Option par défaut (CSS) */}
-              <button type="button" onClick={() => onChange({ enveloppeImageUrl: '' })} style={{
-                ...BTN, padding: 4, borderRadius: 10, overflow: 'hidden',
-                border: `2px solid ${!data.enveloppeImageUrl ? THEMES[data.style].accent : '#fecdd3'}`,
-                background: !data.enveloppeImageUrl ? `${THEMES[data.style].accent}12` : 'white',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-              }}>
-                <div style={{ width: '100%', aspectRatio: '3/4', borderRadius: 6, background: `linear-gradient(160deg, ${THEMES[data.style].fond} 0%, color-mix(in srgb, ${THEMES[data.style].fond} 82%, #000) 100%)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontSize: 24 }}>💌</span>
-                </div>
-                <span style={{ fontSize: 9, color: !data.enveloppeImageUrl ? THEMES[data.style].accent : '#6a5040', fontWeight: !data.enveloppeImageUrl ? 700 : 400 }}>
-                  {locale === 'en' ? 'Classic' : 'Classique'}
-                </span>
-              </button>
-              {/* Images enveloppes */}
-              {[
-                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145307/155_ns6sse.png',
-                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145302/156_xb1yfl.png',
-                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145294/157_dawbum.png',
-                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145295/158_jls9sc.png',
-                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145303/164_h3tmcq.png',
-                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145300/165_huqh2q.png',
-                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145302/166_mbrbxn.png',
-              ].map((url, idx) => {
-                const sel = data.enveloppeImageUrl === url
-                return (
-                  <button key={idx} type="button" onClick={() => onChange({ enveloppeImageUrl: url })} style={{
-                    ...BTN, padding: 4, borderRadius: 10, overflow: 'hidden',
-                    border: `2px solid ${sel ? THEMES[data.style].accent : '#fecdd3'}`,
-                    background: sel ? `${THEMES[data.style].accent}12` : 'white',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-                  }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={url} alt={`Envelope ${idx + 1}`} style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', borderRadius: 6 }} />
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* ── Monogramme ── */}
@@ -4309,19 +4260,13 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
   const handleOpen = () => {
     if (phase > 0) return
     setPhase(1)                          // sceau brise + rabat ouvre
-    if (data.enveloppeImageUrl) {
-      setTimeout(() => setPhase(2), 1200)  // fade out plus tôt pour image
-      setTimeout(() => onDone(), 1800)     // terminé
-    } else {
-      setTimeout(() => setPhase(2), 1800)  // tout fade out
-      setTimeout(() => onDone(), 2600)     // terminé
-    }
+    setTimeout(() => setPhase(2), 1800)  // tout fade out
+    setTimeout(() => onDone(), 2600)     // terminé
   }
 
   const envBg = theme.dark ? '#2a1f15' : fond
   const envBgDark = theme.dark ? '#1a1208' : `color-mix(in srgb, ${fond} 82%, #000)`
   const textColor = theme.dark ? '#e0d0c0' : `color-mix(in srgb, ${a} 70%, #000)`
-  const useImage = !!data.enveloppeImageUrl
 
   // Ornement SVG floral élaboré pour les coins
   const cornerOrn = (rot: string) => (
@@ -4355,106 +4300,17 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
         @keyframes sealBreakR{to{transform:translateX(16px) translateY(16px) rotate(20deg);opacity:0}}
         @keyframes tapPulse{0%,100%{opacity:0.45}50%{opacity:1}}
         @keyframes envAppear{from{opacity:0;transform:rotate(-2.5deg) translateY(30px) scale(0.92)}to{opacity:1;transform:rotate(-2.5deg) translateY(0) scale(1)}}
-        @keyframes imgEnvFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-        @keyframes imgEnvAppear{from{opacity:0;transform:translateY(40px) scale(0.9)}to{opacity:1;transform:translateY(0) scale(1)}}
       `}</style>
 
       {/* Skip */}
       <button onClick={e => { e.stopPropagation(); onDone() }} style={{
         position: 'absolute', top: 20, right: 20, background: 'none', border: 'none',
-        color: useImage ? '#fff' : a, opacity: 0.4, fontSize: 11, fontFamily: FP, letterSpacing: 3,
+        color: a, opacity: 0.3, fontSize: 11, fontFamily: FP, letterSpacing: 3,
         cursor: 'pointer', zIndex: 10, textTransform: 'uppercase',
-        textShadow: useImage ? '0 1px 4px rgba(0,0,0,0.5)' : 'none',
       } as React.CSSProperties}>SKIP</button>
 
-      {useImage ? (
-        /* ═══ ENVELOPPE IMAGE ═══ */
-        <div style={{
-          position: 'relative', width: 300, maxWidth: '80vw',
-          animation: phase === 0 ? 'imgEnvFloat 3.5s ease-in-out infinite' : 'none',
-          willChange: 'transform',
-        }}>
-          <div style={{ animation: 'imgEnvAppear 1s cubic-bezier(0.16,1,0.3,1) forwards' }}>
-            {/* Conteneur image + overlay — overflow hidden pour ne rien laisser dépasser */}
-            <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 4 }}>
-              {/* Image enveloppe */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={data.enveloppeImageUrl}
-                alt=""
-                style={{
-                  width: '100%', height: 'auto', display: 'block',
-                  boxShadow: '0 30px 70px rgba(0,0,0,0.25), 0 15px 35px rgba(0,0,0,0.15)',
-                }}
-              />
-              {/* Overlay centré à l'intérieur de l'image */}
-              <div style={{
-                position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
-                alignItems: 'center', justifyContent: 'center', gap: 8,
-                padding: '15% 12%', overflow: 'hidden',
-              }}>
-                {/* Prénoms — taille réduite pour rester dans l'enveloppe */}
-                <div style={{ textAlign: 'center', maxWidth: '100%' }}>
-                  <div style={{ fontFamily: GV, fontSize: 22, color: '#fff', lineHeight: 1.2, letterSpacing: 1, textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {data.marie1Prenom || 'Prénom'}
-                  </div>
-                  <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 14, color: '#fff', opacity: 0.8, margin: '1px 0', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>&</div>
-                  <div style={{ fontFamily: GV, fontSize: 22, color: '#fff', lineHeight: 1.2, letterSpacing: 1, textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {data.marie2Prenom || 'Prénom'}
-                  </div>
-                </div>
-                {/* Sceau de cire — plus petit */}
-                {phase < 1 && (
-                  <div style={{
-                    width: 56, height: 56, borderRadius: '50%', flexShrink: 0,
-                    background: `radial-gradient(ellipse at 38% 32%, ${a}ff 0%, ${a}dd 40%, ${a}99 80%, ${a}77 100%)`,
-                    boxShadow: `0 4px 18px ${a}55, 0 2px 6px rgba(0,0,0,0.35), inset 0 2px 4px rgba(255,255,255,0.25), inset 0 -2px 6px rgba(0,0,0,0.25)`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    position: 'relative',
-                  }}>
-                    <div style={{ position: 'absolute', inset: -2, borderRadius: '50%', border: `2px solid ${a}33` }} />
-                    <div style={{ position: 'absolute', inset: -1, borderRadius: '50%', border: `1px solid ${a}55` }} />
-                    <div style={{ position: 'absolute', inset: 6, borderRadius: '50%', border: `0.5px solid rgba(255,255,255,0.15)` }} />
-                    <div style={{ position: 'absolute', top: 6, left: 10, width: 18, height: 10, borderRadius: '50%', background: 'rgba(255,255,255,0.28)', filter: 'blur(4px)', pointerEvents: 'none' }} />
-                    <div style={{ position: 'relative', zIndex: 1 }}>
-                      {data.customLogoUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={data.customLogoUrl} alt="" style={{ width: 28, height: 28, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.9 }} />
-                      ) : (
-                        <span style={{ fontFamily: GV, fontSize: 16, color: 'rgba(255,255,255,0.9)', textShadow: '0 1px 1px rgba(0,0,0,0.35)', letterSpacing: 1 }}>
-                          {i1}&{i2}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
-                {phase === 1 && (
-                  <div style={{ width: 56, height: 56, position: 'relative', display: 'flex', flexShrink: 0 }}>
-                    <div style={{
-                      width: 28, height: 56, borderRadius: '56px 0 0 56px',
-                      background: `radial-gradient(ellipse at 70% 35%, ${a}ff, ${a}77)`,
-                      boxShadow: `0 4px 12px ${a}44`,
-                      animation: 'sealBreakL 0.7s cubic-bezier(0.4,0,1,1) forwards',
-                    }} />
-                    <div style={{
-                      width: 28, height: 56, borderRadius: '0 56px 56px 0',
-                      background: `radial-gradient(ellipse at 30% 35%, ${a}ff, ${a}77)`,
-                      boxShadow: `0 4px 12px ${a}44`,
-                      animation: 'sealBreakR 0.7s cubic-bezier(0.4,0,1,1) forwards',
-                    }} />
-                  </div>
-                )}
-                {/* Touchez pour découvrir */}
-                <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 11, color: '#fff', opacity: 0.7, letterSpacing: 1.2, textShadow: '0 1px 6px rgba(0,0,0,0.6)', animation: phase === 0 ? 'tapPulse 2.5s ease-in-out infinite' : 'none' }}>
-                  {locale === 'en' ? 'Tap to discover' : 'Touchez pour découvrir'}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        /* ═══ ENVELOPPE CSS CLASSIQUE ═══ */
-        <div style={{
+      {/* ═══ ENVELOPPE ═══ */}
+      <div style={{
           position: 'relative', width: 300, height: 480,
           animation: phase === 0 ? 'envFloat 3.5s ease-in-out infinite' : 'none',
           willChange: 'transform',
@@ -4620,7 +4476,6 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
             </div>
           </div>
         </div>
-      )}
     </div>
   )
 }
