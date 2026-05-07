@@ -948,6 +948,8 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
   const { t } = useT()
   const [cropIdx, setCropIdx] = useState<number | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [dragIdx, setDragIdx] = useState<number | null>(null)
+  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null)
   const photos = data.photosFond ?? []
   const photosData = data.photosData ?? []
 
@@ -1005,6 +1007,24 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
     else if (cropIdx === target) setCropIdx(idx)
   }
 
+  const handleDrop = (targetIdx: number) => {
+    if (dragIdx === null || dragIdx === targetIdx) return
+    const newPhotos = [...photos]
+    const newData = [...photosData]
+    const [movedPhoto] = newPhotos.splice(dragIdx, 1)
+    const [movedData] = newData.splice(dragIdx, 1)
+    newPhotos.splice(targetIdx, 0, movedPhoto)
+    newData.splice(targetIdx, 0, movedData)
+    onChange({ photosFond: newPhotos, photoFond: newPhotos[0] ?? '', photosData: newData })
+    if (cropIdx === dragIdx) setCropIdx(targetIdx)
+    else if (cropIdx !== null) {
+      if (dragIdx < cropIdx && targetIdx >= cropIdx) setCropIdx(cropIdx - 1)
+      else if (dragIdx > cropIdx && targetIdx <= cropIdx) setCropIdx(cropIdx + 1)
+    }
+    setDragIdx(null)
+    setDragOverIdx(null)
+  }
+
   return (
     <div>
       <Label>{t.fairepart.photoSectionTitle}</Label>
@@ -1026,9 +1046,18 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
             {photos.map((photo, idx) => {
               const crop = photosData[idx]
               const isCropping = cropIdx === idx
+              const isDragOver = dragOverIdx === idx && dragIdx !== idx
               return (
-                <div key={idx}>
-                  <div style={{ position: 'relative', width: 80, height: 80, borderRadius: 8, overflow: 'hidden', border: isCropping ? '2px solid #C9A84C' : '2px solid transparent' }}>
+                <div key={idx}
+                  draggable
+                  onDragStart={() => setDragIdx(idx)}
+                  onDragOver={e => { e.preventDefault(); setDragOverIdx(idx) }}
+                  onDragLeave={() => { if (dragOverIdx === idx) setDragOverIdx(null) }}
+                  onDrop={e => { e.preventDefault(); handleDrop(idx) }}
+                  onDragEnd={() => { setDragIdx(null); setDragOverIdx(null) }}
+                  style={{ cursor: 'grab', opacity: dragIdx === idx ? 0.4 : 1, transition: 'opacity 0.15s, transform 0.15s', transform: isDragOver ? 'scale(1.05)' : 'scale(1)' }}
+                >
+                  <div style={{ position: 'relative', width: 80, height: 80, borderRadius: 8, overflow: 'hidden', border: isDragOver ? '2px solid #C9A84C' : isCropping ? '2px solid #C9A84C' : '2px solid transparent' }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={photo} alt="" style={{ position: 'absolute', top: '50%', left: '50%', transform: crop ? `translate(calc(-50% + ${crop.cropX}px), calc(-50% + ${crop.cropY}px)) scale(${crop.cropScale})` : 'translate(-50%, -50%)', transformOrigin: 'center center', minWidth: '100%', minHeight: '100%', width: 'auto', height: 'auto' }} />
                     <div style={{ position: 'absolute', bottom: 2, left: 2, background: 'rgba(0,0,0,0.55)', color: 'white', fontSize: 8, borderRadius: 3, padding: '1px 4px' }}>Photo {idx + 1}</div>
