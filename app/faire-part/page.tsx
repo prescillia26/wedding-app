@@ -4313,8 +4313,13 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
   const handleOpen = () => {
     if (phase > 0) return
     setPhase(1)                          // sceau brise + rabat ouvre
-    setTimeout(() => setPhase(2), 1800)  // tout fade out
-    setTimeout(() => onDone(), 2600)     // terminé
+    if (data.enveloppeImageUrl) {
+      setTimeout(() => setPhase(2), 1200)  // fade out plus tôt pour image
+      setTimeout(() => onDone(), 1800)     // terminé
+    } else {
+      setTimeout(() => setPhase(2), 1800)  // tout fade out
+      setTimeout(() => onDone(), 2600)     // terminé
+    }
   }
 
   const envBg = theme.dark ? '#2a1f15' : fond
@@ -4356,7 +4361,6 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
         @keyframes envAppear{from{opacity:0;transform:rotate(-2.5deg) translateY(30px) scale(0.92)}to{opacity:1;transform:rotate(-2.5deg) translateY(0) scale(1)}}
         @keyframes imgEnvFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
         @keyframes imgEnvAppear{from{opacity:0;transform:translateY(40px) scale(0.9)}to{opacity:1;transform:translateY(0) scale(1)}}
-        @keyframes imgEnvOpen{from{transform:scale(1)}to{transform:scale(1.05);opacity:0}}
       `}</style>
 
       {/* Skip */}
@@ -4370,82 +4374,84 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
       {useImage ? (
         /* ═══ ENVELOPPE IMAGE ═══ */
         <div style={{
-          position: 'relative', width: 320, maxWidth: '88vw',
-          animation: phase === 0 ? 'imgEnvFloat 3.5s ease-in-out infinite' : phase === 1 ? 'imgEnvOpen 1.5s cubic-bezier(0.16,1,0.3,1) forwards' : 'none',
-          willChange: 'transform, opacity',
+          position: 'relative', width: 300, maxWidth: '80vw',
+          animation: phase === 0 ? 'imgEnvFloat 3.5s ease-in-out infinite' : 'none',
+          willChange: 'transform',
         }}>
           <div style={{ animation: 'imgEnvAppear 1s cubic-bezier(0.16,1,0.3,1) forwards' }}>
-            {/* Image enveloppe */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={data.enveloppeImageUrl}
-              alt=""
-              style={{
-                width: '100%', height: 'auto', display: 'block',
-                borderRadius: 4,
-                boxShadow: '0 30px 70px rgba(0,0,0,0.25), 0 15px 35px rgba(0,0,0,0.15)',
-                filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.2))',
-              }}
-            />
-            {/* Overlay avec prénoms et sceau */}
-            <div style={{
-              position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center', gap: 16,
-            }}>
-              {/* Prénoms */}
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: GV, fontSize: 30, color: '#fff', lineHeight: 1.3, letterSpacing: 1, textShadow: '0 2px 8px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3)' }}>
-                  {data.marie1Prenom || 'Prénom'}
-                </div>
-                <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 16, color: '#fff', opacity: 0.8, margin: '2px 0', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>&</div>
-                <div style={{ fontFamily: GV, fontSize: 30, color: '#fff', lineHeight: 1.3, letterSpacing: 1, textShadow: '0 2px 8px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3)' }}>
-                  {data.marie2Prenom || 'Prénom'}
-                </div>
-              </div>
-              {/* Sceau de cire */}
-              {phase < 1 && (
-                <div style={{
-                  width: 72, height: 72, borderRadius: '50%',
-                  background: `radial-gradient(ellipse at 38% 32%, ${a}ff 0%, ${a}dd 40%, ${a}99 80%, ${a}77 100%)`,
-                  boxShadow: `0 6px 24px ${a}55, 0 3px 8px rgba(0,0,0,0.35), inset 0 3px 6px rgba(255,255,255,0.25), inset 0 -3px 8px rgba(0,0,0,0.25)`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  position: 'relative',
-                }}>
-                  <div style={{ position: 'absolute', inset: -3, borderRadius: '50%', border: `3px solid ${a}33` }} />
-                  <div style={{ position: 'absolute', inset: -1, borderRadius: '50%', border: `1px solid ${a}55` }} />
-                  <div style={{ position: 'absolute', inset: 8, borderRadius: '50%', border: `0.5px solid rgba(255,255,255,0.15)` }} />
-                  <div style={{ position: 'absolute', top: 8, left: 14, width: 22, height: 12, borderRadius: '50%', background: 'rgba(255,255,255,0.28)', filter: 'blur(5px)', pointerEvents: 'none' }} />
-                  <div style={{ position: 'relative', zIndex: 1 }}>
-                    {data.customLogoUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={data.customLogoUrl} alt="" style={{ width: 36, height: 36, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.9 }} />
-                    ) : (
-                      <span style={{ fontFamily: GV, fontSize: 20, color: 'rgba(255,255,255,0.9)', textShadow: '0 2px 1px rgba(0,0,0,0.35)', letterSpacing: 2 }}>
-                        {i1}&{i2}
-                      </span>
-                    )}
+            {/* Conteneur image + overlay — overflow hidden pour ne rien laisser dépasser */}
+            <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 4 }}>
+              {/* Image enveloppe */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={data.enveloppeImageUrl}
+                alt=""
+                style={{
+                  width: '100%', height: 'auto', display: 'block',
+                  boxShadow: '0 30px 70px rgba(0,0,0,0.25), 0 15px 35px rgba(0,0,0,0.15)',
+                }}
+              />
+              {/* Overlay centré à l'intérieur de l'image */}
+              <div style={{
+                position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center', gap: 8,
+                padding: '15% 12%', overflow: 'hidden',
+              }}>
+                {/* Prénoms — taille réduite pour rester dans l'enveloppe */}
+                <div style={{ textAlign: 'center', maxWidth: '100%' }}>
+                  <div style={{ fontFamily: GV, fontSize: 22, color: '#fff', lineHeight: 1.2, letterSpacing: 1, textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {data.marie1Prenom || 'Prénom'}
+                  </div>
+                  <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 14, color: '#fff', opacity: 0.8, margin: '1px 0', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>&</div>
+                  <div style={{ fontFamily: GV, fontSize: 22, color: '#fff', lineHeight: 1.2, letterSpacing: 1, textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {data.marie2Prenom || 'Prénom'}
                   </div>
                 </div>
-              )}
-              {phase === 1 && (
-                <div style={{ width: 72, height: 72, position: 'relative', display: 'flex' }}>
+                {/* Sceau de cire — plus petit */}
+                {phase < 1 && (
                   <div style={{
-                    width: 36, height: 72, borderRadius: '72px 0 0 72px',
-                    background: `radial-gradient(ellipse at 70% 35%, ${a}ff, ${a}77)`,
-                    boxShadow: `0 6px 16px ${a}44`,
-                    animation: 'sealBreakL 0.7s cubic-bezier(0.4,0,1,1) forwards',
-                  }} />
-                  <div style={{
-                    width: 36, height: 72, borderRadius: '0 72px 72px 0',
-                    background: `radial-gradient(ellipse at 30% 35%, ${a}ff, ${a}77)`,
-                    boxShadow: `0 6px 16px ${a}44`,
-                    animation: 'sealBreakR 0.7s cubic-bezier(0.4,0,1,1) forwards',
-                  }} />
+                    width: 56, height: 56, borderRadius: '50%', flexShrink: 0,
+                    background: `radial-gradient(ellipse at 38% 32%, ${a}ff 0%, ${a}dd 40%, ${a}99 80%, ${a}77 100%)`,
+                    boxShadow: `0 4px 18px ${a}55, 0 2px 6px rgba(0,0,0,0.35), inset 0 2px 4px rgba(255,255,255,0.25), inset 0 -2px 6px rgba(0,0,0,0.25)`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    position: 'relative',
+                  }}>
+                    <div style={{ position: 'absolute', inset: -2, borderRadius: '50%', border: `2px solid ${a}33` }} />
+                    <div style={{ position: 'absolute', inset: -1, borderRadius: '50%', border: `1px solid ${a}55` }} />
+                    <div style={{ position: 'absolute', inset: 6, borderRadius: '50%', border: `0.5px solid rgba(255,255,255,0.15)` }} />
+                    <div style={{ position: 'absolute', top: 6, left: 10, width: 18, height: 10, borderRadius: '50%', background: 'rgba(255,255,255,0.28)', filter: 'blur(4px)', pointerEvents: 'none' }} />
+                    <div style={{ position: 'relative', zIndex: 1 }}>
+                      {data.customLogoUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={data.customLogoUrl} alt="" style={{ width: 28, height: 28, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.9 }} />
+                      ) : (
+                        <span style={{ fontFamily: GV, fontSize: 16, color: 'rgba(255,255,255,0.9)', textShadow: '0 1px 1px rgba(0,0,0,0.35)', letterSpacing: 1 }}>
+                          {i1}&{i2}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {phase === 1 && (
+                  <div style={{ width: 56, height: 56, position: 'relative', display: 'flex', flexShrink: 0 }}>
+                    <div style={{
+                      width: 28, height: 56, borderRadius: '56px 0 0 56px',
+                      background: `radial-gradient(ellipse at 70% 35%, ${a}ff, ${a}77)`,
+                      boxShadow: `0 4px 12px ${a}44`,
+                      animation: 'sealBreakL 0.7s cubic-bezier(0.4,0,1,1) forwards',
+                    }} />
+                    <div style={{
+                      width: 28, height: 56, borderRadius: '0 56px 56px 0',
+                      background: `radial-gradient(ellipse at 30% 35%, ${a}ff, ${a}77)`,
+                      boxShadow: `0 4px 12px ${a}44`,
+                      animation: 'sealBreakR 0.7s cubic-bezier(0.4,0,1,1) forwards',
+                    }} />
+                  </div>
+                )}
+                {/* Touchez pour découvrir */}
+                <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 11, color: '#fff', opacity: 0.7, letterSpacing: 1.2, textShadow: '0 1px 6px rgba(0,0,0,0.6)', animation: phase === 0 ? 'tapPulse 2.5s ease-in-out infinite' : 'none' }}>
+                  {locale === 'en' ? 'Tap to discover' : 'Touchez pour découvrir'}
                 </div>
-              )}
-              {/* Touchez pour découvrir */}
-              <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 13, color: '#fff', opacity: 0.75, letterSpacing: 1.5, textShadow: '0 1px 6px rgba(0,0,0,0.5)', animation: phase === 0 ? 'tapPulse 2.5s ease-in-out infinite' : 'none' }}>
-                {locale === 'en' ? 'Tap to discover' : 'Touchez pour découvrir'}
               </div>
             </div>
           </div>
