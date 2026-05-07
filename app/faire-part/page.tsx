@@ -4330,7 +4330,7 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
             boxShadow: `0 35px 70px rgba(0,0,0,0.18), 0 15px 30px rgba(0,0,0,0.10), 0 0 0 1px ${a}10`,
             overflow: 'hidden',
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            padding: '90px 30px 50px',
+            padding: '130px 30px 50px',
           }}>
             {/* Texture papier subtile */}
             <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.025, pointerEvents: 'none' }}>
