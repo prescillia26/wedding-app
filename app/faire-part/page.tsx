@@ -1672,13 +1672,9 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                 'https://res.cloudinary.com/dau96mui2/image/upload/v1778145302/156_xb1yfl.png',
                 'https://res.cloudinary.com/dau96mui2/image/upload/v1778145294/157_dawbum.png',
                 'https://res.cloudinary.com/dau96mui2/image/upload/v1778145295/158_jls9sc.png',
-                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145300/160_n1mwsm.png',
-                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145301/161_qls51e.png',
                 'https://res.cloudinary.com/dau96mui2/image/upload/v1778145303/164_h3tmcq.png',
                 'https://res.cloudinary.com/dau96mui2/image/upload/v1778145300/165_huqh2q.png',
                 'https://res.cloudinary.com/dau96mui2/image/upload/v1778145302/166_mbrbxn.png',
-                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145304/167_odcdh9.png',
-                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145305/168_mi0ie4.png',
               ].map((url, idx) => {
                 const sel = data.enveloppeImageUrl === url
                 return (
