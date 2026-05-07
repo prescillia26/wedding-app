@@ -250,6 +250,7 @@ interface FormData {
   customLogoUrl?: string
   customLogoSize?: number // 50-150, default 100
   customLogoColor?: string // '' = original, ou hex color
+  enveloppeImageUrl?: string
 }
 const defaultCeremony: Ceremony = {
   type: 'Cérémonie religieuse / Houppa',
@@ -1642,6 +1643,59 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             )
           })}
         </div>
+
+        {/* ── Choix image enveloppe ── */}
+        {(data.introAnimation || 'enveloppe') === 'enveloppe' && (
+          <div style={{ marginTop: 16 }}>
+            <Label>{locale === 'en' ? 'Envelope design' : "Design de l'enveloppe"}</Label>
+            <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>
+              {locale === 'en' ? 'Choose an elegant envelope image, or keep the default style.' : "Choisissez une image d'enveloppe élégante, ou gardez le style par défaut."}
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+              {/* Option par défaut (CSS) */}
+              <button type="button" onClick={() => onChange({ enveloppeImageUrl: '' })} style={{
+                ...BTN, padding: 4, borderRadius: 10, overflow: 'hidden',
+                border: `2px solid ${!data.enveloppeImageUrl ? THEMES[data.style].accent : '#fecdd3'}`,
+                background: !data.enveloppeImageUrl ? `${THEMES[data.style].accent}12` : 'white',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+              }}>
+                <div style={{ width: '100%', aspectRatio: '3/4', borderRadius: 6, background: `linear-gradient(160deg, ${THEMES[data.style].fond} 0%, color-mix(in srgb, ${THEMES[data.style].fond} 82%, #000) 100%)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontSize: 24 }}>💌</span>
+                </div>
+                <span style={{ fontSize: 9, color: !data.enveloppeImageUrl ? THEMES[data.style].accent : '#6a5040', fontWeight: !data.enveloppeImageUrl ? 700 : 400 }}>
+                  {locale === 'en' ? 'Classic' : 'Classique'}
+                </span>
+              </button>
+              {/* Images enveloppes */}
+              {[
+                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145307/155_ns6sse.png',
+                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145302/156_xb1yfl.png',
+                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145294/157_dawbum.png',
+                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145295/158_jls9sc.png',
+                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145300/160_n1mwsm.png',
+                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145301/161_qls51e.png',
+                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145303/164_h3tmcq.png',
+                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145300/165_huqh2q.png',
+                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145302/166_mbrbxn.png',
+                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145304/167_odcdh9.png',
+                'https://res.cloudinary.com/dau96mui2/image/upload/v1778145305/168_mi0ie4.png',
+              ].map((url, idx) => {
+                const sel = data.enveloppeImageUrl === url
+                return (
+                  <button key={idx} type="button" onClick={() => onChange({ enveloppeImageUrl: url })} style={{
+                    ...BTN, padding: 4, borderRadius: 10, overflow: 'hidden',
+                    border: `2px solid ${sel ? THEMES[data.style].accent : '#fecdd3'}`,
+                    background: sel ? `${THEMES[data.style].accent}12` : 'white',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+                  }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt={`Envelope ${idx + 1}`} style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', borderRadius: 6 }} />
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── Monogramme ── */}
@@ -4266,6 +4320,7 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
   const envBg = theme.dark ? '#2a1f15' : fond
   const envBgDark = theme.dark ? '#1a1208' : `color-mix(in srgb, ${fond} 82%, #000)`
   const textColor = theme.dark ? '#e0d0c0' : `color-mix(in srgb, ${a} 70%, #000)`
+  const useImage = !!data.enveloppeImageUrl
 
   // Ornement SVG floral élaboré pour les coins
   const cornerOrn = (rot: string) => (
@@ -4299,182 +4354,271 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
         @keyframes sealBreakR{to{transform:translateX(16px) translateY(16px) rotate(20deg);opacity:0}}
         @keyframes tapPulse{0%,100%{opacity:0.45}50%{opacity:1}}
         @keyframes envAppear{from{opacity:0;transform:rotate(-2.5deg) translateY(30px) scale(0.92)}to{opacity:1;transform:rotate(-2.5deg) translateY(0) scale(1)}}
+        @keyframes imgEnvFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+        @keyframes imgEnvAppear{from{opacity:0;transform:translateY(40px) scale(0.9)}to{opacity:1;transform:translateY(0) scale(1)}}
+        @keyframes imgEnvOpen{from{transform:scale(1)}to{transform:scale(1.05);opacity:0}}
       `}</style>
 
       {/* Skip */}
       <button onClick={e => { e.stopPropagation(); onDone() }} style={{
         position: 'absolute', top: 20, right: 20, background: 'none', border: 'none',
-        color: a, opacity: 0.3, fontSize: 11, fontFamily: FP, letterSpacing: 3,
+        color: useImage ? '#fff' : a, opacity: 0.4, fontSize: 11, fontFamily: FP, letterSpacing: 3,
         cursor: 'pointer', zIndex: 10, textTransform: 'uppercase',
+        textShadow: useImage ? '0 1px 4px rgba(0,0,0,0.5)' : 'none',
       } as React.CSSProperties}>SKIP</button>
 
-      {/* ═══ ENVELOPPE ═══ */}
-      <div style={{
-        position: 'relative', width: 300, height: 480,
-        animation: phase === 0 ? 'envFloat 3.5s ease-in-out infinite' : 'none',
-        willChange: 'transform',
-      }}>
-        {/* Apparition initiale */}
-        <div style={{ animation: 'envAppear 1s cubic-bezier(0.16,1,0.3,1) forwards' }}>
-
-          {/* Corps de l'enveloppe */}
-          <div style={{
-            position: 'relative', width: '100%', height: 480,
-            background: `linear-gradient(160deg, ${envBg} 0%, ${envBgDark} 100%)`,
-            borderRadius: 14,
-            boxShadow: `0 40px 80px rgba(0,0,0,0.20), 0 20px 40px rgba(0,0,0,0.10), 0 0 0 1px ${a}15, inset 0 1px 0 rgba(255,255,255,0.15)`,
-            overflow: 'hidden',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            padding: '120px 30px 40px',
-          }}>
-            {/* Bordure dorée intérieure */}
-            <div style={{ position: 'absolute', inset: 6, borderRadius: 10, border: `0.5px solid ${a}20`, pointerEvents: 'none', zIndex: 1 }} />
-
-            {/* Texture papier */}
-            <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.03, pointerEvents: 'none' }}>
-              <filter id="paperTex"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="5" /><feComposite in="SourceGraphic" operator="in" /></filter>
-              <rect width="100%" height="100%" filter="url(#paperTex)" />
-            </svg>
-
-            {/* Liner intérieur subtil (dégradé couleur thème) */}
-            <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, ${a}05 0%, transparent 30%, transparent 70%, ${a}05 100%)`, pointerEvents: 'none' }} />
-
-            {/* Ornements coins — plus grands */}
-            <div style={{ position: 'absolute', top: 8, left: 8, zIndex: 1 }}>{cornerOrn('rotate(0)')}</div>
-            <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}>{cornerOrn('scaleX(-1)')}</div>
-            <div style={{ position: 'absolute', bottom: 8, left: 8, zIndex: 1 }}>{cornerOrn('scaleY(-1)')}</div>
-            <div style={{ position: 'absolute', bottom: 8, right: 8, zIndex: 1 }}>{cornerOrn('scale(-1)')}</div>
-
-            {/* Séparateur horizontal haut */}
-            <div style={{ position: 'absolute', top: 70, left: 30, right: 30, display: 'flex', alignItems: 'center', gap: 8, zIndex: 1 }}>
-              <div style={{ flex: 1, height: '0.5px', background: a, opacity: 0.1 }} />
-              <svg width="12" height="12" viewBox="0 0 12 12" style={{ opacity: 0.15 }}><path d="M6,0 L8,4 L12,6 L8,8 L6,12 L4,8 L0,6 L4,4Z" fill={a} /></svg>
-              <div style={{ flex: 1, height: '0.5px', background: a, opacity: 0.1 }} />
-            </div>
-
-            {/* Séparateur horizontal bas */}
-            <div style={{ position: 'absolute', bottom: 60, left: 30, right: 30, display: 'flex', alignItems: 'center', gap: 8, zIndex: 1 }}>
-              <div style={{ flex: 1, height: '0.5px', background: a, opacity: 0.1 }} />
-              <svg width="12" height="12" viewBox="0 0 12 12" style={{ opacity: 0.15 }}><path d="M6,0 L8,4 L12,6 L8,8 L6,12 L4,8 L0,6 L4,4Z" fill={a} /></svg>
-              <div style={{ flex: 1, height: '0.5px', background: a, opacity: 0.1 }} />
-            </div>
-
-            {/* ── EN HAUT : Prénoms en calligraphie ── */}
-            <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', marginBottom: 32 }}>
-              <div style={{ fontFamily: GV, fontSize: 28, color: textColor, lineHeight: 1.3, letterSpacing: 1 }}>
-                {data.marie1Prenom || 'Prénom'}
+      {useImage ? (
+        /* ═══ ENVELOPPE IMAGE ═══ */
+        <div style={{
+          position: 'relative', width: 320, maxWidth: '88vw',
+          animation: phase === 0 ? 'imgEnvFloat 3.5s ease-in-out infinite' : phase === 1 ? 'imgEnvOpen 1.5s cubic-bezier(0.16,1,0.3,1) forwards' : 'none',
+          willChange: 'transform, opacity',
+        }}>
+          <div style={{ animation: 'imgEnvAppear 1s cubic-bezier(0.16,1,0.3,1) forwards' }}>
+            {/* Image enveloppe */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={data.enveloppeImageUrl}
+              alt=""
+              style={{
+                width: '100%', height: 'auto', display: 'block',
+                borderRadius: 4,
+                boxShadow: '0 30px 70px rgba(0,0,0,0.25), 0 15px 35px rgba(0,0,0,0.15)',
+                filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.2))',
+              }}
+            />
+            {/* Overlay avec prénoms et sceau */}
+            <div style={{
+              position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center', gap: 16,
+            }}>
+              {/* Prénoms */}
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontFamily: GV, fontSize: 30, color: '#fff', lineHeight: 1.3, letterSpacing: 1, textShadow: '0 2px 8px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3)' }}>
+                  {data.marie1Prenom || 'Prénom'}
+                </div>
+                <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 16, color: '#fff', opacity: 0.8, margin: '2px 0', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>&</div>
+                <div style={{ fontFamily: GV, fontSize: 30, color: '#fff', lineHeight: 1.3, letterSpacing: 1, textShadow: '0 2px 8px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3)' }}>
+                  {data.marie2Prenom || 'Prénom'}
+                </div>
               </div>
-              <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 16, color: textColor, opacity: 0.5, margin: '2px 0' }}>&</div>
-              <div style={{ fontFamily: GV, fontSize: 28, color: textColor, lineHeight: 1.3, letterSpacing: 1 }}>
-                {data.marie2Prenom || 'Prénom'}
-              </div>
-            </div>
-
-            {/* ── AU CENTRE : Sceau de cire luxe ── */}
-            <div style={{ position: 'relative', zIndex: 2, marginBottom: 28 }}>
-              {/* Sceau intact (phase 0) */}
+              {/* Sceau de cire */}
               {phase < 1 && (
                 <div style={{
-                  width: 88, height: 88, borderRadius: '50%',
+                  width: 72, height: 72, borderRadius: '50%',
                   background: `radial-gradient(ellipse at 38% 32%, ${a}ff 0%, ${a}dd 40%, ${a}99 80%, ${a}77 100%)`,
-                  boxShadow: `0 8px 28px ${a}55, 0 3px 8px rgba(0,0,0,0.3), inset 0 3px 6px rgba(255,255,255,0.25), inset 0 -3px 8px rgba(0,0,0,0.25)`,
+                  boxShadow: `0 6px 24px ${a}55, 0 3px 8px rgba(0,0,0,0.35), inset 0 3px 6px rgba(255,255,255,0.25), inset 0 -3px 8px rgba(0,0,0,0.25)`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   position: 'relative',
                 }}>
-                  {/* Bord extérieur irrégulier (texture cire) */}
-                  <div style={{ position: 'absolute', inset: -4, borderRadius: '50%', border: `4px solid ${a}33`, background: 'transparent' }} />
+                  <div style={{ position: 'absolute', inset: -3, borderRadius: '50%', border: `3px solid ${a}33` }} />
                   <div style={{ position: 'absolute', inset: -1, borderRadius: '50%', border: `1px solid ${a}55` }} />
-                  {/* Cercle intérieur gravé */}
-                  <div style={{ position: 'absolute', inset: 10, borderRadius: '50%', border: `0.5px solid rgba(255,255,255,0.15)` }} />
-                  {/* Reflet lumineux principal */}
-                  <div style={{ position: 'absolute', top: 10, left: 18, width: 28, height: 16, borderRadius: '50%', background: 'rgba(255,255,255,0.28)', filter: 'blur(6px)', pointerEvents: 'none' }} />
-                  {/* Petit reflet secondaire */}
-                  <div style={{ position: 'absolute', bottom: 16, right: 20, width: 10, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', filter: 'blur(3px)', pointerEvents: 'none' }} />
-                  {/* Logo ou initiales sur le sceau */}
-                  <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ position: 'absolute', inset: 8, borderRadius: '50%', border: `0.5px solid rgba(255,255,255,0.15)` }} />
+                  <div style={{ position: 'absolute', top: 8, left: 14, width: 22, height: 12, borderRadius: '50%', background: 'rgba(255,255,255,0.28)', filter: 'blur(5px)', pointerEvents: 'none' }} />
+                  <div style={{ position: 'relative', zIndex: 1 }}>
                     {data.customLogoUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={data.customLogoUrl} alt="" style={{ width: 44, height: 44, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.9 }} />
+                      <img src={data.customLogoUrl} alt="" style={{ width: 36, height: 36, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.9 }} />
                     ) : (
-                      <span style={{ fontFamily: GV, fontSize: 24, color: 'rgba(255,255,255,0.9)', textShadow: '0 2px 1px rgba(0,0,0,0.35), 0 -1px 0 rgba(255,255,255,0.2)', letterSpacing: 2 }}>
+                      <span style={{ fontFamily: GV, fontSize: 20, color: 'rgba(255,255,255,0.9)', textShadow: '0 2px 1px rgba(0,0,0,0.35)', letterSpacing: 2 }}>
                         {i1}&{i2}
                       </span>
                     )}
                   </div>
                 </div>
               )}
-              {/* Sceau qui se brise (phase 1) */}
               {phase === 1 && (
-                <div style={{ width: 88, height: 88, position: 'relative', display: 'flex' }}>
+                <div style={{ width: 72, height: 72, position: 'relative', display: 'flex' }}>
                   <div style={{
-                    width: 44, height: 88, borderRadius: '88px 0 0 88px',
+                    width: 36, height: 72, borderRadius: '72px 0 0 72px',
                     background: `radial-gradient(ellipse at 70% 35%, ${a}ff, ${a}77)`,
                     boxShadow: `0 6px 16px ${a}44`,
                     animation: 'sealBreakL 0.7s cubic-bezier(0.4,0,1,1) forwards',
                   }} />
                   <div style={{
-                    width: 44, height: 88, borderRadius: '0 88px 88px 0',
+                    width: 36, height: 72, borderRadius: '0 72px 72px 0',
                     background: `radial-gradient(ellipse at 30% 35%, ${a}ff, ${a}77)`,
                     boxShadow: `0 6px 16px ${a}44`,
                     animation: 'sealBreakR 0.7s cubic-bezier(0.4,0,1,1) forwards',
                   }} />
                 </div>
               )}
-            </div>
-
-            {/* ── EN BAS : "Touchez pour découvrir" ── */}
-            <div style={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
-              <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 14, color: textColor, opacity: 0.65, letterSpacing: 1.5, animation: phase === 0 ? 'tapPulse 2.5s ease-in-out infinite' : 'none' }}>
+              {/* Touchez pour découvrir */}
+              <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 13, color: '#fff', opacity: 0.75, letterSpacing: 1.5, textShadow: '0 1px 6px rgba(0,0,0,0.5)', animation: phase === 0 ? 'tapPulse 2.5s ease-in-out infinite' : 'none' }}>
                 {locale === 'en' ? 'Tap to discover' : 'Touchez pour découvrir'}
               </div>
             </div>
-
-            {/* V pliure en bas */}
-            <svg style={{ position: 'absolute', bottom: 0, left: 0, right: 0, pointerEvents: 'none' }} viewBox="0 0 300 60" preserveAspectRatio="none">
-              <path d="M0 60 L150 15 L300 60" fill={`${a}06`} stroke={`${a}0a`} strokeWidth="0.5" />
-            </svg>
-          </div>
-
-          {/* Rabat triangulaire — s'ouvre vers l'arrière en 3D */}
-          <div style={{
-            position: 'absolute', top: -1, left: -1, right: -1, height: 100,
-            transformOrigin: 'top center',
-            transform: phase >= 1 ? 'perspective(800px) rotateX(-160deg)' : 'perspective(800px) rotateX(0)',
-            transition: 'transform 1.2s cubic-bezier(0.16,1,0.3,1)',
-            zIndex: 10,
-            transformStyle: 'preserve-3d',
-          } as React.CSSProperties}>
-            {/* Face avant du rabat (visible quand fermé) */}
-            <div style={{
-              position: 'absolute', inset: 0,
-              background: `linear-gradient(170deg, ${envBg} 15%, ${envBgDark})`,
-              border: `1px solid ${a}12`, borderBottom: 'none',
-              borderRadius: '12px 12px 0 0',
-              clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
-              backfaceVisibility: 'hidden',
-            } as React.CSSProperties}>
-              <div style={{ position: 'absolute', top: '30%', left: '50%', transform: 'translateX(-50%)', opacity: 0.08 }}>
-                <svg width="80" height="35" viewBox="0 0 80 35">
-                  <path d="M5,30 Q20,5 40,18 Q60,5 75,30" fill="none" stroke={a} strokeWidth="0.7" strokeLinecap="round" />
-                  <circle cx="40" cy="15" r="2" fill={a} opacity="0.4" />
-                  <circle cx="18" cy="14" r="1" fill={a} opacity="0.3" />
-                  <circle cx="62" cy="14" r="1" fill={a} opacity="0.3" />
-                </svg>
-              </div>
-            </div>
-            {/* Face arrière du rabat (visible quand ouvert) */}
-            <div style={{
-              position: 'absolute', inset: 0,
-              background: `linear-gradient(10deg, ${envBg} 30%, ${envBgDark})`,
-              borderRadius: '12px 12px 0 0',
-              clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
-              backfaceVisibility: 'hidden',
-              transform: 'rotateX(180deg)',
-              boxShadow: `inset 0 -2px 8px rgba(0,0,0,0.08)`,
-            } as React.CSSProperties} />
           </div>
         </div>
-      </div>
+      ) : (
+        /* ═══ ENVELOPPE CSS CLASSIQUE ═══ */
+        <div style={{
+          position: 'relative', width: 300, height: 480,
+          animation: phase === 0 ? 'envFloat 3.5s ease-in-out infinite' : 'none',
+          willChange: 'transform',
+        }}>
+          {/* Apparition initiale */}
+          <div style={{ animation: 'envAppear 1s cubic-bezier(0.16,1,0.3,1) forwards' }}>
+
+            {/* Corps de l'enveloppe */}
+            <div style={{
+              position: 'relative', width: '100%', height: 480,
+              background: `linear-gradient(160deg, ${envBg} 0%, ${envBgDark} 100%)`,
+              borderRadius: 14,
+              boxShadow: `0 40px 80px rgba(0,0,0,0.20), 0 20px 40px rgba(0,0,0,0.10), 0 0 0 1px ${a}15, inset 0 1px 0 rgba(255,255,255,0.15)`,
+              overflow: 'hidden',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              padding: '120px 30px 40px',
+            }}>
+              {/* Bordure dorée intérieure */}
+              <div style={{ position: 'absolute', inset: 6, borderRadius: 10, border: `0.5px solid ${a}20`, pointerEvents: 'none', zIndex: 1 }} />
+
+              {/* Texture papier */}
+              <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.03, pointerEvents: 'none' }}>
+                <filter id="paperTex"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="5" /><feComposite in="SourceGraphic" operator="in" /></filter>
+                <rect width="100%" height="100%" filter="url(#paperTex)" />
+              </svg>
+
+              {/* Liner intérieur subtil (dégradé couleur thème) */}
+              <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, ${a}05 0%, transparent 30%, transparent 70%, ${a}05 100%)`, pointerEvents: 'none' }} />
+
+              {/* Ornements coins — plus grands */}
+              <div style={{ position: 'absolute', top: 8, left: 8, zIndex: 1 }}>{cornerOrn('rotate(0)')}</div>
+              <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}>{cornerOrn('scaleX(-1)')}</div>
+              <div style={{ position: 'absolute', bottom: 8, left: 8, zIndex: 1 }}>{cornerOrn('scaleY(-1)')}</div>
+              <div style={{ position: 'absolute', bottom: 8, right: 8, zIndex: 1 }}>{cornerOrn('scale(-1)')}</div>
+
+              {/* Séparateur horizontal haut */}
+              <div style={{ position: 'absolute', top: 70, left: 30, right: 30, display: 'flex', alignItems: 'center', gap: 8, zIndex: 1 }}>
+                <div style={{ flex: 1, height: '0.5px', background: a, opacity: 0.1 }} />
+                <svg width="12" height="12" viewBox="0 0 12 12" style={{ opacity: 0.15 }}><path d="M6,0 L8,4 L12,6 L8,8 L6,12 L4,8 L0,6 L4,4Z" fill={a} /></svg>
+                <div style={{ flex: 1, height: '0.5px', background: a, opacity: 0.1 }} />
+              </div>
+
+              {/* Séparateur horizontal bas */}
+              <div style={{ position: 'absolute', bottom: 60, left: 30, right: 30, display: 'flex', alignItems: 'center', gap: 8, zIndex: 1 }}>
+                <div style={{ flex: 1, height: '0.5px', background: a, opacity: 0.1 }} />
+                <svg width="12" height="12" viewBox="0 0 12 12" style={{ opacity: 0.15 }}><path d="M6,0 L8,4 L12,6 L8,8 L6,12 L4,8 L0,6 L4,4Z" fill={a} /></svg>
+                <div style={{ flex: 1, height: '0.5px', background: a, opacity: 0.1 }} />
+              </div>
+
+              {/* ── EN HAUT : Prénoms en calligraphie ── */}
+              <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', marginBottom: 32 }}>
+                <div style={{ fontFamily: GV, fontSize: 28, color: textColor, lineHeight: 1.3, letterSpacing: 1 }}>
+                  {data.marie1Prenom || 'Prénom'}
+                </div>
+                <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 16, color: textColor, opacity: 0.5, margin: '2px 0' }}>&</div>
+                <div style={{ fontFamily: GV, fontSize: 28, color: textColor, lineHeight: 1.3, letterSpacing: 1 }}>
+                  {data.marie2Prenom || 'Prénom'}
+                </div>
+              </div>
+
+              {/* ── AU CENTRE : Sceau de cire luxe ── */}
+              <div style={{ position: 'relative', zIndex: 2, marginBottom: 28 }}>
+                {/* Sceau intact (phase 0) */}
+                {phase < 1 && (
+                  <div style={{
+                    width: 88, height: 88, borderRadius: '50%',
+                    background: `radial-gradient(ellipse at 38% 32%, ${a}ff 0%, ${a}dd 40%, ${a}99 80%, ${a}77 100%)`,
+                    boxShadow: `0 8px 28px ${a}55, 0 3px 8px rgba(0,0,0,0.3), inset 0 3px 6px rgba(255,255,255,0.25), inset 0 -3px 8px rgba(0,0,0,0.25)`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    position: 'relative',
+                  }}>
+                    {/* Bord extérieur irrégulier (texture cire) */}
+                    <div style={{ position: 'absolute', inset: -4, borderRadius: '50%', border: `4px solid ${a}33`, background: 'transparent' }} />
+                    <div style={{ position: 'absolute', inset: -1, borderRadius: '50%', border: `1px solid ${a}55` }} />
+                    {/* Cercle intérieur gravé */}
+                    <div style={{ position: 'absolute', inset: 10, borderRadius: '50%', border: `0.5px solid rgba(255,255,255,0.15)` }} />
+                    {/* Reflet lumineux principal */}
+                    <div style={{ position: 'absolute', top: 10, left: 18, width: 28, height: 16, borderRadius: '50%', background: 'rgba(255,255,255,0.28)', filter: 'blur(6px)', pointerEvents: 'none' }} />
+                    {/* Petit reflet secondaire */}
+                    <div style={{ position: 'absolute', bottom: 16, right: 20, width: 10, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', filter: 'blur(3px)', pointerEvents: 'none' }} />
+                    {/* Logo ou initiales sur le sceau */}
+                    <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {data.customLogoUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={data.customLogoUrl} alt="" style={{ width: 44, height: 44, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.9 }} />
+                      ) : (
+                        <span style={{ fontFamily: GV, fontSize: 24, color: 'rgba(255,255,255,0.9)', textShadow: '0 2px 1px rgba(0,0,0,0.35), 0 -1px 0 rgba(255,255,255,0.2)', letterSpacing: 2 }}>
+                          {i1}&{i2}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {/* Sceau qui se brise (phase 1) */}
+                {phase === 1 && (
+                  <div style={{ width: 88, height: 88, position: 'relative', display: 'flex' }}>
+                    <div style={{
+                      width: 44, height: 88, borderRadius: '88px 0 0 88px',
+                      background: `radial-gradient(ellipse at 70% 35%, ${a}ff, ${a}77)`,
+                      boxShadow: `0 6px 16px ${a}44`,
+                      animation: 'sealBreakL 0.7s cubic-bezier(0.4,0,1,1) forwards',
+                    }} />
+                    <div style={{
+                      width: 44, height: 88, borderRadius: '0 88px 88px 0',
+                      background: `radial-gradient(ellipse at 30% 35%, ${a}ff, ${a}77)`,
+                      boxShadow: `0 6px 16px ${a}44`,
+                      animation: 'sealBreakR 0.7s cubic-bezier(0.4,0,1,1) forwards',
+                    }} />
+                  </div>
+                )}
+              </div>
+
+              {/* ── EN BAS : "Touchez pour découvrir" ── */}
+              <div style={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
+                <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 14, color: textColor, opacity: 0.65, letterSpacing: 1.5, animation: phase === 0 ? 'tapPulse 2.5s ease-in-out infinite' : 'none' }}>
+                  {locale === 'en' ? 'Tap to discover' : 'Touchez pour découvrir'}
+                </div>
+              </div>
+
+              {/* V pliure en bas */}
+              <svg style={{ position: 'absolute', bottom: 0, left: 0, right: 0, pointerEvents: 'none' }} viewBox="0 0 300 60" preserveAspectRatio="none">
+                <path d="M0 60 L150 15 L300 60" fill={`${a}06`} stroke={`${a}0a`} strokeWidth="0.5" />
+              </svg>
+            </div>
+
+            {/* Rabat triangulaire — s'ouvre vers l'arrière en 3D */}
+            <div style={{
+              position: 'absolute', top: -1, left: -1, right: -1, height: 100,
+              transformOrigin: 'top center',
+              transform: phase >= 1 ? 'perspective(800px) rotateX(-160deg)' : 'perspective(800px) rotateX(0)',
+              transition: 'transform 1.2s cubic-bezier(0.16,1,0.3,1)',
+              zIndex: 10,
+              transformStyle: 'preserve-3d',
+            } as React.CSSProperties}>
+              {/* Face avant du rabat (visible quand fermé) */}
+              <div style={{
+                position: 'absolute', inset: 0,
+                background: `linear-gradient(170deg, ${envBg} 15%, ${envBgDark})`,
+                border: `1px solid ${a}12`, borderBottom: 'none',
+                borderRadius: '12px 12px 0 0',
+                clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
+                backfaceVisibility: 'hidden',
+              } as React.CSSProperties}>
+                <div style={{ position: 'absolute', top: '30%', left: '50%', transform: 'translateX(-50%)', opacity: 0.08 }}>
+                  <svg width="80" height="35" viewBox="0 0 80 35">
+                    <path d="M5,30 Q20,5 40,18 Q60,5 75,30" fill="none" stroke={a} strokeWidth="0.7" strokeLinecap="round" />
+                    <circle cx="40" cy="15" r="2" fill={a} opacity="0.4" />
+                    <circle cx="18" cy="14" r="1" fill={a} opacity="0.3" />
+                    <circle cx="62" cy="14" r="1" fill={a} opacity="0.3" />
+                  </svg>
+                </div>
+              </div>
+              {/* Face arrière du rabat (visible quand ouvert) */}
+              <div style={{
+                position: 'absolute', inset: 0,
+                background: `linear-gradient(10deg, ${envBg} 30%, ${envBgDark})`,
+                borderRadius: '12px 12px 0 0',
+                clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
+                backfaceVisibility: 'hidden',
+                transform: 'rotateX(180deg)',
+                boxShadow: `inset 0 -2px 8px rgba(0,0,0,0.08)`,
+              } as React.CSSProperties} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
