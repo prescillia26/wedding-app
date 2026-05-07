@@ -4316,7 +4316,7 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
 
       {/* ═══ ENVELOPPE ═══ */}
       <div style={{
-        position: 'relative', width: 300, height: 420,
+        position: 'relative', width: 300,
         animation: phase === 0 ? 'envFloat 3.5s ease-in-out infinite' : 'none',
         willChange: 'transform',
       }}>
@@ -4324,13 +4324,13 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
 
           {/* Corps principal */}
           <div style={{
-            position: 'relative', width: '100%', height: 420,
+            position: 'relative', width: '100%',
             background: `linear-gradient(165deg, ${es.bg} 0%, ${es.bgDark} 100%)`,
             borderRadius: 16,
             boxShadow: `0 35px 70px rgba(0,0,0,0.18), 0 15px 30px rgba(0,0,0,0.10), 0 0 0 1px ${a}10`,
             overflow: 'hidden',
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            padding: '80px 30px 40px',
+            padding: '90px 30px 50px',
           }}>
             {/* Texture papier subtile */}
             <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.025, pointerEvents: 'none' }}>
