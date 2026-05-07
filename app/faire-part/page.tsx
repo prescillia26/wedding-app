@@ -4328,10 +4328,10 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
       <style>{`
         @keyframes envFloat{0%,100%{transform:translateY(0) rotate(-1.5deg)}50%{transform:translateY(-10px) rotate(-0.8deg)}}
         @keyframes envAppear{from{opacity:0;transform:translateY(40px) scale(0.92) rotate(-1.5deg)}to{opacity:1;transform:translateY(0) scale(1) rotate(-1.5deg)}}
-        @keyframes sealCrack{0%{transform:scale(1);opacity:1}40%{transform:scale(1.08);opacity:1}100%{transform:scale(0.6);opacity:0}}
+        @keyframes sealLift{0%{transform:scale(1) translateY(0);opacity:1}100%{transform:scale(1.15) translateY(-30px);opacity:0}}
         @keyframes tapPulse{0%,100%{opacity:0.4}50%{opacity:0.9}}
-        @keyframes ribbonFallL{0%{transform:rotate(0) translateY(0)}100%{transform:rotate(-45deg) translateY(80px) translateX(-30px);opacity:0}}
-        @keyframes ribbonFallR{0%{transform:rotate(0) translateY(0)}100%{transform:rotate(40deg) translateY(90px) translateX(25px);opacity:0}}
+        @keyframes ribbonFallL{0%{transform:rotate(0) translateY(0);opacity:1}100%{transform:rotate(-15deg) translateY(-40px) translateX(-20px);opacity:0}}
+        @keyframes ribbonFallR{0%{transform:rotate(0) translateY(0);opacity:1}100%{transform:rotate(15deg) translateY(-40px) translateX(20px);opacity:0}}
         @keyframes ribbonLoopWiggle{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
         @keyframes flapOpen{from{transform:perspective(800px) rotateX(0deg)}to{transform:perspective(800px) rotateX(-170deg)}}
         @keyframes sealShine{0%,100%{background-position:30% 25%}50%{background-position:60% 40%}}
@@ -4525,20 +4525,14 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
                       </div>
                     </div>
                   )}
-                  {/* Sceau qui craque */}
+                  {/* Sceau qui s'envole doucement */}
                   {phase === 1 && (
                     <div style={{
                       width: 92, height: 92, borderRadius: '50%', position: 'relative',
-                      background: `radial-gradient(ellipse at 35% 28%, ${es.sealColor}, color-mix(in srgb, ${es.sealColor} 60%, #000))`,
-                      animation: 'sealCrack 0.8s cubic-bezier(0.4,0,1,1) forwards',
-                    }}>
-                      {/* Lignes de fissure */}
-                      <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} viewBox="0 0 92 92">
-                        <path d="M46,10 L42,30 L50,46 L38,56 L46,80" fill="none" stroke="rgba(0,0,0,0.4)" strokeWidth="1.5" strokeLinecap="round" />
-                        <path d="M50,46 L65,40 L80,46" fill="none" stroke="rgba(0,0,0,0.3)" strokeWidth="1" strokeLinecap="round" />
-                        <path d="M42,30 L25,25" fill="none" stroke="rgba(0,0,0,0.3)" strokeWidth="1" strokeLinecap="round" />
-                      </svg>
-                    </div>
+                      background: `radial-gradient(ellipse at 35% 28%, color-mix(in srgb, ${es.sealColor} 100%, #fff 20%) 0%, ${es.sealColor} 35%, color-mix(in srgb, ${es.sealColor} 80%, #000) 75%)`,
+                      boxShadow: `0 8px 30px ${es.sealColor}55, 0 3px 10px rgba(0,0,0,0.3)`,
+                      animation: 'sealLift 0.9s cubic-bezier(0.16,1,0.3,1) forwards',
+                    }} />
                   )}
                 </>
               )}
