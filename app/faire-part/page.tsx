@@ -98,8 +98,23 @@ const ILLUSTRATIONS_COUPLES = [
   { id: 'couple-06', label: '🌸 Arche florale rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878838/94_l7zjbv.png' },
 ] as const
 
-const FRAMES_STRONG_BG = new Set(['frame-80', 'frame-107', 'frame-108'])
-const FRAMES: { id: string; label: string; url: string | null }[] = [
+// Vidéos animées pour page d'accueil et cadres
+const VIDEO_BACKGROUNDS: { id: string; label: string; url: string; textPosition: 'top' | 'center' | 'center-top'; needsOverlay: boolean; dark?: boolean }[] = [
+  { id: 'vid-192', label: '✨ Cadre doré baroque', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511807/192_tcw3l4.mp4', textPosition: 'center', needsOverlay: false },
+  { id: 'vid-178', label: '🏛️ Palais & fontaine', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511799/178_ngv1mw.mp4', textPosition: 'center', needsOverlay: false },
+  { id: 'vid-191', label: '🌙 Nuit étoilée', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511807/191_cvtes6.mp4', textPosition: 'center', needsOverlay: false, dark: true },
+  { id: 'vid-176', label: '🦢 Jardin romantique', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511791/176_xkqggp.mp4', textPosition: 'center-top', needsOverlay: false },
+  { id: 'vid-189', label: '🌸 Houppa fleurie', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511805/189_qyfzpf.mp4', textPosition: 'center-top', needsOverlay: false },
+  { id: 'vid-187', label: '🌿 Jardin escalier', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511807/187_utfk2j.mp4', textPosition: 'top', needsOverlay: false },
+  { id: 'vid-173', label: '💐 Arche florale', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511799/173_tof9lr.mp4', textPosition: 'center-top', needsOverlay: true },
+  { id: 'vid-177', label: '🌻 Tournesols', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511793/177_ahtttq.mp4', textPosition: 'center-top', needsOverlay: true },
+  { id: 'vid-180', label: '💕 Cœurs roses', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511798/180_kafbld.mp4', textPosition: 'top', needsOverlay: true },
+  { id: 'vid-190', label: '🎪 Mandap fleuri', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511806/190_uc4hem.mp4', textPosition: 'center', needsOverlay: true },
+  { id: 'vid-194', label: '🕯️ Nuit & chandeliers', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511813/194_kvvbyk.mp4', textPosition: 'center', needsOverlay: true, dark: true },
+]
+
+const FRAMES_STRONG_BG = new Set(['frame-80', 'frame-107', 'frame-108', 'frame-vid-173', 'frame-vid-177', 'frame-vid-180', 'frame-vid-190', 'frame-vid-194'])
+const FRAMES: { id: string; label: string; url: string | null; video?: boolean }[] = [
   { id: 'frame-02', label: '🤍 Roses Crème Haut/Bas', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/51_m9vx96.png' },
   { id: 'frame-03', label: '🌺 Cadre Floral Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/53_ho1gq8.png' },
   { id: 'frame-07', label: '🌷 Fleurs Rose Aquarelle', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785416/49_ewrr8v.png' },
@@ -137,6 +152,8 @@ const FRAMES: { id: string; label: string; url: string | null }[] = [
   { id: 'frame-151', label: '🌿 Feuillage 151', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896742/151_mllw5q.png' },
   { id: 'frame-152', label: '🌿 Feuillage 152', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896745/152_vlbdi9.png' },
   { id: 'frame-154', label: '🌿 Feuillage 154', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896718/154_pxirys.png' },
+  // Cadres vidéo animés
+  ...VIDEO_BACKGROUNDS.map(v => ({ id: `frame-${v.id}`, label: `🎬 ${v.label.replace(/^.+?\s/, '')}`, url: v.url, video: true })),
   { id: 'none', label: '⬜ Sans cadre', url: null },
 ]
 
@@ -240,10 +257,11 @@ interface FormData {
   introAnimation?: string
   slug?: string
   zoneStyles?: ZoneStyles 
-  styleAccueil?: 'photo' | 'monogramme' | 'illustration'
+  styleAccueil?: 'photo' | 'monogramme' | 'illustration' | 'video'
   illustrationCoupleId?: string
   effetTexte?: 'aucun' | 'or' | 'aquarelle' | 'embosse'
   dateAccueilOverride?: string // Date affichée sur la page d'accueil (override manuel)
+  videoAccueilId?: string // ID vidéo animée pour page d'accueil
   customLogoUrl?: string
   customLogoSize?: number // 50-150, default 100
   customLogoColor?: string // '' = original, ou hex color
@@ -904,9 +922,10 @@ function IllustrationCoupleSelector({ data, onChange }: { data: FormData; onChan
 function StyleAccueilSelector({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
   const { t } = useT()
   const style = data.styleAccueil || 'photo'
-  const options: Array<{ id: 'photo' | 'monogramme' | 'illustration'; label: string; emoji: string }> = [
+  const options: Array<{ id: string; label: string; emoji: string }> = [
     { id: 'photo', label: 'Photos', emoji: '📸' },
     { id: 'illustration', label: 'Illustration', emoji: '🎨' },
+    { id: 'video', label: 'Vidéo animée', emoji: '🎬' },
   ]
   return (
     <div style={{ marginBottom: 16 }}>
@@ -920,7 +939,7 @@ function StyleAccueilSelector({ data, onChange }: { data: FormData; onChange: (d
             <button
               key={opt.id}
               type="button"
-              onClick={() => onChange({ styleAccueil: opt.id })}
+              onClick={() => onChange({ styleAccueil: opt.id as FormData['styleAccueil'] })}
               style={{
                 ...BTN,
                 padding: '14px 8px',
@@ -939,6 +958,29 @@ function StyleAccueilSelector({ data, onChange }: { data: FormData; onChange: (d
         })}
       </div>
       {style === 'illustration' && <IllustrationCoupleSelector data={data} onChange={onChange} />}
+      {style === 'video' && (
+        <div>
+          <div style={{ fontSize: 11, color: '#9a928a', marginBottom: 10 }}>
+            Choisissez un fond animé pour votre page d&apos;accueil
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+            {VIDEO_BACKGROUNDS.map(v => {
+              const sel = data.videoAccueilId === v.id
+              return (
+                <button key={v.id} type="button" onClick={() => onChange({ videoAccueilId: v.id, styleAccueil: 'video' })} style={{
+                  ...BTN, padding: 4, borderRadius: 10, overflow: 'hidden',
+                  border: `2px solid ${sel ? '#C9A84C' : '#e0d5c8'}`,
+                  background: sel ? '#faf5ea' : '#fffdf9',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                }}>
+                  <video src={v.url} muted playsInline autoPlay loop style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', borderRadius: 6 }} />
+                  <span style={{ fontSize: 8, color: sel ? '#C9A84C' : '#3a3330', fontWeight: sel ? 700 : 400, padding: '0 2px 2px', textAlign: 'center', lineHeight: 1.2 }}>{v.label.replace(/^.+?\s/, '')}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -1854,12 +1896,16 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
 }) {
   const frame = FRAMES.find(f => f.id === frameId) ?? FRAMES[FRAMES.length - 1]
   const hasFrame = !!frame.url
+  const isVideo = frame.video
   const ornUrl = hasFrame ? '' : (ORNEMENTS_LIBRARY.find(o => o.id === ornamentId)?.url ?? '')
   return (
-    <div style={{ position: 'relative', width: '100%', margin: 0, padding: 0, background: hasFrame ? '#ffffff' : themeCardBg }}>
-      {hasFrame && (
+    <div style={{ position: 'relative', width: '100%', margin: 0, padding: 0, background: hasFrame ? '#ffffff' : themeCardBg, overflow: 'hidden' }}>
+      {hasFrame && !isVideo && (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: frameOpacity, transform: `scale(${frameSize / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
+      )}
+      {hasFrame && isVideo && (
+        <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: frameOpacity, pointerEvents: 'none', zIndex: 1 }} />
       )}
       <OrnementCorner url={ornUrl} corner="top-right" size={130} />
       <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
@@ -4948,8 +4994,23 @@ const firstDate = sorted[0]?.date
       `}</style>
 {/* SECTION 1 : Écran d'accueil */}
       <div style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', maxWidth: 480, margin: '0 auto', boxShadow: '0 8px 60px rgba(0,0,0,0.15)' }}>
-        {/* Wrapper overflow:hidden uniquement pour le carousel photo — ne clip pas le monogramme */}
-        {data.styleAccueil !== 'illustration' && (
+        {/* Wrapper overflow:hidden pour le fond (photo carousel ou vidéo) */}
+        {data.styleAccueil === 'video' && data.videoAccueilId ? (
+          <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
+            <video
+              src={VIDEO_BACKGROUNDS.find(v => v.id === data.videoAccueilId)?.url}
+              autoPlay loop muted playsInline
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+            {/* Voile pour lisibilité du texte */}
+            {VIDEO_BACKGROUNDS.find(v => v.id === data.videoAccueilId)?.needsOverlay && (
+              <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.3) 70%, transparent 100%)' }} />
+            )}
+            {VIDEO_BACKGROUNDS.find(v => v.id === data.videoAccueilId)?.dark && (
+              <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.15)' }} />
+            )}
+          </div>
+        ) : data.styleAccueil !== 'illustration' && (
           <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
             <IntroCarousel photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} themeAccent={G} photosData={data.photosData} />
           </div>
@@ -5008,7 +5069,9 @@ const firstDate = sorted[0]?.date
             <React.Fragment key={realIdx}>
               <CeremonyCard isCard={isCard} accent={G}>
                 <section id={`ceremony-${realIdx}`} style={{ paddingTop: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingBottom: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingLeft: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: 'visible', scrollMarginTop: 60, ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
-                  {hasFrame ? (
+                  {hasFrame && frame.video ? (
+                    <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
+                  ) : hasFrame ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: data.frameOpacity ?? 1, transform: `scale(${(data.frameSize ?? 100) / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
                   ) : usePhotoBg ? (
