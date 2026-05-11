@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { showToast } from '../components/Toast'
 import { useT } from '@/lib/i18n'
 
@@ -4659,7 +4659,35 @@ function AnimSceau({ data, theme, onDone }: { data: FormData; theme: ThemeObj; o
   )
 }
 
-// ── 🌹 PÉTALES ────────────────────────────────────────────────────────────────
+// ── 🌹 PÉTALES PERMANENTS (overlay sur la carte) ─────────────────────────────
+function FloatingPetals({ accent }: { accent: string }) {
+  const petals = useMemo(() => Array.from({ length: 12 }, (_, i) => ({
+    id: i,
+    left: Math.random() * 100,
+    delay: Math.random() * 8,
+    duration: 6 + Math.random() * 6,
+    size: 8 + Math.random() * 10,
+    rotation: Math.random() * 360,
+    opacity: 0.15 + Math.random() * 0.2,
+  })), [])
+  return (
+    <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 50, overflow: 'hidden' }}>
+      <style>{`
+        @keyframes floatPetal{0%{transform:translateY(-20px) rotate(0deg) translateX(0);opacity:0}5%{opacity:1}95%{opacity:0.5}100%{transform:translateY(105vh) rotate(540deg) translateX(40px);opacity:0}}
+      `}</style>
+      {petals.map(p => (
+        <div key={p.id} style={{ position: 'absolute', left: `${p.left}%`, top: -20, animation: `floatPetal ${p.duration}s ease-in-out ${p.delay}s infinite` }}>
+          <svg width={p.size} height={p.size * 1.4} viewBox="0 0 16 22">
+            <ellipse cx="8" cy="11" rx="6" ry="10" fill={accent} opacity={p.opacity} transform={`rotate(${p.rotation} 8 11)`} />
+            <ellipse cx="8" cy="11" rx="3.5" ry="7" fill={accent} opacity={p.opacity * 0.5} transform={`rotate(${p.rotation + 25} 8 11)`} />
+          </svg>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ── 🌹 PÉTALES (animation d'ouverture) ──────────────────────────────────────
 function AnimPetales({ data, theme, onDone }: { data: FormData; theme: ThemeObj; onDone: () => void }) {
   const [phase, setPhase] = useState(0)
   const [disparait, setDisparait] = useState(false)
@@ -5338,6 +5366,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
     }
     return (
       <div style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
+        <FloatingPetals accent={theme.accent} />
         <SharedPageContent
           data={{ ...data, zoneStyles: data.zoneStyles ?? {} }}
           theme={theme}
@@ -5391,6 +5420,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
 
   return (
     <div id="faire-part-preview-target" style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
+      <FloatingPetals accent={theme.accent} />
       <SharedPageContent
         data={{ ...data, textOverrides: { ...data.textOverrides, ...textOverrides }, zoneStyles }}
         theme={theme}
