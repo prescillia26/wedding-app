@@ -270,9 +270,9 @@ const fr: Dictionary = {
     themeLabel: 'Thème',
     presentationLabel: 'Format',
     presentationOptions: {
-      'page-unique': 'Page unique',
-      'cartes-scrollables': 'Cartes défilement',
-      'cartes-separees': 'Une carte à la fois',
+      'page-unique': 'Scroll continu',
+      'cartes-scrollables': 'Carrousel',
+      'cartes-separees': 'Une par une',
     },
     fontLabel: 'Police du faire-part',
     textColorLabel: 'Couleur du texte',
@@ -342,9 +342,9 @@ const fr: Dictionary = {
     monogramPreviewHint: 'Aperçu avec vos initiales en temps réel',
     illustrationReplacesMonogram: 'Cette illustration remplacera votre monogramme sur la page d\'accueil du faire-part.',
     presentationDescriptions: {
-      'page-unique': 'Défilement fluide',
-      'cartes-scrollables': 'Cartes enchaînées',
-      'cartes-separees': 'Une carte à la fois',
+      'page-unique': 'Tout sur une seule page, on scrolle vers le bas',
+      'cartes-scrollables': 'Les invités swipent pour passer d\'une section à l\'autre',
+      'cartes-separees': 'Chaque cérémonie est affichée séparément',
     },
     effectLabel: 'Effet sur le texte',
     effectOptions: {

@@ -1589,14 +1589,15 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             const sel = (data.presentationStyle ?? 'page-unique') === opt.key
             return (
               <button key={opt.key} type="button" onClick={() => onChange({ presentationStyle: opt.key })} style={{
-                ...BTN, padding: '12px 8px', borderRadius: 12,
+                ...BTN, padding: '14px 8px 12px', borderRadius: 12, position: 'relative',
                 border: `2px solid ${sel ? '#C9A84C' : '#e0d5c8'}`,
-                background: sel ? '#faf5ea' : 'white',
+                background: sel ? '#faf5ea' : '#fffdf9',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
               }}>
-                <div style={{ color: sel ? '#C9A84C' : '#9ca3af' }}>{opt.icon}</div>
-                <div style={{ fontSize: 10, fontWeight: sel ? 700 : 500, color: sel ? '#C9A84C' : '#3a3330', textAlign: 'center', lineHeight: 1.3 }}>{opt.label}</div>
-                <div style={{ fontSize: 9, color: '#9ca3af', textAlign: 'center' }}>{opt.desc}</div>
+                {opt.key === 'page-unique' && <span style={{ position: 'absolute', top: -8, right: -4, background: '#C9A84C', color: 'white', fontSize: 8, fontWeight: 700, padding: '2px 6px', borderRadius: 9999, letterSpacing: '0.05em' }}>★</span>}
+                <div style={{ color: sel ? '#C9A84C' : '#b0a898' }}>{opt.icon}</div>
+                <div style={{ fontSize: 11, fontWeight: sel ? 700 : 600, color: sel ? '#C9A84C' : '#3a3330', textAlign: 'center', lineHeight: 1.3 }}>{opt.label}</div>
+                <div style={{ fontSize: 9, color: '#9a928a', textAlign: 'center', lineHeight: 1.4 }}>{opt.desc}</div>
               </button>
             )
           })}
@@ -1655,23 +1656,49 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         </div>
       </AccordionSection>
 
-      <AccordionSection title={locale === 'en' ? '✨ Animations' : '✨ Animations'}>
-<div style={{ marginBottom: 16 }}>
-  <Label>{t.fairepart.animationTextLabel}</Label>
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-    {(Object.entries(t.fairepart.animationTextOptions).map(([key, label]) => ({ key, label }))).map(opt => {
-      const sel = (data.animationStyle || 'slide-up') === opt.key
-      return (
-        <button key={opt.key} type="button" onClick={() => onChange({ animationStyle: opt.key })} style={{
-          ...BTN, padding: '10px 6px', borderRadius: 10, fontSize: 11, fontWeight: sel ? 700 : 400,
-          border: `2px solid ${sel ? THEMES[data.style].accent : '#e0d5c8'}`,
-          background: sel ? `${THEMES[data.style].accent}15` : 'white',
-          color: sel ? THEMES[data.style].accent : '#3a3330',
-        }}>{opt.label}</button>
-      )
-    })}
-  </div>
-</div>
+      <AccordionSection title={locale === 'en' ? '✨ Text animations' : '✨ Animations de texte'}>
+        <Label>{t.fairepart.animationTextLabel}</Label>
+        <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 12 }}>
+          {locale === 'en' ? 'Hover over each option to preview the effect.' : 'Survolez chaque option pour voir l\'effet.'}
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+          {(Object.entries(t.fairepart.animationTextOptions).map(([key, label]) => ({ key, label }))).map(opt => {
+            const sel = (data.animationStyle || 'slide-up') === opt.key
+            const accent = THEMES[data.style].accent
+            const cls = `anim-btn-${opt.key}`
+            const animMap: Record<string, string> = {
+              'slide-up': 'animDemoSlideUp 0.7s ease both',
+              'slide-left': 'animDemoSlideLeft 0.7s ease both',
+              'zoom': 'animDemoZoom 0.7s ease both',
+              'flip': 'animDemoFlip 0.7s ease both',
+              'fade': 'animDemoFade 0.7s ease both',
+              'none': 'none',
+            }
+            return (
+              <button key={opt.key} type="button" onClick={() => onChange({ animationStyle: opt.key })}
+                className={cls}
+                style={{
+                  ...BTN, padding: '14px 6px', borderRadius: 12, overflow: 'hidden',
+                  border: `2px solid ${sel ? accent : '#e0d5c8'}`,
+                  background: sel ? `${accent}12` : '#fffdf9',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                }}>
+                <div className={`${cls}-txt`} style={{
+                  fontFamily: 'var(--font-great-vibes)', fontSize: 18, color: sel ? accent : '#b0a898',
+                }}>Abc</div>
+                <div style={{ fontSize: 10, fontWeight: sel ? 700 : 500, color: sel ? accent : '#3a3330' }}>{opt.label}</div>
+                <style>{`.${cls}:hover .${cls}-txt{animation:${animMap[opt.key] || 'none'};}`}</style>
+              </button>
+            )
+          })}
+          <style>{`
+            @keyframes animDemoSlideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+            @keyframes animDemoSlideLeft{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+            @keyframes animDemoZoom{from{opacity:0;transform:scale(0.7)}to{opacity:1;transform:scale(1)}}
+            @keyframes animDemoFlip{from{opacity:0;transform:rotateX(90deg)}to{opacity:1;transform:rotateX(0)}}
+            @keyframes animDemoFade{from{opacity:0}to{opacity:1}}
+          `}</style>
+        </div>
       </AccordionSection>
 
       <AccordionSection title={locale === 'en' ? '✒️ Monogram' : '✒️ Monogramme'}>

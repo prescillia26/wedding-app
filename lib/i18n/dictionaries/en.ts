@@ -270,9 +270,9 @@ const en: Dictionary = {
     themeLabel: 'Theme',
     presentationLabel: 'Format',
     presentationOptions: {
-      'page-unique': 'Single page',
-      'cartes-scrollables': 'Scrollable cards',
-      'cartes-separees': 'One card at a time',
+      'page-unique': 'Continuous scroll',
+      'cartes-scrollables': 'Carousel',
+      'cartes-separees': 'One by one',
     },
     fontLabel: 'Invitation font',
     textColorLabel: 'Text color',
@@ -342,9 +342,9 @@ const en: Dictionary = {
     monogramPreviewHint: 'Live preview with your initials',
     illustrationReplacesMonogram: 'This illustration will replace your monogram on the invitation homepage.',
     presentationDescriptions: {
-      'page-unique': 'Smooth scrolling',
-      'cartes-scrollables': 'Stacked cards',
-      'cartes-separees': 'One card at a time',
+      'page-unique': 'Everything on one page, guests scroll down',
+      'cartes-scrollables': 'Guests swipe between sections',
+      'cartes-separees': 'Each ceremony displayed separately',
     },
     effectLabel: 'Text effect',
     effectOptions: {
