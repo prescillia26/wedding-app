@@ -1929,10 +1929,8 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
       <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
       {/* Zone texte avec voile blanc semi-transparent derrière pour garantir la lisibilité sur cadres chargés */}
       <div style={{ position: 'relative', zIndex: 10, paddingTop: `${framePaddingV}%`, paddingBottom: `${framePaddingV}%`, paddingLeft: `${framePaddingH}%`, paddingRight: `${framePaddingH}%`, textAlign: 'center', opacity: textOpacity }}>
-        {hasFrame && (
-          <div style={{ position: 'absolute', inset: FRAMES_STRONG_BG.has(frameId) ? '12% 18%' : '10% 15%', background: FRAMES_STRONG_BG.has(frameId)
-            ? 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)'
-            : 'radial-gradient(ellipse at center, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.45) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: -1 }} />
+        {hasFrame && FRAMES_STRONG_BG.has(frameId) && (
+          <div style={{ position: 'absolute', inset: '12% 18%', background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: -1 }} />
         )}
         {children}
       </div>
@@ -5107,10 +5105,8 @@ const firstDate = sorted[0]?.date
                       {i % 2 === 0 ? <><OrnTR /><OrnBL /></> : <><OrnTL /><OrnBR /></>}
                     </>
                   )}
-                  {hasFrame && (
-                    <div style={{ position: 'absolute', inset: FRAMES_STRONG_BG.has(data.frameId ?? '') ? '12% 18%' : '10% 15%', background: FRAMES_STRONG_BG.has(data.frameId ?? '')
-                      ? 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)'
-                      : 'radial-gradient(ellipse at center, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.45) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: 0 }} />
+                  {hasFrame && FRAMES_STRONG_BG.has(data.frameId ?? '') && (
+                    <div style={{ position: 'absolute', inset: '12% 18%', background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: 0 }} />
                   )}
                   <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame) }}>
                     {data.mariageJuif && (
