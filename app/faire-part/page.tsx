@@ -1659,45 +1659,46 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       <AccordionSection title={locale === 'en' ? '✨ Text animations' : '✨ Animations de texte'}>
         <Label>{t.fairepart.animationTextLabel}</Label>
         <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 12 }}>
-          {locale === 'en' ? 'Hover over each option to preview the effect.' : 'Survolez chaque option pour voir l\'effet.'}
+          {locale === 'en' ? 'Hover to preview each effect.' : 'Survolez pour voir l\'effet en direct.'}
         </p>
+        <style>{`
+          @keyframes adSlideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+          @keyframes adSlideLeft{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+          @keyframes adZoom{from{opacity:0;transform:scale(0.5)}to{opacity:1;transform:scale(1)}}
+          @keyframes adFlip{from{opacity:0;transform:perspective(200px) rotateX(90deg)}to{opacity:1;transform:perspective(200px) rotateX(0)}}
+          @keyframes adFade{from{opacity:0}to{opacity:1}}
+          @keyframes adRideau{0%{clip-path:inset(0 100% 0 0)}100%{clip-path:inset(0 0 0 0)}}
+          @keyframes adBrille{0%{opacity:0;filter:brightness(2)}50%{opacity:1;filter:brightness(1.5)}100%{opacity:1;filter:brightness(1)}}
+          @keyframes adDeplie{from{opacity:0;transform:scaleY(0);transform-origin:top}to{opacity:1;transform:scaleY(1)}}
+          @keyframes adFlou{from{opacity:0;filter:blur(8px)}to{opacity:1;filter:blur(0)}}
+          ${Object.keys(t.fairepart.animationTextOptions).map(k => {
+            const a: Record<string, string> = { fade:'adFade', 'slide-up':'adSlideUp', rideau:'adRideau', brille:'adBrille', deplie:'adDeplie', flou:'adFlou', 'slide-left':'adSlideLeft', zoom:'adZoom', flip:'adFlip' }
+            return `.anim-${k}:hover .anim-${k}-t{animation:${a[k] || 'adFade'} 0.7s ease both;}`
+          }).join('\n')}
+        `}</style>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
           {(Object.entries(t.fairepart.animationTextOptions).map(([key, label]) => ({ key, label }))).map(opt => {
             const sel = (data.animationStyle || 'slide-up') === opt.key
             const accent = THEMES[data.style].accent
-            const cls = `anim-btn-${opt.key}`
-            const animMap: Record<string, string> = {
-              'slide-up': 'animDemoSlideUp 0.7s ease both',
-              'slide-left': 'animDemoSlideLeft 0.7s ease both',
-              'zoom': 'animDemoZoom 0.7s ease both',
-              'flip': 'animDemoFlip 0.7s ease both',
-              'fade': 'animDemoFade 0.7s ease both',
-              'none': 'none',
-            }
             return (
               <button key={opt.key} type="button" onClick={() => onChange({ animationStyle: opt.key })}
-                className={cls}
+                className={`anim-${opt.key}`}
                 style={{
-                  ...BTN, padding: '14px 6px', borderRadius: 12, overflow: 'hidden',
+                  ...BTN, padding: '16px 6px 12px', borderRadius: 12, overflow: 'hidden',
                   border: `2px solid ${sel ? accent : '#e0d5c8'}`,
-                  background: sel ? `${accent}12` : '#fffdf9',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                  background: sel ? `${accent}10` : '#fffdf9',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
                 }}>
-                <div className={`${cls}-txt`} style={{
-                  fontFamily: 'var(--font-great-vibes)', fontSize: 18, color: sel ? accent : '#b0a898',
+                <div className={`anim-${opt.key}-t`} style={{
+                  fontFamily: 'var(--font-great-vibes)', fontSize: 20, color: sel ? accent : '#b0a898',
+                  lineHeight: 1,
                 }}>Abc</div>
-                <div style={{ fontSize: 10, fontWeight: sel ? 700 : 500, color: sel ? accent : '#3a3330' }}>{opt.label}</div>
-                <style>{`.${cls}:hover .${cls}-txt{animation:${animMap[opt.key] || 'none'};}`}</style>
+                <div style={{ fontSize: 9.5, fontWeight: sel ? 700 : 500, color: sel ? accent : '#3a3330', lineHeight: 1.2, textAlign: 'center' }}>
+                  {(opt.label as string).replace(/^.+?\s/, '')}
+                </div>
               </button>
             )
           })}
-          <style>{`
-            @keyframes animDemoSlideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-            @keyframes animDemoSlideLeft{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
-            @keyframes animDemoZoom{from{opacity:0;transform:scale(0.7)}to{opacity:1;transform:scale(1)}}
-            @keyframes animDemoFlip{from{opacity:0;transform:rotateX(90deg)}to{opacity:1;transform:rotateX(0)}}
-            @keyframes animDemoFade{from{opacity:0}to{opacity:1}}
-          `}</style>
         </div>
       </AccordionSection>
 
