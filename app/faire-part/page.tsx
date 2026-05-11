@@ -1680,19 +1680,22 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           {(Object.entries(t.fairepart.animationTextOptions).map(([key, label]) => ({ key, label }))).map(opt => {
             const sel = (data.animationStyle || 'slide-up') === opt.key
             const accent = THEMES[data.style].accent
+            const p1 = data.marie1Prenom || 'Sarah'
             return (
               <button key={opt.key} type="button" onClick={() => onChange({ animationStyle: opt.key })}
                 className={`anim-${opt.key}`}
                 style={{
-                  ...BTN, padding: '16px 6px 12px', borderRadius: 12, overflow: 'hidden',
+                  ...BTN, padding: '18px 6px 14px', borderRadius: 12, overflow: 'hidden',
                   border: `2px solid ${sel ? accent : '#e0d5c8'}`,
                   background: sel ? `${accent}10` : '#fffdf9',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
                 }}>
-                <div className={`anim-${opt.key}-t`} style={{
-                  fontFamily: 'var(--font-great-vibes)', fontSize: 20, color: sel ? accent : '#b0a898',
-                  lineHeight: 1,
-                }}>Abc</div>
+                <div style={{ height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', width: '100%' }}>
+                  <div className={`anim-${opt.key}-t`} style={{
+                    fontFamily: 'var(--font-great-vibes)', fontSize: 28, color: sel ? accent : '#b0a898',
+                    lineHeight: 1, whiteSpace: 'nowrap',
+                  }}>{p1}</div>
+                </div>
                 <div style={{ fontSize: 9.5, fontWeight: sel ? 700 : 500, color: sel ? accent : '#3a3330', lineHeight: 1.2, textAlign: 'center' }}>
                   {(opt.label as string).replace(/^.+?\s/, '')}
                 </div>
