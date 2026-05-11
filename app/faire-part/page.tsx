@@ -727,6 +727,14 @@ function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
   const [selected, setSelected] = useState(false)
   const [showPanel, setShowPanel] = useState(false)
 
+  // Fermer quand on clique ailleurs
+  useEffect(() => {
+    if (!selected) return
+    const close = () => { setSelected(false); setShowPanel(false) }
+    const timer = setTimeout(() => document.addEventListener('pointerdown', close, { once: true }), 0)
+    return () => { clearTimeout(timer); document.removeEventListener('pointerdown', close) }
+  }, [selected])
+
   const handlePointerDown = (e: React.PointerEvent) => {
     if (!editable) return
     e.preventDefault()
