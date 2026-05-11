@@ -5242,6 +5242,17 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
   const [sharingStatus, setSharingStatus] = useState('')
   const [enveloppeFinie, setEnveloppeFinie] = useState(data.introAnimation === 'none')
 
+  // Ouvrir directement le modal RSVP si ?rsvp=1 dans l'URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('rsvp') === '1') {
+      const id = params.get('share')
+      if (id) setLastShareId(id)
+      setEnveloppeFinie(true)
+      setRsvpListOpen(true)
+    }
+  }, [])
+
   const startYoutubeMusic = useCallback((videoId: string) => {
     if (ytIframeRef.current) return
     const iframe = document.createElement('iframe')

@@ -276,7 +276,7 @@ function FairepartCardComponent({ fp, locale, formatDate, t }: { fp: FairepartCa
           }}>
             {t.shareBtn}
           </button>
-          <a href={`/faire-part?share=${fp.shareId}&role=couple`} style={{
+          <a href={`/faire-part?share=${fp.shareId}&role=couple&rsvp=1`} style={{
             flex: 1, textAlign: 'center', padding: '10px 12px', borderRadius: 9999,
             background: 'transparent', border: '1px solid #d1d5db',
             color: '#6b7280', textDecoration: 'none', fontSize: 12, fontWeight: 600,
