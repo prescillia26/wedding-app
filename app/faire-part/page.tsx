@@ -1740,6 +1740,12 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             { value: '#d4829a', label: t.fairepart.colorOptions['#d4829a'] || 'Pink',   swatch: '#d4829a' },
             { value: '#8b0000', label: t.fairepart.colorOptions['#8b0000'] || 'Burgundy', swatch: '#8b0000' },
             { value: '#1a1a1a', label: t.fairepart.colorOptions['#1a1a1a'] || 'Black',  swatch: '#1a1a1a' },
+            { value: '#2c4a7c', label: t.fairepart.colorOptions['#2c4a7c'] || 'Navy',   swatch: '#2c4a7c' },
+            { value: '#7a9e6e', label: t.fairepart.colorOptions['#7a9e6e'] || 'Green',  swatch: '#7a9e6e' },
+            { value: '#4a3728', label: t.fairepart.colorOptions['#4a3728'] || 'Brown',  swatch: '#4a3728' },
+            { value: '#d4a574', label: t.fairepart.colorOptions['#d4a574'] || 'Copper', swatch: '#d4a574' },
+            { value: '#2a9a6a', label: t.fairepart.colorOptions['#2a9a6a'] || 'Mint',   swatch: '#2a9a6a' },
+            { value: '#ffffff', label: t.fairepart.colorOptions['#ffffff'] || 'White',  swatch: '#ffffff' },
           ] as { value: string; label: string; swatch: string }[]).map(opt => {
             const sel = (data.monogrammeColor ?? '') === opt.value
             return (
@@ -1860,9 +1866,9 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
       {/* Zone texte avec voile blanc semi-transparent derrière pour garantir la lisibilité sur cadres chargés */}
       <div style={{ position: 'relative', zIndex: 10, paddingTop: `${framePaddingV}%`, paddingBottom: `${framePaddingV}%`, paddingLeft: `${framePaddingH}%`, paddingRight: `${framePaddingH}%`, textAlign: 'center', opacity: textOpacity }}>
         {hasFrame && (
-          <div style={{ position: 'absolute', inset: FRAMES_STRONG_BG.has(frameId) ? '4%' : '8%', background: FRAMES_STRONG_BG.has(frameId)
-            ? 'radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 50%, rgba(255,255,255,0.4) 80%, rgba(255,255,255,0) 100%)'
-            : 'radial-gradient(ellipse at center, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: -1 }} />
+          <div style={{ position: 'absolute', inset: FRAMES_STRONG_BG.has(frameId) ? '12% 18%' : '10% 15%', background: FRAMES_STRONG_BG.has(frameId)
+            ? 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)'
+            : 'radial-gradient(ellipse at center, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.45) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: -1 }} />
         )}
         {children}
       </div>
@@ -5017,9 +5023,9 @@ const firstDate = sorted[0]?.date
                     </>
                   )}
                   {hasFrame && (
-                    <div style={{ position: 'absolute', inset: FRAMES_STRONG_BG.has(data.frameId ?? '') ? '3%' : '8%', background: FRAMES_STRONG_BG.has(data.frameId ?? '')
-                      ? 'radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 50%, rgba(255,255,255,0.35) 80%, rgba(255,255,255,0) 100%)'
-                      : 'radial-gradient(ellipse at center, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.5) 55%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: 0 }} />
+                    <div style={{ position: 'absolute', inset: FRAMES_STRONG_BG.has(data.frameId ?? '') ? '12% 18%' : '10% 15%', background: FRAMES_STRONG_BG.has(data.frameId ?? '')
+                      ? 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)'
+                      : 'radial-gradient(ellipse at center, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.45) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: 0 }} />
                   )}
                   <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame) }}>
                     {data.mariageJuif && (
