@@ -4297,10 +4297,7 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
   const GV = 'var(--font-great-vibes)'
   const CG = 'var(--font-cormorant-garamond)'
   const FP = 'var(--font-playfair-display)'
-  const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
-  const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
   const es = ENV_STYLES[data.style] || ENV_STYLES['ivoire-or']
-  const isRibbon = es.variant === 'ribbon'
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) onDone()
@@ -4308,9 +4305,8 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
 
   const handleOpen = () => {
     if (phase > 0) return
-    setPhase(1)                          // sceau/noeud disparaît
-    setTimeout(() => setPhase(2), 800)   // fondu global
-    setTimeout(() => onDone(), 1600)     // terminé
+    setPhase(2)                          // fondu direct
+    setTimeout(() => onDone(), 800)      // terminé
   }
 
   const textColor = theme.dark ? '#e8ddd0' : `color-mix(in srgb, ${a} 60%, #2a2018)`
@@ -4328,13 +4324,7 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
       <style>{`
         @keyframes envFloat{0%,100%{transform:translateY(0) rotate(-1.5deg)}50%{transform:translateY(-10px) rotate(-0.8deg)}}
         @keyframes envAppear{from{opacity:0;transform:translateY(40px) scale(0.92) rotate(-1.5deg)}to{opacity:1;transform:translateY(0) scale(1) rotate(-1.5deg)}}
-        @keyframes sealLift{0%{transform:scale(1) translateY(0);opacity:1}100%{transform:scale(1.15) translateY(-30px);opacity:0}}
         @keyframes tapPulse{0%,100%{opacity:0.4}50%{opacity:0.9}}
-        @keyframes ribbonFallL{0%{transform:rotate(0) translateY(0);opacity:1}100%{transform:rotate(-15deg) translateY(-40px) translateX(-20px);opacity:0}}
-        @keyframes ribbonFallR{0%{transform:rotate(0) translateY(0);opacity:1}100%{transform:rotate(15deg) translateY(-40px) translateX(20px);opacity:0}}
-        @keyframes ribbonLoopWiggle{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
-        @keyframes sealShine{0%,100%{background-position:30% 25%}50%{background-position:60% 40%}}
-        @keyframes gentleGlow{0%,100%{box-shadow:0 0 20px ${es.sealColor}30}50%{box-shadow:0 0 35px ${es.sealColor}50}}
       `}</style>
 
       {/* Skip */}
@@ -4420,122 +4410,6 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
               <div style={{ flex: 1, height: '0.5px', background: `linear-gradient(90deg, transparent, ${a}30, transparent)` }} />
             </div>
 
-            {/* ── SCEAU ou NOEUD ── */}
-            <div style={{ position: 'relative', zIndex: 2, marginBottom: 20 }}>
-              {isRibbon ? (
-                /* ═══ NOEUD PAPILLON EN RUBAN DE SOIE ═══ */
-                <>
-                  {phase < 1 && (
-                    <div style={{ position: 'relative', width: 120, height: 70, animation: 'ribbonLoopWiggle 3s ease-in-out infinite' }}>
-                      {/* Boucle gauche */}
-                      <svg width="120" height="70" viewBox="0 0 120 70" style={{ position: 'absolute', top: 0, left: 0 }}>
-                        <defs>
-                          <linearGradient id="ribbonG1" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor={es.ribbonColor} stopOpacity="0.95" />
-                            <stop offset="50%" stopColor={es.sealColor} stopOpacity="1" />
-                            <stop offset="100%" stopColor={es.ribbonColor} stopOpacity="0.85" />
-                          </linearGradient>
-                          <linearGradient id="ribbonG2" x1="100%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stopColor={es.ribbonColor} stopOpacity="0.95" />
-                            <stop offset="50%" stopColor={es.sealColor} stopOpacity="1" />
-                            <stop offset="100%" stopColor={es.ribbonColor} stopOpacity="0.85" />
-                          </linearGradient>
-                          <filter id="ribbonShadow"><feDropShadow dx="0" dy="2" stdDeviation="2" floodOpacity="0.2" /></filter>
-                        </defs>
-                        {/* Boucle gauche */}
-                        <path d="M60,35 Q30,8 10,22 Q-2,32 15,42 Q32,52 60,35Z" fill="url(#ribbonG1)" filter="url(#ribbonShadow)" />
-                        <path d="M60,35 Q38,14 18,24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.8" />
-                        {/* Boucle droite */}
-                        <path d="M60,35 Q90,8 110,22 Q122,32 105,42 Q88,52 60,35Z" fill="url(#ribbonG2)" filter="url(#ribbonShadow)" />
-                        <path d="M60,35 Q82,14 102,24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.8" />
-                        {/* Noeud central */}
-                        <ellipse cx="60" cy="35" rx="8" ry="10" fill={es.sealColor} />
-                        <ellipse cx="60" cy="35" rx="8" ry="10" fill="url(#ribbonG1)" opacity="0.5" />
-                        <ellipse cx="58" cy="32" rx="3" ry="4" fill="rgba(255,255,255,0.15)" />
-                        {/* Pans tombants */}
-                        <path d="M55,44 Q48,58 42,68" fill="none" stroke={es.ribbonColor} strokeWidth="5" strokeLinecap="round" opacity="0.8" />
-                        <path d="M65,44 Q72,58 78,68" fill="none" stroke={es.ribbonColor} strokeWidth="5" strokeLinecap="round" opacity="0.8" />
-                        <path d="M55,44 Q48,58 42,68" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="2" strokeLinecap="round" />
-                        <path d="M65,44 Q72,58 78,68" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="2" strokeLinecap="round" />
-                      </svg>
-                    </div>
-                  )}
-                  {/* Ruban qui tombe à l'ouverture */}
-                  {phase === 1 && (
-                    <div style={{ position: 'relative', width: 120, height: 70 }}>
-                      <svg width="60" height="70" viewBox="0 0 60 70" style={{ position: 'absolute', left: 0, top: 0, transformOrigin: '60px 35px', animation: 'ribbonFallL 0.9s cubic-bezier(0.4,0,1,1) forwards' }}>
-                        <path d="M60,35 Q30,8 10,22 Q-2,32 15,42 Q32,52 60,35Z" fill={es.ribbonColor} />
-                        <path d="M55,44 Q48,58 42,68" fill="none" stroke={es.ribbonColor} strokeWidth="5" strokeLinecap="round" />
-                      </svg>
-                      <svg width="60" height="70" viewBox="0 0 60 70" style={{ position: 'absolute', right: 0, top: 0, transformOrigin: '0px 35px', animation: 'ribbonFallR 0.9s cubic-bezier(0.4,0,1,1) forwards' }}>
-                        <path d="M0,35 Q30,8 50,22 Q62,32 45,42 Q28,52 0,35Z" fill={es.ribbonColor} />
-                        <path d="M5,44 Q12,58 18,68" fill="none" stroke={es.ribbonColor} strokeWidth="5" strokeLinecap="round" />
-                      </svg>
-                    </div>
-                  )}
-                </>
-              ) : (
-                /* ═══ SCEAU DE CIRE RÉALISTE ═══ */
-                <>
-                  {phase < 1 && (
-                    <div style={{
-                      width: 92, height: 92, borderRadius: '50%', position: 'relative',
-                      animation: phase === 0 ? 'gentleGlow 3s ease-in-out infinite' : 'none',
-                    }}>
-                      {/* Base du sceau — dégradé riche */}
-                      <div style={{
-                        position: 'absolute', inset: 0, borderRadius: '50%',
-                        background: `radial-gradient(ellipse at 35% 28%, color-mix(in srgb, ${es.sealColor} 100%, #fff 20%) 0%, ${es.sealColor} 35%, color-mix(in srgb, ${es.sealColor} 80%, #000) 75%, color-mix(in srgb, ${es.sealColor} 60%, #000) 100%)`,
-                        boxShadow: `0 8px 30px ${es.sealColor}55, 0 3px 10px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.2), inset 0 -4px 10px rgba(0,0,0,0.3)`,
-                      }} />
-                      {/* Bord irrégulier de cire fondue */}
-                      <svg style={{ position: 'absolute', inset: -6, width: 'calc(100% + 12px)', height: 'calc(100% + 12px)' }} viewBox="0 0 104 104">
-                        <path d="M52,2 Q62,0 72,6 Q80,4 86,14 Q94,18 96,28 Q102,36 100,48 Q104,58 98,66 Q100,76 92,84 Q88,92 78,94 Q70,100 60,98 Q50,104 40,98 Q30,100 22,92 Q14,90 10,80 Q2,74 4,64 Q-2,54 4,44 Q0,34 8,26 Q10,16 20,10 Q28,4 38,4 Q46,0 52,2Z"
-                          fill="none" stroke={es.sealColor} strokeWidth="1.5" opacity="0.25" />
-                      </svg>
-                      {/* Anneau intérieur gravé */}
-                      <div style={{ position: 'absolute', inset: 12, borderRadius: '50%', border: `1px solid rgba(255,255,255,0.12)`, boxShadow: `inset 0 1px 2px rgba(0,0,0,0.15)` }} />
-                      <div style={{ position: 'absolute', inset: 14, borderRadius: '50%', border: `0.5px solid rgba(0,0,0,0.1)` }} />
-                      {/* Reflet principal en haut à gauche */}
-                      <div style={{ position: 'absolute', top: 10, left: 16, width: 32, height: 18, borderRadius: '50%', background: 'rgba(255,255,255,0.22)', filter: 'blur(7px)', pointerEvents: 'none' }} />
-                      {/* Petit reflet bas droite */}
-                      <div style={{ position: 'absolute', bottom: 18, right: 18, width: 14, height: 8, borderRadius: '50%', background: 'rgba(255,255,255,0.08)', filter: 'blur(4px)', pointerEvents: 'none' }} />
-                      {/* Initiales ou logo */}
-                      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}>
-                        {data.customLogoUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={data.customLogoUrl} alt="" style={{ width: 42, height: 42, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.85 }} />
-                        ) : (
-                          <>
-                            {/* Déco feuille de laurier autour des initiales */}
-                            <svg width="60" height="60" viewBox="0 0 60 60" style={{ position: 'absolute', opacity: 0.2 }}>
-                              <path d="M14,42 Q10,34 14,26 Q12,22 16,18" fill="none" stroke="#fff" strokeWidth="0.8" strokeLinecap="round" />
-                              <path d="M12,38 Q8,36 10,32" fill="none" stroke="#fff" strokeWidth="0.6" />
-                              <path d="M13,34 Q9,32 11,28" fill="none" stroke="#fff" strokeWidth="0.6" />
-                              <path d="M46,42 Q50,34 46,26 Q48,22 44,18" fill="none" stroke="#fff" strokeWidth="0.8" strokeLinecap="round" />
-                              <path d="M48,38 Q52,36 50,32" fill="none" stroke="#fff" strokeWidth="0.6" />
-                              <path d="M47,34 Q51,32 49,28" fill="none" stroke="#fff" strokeWidth="0.6" />
-                            </svg>
-                            <span style={{ fontFamily: GV, fontSize: 26, color: 'rgba(255,255,255,0.88)', textShadow: '0 2px 2px rgba(0,0,0,0.4), 0 -1px 0 rgba(255,255,255,0.15)', letterSpacing: 3, position: 'relative' }}>
-                              {i1}&{i2}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  {/* Sceau qui s'envole doucement */}
-                  {phase === 1 && (
-                    <div style={{
-                      width: 92, height: 92, borderRadius: '50%', position: 'relative',
-                      background: `radial-gradient(ellipse at 35% 28%, color-mix(in srgb, ${es.sealColor} 100%, #fff 20%) 0%, ${es.sealColor} 35%, color-mix(in srgb, ${es.sealColor} 80%, #000) 75%)`,
-                      boxShadow: `0 8px 30px ${es.sealColor}55, 0 3px 10px rgba(0,0,0,0.3)`,
-                      animation: 'sealLift 0.9s cubic-bezier(0.16,1,0.3,1) forwards',
-                    }} />
-                  )}
-                </>
-              )}
-            </div>
 
             {/* ── "Touchez pour découvrir" ── */}
             <div style={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
