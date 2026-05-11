@@ -2648,7 +2648,9 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
   }, [storageKey])
 
   const [step, setStep] = useState(1)
-  const [nom, setNom] = useState('')
+  const [nom, setNom] = useState(() => {
+    try { return new URLSearchParams(window.location.search).get('guest') || '' } catch { return '' }
+  })
   const [email, setEmail] = useState('')
   const [reponses, setReponses] = useState<{ ceremonie: string; date: string; present: boolean | null; nbPersonnes: number }[]>(
     ceremonies.map(c => ({ ceremonie: getCeremonyName(c), date: c.date || '', present: null, nbPersonnes: 1 }))
@@ -3494,12 +3496,90 @@ function CopyTextRow({ text, accent }: { text: string; accent: string }) {
   )
 }
 
-function ShareModal({ accent, guestUrl, coupleUrl, onClose, data }: { accent: string; guestUrl: string; coupleUrl: string; onClose: () => void; data: FormData }) {
+interface GuestEntry { name: string; phone: string; sentAt?: string }
+
+function ShareModal({ accent, guestUrl, coupleUrl, onClose, data, shareId, rsvpEntries }: { accent: string; guestUrl: string; coupleUrl: string; onClose: () => void; data: FormData; shareId: string | null; rsvpEntries: { nom: string }[] }) {
   const { t, locale } = useT()
   const [message, setMessage] = useState(() => buildWhatsAppMessage(data, guestUrl, t.fairepart, locale))
   const sorted = sortByDate(data.ceremonies)
   const [customLinks, setCustomLinks] = useState<{ name: string; events: number[] }[]>([])
   const [showCustom, setShowCustom] = useState(false)
+
+  // ── Guest list ──
+  const [guests, setGuests] = useState<GuestEntry[]>([])
+  const [newGuestName, setNewGuestName] = useState('')
+  const [newGuestPhone, setNewGuestPhone] = useState('')
+  const [guestListLoading, setGuestListLoading] = useState(false)
+  const [showGuestList, setShowGuestList] = useState(false)
+
+  // Charger la liste d'invités depuis le serveur
+  useEffect(() => {
+    if (!shareId) return
+    fetch(`/api/guests?shareId=${shareId}`).then(r => r.json()).then(d => {
+      if (d.guests?.length) setGuests(d.guests)
+    }).catch(() => {})
+  }, [shareId])
+
+  const saveGuests = async (list: GuestEntry[]) => {
+    if (!shareId) return
+    await fetch('/api/guests', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ shareId, guests: list }),
+    }).catch(() => {})
+  }
+
+  const addGuest = () => {
+    if (!newGuestName.trim()) return
+    const updated = [...guests, { name: newGuestName.trim(), phone: newGuestPhone.trim() }]
+    setGuests(updated)
+    setNewGuestName('')
+    setNewGuestPhone('')
+    saveGuests(updated)
+  }
+
+  const removeGuest = (idx: number) => {
+    const updated = guests.filter((_, i) => i !== idx)
+    setGuests(updated)
+    saveGuests(updated)
+  }
+
+  const markSent = (idx: number) => {
+    const updated = guests.map((g, i) => i === idx ? { ...g, sentAt: new Date().toISOString() } : g)
+    setGuests(updated)
+    saveGuests(updated)
+  }
+
+  const buildGuestWhatsAppUrl = (guest: GuestEntry) => {
+    const guestParam = encodeURIComponent(guest.name)
+    const link = guestUrl.includes('?') ? `${guestUrl}&guest=${guestParam}` : `${guestUrl}?guest=${guestParam}`
+    const p1 = data.marie1Prenom || ''
+    const p2 = data.marie2Prenom || ''
+    const msg = locale === 'en'
+      ? `Dear ${guest.name},\n\n${p1} & ${p2} are delighted to invite you to their wedding!\n\nDiscover your invitation and RSVP:\n${link}`
+      : `Cher(e) ${guest.name},\n\n${p1} & ${p2} ont la joie de vous convier à leur mariage !\n\nDécouvrez votre invitation et confirmez votre présence :\n${link}`
+    const phone = guest.phone.replace(/\s/g, '').replace(/^0/, '33')
+    return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
+  }
+
+  const buildReminderWhatsAppUrl = (guest: GuestEntry) => {
+    const guestParam = encodeURIComponent(guest.name)
+    const link = guestUrl.includes('?') ? `${guestUrl}&guest=${guestParam}` : `${guestUrl}?guest=${guestParam}`
+    const p1 = data.marie1Prenom || ''
+    const p2 = data.marie2Prenom || ''
+    const msg = locale === 'en'
+      ? `Hi ${guest.name},\n\nJust a gentle reminder — ${p1} & ${p2} would love to know if you can make it to their wedding!\n\nRSVP here:\n${link}`
+      : `Bonjour ${guest.name},\n\nPetit rappel — ${p1} & ${p2} seraient ravis de savoir si vous serez des leurs !\n\nConfirmez votre présence ici :\n${link}`
+    const phone = guest.phone.replace(/\s/g, '').replace(/^0/, '33')
+    return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
+  }
+
+  const getGuestStatus = (guest: GuestEntry): 'replied' | 'sent' | 'pending' => {
+    const hasRsvp = rsvpEntries.some(r => r.nom.toLowerCase().trim() === guest.name.toLowerCase().trim())
+    if (hasRsvp) return 'replied'
+    if (guest.sentAt) return 'sent'
+    return 'pending'
+  }
   const [newLinkName, setNewLinkName] = useState('')
   const [newLinkEvents, setNewLinkEvents] = useState<number[]>([])
 
@@ -3609,7 +3689,105 @@ function ShareModal({ accent, guestUrl, coupleUrl, onClose, data }: { accent: st
           </div>
         )}
 
-        {/* Section 4 — Lien mariés */}
+        {/* Section 4 — Liste d'invités + envoi WhatsApp */}
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>
+            {locale === 'en' ? '📱 Send to your guests' : '📱 Envoyer à vos invités'}
+          </div>
+          <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 12 }}>
+            {locale === 'en'
+              ? 'Add your guests and send them your invitation via WhatsApp in one tap.'
+              : 'Ajoutez vos invités et envoyez-leur votre invitation via WhatsApp en un clic.'}
+          </div>
+
+          {!showGuestList ? (
+            <button onClick={() => setShowGuestList(true)} style={{ ...BTN, width: '100%', padding: '12px', borderRadius: 10, border: `1.5px dashed ${accent}44`, background: 'transparent', color: accent, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+              + {locale === 'en' ? 'Manage guest list' : 'Gérer la liste d\'invités'}
+            </button>
+          ) : (
+            <div style={{ padding: '16px', background: '#fafafa', borderRadius: 12, border: '1px solid #e5e7eb' }}>
+              {/* Formulaire d'ajout */}
+              <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+                <input value={newGuestName} onChange={e => setNewGuestName(e.target.value)} placeholder={locale === 'en' ? 'Name' : 'Nom'}
+                  onKeyDown={e => { if (e.key === 'Enter') addGuest() }}
+                  style={{ flex: 1, padding: '9px 12px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 13, outline: 'none', boxSizing: 'border-box' }} />
+                <input value={newGuestPhone} onChange={e => setNewGuestPhone(e.target.value)} placeholder={locale === 'en' ? 'Phone' : 'Téléphone'}
+                  onKeyDown={e => { if (e.key === 'Enter') addGuest() }}
+                  style={{ width: 130, padding: '9px 12px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 13, outline: 'none', boxSizing: 'border-box' }} />
+                <button onClick={addGuest} disabled={!newGuestName.trim()} style={{ ...BTN, padding: '9px 16px', borderRadius: 8, border: 'none', background: newGuestName.trim() ? accent : '#e5e7eb', color: 'white', fontSize: 13, fontWeight: 700, cursor: newGuestName.trim() ? 'pointer' : 'default', flexShrink: 0 }}>+</button>
+              </div>
+
+              {/* Liste des invités */}
+              {guests.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '20px 0', color: '#9ca3af', fontSize: 13, fontStyle: 'italic' }}>
+                  {locale === 'en' ? 'No guests added yet' : 'Aucun invité ajouté'}
+                </div>
+              ) : (
+                <div style={{ maxHeight: 300, overflowY: 'auto' }}>
+                  {guests.map((guest, idx) => {
+                    const status = getGuestStatus(guest)
+                    const statusColor = status === 'replied' ? '#22c55e' : status === 'sent' ? '#f59e0b' : '#d1d5db'
+                    const statusLabel = status === 'replied'
+                      ? (locale === 'en' ? 'Replied' : 'Répondu')
+                      : status === 'sent'
+                        ? (locale === 'en' ? 'Sent' : 'Envoyé')
+                        : (locale === 'en' ? 'Pending' : 'En attente')
+                    return (
+                      <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 0', borderBottom: '1px solid #f3f4f6' }}>
+                        {/* Pastille statut */}
+                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: statusColor, flexShrink: 0 }} title={statusLabel} />
+                        {/* Nom + tel */}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{guest.name}</div>
+                          {guest.phone && <div style={{ fontSize: 11, color: '#9ca3af' }}>{guest.phone}</div>}
+                        </div>
+                        {/* Statut texte */}
+                        <div style={{ fontSize: 10, color: statusColor, fontWeight: 600, flexShrink: 0 }}>{statusLabel}</div>
+                        {/* Actions */}
+                        {guest.phone && status !== 'replied' && (
+                          <a href={status === 'sent' ? buildReminderWhatsAppUrl(guest) : buildGuestWhatsAppUrl(guest)}
+                            target="_blank" rel="noopener noreferrer"
+                            onClick={() => markSent(idx)}
+                            style={{ ...BTN, padding: '5px 10px', borderRadius: 6, background: status === 'sent' ? '#f59e0b' : '#25D366', color: 'white', fontSize: 10, fontWeight: 700, textDecoration: 'none', flexShrink: 0 }}>
+                            {status === 'sent'
+                              ? (locale === 'en' ? '🔔 Remind' : '🔔 Relancer')
+                              : (locale === 'en' ? '📱 Send' : '📱 Envoyer')}
+                          </a>
+                        )}
+                        {status === 'replied' && (
+                          <span style={{ fontSize: 14, flexShrink: 0 }}>✅</span>
+                        )}
+                        <button onClick={() => removeGuest(idx)} style={{ ...BTN, background: 'none', border: 'none', color: '#d1d5db', fontSize: 14, cursor: 'pointer', padding: '2px 4px', flexShrink: 0 }}>✕</button>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
+              {/* Résumé + bouton relancer tous */}
+              {guests.length > 0 && (() => {
+                const pending = guests.filter(g => getGuestStatus(g) === 'pending' && g.phone)
+                const sentNotReplied = guests.filter(g => getGuestStatus(g) === 'sent' && g.phone)
+                const replied = guests.filter(g => getGuestStatus(g) === 'replied')
+                return (
+                  <div style={{ marginTop: 14, padding: '12px', background: 'white', borderRadius: 8, border: '1px solid #e5e7eb' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-around', textAlign: 'center', marginBottom: pending.length + sentNotReplied.length > 0 ? 12 : 0 }}>
+                      <div><div style={{ fontSize: 20, fontWeight: 700, color: '#22c55e' }}>{replied.length}</div><div style={{ fontSize: 10, color: '#9ca3af' }}>{locale === 'en' ? 'Replied' : 'Répondu'}</div></div>
+                      <div><div style={{ fontSize: 20, fontWeight: 700, color: '#f59e0b' }}>{sentNotReplied.length}</div><div style={{ fontSize: 10, color: '#9ca3af' }}>{locale === 'en' ? 'Awaiting' : 'En attente'}</div></div>
+                      <div><div style={{ fontSize: 20, fontWeight: 700, color: '#d1d5db' }}>{pending.length}</div><div style={{ fontSize: 10, color: '#9ca3af' }}>{locale === 'en' ? 'Not sent' : 'Non envoyé'}</div></div>
+                    </div>
+                  </div>
+                )
+              })()}
+
+              <button onClick={() => setShowGuestList(false)} style={{ ...BTN, width: '100%', marginTop: 10, padding: '8px', borderRadius: 8, border: '1px solid #e5e7eb', background: 'white', color: '#6b7280', fontSize: 12, cursor: 'pointer' }}>
+                {locale === 'en' ? 'Close' : 'Fermer'}
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Section 5 — Lien mariés */}
         <div style={{ padding: '16px 18px', background: '#f0fdf4', borderRadius: 12 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>{t.fairepart.shareCoupleLink}</div>
           <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 12 }}>{t.fairepart.shareKeepLink}</div>
@@ -5240,7 +5418,16 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
   const [coupleUrl, setCoupleUrl] = useState<string | null>(null)
   const [sharing, setSharing] = useState(false)
   const [sharingStatus, setSharingStatus] = useState('')
+  const [rsvpNames, setRsvpNames] = useState<{ nom: string }[]>([])
   const [enveloppeFinie, setEnveloppeFinie] = useState(data.introAnimation === 'none')
+
+  // Charger les noms RSVP pour le suivi invités
+  useEffect(() => {
+    if (!lastShareId) return
+    fetch(`/api/get-rsvp?shareId=${lastShareId}`).then(r => r.json()).then(d => {
+      if (Array.isArray(d)) setRsvpNames(d.map((e: { nom?: string }) => ({ nom: e.nom || '' })))
+    }).catch(() => {})
+  }, [lastShareId])
 
   // Ouvrir directement le modal RSVP si ?rsvp=1 dans l'URL
   useEffect(() => {
@@ -5376,7 +5563,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
           />
         )}
         {shareModalOpen && guestUrl && coupleUrl && (
-          <ShareModal accent={theme.accent} guestUrl={guestUrl} coupleUrl={coupleUrl} onClose={() => setShareModalOpen(false)} data={data} />
+          <ShareModal accent={theme.accent} guestUrl={guestUrl} coupleUrl={coupleUrl} onClose={() => setShareModalOpen(false)} data={data} shareId={lastShareId} rsvpEntries={rsvpNames} />
         )}
       </div>
     )
@@ -5431,7 +5618,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
   />
 )}
       {shareModalOpen && guestUrl && coupleUrl && (
-        <ShareModal accent={theme.accent} guestUrl={guestUrl} coupleUrl={coupleUrl} onClose={() => setShareModalOpen(false)} data={data} />
+        <ShareModal accent={theme.accent} guestUrl={guestUrl} coupleUrl={coupleUrl} onClose={() => setShareModalOpen(false)} data={data} shareId={lastShareId} rsvpEntries={rsvpNames} />
       )}
     </div>
   )
