@@ -276,7 +276,7 @@ interface FormData {
   effetTexte?: 'aucun' | 'or' | 'aquarelle' | 'embosse'
   dateAccueilOverride?: string // Date affichée sur la page d'accueil (override manuel)
   videoAccueilId?: string
-  accueilLayout?: Record<string, { x: number; y: number; scale: number }>
+  accueilLayout?: Record<string, { x: number; y: number; scale: number; color?: string; fontFamily?: string }>
   customLogoUrl?: string
   customLogoSize?: number // 50-150, default 100
   customLogoColor?: string // '' = original, ou hex color
@@ -703,16 +703,29 @@ function applyZoneStyle(baseStyle: React.CSSProperties, zone: TextZone, zoneStyl
   return result
 }
 // ── Drag & drop pour positionner les éléments sur la page d'accueil ──
+type LayoutEntry = { x: number; y: number; scale: number; color?: string; fontFamily?: string }
+type LayoutMap = Record<string, LayoutEntry>
+
+const DRAG_COLORS = ['', '#ffffff', '#000000', '#C9A84C', '#d4829a', '#8b0000', '#2c4a7c', '#7a9e6e', '#d4a574', '#2a9a6a']
+const DRAG_FONTS = [
+  { value: '', label: 'Défaut' },
+  { value: 'var(--font-great-vibes)', label: 'Calligraphie' },
+  { value: 'var(--font-cormorant-garamond)', label: 'Élégant' },
+  { value: 'var(--font-playfair-display)', label: 'Serif' },
+  { value: 'Georgia, serif', label: 'Georgia' },
+]
+
 function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
   id: string
-  layout?: Record<string, { x: number; y: number; scale: number }>
-  onLayoutChange?: (layout: Record<string, { x: number; y: number; scale: number }>) => void
+  layout?: LayoutMap
+  onLayoutChange?: (layout: LayoutMap) => void
   editable: boolean
   children: React.ReactNode
 }) {
   const pos = layout?.[id] ?? { x: 0, y: 0, scale: 1 }
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null)
   const [selected, setSelected] = useState(false)
+  const [showPanel, setShowPanel] = useState(false)
 
   const handlePointerDown = (e: React.PointerEvent) => {
     if (!editable) return
@@ -732,11 +745,14 @@ function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
 
   const handlePointerUp = () => { dragRef.current = null }
 
-  const changeScale = (delta: number) => {
-    if (!onLayoutChange) return
-    const newScale = Math.max(0.4, Math.min(2.5, pos.scale + delta))
-    onLayoutChange({ ...layout, [id]: { ...pos, scale: newScale } })
+  const update = (patch: Partial<LayoutEntry>) => {
+    onLayoutChange?.({ ...layout, [id]: { ...pos, ...patch } })
   }
+
+  // Appliquer couleur et police sur les enfants via un wrapper
+  const customStyle: React.CSSProperties = {}
+  if (pos.color) customStyle.color = pos.color
+  if (pos.fontFamily) customStyle.fontFamily = pos.fontFamily
 
   return (
     <div
@@ -752,14 +768,46 @@ function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
         borderRadius: 4,
         touchAction: editable ? 'none' : 'auto',
         userSelect: editable ? 'none' : 'auto',
+        ...customStyle,
       } as React.CSSProperties}
     >
-      {/* Boutons de taille — visibles quand sélectionné */}
+      {/* Barre d'outils — visible quand sélectionné */}
       {editable && selected && (
-        <div style={{ position: 'absolute', top: -24, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 4, zIndex: 20 }} onPointerDown={e => e.stopPropagation()}>
-          <button type="button" onClick={() => changeScale(-0.1)} style={{ ...BTN, width: 22, height: 22, borderRadius: '50%', border: '1px solid #C9A84C', background: 'white', color: '#C9A84C', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}>−</button>
-          <div style={{ fontSize: 9, color: '#C9A84C', background: 'white', border: '1px solid #C9A84C22', borderRadius: 4, padding: '3px 6px', fontWeight: 600, display: 'flex', alignItems: 'center' }}>{Math.round(pos.scale * 100)}%</div>
-          <button type="button" onClick={() => changeScale(0.1)} style={{ ...BTN, width: 22, height: 22, borderRadius: '50%', border: '1px solid #C9A84C', background: 'white', color: '#C9A84C', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}>+</button>
+        <div style={{ position: 'absolute', top: -28, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 3, zIndex: 20, background: 'white', borderRadius: 8, padding: '3px 5px', boxShadow: '0 2px 12px rgba(0,0,0,0.15)', border: '1px solid #e0d5c8' }} onPointerDown={e => e.stopPropagation()}>
+          <button type="button" onClick={() => update({ scale: Math.max(0.4, pos.scale - 0.1) })} style={{ ...BTN, width: 20, height: 20, borderRadius: 4, border: 'none', background: '#f5f0e8', color: '#C9A84C', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>−</button>
+          <div style={{ fontSize: 8, color: '#8a7e72', display: 'flex', alignItems: 'center', padding: '0 3px', fontWeight: 600 }}>{Math.round(pos.scale * 100)}%</div>
+          <button type="button" onClick={() => update({ scale: Math.min(2.5, pos.scale + 0.1) })} style={{ ...BTN, width: 20, height: 20, borderRadius: 4, border: 'none', background: '#f5f0e8', color: '#C9A84C', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>+</button>
+          <div style={{ width: 1, background: '#e0d5c8', margin: '2px 2px' }} />
+          <button type="button" onClick={() => setShowPanel(p => !p)} style={{ ...BTN, width: 20, height: 20, borderRadius: 4, border: 'none', background: showPanel ? '#C9A84C' : '#f5f0e8', color: showPanel ? 'white' : '#C9A84C', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>🎨</button>
+        </div>
+      )}
+      {/* Panneau couleur + police */}
+      {editable && selected && showPanel && (
+        <div style={{ position: 'absolute', top: -90, left: '50%', transform: 'translateX(-50%)', zIndex: 30, background: 'white', borderRadius: 10, padding: '10px 12px', boxShadow: '0 4px 20px rgba(0,0,0,0.18)', border: '1px solid #e0d5c8', minWidth: 200 }} onPointerDown={e => e.stopPropagation()}>
+          <div style={{ fontSize: 9, color: '#8a7e72', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Couleur</div>
+          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 8 }}>
+            {DRAG_COLORS.map(c => (
+              <button key={c || 'def'} type="button" onClick={() => update({ color: c })} style={{
+                ...BTN, width: 18, height: 18, borderRadius: '50%', padding: 0,
+                background: c || 'linear-gradient(135deg, #ccc 25%, #fff 25%, #fff 50%, #ccc 50%, #ccc 75%, #fff 75%)',
+                backgroundSize: c ? undefined : '6px 6px',
+                border: (pos.color ?? '') === c ? '2px solid #C9A84C' : '1px solid #d6d1cb',
+                boxShadow: (pos.color ?? '') === c ? '0 0 0 1px #C9A84C' : 'none',
+              }} />
+            ))}
+          </div>
+          <div style={{ fontSize: 9, color: '#8a7e72', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Police</div>
+          <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+            {DRAG_FONTS.map(f => (
+              <button key={f.value || 'def'} type="button" onClick={() => update({ fontFamily: f.value })} style={{
+                ...BTN, padding: '3px 8px', borderRadius: 6, fontSize: 9, fontWeight: (pos.fontFamily ?? '') === f.value ? 700 : 400,
+                border: `1px solid ${(pos.fontFamily ?? '') === f.value ? '#C9A84C' : '#e0d5c8'}`,
+                background: (pos.fontFamily ?? '') === f.value ? '#faf5ea' : 'white',
+                color: (pos.fontFamily ?? '') === f.value ? '#C9A84C' : '#3a3330',
+                fontFamily: f.value || 'inherit',
+              }}>{f.label}</button>
+            ))}
+          </div>
         </div>
       )}
       {children}
@@ -5106,7 +5154,7 @@ const firstDate = sorted[0]?.date
           {(() => {
             const canEdit = role !== 'guest' && !!onUpdate
             const layout = data.accueilLayout ?? {}
-            const setLayout = (l: Record<string, { x: number; y: number; scale: number }>) => onUpdate?.({ accueilLayout: l })
+            const setLayout = (l: LayoutMap) => onUpdate?.({ accueilLayout: l })
             return (<>
           {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 16, color: introTextColor, direction: 'rtl', marginBottom: 20, animation: 'sharedFadeIn 0.9s ease forwards' }}>בס״ד</div>}
           <DraggableElement id="monogram" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
