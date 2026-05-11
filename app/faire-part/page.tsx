@@ -1668,7 +1668,7 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           @keyframes adFlip{from{opacity:0;transform:perspective(200px) rotateX(90deg)}to{opacity:1;transform:perspective(200px) rotateX(0)}}
           @keyframes adFade{from{opacity:0}to{opacity:1}}
           @keyframes adRideau{0%{clip-path:inset(0 100% 0 0)}100%{clip-path:inset(0 0 0 0)}}
-          @keyframes adBrille{0%{opacity:0;filter:brightness(2)}50%{opacity:1;filter:brightness(1.5)}100%{opacity:1;filter:brightness(1)}}
+          @keyframes adBrille{0%{opacity:0;filter:brightness(2.5) saturate(1.5);text-shadow:0 0 20px currentColor}40%{opacity:1;filter:brightness(1.8);text-shadow:0 0 12px currentColor}100%{opacity:1;filter:brightness(1);text-shadow:none}}
           @keyframes adDeplie{from{opacity:0;transform:scaleY(0);transform-origin:top}to{opacity:1;transform:scaleY(1)}}
           @keyframes adFlou{from{opacity:0;filter:blur(8px)}to{opacity:1;filter:blur(0)}}
           ${Object.keys(t.fairepart.animationTextOptions).map(k => {
@@ -1681,6 +1681,7 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             const sel = (data.animationStyle || 'slide-up') === opt.key
             const accent = THEMES[data.style].accent
             const p1 = data.marie1Prenom || 'Sarah'
+            const p2 = data.marie2Prenom || 'David'
             return (
               <button key={opt.key} type="button" onClick={() => onChange({ animationStyle: opt.key })}
                 className={`anim-${opt.key}`}
@@ -1690,11 +1691,11 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                   background: sel ? `${accent}10` : '#fffdf9',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
                 }}>
-                <div style={{ height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', width: '100%' }}>
+                <div style={{ height: 52, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', width: '100%' }}>
                   <div className={`anim-${opt.key}-t`} style={{
-                    fontFamily: 'var(--font-great-vibes)', fontSize: 28, color: sel ? accent : '#b0a898',
-                    lineHeight: 1, whiteSpace: 'nowrap',
-                  }}>{p1}</div>
+                    fontFamily: 'var(--font-great-vibes)', fontSize: 22, color: sel ? accent : '#b0a898',
+                    lineHeight: 1.15, whiteSpace: 'nowrap', textAlign: 'center',
+                  }}>{p1}<br/><span style={{ fontSize: 13, opacity: 0.5 }}>&</span> {p2}</div>
                 </div>
                 <div style={{ fontSize: 9.5, fontWeight: sel ? 700 : 500, color: sel ? accent : '#3a3330', lineHeight: 1.2, textAlign: 'center' }}>
                   {(opt.label as string).replace(/^.+?\s/, '')}
