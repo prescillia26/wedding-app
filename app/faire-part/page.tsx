@@ -100,7 +100,6 @@ const ILLUSTRATIONS_COUPLES = [
 
 // Vidéos animées pour page d'accueil et cadres
 const VIDEO_BACKGROUNDS: { id: string; label: string; url: string; textPosition: 'top' | 'center' | 'center-top'; needsOverlay: boolean; dark?: boolean }[] = [
-  { id: 'vid-192', label: '✨ Cadre doré baroque', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511807/192_tcw3l4.mp4', textPosition: 'center', needsOverlay: false },
   { id: 'vid-178', label: '🏛️ Palais & fontaine', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511799/178_ngv1mw.mp4', textPosition: 'center', needsOverlay: false },
   { id: 'vid-191', label: '🌙 Nuit étoilée', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511807/191_cvtes6.mp4', textPosition: 'center', needsOverlay: false, dark: true },
   { id: 'vid-176', label: '🦢 Jardin romantique', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511791/176_xkqggp.mp4', textPosition: 'center-top', needsOverlay: false },
@@ -275,8 +274,7 @@ interface FormData {
   illustrationCoupleId?: string
   effetTexte?: 'aucun' | 'or' | 'aquarelle' | 'embosse'
   dateAccueilOverride?: string // Date affichée sur la page d'accueil (override manuel)
-  videoAccueilId?: string
-  accueilLayout?: Record<string, { x: number; y: number; scale: number; color?: string; fontFamily?: string }>
+  videoAccueilId?: string // ID vidéo animée pour page d'accueil
   customLogoUrl?: string
   customLogoSize?: number // 50-150, default 100
   customLogoColor?: string // '' = original, ou hex color
@@ -702,146 +700,6 @@ function applyZoneStyle(baseStyle: React.CSSProperties, zone: TextZone, zoneStyl
   }
   return result
 }
-// ── Drag & drop pour positionner les éléments sur la page d'accueil ──
-type LayoutEntry = { x: number; y: number; scale: number; color?: string; fontFamily?: string }
-type LayoutMap = Record<string, LayoutEntry>
-
-const DRAG_COLORS = ['', '#ffffff', '#000000', '#C9A84C', '#d4829a', '#8b0000', '#2c4a7c', '#7a9e6e', '#d4a574', '#2a9a6a']
-const DRAG_FONTS = [
-  { value: '', label: 'Défaut' },
-  { value: 'var(--font-great-vibes)', label: 'Calligraphie' },
-  { value: 'var(--font-cormorant-garamond)', label: 'Élégant' },
-  { value: 'var(--font-playfair-display)', label: 'Serif' },
-  { value: 'Georgia, serif', label: 'Georgia' },
-]
-
-function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
-  id: string
-  layout?: LayoutMap
-  onLayoutChange?: (layout: LayoutMap) => void
-  editable: boolean
-  children: React.ReactNode
-}) {
-  const pos = layout?.[id] ?? { x: 0, y: 0, scale: 1 }
-  const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null)
-  const [selected, setSelected] = useState(false)
-  const [showPanel, setShowPanel] = useState(false)
-
-  // Fermer quand on clique ailleurs (mais pas sur la barre d'outils/panneau)
-  const containerRef = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    if (!selected) return
-    const close = (e: PointerEvent) => {
-      if (containerRef.current?.contains(e.target as Node)) return
-      setSelected(false)
-      setShowPanel(false)
-    }
-    const timer = setTimeout(() => document.addEventListener('pointerdown', close), 10)
-    return () => { clearTimeout(timer); document.removeEventListener('pointerdown', close) }
-  }, [selected])
-
-  const toolbarRef = useRef<HTMLDivElement>(null)
-  const panelRef = useRef<HTMLDivElement>(null)
-
-  const handlePointerDown = (e: React.PointerEvent) => {
-    if (!editable) return
-    // Ne pas démarrer le drag si on clique sur la toolbar ou le panneau
-    if (toolbarRef.current?.contains(e.target as Node)) return
-    if (panelRef.current?.contains(e.target as Node)) return
-    e.preventDefault()
-    e.stopPropagation()
-    setSelected(true)
-    dragRef.current = { startX: e.clientX, startY: e.clientY, origX: pos.x, origY: pos.y }
-    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
-  }
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!dragRef.current || !onLayoutChange) return
-    const dx = e.clientX - dragRef.current.startX
-    const dy = e.clientY - dragRef.current.startY
-    onLayoutChange({ ...layout, [id]: { ...pos, x: dragRef.current.origX + dx, y: dragRef.current.origY + dy } })
-  }
-
-  const handlePointerUp = () => { dragRef.current = null }
-
-  const update = (patch: Partial<LayoutEntry>) => {
-    onLayoutChange?.({ ...layout, [id]: { ...pos, ...patch } })
-  }
-
-  // Appliquer couleur et police — force via !important en injectant un style
-  const customColor = pos.color || ''
-  const customFont = pos.fontFamily || ''
-
-  return (
-    <div
-      ref={containerRef}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      className={`drag-el-${id}`}
-      style={{
-        transform: `translate(${pos.x}px, ${pos.y}px) scale(${pos.scale})`,
-        cursor: editable ? 'grab' : 'default',
-        position: 'relative',
-        outline: editable && selected ? '1.5px dashed rgba(201,168,76,0.5)' : editable ? '1px dashed rgba(201,168,76,0.15)' : 'none',
-        outlineOffset: 6,
-        borderRadius: 4,
-        touchAction: editable ? 'none' : 'auto',
-        userSelect: editable ? 'none' : 'auto',
-      } as React.CSSProperties}
-    >
-      {(customColor || customFont) && (
-        <style>{`
-          .drag-el-${id}, .drag-el-${id} * {
-            ${customColor ? `color: ${customColor} !important;` : ''}
-            ${customFont ? `font-family: ${customFont} !important;` : ''}
-          }
-        `}</style>
-      )}
-      {/* Barre d'outils — visible quand sélectionné */}
-      {editable && selected && (
-        <div ref={toolbarRef} style={{ position: 'absolute', top: -28, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 3, zIndex: 20, background: 'white', borderRadius: 8, padding: '3px 5px', boxShadow: '0 2px 12px rgba(0,0,0,0.15)', border: '1px solid #e0d5c8' }}>
-          <button type="button" onClick={() => update({ scale: Math.max(0.4, pos.scale - 0.1) })} style={{ ...BTN, width: 20, height: 20, borderRadius: 4, border: 'none', background: '#f5f0e8', color: '#C9A84C', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>−</button>
-          <div style={{ fontSize: 8, color: '#8a7e72', display: 'flex', alignItems: 'center', padding: '0 3px', fontWeight: 600 }}>{Math.round(pos.scale * 100)}%</div>
-          <button type="button" onClick={() => update({ scale: Math.min(2.5, pos.scale + 0.1) })} style={{ ...BTN, width: 20, height: 20, borderRadius: 4, border: 'none', background: '#f5f0e8', color: '#C9A84C', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>+</button>
-          <div style={{ width: 1, background: '#e0d5c8', margin: '2px 2px' }} />
-          <button type="button" onClick={() => setShowPanel(p => !p)} style={{ ...BTN, width: 20, height: 20, borderRadius: 4, border: 'none', background: showPanel ? '#C9A84C' : '#f5f0e8', color: showPanel ? 'white' : '#C9A84C', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>🎨</button>
-        </div>
-      )}
-      {/* Panneau couleur + police */}
-      {editable && selected && showPanel && (
-        <div ref={panelRef} style={{ position: 'absolute', top: -90, left: '50%', transform: 'translateX(-50%)', zIndex: 30, background: 'white', borderRadius: 10, padding: '10px 12px', boxShadow: '0 4px 20px rgba(0,0,0,0.18)', border: '1px solid #e0d5c8', minWidth: 200 }}>
-          <div style={{ fontSize: 9, color: '#8a7e72', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Couleur</div>
-          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 8 }}>
-            {DRAG_COLORS.map(c => (
-              <button key={c || 'def'} type="button" onClick={() => update({ color: c })} style={{
-                ...BTN, width: 18, height: 18, borderRadius: '50%', padding: 0,
-                background: c || 'linear-gradient(135deg, #ccc 25%, #fff 25%, #fff 50%, #ccc 50%, #ccc 75%, #fff 75%)',
-                backgroundSize: c ? undefined : '6px 6px',
-                border: (pos.color ?? '') === c ? '2px solid #C9A84C' : '1px solid #d6d1cb',
-                boxShadow: (pos.color ?? '') === c ? '0 0 0 1px #C9A84C' : 'none',
-              }} />
-            ))}
-          </div>
-          <div style={{ fontSize: 9, color: '#8a7e72', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Police</div>
-          <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
-            {DRAG_FONTS.map(f => (
-              <button key={f.value || 'def'} type="button" onClick={() => update({ fontFamily: f.value })} style={{
-                ...BTN, padding: '3px 8px', borderRadius: 6, fontSize: 9, fontWeight: (pos.fontFamily ?? '') === f.value ? 700 : 400,
-                border: `1px solid ${(pos.fontFamily ?? '') === f.value ? '#C9A84C' : '#e0d5c8'}`,
-                background: (pos.fontFamily ?? '') === f.value ? '#faf5ea' : 'white',
-                color: (pos.fontFamily ?? '') === f.value ? '#C9A84C' : '#3a3330',
-                fontFamily: f.value || 'inherit',
-              }}>{f.label}</button>
-            ))}
-          </div>
-        </div>
-      )}
-      {children}
-    </div>
-  )
-}
-
 const S: Record<string, React.CSSProperties> = {
   input: {
     width: '100%', border: '1px solid #e0d5c8', borderRadius: 8, padding: '12px 15px',
@@ -1128,8 +986,7 @@ function StyleAccueilSelector({ data, onChange }: { data: FormData; onChange: (d
                   background: sel ? '#faf5ea' : '#fffdf9',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
                 }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={v.url.replace('/video/upload/', '/video/upload/so_2,w_200,h_260,c_fill,f_jpg/').replace('.mp4', '.jpg')} alt={v.label} style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', borderRadius: 6 }} />
+                  <video src={v.url} muted playsInline autoPlay loop style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', borderRadius: 6 }} />
                   <span style={{ fontSize: 8, color: sel ? '#C9A84C' : '#3a3330', fontWeight: sel ? 700 : 400, padding: '0 2px 2px', textAlign: 'center', lineHeight: 1.2 }}>{v.label.replace(/^.+?\s/, '')}</span>
                 </button>
               )
@@ -1823,9 +1680,12 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       </AccordionSection>
 
       <AccordionSection title={locale === 'en' ? '🖼️ Decorative frame' : '🖼️ Cadre décoratif'}>
-        <Label>{locale === 'en' ? 'Choose your frame' : 'Choisissez votre cadre'}</Label>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-          {FRAMES.map(fr => {
+        {/* Cadres statiques (images) */}
+        <div style={{ fontSize: 12, fontWeight: 700, color: '#3a3028', marginBottom: 8 }}>
+          {locale === 'en' ? '🌸 Floral frames' : '🌸 Cadres floraux'}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
+          {FRAMES.filter(fr => !fr.video).map(fr => {
             const accent = THEMES[data.style].accent
             const sel = (data.frameId ?? 'frame-09') === fr.id
             return (
@@ -1836,15 +1696,46 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
                 boxShadow: sel ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.08)',
               }}>
-                {fr.url && fr.video ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={fr.url.replace('/video/upload/', '/video/upload/so_2,w_160,h_200,c_fill,f_jpg/').replace('.mp4', '.jpg')} alt={fr.label} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
-                ) : fr.url ? (
+                {fr.url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={fr.url} alt={fr.label} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
                 ) : (
                   <div style={{ width: 80, height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, opacity: 0.4, background: '#f5f5f5', borderRadius: 6 }}>✕</div>
                 )}
+                <span style={{ fontSize: 9, fontWeight: sel ? 700 : 400, color: sel ? accent : '#3a3330', textAlign: 'center', lineHeight: 1.3 }}>{fr.label}</span>
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Séparateur */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+          <div style={{ flex: 1, height: 1, background: '#efe5d8' }} />
+          <span style={{ fontSize: 10, color: '#b0a898', fontStyle: 'italic' }}>ou</span>
+          <div style={{ flex: 1, height: 1, background: '#efe5d8' }} />
+        </div>
+
+        {/* Cadres vidéo animés */}
+        <div style={{ fontSize: 12, fontWeight: 700, color: '#3a3028', marginBottom: 8 }}>
+          {locale === 'en' ? '🎬 Animated video frames' : '🎬 Cadres vidéo animés'}
+        </div>
+        <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 10 }}>
+          {locale === 'en' ? 'Moving backgrounds that bring your invitation to life.' : 'Des fonds animés qui donnent vie à votre invitation.'}
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+          {FRAMES.filter(fr => fr.video).map(fr => {
+            const accent = THEMES[data.style].accent
+            const sel = (data.frameId ?? 'frame-09') === fr.id
+            return (
+              <button key={fr.id} type="button" onClick={() => onChange({ frameId: fr.id })} style={{
+                ...BTN, padding: 8, borderRadius: 10,
+                border: `2px solid ${sel ? accent : '#f0e0d0'}`,
+                background: sel ? `${accent}10` : 'white',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                boxShadow: sel ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.08)',
+              }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={fr.url!.replace('/video/upload/', '/video/upload/so_2,w_160,h_200,c_fill,f_jpg/').replace('.mp4', '.jpg')} alt={fr.label} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
                 <span style={{ fontSize: 9, fontWeight: sel ? 700 : 400, color: sel ? accent : '#3a3330', textAlign: 'center', lineHeight: 1.3 }}>{fr.label}</span>
               </button>
             )
@@ -2064,14 +1955,16 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
         <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: frameOpacity, transform: `scale(${frameSize / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
       )}
       {hasFrame && isVideo && (
-        <video src={frame.url!} autoPlay loop muted playsInline preload="auto" poster={frame.url!.replace('/video/upload/', '/video/upload/so_2,w_600,h_800,c_fill,f_jpg/').replace('.mp4', '.jpg')} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: frameOpacity, pointerEvents: 'none', zIndex: 1 }} />
+        <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: frameOpacity, pointerEvents: 'none', zIndex: 1 }} />
       )}
       <OrnementCorner url={ornUrl} corner="top-right" size={130} />
       <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
       {/* Zone texte avec voile blanc semi-transparent derrière pour garantir la lisibilité sur cadres chargés */}
       <div style={{ position: 'relative', zIndex: 10, paddingTop: `${framePaddingV}%`, paddingBottom: `${framePaddingV}%`, paddingLeft: `${framePaddingH}%`, paddingRight: `${framePaddingH}%`, textAlign: 'center', opacity: textOpacity }}>
-        {hasFrame && FRAMES_STRONG_BG.has(frameId) && (
-          <div style={{ position: 'absolute', inset: '12% 18%', background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: -1 }} />
+        {hasFrame && (
+          <div style={{ position: 'absolute', inset: FRAMES_STRONG_BG.has(frameId) ? '12% 18%' : '10% 15%', background: FRAMES_STRONG_BG.has(frameId)
+            ? 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)'
+            : 'radial-gradient(ellipse at center, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.45) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: -1 }} />
         )}
         {children}
       </div>
@@ -4512,7 +4405,6 @@ interface SharedPageContentProps {
   onStartYoutube?: () => void
   ytIframeRef: React.RefObject<HTMLIFrameElement | null>
   ytMuted: boolean; onToggleYtMute: () => void
-  onUpdate?: (d: Partial<FormData>) => void
 }
 // ── 💌 ENVELOPPE PREMIUM ─────────────────────────────────────────────────────
 // Design : prénoms en haut, sceau au centre, "Touchez" en bas, ornements SVG
@@ -5059,7 +4951,7 @@ function EnveloppeAnimation({ data, theme, onDone }: { data: FormData; theme: Th
 }
 
 // ── ItineraireButtons : Google Maps + Waze avec design luxe ───────────────────
-function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute, onUpdate }: SharedPageContentProps) {
+function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute }: SharedPageContentProps) {
   const { t, locale } = useT()
   const contentRef = useRef<HTMLDivElement>(null)
   const [currentCeremonyIdx, setCurrentCeremonyIdx] = useState(0)
@@ -5160,8 +5052,7 @@ const firstDate = sorted[0]?.date
           <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
             <video
               src={VIDEO_BACKGROUNDS.find(v => v.id === data.videoAccueilId)?.url}
-              autoPlay loop muted playsInline preload="auto"
-              poster={VIDEO_BACKGROUNDS.find(v => v.id === data.videoAccueilId)?.url?.replace('/video/upload/', '/video/upload/so_2,w_600,h_900,c_fill,f_jpg/')?.replace('.mp4', '.jpg')}
+              autoPlay loop muted playsInline
               style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
             />
             {/* Voile pour lisibilité du texte */}
@@ -5178,24 +5069,16 @@ const firstDate = sorted[0]?.date
           </div>
         )}
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '0 32px', maxWidth: 480, width: '100%', margin: '0 auto' }}>
-          {(() => {
-            const canEdit = role !== 'guest' && !!onUpdate
-            const layout = data.accueilLayout ?? {}
-            const setLayout = (l: LayoutMap) => onUpdate?.({ accueilLayout: l })
-            return (<>
           {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 16, color: introTextColor, direction: 'rtl', marginBottom: 20, animation: 'sharedFadeIn 0.9s ease forwards' }}>בס״ד</div>}
-          <DraggableElement id="monogram" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: data.styleAccueil === 'video' ? 10 : 16, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
-            {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={data.styleAccueil === 'video' ? 110 : 140} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={data.styleAccueil === 'video' ? 110 : 140} style={data.monogrammeStyle || 'cercle'} />}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
+            {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={140} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor}size={140} style={data.monogrammeStyle || 'cercle'} />}
           </div>
-          </DraggableElement>
           {data.styleAccueil === 'illustration' && data.illustrationCoupleId && (
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 30, animation: 'sharedFadeIn 1s 0.2s ease forwards', opacity: 0 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url} alt="" style={{ maxWidth: '70%', maxHeight: 280, objectFit: 'contain' }} />
             </div>
           )}
-          <DraggableElement id="names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', margin: '0 auto 16px', maxWidth: 160 }}>
             <div style={{ flex: 1, height: 0.5, background: introTextColor, opacity: 0.4 }} />
             <span style={{ color: introTextColor, fontSize: 10, opacity: 0.7 }}>◆</span>
@@ -5204,27 +5087,18 @@ const firstDate = sorted[0]?.date
           <div style={{ fontFamily: FS, fontSize: 'clamp(30px,8vw,46px)', color: introTextColor, marginBottom: 16, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.2, textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : readableShadow(theme) }}>
             {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
           </div>
-          </DraggableElement>
-          <DraggableElement id="phrase" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: introTextColor, marginBottom: 20, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}>
             {t.fairepart.pleaseJoin}
           </div>
-          </DraggableElement>
           {/* Compte à rebours intégré dans l'accueil */}
           {firstDate && (
-            <DraggableElement id="countdown" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
             <div style={{ marginBottom: 28, animation: 'sharedFadeIn 1s 0.65s ease forwards', opacity: 0 }}>
               <Countdown targetDate={firstDate} accent={hasIntroPhoto ? 'rgba(255,255,255,0.9)' : G} />
             </div>
-            </DraggableElement>
           )}
-          <DraggableElement id="button" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <button className="lovit-btn" onClick={canEdit ? undefined : handleDiscover} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '14px 40px', fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', boxShadow: `0 4px 20px ${G}44`, animation: 'sharedFadeIn 1s 0.8s ease forwards', opacity: 0 } as React.CSSProperties}>
+          <button className="lovit-btn" onClick={handleDiscover} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '14px 40px', fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', boxShadow: `0 4px 20px ${G}44`, animation: 'sharedFadeIn 1s 0.8s ease forwards', opacity: 0 } as React.CSSProperties}>
             {t.fairepart.discoverInvitation}
           </button>
-          </DraggableElement>
-          </>)
-          })()}
         </div>
         </div>
       </div>
@@ -5249,7 +5123,7 @@ const firstDate = sorted[0]?.date
               <CeremonyCard isCard={isCard} accent={G}>
                 <section id={`ceremony-${realIdx}`} style={{ paddingTop: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingBottom: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingLeft: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: 'visible', scrollMarginTop: 60, ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
                   {hasFrame && frame.video ? (
-                    <video src={frame.url!} autoPlay loop muted playsInline preload="auto" poster={frame.url!.replace('/video/upload/', '/video/upload/so_2,w_600,h_800,c_fill,f_jpg/').replace('.mp4', '.jpg')} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
+                    <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
                   ) : hasFrame ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: data.frameOpacity ?? 1, transform: `scale(${(data.frameSize ?? 100) / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
@@ -5264,8 +5138,10 @@ const firstDate = sorted[0]?.date
                       {i % 2 === 0 ? <><OrnTR /><OrnBL /></> : <><OrnTL /><OrnBR /></>}
                     </>
                   )}
-                  {hasFrame && FRAMES_STRONG_BG.has(data.frameId ?? '') && (
-                    <div style={{ position: 'absolute', inset: '12% 18%', background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: 0 }} />
+                  {hasFrame && (
+                    <div style={{ position: 'absolute', inset: FRAMES_STRONG_BG.has(data.frameId ?? '') ? '12% 18%' : '10% 15%', background: FRAMES_STRONG_BG.has(data.frameId ?? '')
+                      ? 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)'
+                      : 'radial-gradient(ellipse at center, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.45) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: 0 }} />
                   )}
                   <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame) }}>
                     {data.mariageJuif && (
@@ -5547,7 +5423,6 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
   const [zoneStyles, setZoneStyles] = useState<ZoneStyles>(data.zoneStyles ?? {})
   const [textEditOpen, setTextEditOpen] = useState(false)
   const [shareModalOpen, setShareModalOpen] = useState(false)
-  const [previewMode, setPreviewMode] = useState(false)
   const [guestUrl, setGuestUrl] = useState<string | null>(null)
   const [coupleUrl, setCoupleUrl] = useState<string | null>(null)
   const [sharing, setSharing] = useState(false)
@@ -5660,7 +5535,6 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
           ytIframeRef={ytIframeRef}
           ytMuted={ytMuted}
           onToggleYtMute={toggleYtMute}
-          onUpdate={onUpdate}
         />
         {role === 'couple' && (
           <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -5707,7 +5581,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         data={{ ...data, textOverrides: { ...data.textOverrides, ...textOverrides }, zoneStyles }}
         theme={theme}
         sorted={sorted}
-        role={previewMode ? 'guest' : 'couple'}
+        role="guest"
         lastShareId={lastShareId}
         onRsvpOpen={() => setRsvpOpen(true)}
         onRsvpListOpen={() => setRsvpListOpen(true)}
@@ -5715,7 +5589,6 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         ytIframeRef={ytIframeRef}
         ytMuted={ytMuted}
         onToggleYtMute={toggleYtMute}
-        onUpdate={previewMode ? undefined : onUpdate}
       />
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
         <button onClick={onEdit} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>{t.fairepart.editBtn}</button>
@@ -5727,9 +5600,6 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         {lastShareId && (
           <a href={`/plan-table?shareId=${lastShareId}`} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>{t.fairepart.tablesBtn}</a>
         )}
-        <button onClick={() => setPreviewMode(p => !p)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${previewMode ? '#22c55e' : theme.accent}`, background: previewMode ? '#22c55e15' : 'transparent', color: previewMode ? '#22c55e' : theme.accent, fontSize: 13, fontWeight: 600 }}>
-          {previewMode ? '✏️ Éditer' : '👁️ Preview'}
-        </button>
         <a href="/paiement" style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: '1.5px solid #e5d5c5', background: 'transparent', color: '#8a7860', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>{t.fairepart.newBtn}</a>
       </div>
       {rsvpOpen && (
@@ -6260,7 +6130,7 @@ export default function FairePartPage() {
   // Gate d'accès
   if (!accessGranted && !isShared) return <AccessGate onGranted={() => { setAccessGranted(true); try { const draft = localStorage.getItem('wedding-draft'); if (draft) setHasDraft(true) } catch { /* ignore */ } }} />
 
-  if (showCards) return <CardsView data={formData} onEdit={() => { try { localStorage.setItem('wedding-draft', JSON.stringify(formData)) } catch { /* ignore */ } setShowCards(false); setStep(4) }} onReset={() => { setFormData(defaultFormData); setShowCards(false); setStep(1); try { localStorage.removeItem('wedding-draft') } catch { /* ignore */ } }} isShared={isShared} role={role} onUpdate={update} />
+  if (showCards) return <CardsView data={formData} onEdit={() => { try { localStorage.setItem('wedding-draft', JSON.stringify(formData)) } catch { /* ignore */ } setShowCards(false); setStep(1) }} onReset={() => { setFormData(defaultFormData); setShowCards(false); setStep(1); try { localStorage.removeItem('wedding-draft') } catch { /* ignore */ } }} isShared={isShared} role={role} onUpdate={update} />
 
   if (loadingShare) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fff8ed 0%, #fffaf4 50%, #fff8ed 100%)' }}>
