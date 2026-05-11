@@ -1668,12 +1668,12 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           @keyframes adFlip{from{opacity:0;transform:perspective(200px) rotateX(90deg)}to{opacity:1;transform:perspective(200px) rotateX(0)}}
           @keyframes adFade{from{opacity:0}to{opacity:1}}
           @keyframes adRideau{0%{clip-path:inset(0 100% 0 0)}100%{clip-path:inset(0 0 0 0)}}
-          @keyframes adBrille{0%{opacity:0;filter:brightness(2.5) saturate(1.5);text-shadow:0 0 20px currentColor}40%{opacity:1;filter:brightness(1.8);text-shadow:0 0 12px currentColor}100%{opacity:1;filter:brightness(1);text-shadow:none}}
+          @keyframes adBrille{0%{opacity:0;color:#fff;text-shadow:0 0 30px currentColor,0 0 60px currentColor}30%{opacity:1;text-shadow:0 0 20px currentColor,0 0 40px currentColor}100%{opacity:1;text-shadow:none}}
           @keyframes adDeplie{from{opacity:0;transform:scaleY(0);transform-origin:top}to{opacity:1;transform:scaleY(1)}}
-          @keyframes adFlou{from{opacity:0;filter:blur(8px)}to{opacity:1;filter:blur(0)}}
+          @keyframes adFlou{0%{filter:blur(10px);opacity:0.3}50%{filter:blur(4px);opacity:0.7}100%{filter:blur(0);opacity:1}}
           ${Object.keys(t.fairepart.animationTextOptions).map(k => {
             const a: Record<string, string> = { fade:'adFade', 'slide-up':'adSlideUp', rideau:'adRideau', brille:'adBrille', deplie:'adDeplie', flou:'adFlou', 'slide-left':'adSlideLeft', zoom:'adZoom', flip:'adFlip' }
-            return `.anim-${k}:hover .anim-${k}-t{animation:${a[k] || 'adFade'} 0.7s ease both;}`
+            return `.anim-${k} .anim-${k}-t{opacity:0.35;transition:opacity 0.3s;}\n.anim-${k}:hover .anim-${k}-t{animation:${a[k] || 'adFade'} 1s ease both;opacity:1;}`
           }).join('\n')}
         `}</style>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
