@@ -290,7 +290,7 @@ const defaultFormData: FormData = {
   textOpacity: 1,
   textBg: 0.5,
   animationStyle: 'slide-up',
-  introAnimation: 'enveloppe',
+  introAnimation: 'petales',
   slug: '',
   zoneStyles: {},
   styleAccueil: 'photo',
@@ -676,13 +676,13 @@ function applyZoneStyle(baseStyle: React.CSSProperties, zone: TextZone, zoneStyl
 }
 const S: Record<string, React.CSSProperties> = {
   input: {
-    width: '100%', border: '1px solid #d6d1cb', borderRadius: 8, padding: '11px 14px',
-    background: '#fff', fontSize: 14, outline: 'none', color: '#3a3330', boxSizing: 'border-box',
+    width: '100%', border: '1px solid #e0d5c8', borderRadius: 8, padding: '12px 15px',
+    background: '#fffdf9', fontSize: 14, outline: 'none', color: '#2c2622', boxSizing: 'border-box',
     transition: 'border-color 0.2s',
   },
   label: {
     display: 'block', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.14em',
-    color: '#8a7e72', marginBottom: 7, fontWeight: 700,
+    color: '#b09a7c', marginBottom: 7, fontWeight: 700,
   },
 }
 
@@ -744,7 +744,7 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
   return (
     <div>
       <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#3a3330', marginBottom: 24 }}>{t.fairepart.step1Title}</h2>
-      <div style={{ background: '#f9f8f6', borderRadius: 12, padding: 20, marginBottom: 16 }}>
+      <div style={{ background: '#fdf8f0', borderRadius: 12, padding: 20, marginBottom: 16 }}>
         <div style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>{t.fairepart.person1}</div>
         <div style={{ display: 'flex', gap: 12 }}>
           <Field label={t.fairepart.firstName} value={data.marie1Prenom} onChange={v => onChange({ marie1Prenom: v })} placeholder={t.fairepart.placeholderFirstName1} />
@@ -753,11 +753,11 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         <Field label={t.fairepart.secondName} value={data.marie1Prenom2} onChange={v => onChange({ marie1Prenom2: v })} placeholder="" />
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '16px 0' }}>
-        <div style={{ flex: 1, height: 1, background: '#d6d1cb' }} />
+        <div style={{ flex: 1, height: 1, background: '#e0d5c8' }} />
         <span style={{ color: '#C9A84C', fontSize: 20 }}>&</span>
-        <div style={{ flex: 1, height: 1, background: '#d6d1cb' }} />
+        <div style={{ flex: 1, height: 1, background: '#e0d5c8' }} />
       </div>
-      <div style={{ background: '#f9f8f6', borderRadius: 12, padding: 20 }}>
+      <div style={{ background: '#fdf8f0', borderRadius: 12, padding: 20 }}>
         <div style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>{t.fairepart.person2}</div>
         <div style={{ display: 'flex', gap: 12 }}>
           <Field label={t.fairepart.firstName} value={data.marie2Prenom} onChange={v => onChange({ marie2Prenom: v })} placeholder={t.fairepart.placeholderFirstName2} />
@@ -765,7 +765,7 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         </div>
         <Field label={t.fairepart.secondName} value={data.marie2Prenom2} onChange={v => onChange({ marie2Prenom2: v })} placeholder="" />
       </div>
-      <div style={{ marginTop: 20, padding: 16, background: '#f9f8f6', borderRadius: 12 }}>
+      <div style={{ marginTop: 20, padding: 16, background: '#fdf8f0', borderRadius: 12 }}>
   <Label>{t.fairepart.customLink} (optionnel)</Label>
   <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Ex: sarah-et-david → lovit.fr/sarah-et-david</p>
   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -879,9 +879,9 @@ function IllustrationCoupleSelector({ data, onChange }: { data: FormData; onChan
               style={{
                 ...BTN,
                 padding: 4,
-                border: isSel ? '2.5px solid #c48b9f' : '1px solid #d6d1cb',
+                border: isSel ? '2.5px solid #c48b9f' : '1px solid #e0d5c8',
                 borderRadius: 10,
-                background: isSel ? '#f7f3ec' : 'white',
+                background: isSel ? '#faf5ea' : 'white',
                 cursor: 'pointer',
                 position: 'relative',
                 aspectRatio: '3/4',
@@ -929,9 +929,9 @@ function StyleAccueilSelector({ data, onChange }: { data: FormData; onChange: (d
               style={{
                 ...BTN,
                 padding: '14px 8px',
-                border: isSel ? '2.5px solid #c48b9f' : '1px solid #d6d1cb',
+                border: isSel ? '2.5px solid #c48b9f' : '1px solid #e0d5c8',
                 borderRadius: 10,
-                background: isSel ? '#f7f3ec' : 'white',
+                background: isSel ? '#faf5ea' : 'white',
                 fontSize: 13,
                 fontWeight: isSel ? 700 : 400,
                 color: '#3a3330',
@@ -1037,7 +1037,7 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
 
       {photos.length < 5 && (
         <label style={{ display: 'block', cursor: uploading ? 'wait' : 'pointer', marginBottom: photos.length > 0 ? 12 : 0 }}>
-          <div style={{ border: '2px dashed #d6d1cb', borderRadius: 10, padding: 16, textAlign: 'center', background: uploading ? '#f7f3ec' : 'white' }}>
+          <div style={{ border: '2px dashed #e0d5c8', borderRadius: 10, padding: 16, textAlign: 'center', background: uploading ? '#faf5ea' : 'white' }}>
             <div style={{ fontSize: 22, marginBottom: 4 }}>{uploading ? '⏳' : '📷'}</div>
             <p style={{ fontSize: 13, color: '#3a3330', margin: 0 }}>{uploading ? t.fairepart.photoUploading : t.fairepart.photoClickToAdd}</p>
           </div>
@@ -1070,13 +1070,13 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
                   </div>
                   <div style={{ display: 'flex', gap: 2, marginTop: 4 }}>
                     {idx > 0 && (
-                      <button type="button" onClick={() => movePhoto(idx, -1)} style={{ ...BTN, flex: '0 0 20px', padding: '4px 0', borderRadius: 6, border: '1px solid #d6d1cb', background: 'white', color: '#3a3330', fontSize: 10 }}>←</button>
+                      <button type="button" onClick={() => movePhoto(idx, -1)} style={{ ...BTN, flex: '0 0 20px', padding: '4px 0', borderRadius: 6, border: '1px solid #e0d5c8', background: 'white', color: '#3a3330', fontSize: 10 }}>←</button>
                     )}
-                    <button type="button" onClick={() => setCropIdx(isCropping ? null : idx)} style={{ ...BTN, flex: 1, padding: '4px 0', borderRadius: 6, border: `1px solid ${isCropping ? '#C9A84C' : '#d6d1cb'}`, background: isCropping ? '#f7f3ec' : 'white', color: isCropping ? '#C9A84C' : '#3a3330', fontSize: 9, fontWeight: isCropping ? 700 : 400 }}>
+                    <button type="button" onClick={() => setCropIdx(isCropping ? null : idx)} style={{ ...BTN, flex: 1, padding: '4px 0', borderRadius: 6, border: `1px solid ${isCropping ? '#C9A84C' : '#e0d5c8'}`, background: isCropping ? '#faf5ea' : 'white', color: isCropping ? '#C9A84C' : '#3a3330', fontSize: 9, fontWeight: isCropping ? 700 : 400 }}>
                       {isCropping ? t.fairepart.photoCropClose : t.fairepart.photoCropBtn}
                     </button>
                     {idx < photos.length - 1 && (
-                      <button type="button" onClick={() => movePhoto(idx, 1)} style={{ ...BTN, flex: '0 0 20px', padding: '4px 0', borderRadius: 6, border: '1px solid #d6d1cb', background: 'white', color: '#3a3330', fontSize: 10 }}>→</button>
+                      <button type="button" onClick={() => movePhoto(idx, 1)} style={{ ...BTN, flex: '0 0 20px', padding: '4px 0', borderRadius: 6, border: '1px solid #e0d5c8', background: 'white', color: '#3a3330', fontSize: 10 }}>→</button>
                     )}
                   </div>
                 </div>
@@ -1085,7 +1085,7 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
           </div>
 
           {cropIdx !== null && photos[cropIdx] && (
-            <div style={{ background: '#f9f8f6', borderRadius: 12, padding: 16, marginBottom: 12, border: '1.5px solid #d6d1cb' }}>
+            <div style={{ background: '#fdf8f0', borderRadius: 12, padding: 16, marginBottom: 12, border: '1.5px solid #e0d5c8' }}>
               <div style={{ fontSize: 12, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>{t.fairepart.photoCropTitle} {cropIdx + 1}</div>
               <ImageCropper
                 src={photos[cropIdx]}
@@ -1180,7 +1180,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
     <div>
       <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#3a3330', marginBottom: 24 }}>{t.fairepart.step3Title}</h2>
       {data.ceremonies.map((c, i) => (
-        <div key={i} style={{ background: '#f9f8f6', borderRadius: 12, padding: 20, marginBottom: 16 }}>
+        <div key={i} style={{ background: '#fdf8f0', borderRadius: 12, padding: 20, marginBottom: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <span style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Événement {i + 1}</span>
             {data.ceremonies.length > 1 && (
@@ -1228,7 +1228,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           </div>
 
           {/* ── Infos transport / hébergement (optionnel) ── */}
-          <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px dashed #d6d1cb' }}>
+          <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px dashed #e0d5c8' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: '#3a3330' }}>
               <input
                 type="checkbox"
@@ -1266,7 +1266,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
 
           {/* ── Pensées pour les défunts (Houppa uniquement) ── */}
           {c.type === 'Cérémonie religieuse / Houppa' && (
-            <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px dashed #d6d1cb' }}>
+            <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px dashed #e0d5c8' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: '#3a3330' }}>
                 <input
                   type="checkbox"
@@ -1316,7 +1316,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                           const newNoms = c.penseesDefuntsNoms.filter((_, j) => j !== nomIdx)
                           update(i, { penseesDefuntsNoms: newNoms })
                         }}
-                        style={{ ...BTN, padding: '0 12px', borderRadius: 8, border: '1px solid #d6d1cb', background: 'white', cursor: 'pointer', fontSize: 14 }}
+                        style={{ ...BTN, padding: '0 12px', borderRadius: 8, border: '1px solid #e0d5c8', background: 'white', cursor: 'pointer', fontSize: 14 }}
                         title={t.fairepart.memorialDeleteName}
                       >
                         🗑
@@ -1489,7 +1489,7 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
         </div>
 
         <div style={{ marginTop: 10 }}>
-          <button type="button" onClick={() => onChange({ customLogoUrl: '', customLogoSize: 100, customLogoColor: '' })} style={{ cursor: 'pointer', background: 'transparent', border: `1px solid #d6d1cb`, borderRadius: 9999, padding: '6px 16px', fontSize: 11, color: '#d45050', fontWeight: 600 }}>
+          <button type="button" onClick={() => onChange({ customLogoUrl: '', customLogoSize: 100, customLogoColor: '' })} style={{ cursor: 'pointer', background: 'transparent', border: `1px solid #e0d5c8`, borderRadius: 9999, padding: '6px 16px', fontSize: 11, color: '#d45050', fontWeight: 600 }}>
             {t.fairepart.logoDelete}
           </button>
         </div>
@@ -1520,16 +1520,16 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
 function AccordionSection({ title, defaultOpen = false, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
   const [open, setOpen] = useState(defaultOpen)
   return (
-    <div style={{ marginBottom: 12, border: '1px solid #e5e0db', borderRadius: 10, overflow: 'hidden', background: 'white' }}>
+    <div style={{ marginBottom: 14, border: '1px solid #e8ddd0', borderRadius: 12, overflow: 'hidden', background: '#fffdf9' }}>
       <button type="button" onClick={() => setOpen(!open)} style={{
-        ...BTN, width: '100%', padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        background: open ? '#f9f8f6' : 'white', border: 'none', borderBottom: open ? '1px solid #eae6e1' : 'none',
+        ...BTN, width: '100%', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        background: open ? '#faf5ea' : '#fffdf9', border: 'none', borderBottom: open ? '1px solid #efe5d8' : 'none',
         transition: 'background 0.2s',
       }}>
-        <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 14, fontWeight: 600, color: '#3a3330', letterSpacing: '0.02em' }}>{title}</span>
-        <span style={{ fontSize: 18, color: '#b0a898', transition: 'transform 0.2s', transform: open ? 'rotate(45deg)' : 'rotate(0)' }}>+</span>
+        <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 14, fontWeight: 600, color: '#3a3028', letterSpacing: '0.02em' }}>{title}</span>
+        <span style={{ fontSize: 16, color: '#C9A84C', fontWeight: 300, transition: 'transform 0.25s', transform: open ? 'rotate(45deg)' : 'rotate(0)' }}>+</span>
       </button>
-      {open && <div style={{ padding: '18px 18px 14px' }}>{children}</div>}
+      {open && <div style={{ padding: '20px 20px 16px' }}>{children}</div>}
     </div>
   )
 }
@@ -1590,8 +1590,8 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             return (
               <button key={opt.key} type="button" onClick={() => onChange({ presentationStyle: opt.key })} style={{
                 ...BTN, padding: '12px 8px', borderRadius: 12,
-                border: `2px solid ${sel ? '#C9A84C' : '#d6d1cb'}`,
-                background: sel ? '#f7f3ec' : 'white',
+                border: `2px solid ${sel ? '#C9A84C' : '#e0d5c8'}`,
+                background: sel ? '#faf5ea' : 'white',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
               }}>
                 <div style={{ color: sel ? '#C9A84C' : '#9ca3af' }}>{opt.icon}</div>
@@ -1664,7 +1664,7 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       return (
         <button key={opt.key} type="button" onClick={() => onChange({ animationStyle: opt.key })} style={{
           ...BTN, padding: '10px 6px', borderRadius: 10, fontSize: 11, fontWeight: sel ? 700 : 400,
-          border: `2px solid ${sel ? THEMES[data.style].accent : '#d6d1cb'}`,
+          border: `2px solid ${sel ? THEMES[data.style].accent : '#e0d5c8'}`,
           background: sel ? `${THEMES[data.style].accent}15` : 'white',
           color: sel ? THEMES[data.style].accent : '#3a3330',
         }}>{opt.label}</button>
@@ -1672,36 +1672,6 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
     })}
   </div>
 </div>
-      {/* ── Animation d'ouverture ── */}
-      <div style={{ marginBottom: 24 }}>
-        <Label>{locale === 'en' ? 'Opening animation' : "Animation d'ouverture"}</Label>
-        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>
-          {locale === 'en' ? 'The effect guests see when they open your invitation link.' : "L'effet que vos invités voient en ouvrant le lien."}
-        </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
-          {([
-            { key: 'enveloppe', label: locale === 'en' ? 'Envelope' : 'Enveloppe', icon: '💌', desc: locale === 'en' ? 'Wax seal + card' : 'Sceau de cire + carte' },
-            { key: 'petales', label: locale === 'en' ? 'Petals' : 'Pétales', icon: '🌸', desc: locale === 'en' ? 'Falling petals' : 'Pétales tombants' },
-            { key: 'parchemin', label: locale === 'en' ? 'Scroll' : 'Parchemin', icon: '📜', desc: locale === 'en' ? 'Unrolling scroll' : 'Rouleau qui se déroule' },
-            { key: 'none', label: locale === 'en' ? 'None' : 'Aucune', icon: '✦', desc: locale === 'en' ? 'Direct display' : 'Affichage direct' },
-          ] as { key: string; label: string; icon: string; desc: string }[]).map(opt => {
-            const sel = (data.introAnimation || 'enveloppe') === opt.key
-            return (
-              <button key={opt.key} type="button" onClick={() => onChange({ introAnimation: opt.key })} style={{
-                ...BTN, padding: '14px 8px', borderRadius: 12, textAlign: 'center',
-                border: `2px solid ${sel ? THEMES[data.style].accent : '#d6d1cb'}`,
-                background: sel ? `${THEMES[data.style].accent}12` : 'white',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-              }}>
-                <span style={{ fontSize: 22 }}>{opt.icon}</span>
-                <span style={{ fontSize: 12, fontWeight: sel ? 700 : 500, color: sel ? THEMES[data.style].accent : '#3a3330' }}>{opt.label}</span>
-                <span style={{ fontSize: 9, color: '#9ca3af' }}>{opt.desc}</span>
-              </button>
-            )
-          })}
-        </div>
-
-      </div>
       </AccordionSection>
 
       <AccordionSection title={locale === 'en' ? '✒️ Monogram' : '✒️ Monogramme'}>
@@ -1721,8 +1691,8 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                 cursor: 'pointer',
                 padding: '12px 6px 8px',
                 borderRadius: 10,
-                border: `2px solid ${sel ? '#C9A84C' : '#d6d1cb'}`,
-                background: sel ? '#f7f3ec' : 'white',
+                border: `2px solid ${sel ? '#C9A84C' : '#e0d5c8'}`,
+                background: sel ? '#faf5ea' : 'white',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6,
                 minHeight: 130, overflow: 'visible',
               }}>
@@ -1792,7 +1762,7 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       </AccordionSection>
 
       <AccordionSection title={locale === 'en' ? '⚙️ Options' : '⚙️ Options'}>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 14, border: '1px solid #d6d1cb', borderRadius: 10, cursor: 'pointer', marginBottom: 16, fontSize: 14, color: '#3a3330' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 14, border: '1px solid #e0d5c8', borderRadius: 10, cursor: 'pointer', marginBottom: 16, fontSize: 14, color: '#3a3330' }}>
           <input type="checkbox" checked={data.mariageJuif} onChange={e => onChange({ mariageJuif: e.target.checked })} />
           {t.fairepart.jewishWedding}
         </label>
@@ -2757,7 +2727,7 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
           <button onClick={onClose} style={{ ...BTN, padding: '12px 32px', borderRadius: 9999, background: accent, color: 'white', border: 'none', fontSize: 14, fontWeight: 600, marginBottom: 20 }}>
             {t.fairepart.rsvpClose}
           </button>
-          <div style={{ borderTop: '1px solid #eae6e1', paddingTop: 16 }}>
+          <div style={{ borderTop: '1px solid #efe5d8', paddingTop: 16 }}>
             <button onClick={() => setForceReopen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#9ca3af', textDecoration: 'underline' }}>
               {t.fairepart.rsvpNotMeBtn}
             </button>
@@ -2823,19 +2793,19 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
             <div style={{ fontSize: 12, color: '#9ca3af', textAlign: 'center', marginBottom: 20, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Étape 2 / 3 — Votre présence</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 28 }}>
               {reponses.map((r, i) => (
-                <div key={i} style={{ border: `1.5px solid ${r.present === true ? accent : r.present === false ? '#d45050' : '#d6d1cb'}`, borderRadius: 14, padding: '14px 16px', transition: 'border-color 0.2s' }}>
+                <div key={i} style={{ border: `1.5px solid ${r.present === true ? accent : r.present === false ? '#d45050' : '#e0d5c8'}`, borderRadius: 14, padding: '14px 16px', transition: 'border-color 0.2s' }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: '#3a3330', marginBottom: 4 }}>{r.ceremonie}</div>
                   {r.date && <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>{formatDateFrCap(r.date)}</div>}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: r.present === true ? 12 : 0 }}>
                     <button type="button" onClick={() => setPresent(i, true)} style={{
                       ...BTN, padding: '10px 8px', borderRadius: 9, fontSize: 13, fontWeight: 600,
-                      border: `2px solid ${r.present === true ? accent : '#d6d1cb'}`,
+                      border: `2px solid ${r.present === true ? accent : '#e0d5c8'}`,
                       background: r.present === true ? accent : 'white',
                       color: r.present === true ? 'white' : '#3a3330',
                     }}>{t.fairepart.rsvpPresent} ✓</button>
                     <button type="button" onClick={() => setPresent(i, false)} style={{
                       ...BTN, padding: '10px 8px', borderRadius: 9, fontSize: 13, fontWeight: 600,
-                      border: `2px solid ${r.present === false ? '#d45050' : '#d6d1cb'}`,
+                      border: `2px solid ${r.present === false ? '#d45050' : '#e0d5c8'}`,
                       background: r.present === false ? '#d45050' : 'white',
                       color: r.present === false ? 'white' : '#3a3330',
                     }}>{t.fairepart.rsvpAbsent} ✗</button>
@@ -3102,7 +3072,7 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
                         const rep = e.reponses?.find(r => r.ceremonie === nomEvt)
                         const acc = rep?.accompagnants?.filter(Boolean) ?? []
                         return (
-                          <tr key={i} style={{ borderBottom: '1px solid #eae6e1', background: i % 2 === 0 ? 'white' : '#f9f8f6' }}>
+                          <tr key={i} style={{ borderBottom: '1px solid #efe5d8', background: i % 2 === 0 ? 'white' : '#fdf8f0' }}>
                             <td style={{ padding: '10px', color: '#3a3330', fontWeight: 500, verticalAlign: 'top' }}>
                               {e.nom}
                               {present === true && acc.length > 0 && (
@@ -3176,7 +3146,7 @@ function MusicUploader({ musicUrl, musicName, onChange }: { musicUrl: string; mu
 
   if (musicUrl) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', border: '1px solid #C9A84C44', borderRadius: 10, background: '#f7f3ec' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', border: '1px solid #C9A84C44', borderRadius: 10, background: '#faf5ea' }}>
         <span style={{ fontSize: 18 }}>🎵</span>
         <span style={{ flex: 1, fontSize: 12, color: '#3a3330', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{musicName || t.fairepart.musicUploaded}</span>
         <button type="button" onClick={() => onChange('')} style={{ ...BTN, background: 'none', border: 'none', color: '#d45050', fontSize: 13 }}>{t.fairepart.musicDelete}</button>
@@ -3187,7 +3157,7 @@ function MusicUploader({ musicUrl, musicName, onChange }: { musicUrl: string; mu
   return (
     <div>
       <label style={{ display: 'block', cursor: uploading ? 'wait' : 'pointer' }}>
-        <div style={{ border: '2px dashed #C9A84C66', borderRadius: 10, padding: 20, textAlign: 'center', background: uploading ? '#f7f3ec' : 'white' }}>
+        <div style={{ border: '2px dashed #C9A84C66', borderRadius: 10, padding: 20, textAlign: 'center', background: uploading ? '#faf5ea' : 'white' }}>
           <div style={{ fontSize: 24, marginBottom: 6 }}>{uploading ? '⏳' : '🎵'}</div>
           <p style={{ fontSize: 13, color: '#3a3330', margin: 0 }}>{uploading ? t.fairepart.musicUploadInProgress : t.fairepart.musicClickToUpload}</p>
           <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>{t.fairepart.musicFormatHelp}</p>
@@ -3452,7 +3422,7 @@ function CopyLinkRow({ label, url, accent }: { label: string; url: string; accen
     <div style={{ marginBottom: 16 }}>
       <div style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>{label}</div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <input readOnly value={url} onFocus={e => e.target.select()} style={{ flex: 1, fontSize: 11, color: '#3a3330', background: '#f9f8f6', border: `1px solid ${accent}33`, borderRadius: 6, padding: '8px 10px', outline: 'none' }} />
+        <input readOnly value={url} onFocus={e => e.target.select()} style={{ flex: 1, fontSize: 11, color: '#3a3330', background: '#fdf8f0', border: `1px solid ${accent}33`, borderRadius: 6, padding: '8px 10px', outline: 'none' }} />
         <button onClick={copy} style={{ ...BTN, padding: '8px 14px', borderRadius: 6, background: copied ? '#22c55e' : accent, color: 'white', border: 'none', fontSize: 12, whiteSpace: 'nowrap', transition: 'background 0.2s' }}>{copied ? `✓ ${t.fairepart.shareCopied}` : t.fairepart.shareCopyBtn}</button>
       </div>
     </div>
@@ -3704,7 +3674,7 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: 4, marginBottom: 24, padding: 4, background: '#f7f3ec', borderRadius: 10 }}>
+        <div style={{ display: 'flex', gap: 4, marginBottom: 24, padding: 4, background: '#faf5ea', borderRadius: 10 }}>
           <button type="button" onClick={() => setTab('texte')} style={tabBtn(tab === 'texte')}>{`✏️ ${t.fairepart.textEditTabText}`}</button>
           <button type="button" onClick={() => setTab('style')} style={tabBtn(tab === 'style')}>{`🎨 ${t.fairepart.textEditTabStyle}`}</button>
         </div>
@@ -3719,15 +3689,15 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
                   <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: theme.accent, marginBottom: 12 }}>{name}</div>
                   <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>{t.fairepart.textEditTitreLabel}</label>
                   <input value={localText[`ceremony_${i}_titre`] ?? ''} onChange={e => setText(`ceremony_${i}_titre`, e.target.value)} placeholder={name}
-                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #d6d1cb', borderRadius: 8, fontSize: 14, color: '#3a3330', outline: 'none', boxSizing: 'border-box', marginBottom: 12 }} />
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #e0d5c8', borderRadius: 8, fontSize: 14, color: '#3a3330', outline: 'none', boxSizing: 'border-box', marginBottom: 12 }} />
                   {c.type === 'Cérémonie religieuse / Houppa' && (
                     <>
                       <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>{t.fairepart.textEditJoyLabel}</label>
                       <textarea value={localText[`ceremony_${i}_joie`] ?? ''} onChange={e => setText(`ceremony_${i}_joie`, e.target.value)} placeholder={t.fairepart.textEditJoyPlaceholder}
-                        style={{ width: '100%', padding: '10px 12px', border: '1px solid #d6d1cb', borderRadius: 8, fontSize: 14, color: '#3a3330', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 56, marginBottom: 12 }} />
+                        style={{ width: '100%', padding: '10px 12px', border: '1px solid #e0d5c8', borderRadius: 8, fontSize: 14, color: '#3a3330', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 56, marginBottom: 12 }} />
                       <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>{t.fairepart.textEditHonoreLabel}</label>
                       <textarea value={localText[`ceremony_${i}_honore`] ?? ''} onChange={e => setText(`ceremony_${i}_honore`, e.target.value)} placeholder={t.fairepart.textEditHonorePlaceholder}
-                        style={{ width: '100%', padding: '10px 12px', border: '1px solid #d6d1cb', borderRadius: 8, fontSize: 14, color: '#3a3330', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 56, marginBottom: 12 }} />
+                        style={{ width: '100%', padding: '10px 12px', border: '1px solid #e0d5c8', borderRadius: 8, fontSize: 14, color: '#3a3330', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 56, marginBottom: 12 }} />
                     </>
                   )}
                   {c.type !== 'Mairie' && c.type !== 'Cérémonie religieuse / Houppa' && (
@@ -3737,7 +3707,7 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
                         value={localText[`ceremony_${i}_invitation`] ?? ''}
                         onChange={e => setText(`ceremony_${i}_invitation`, e.target.value)}
                         placeholder={`ex: ${c.type === 'Shabbat Hatan' ? 'Les familles X et Y seront ravies de vous convier au Shabbat Hatan de...' : c.type === 'Henné' ? 'Vous convient à célébrer leur soirée de henné...' : c.type === 'Cocktail' ? 'Vous invitent à lever leur verre...' : c.type === 'Soirée' ? 'Vous invitent à danser et célébrer leur amour...' : c.type === 'Boat Party' ? 'Embarquez avec eux pour une soirée inoubliable...' : 'Rejoignez-les pour cet événement...'}`}
-                        style={{ width: '100%', padding: '10px 12px', border: '1px solid #d6d1cb', borderRadius: 8, fontSize: 14, color: '#3a3330', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 70, marginBottom: 12 }}
+                        style={{ width: '100%', padding: '10px 12px', border: '1px solid #e0d5c8', borderRadius: 8, fontSize: 14, color: '#3a3330', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 70, marginBottom: 12 }}
                       />
                       <p style={{ fontSize: 11, color: '#9ca3af', fontStyle: 'italic', marginTop: -6, marginBottom: 12 }}>
                         {t.fairepart.textEditInvitationHelp}
@@ -3746,7 +3716,7 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
                   )}
                   <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>{t.fairepart.textEditLieuLabel}</label>
                   <input value={localText[`ceremony_${i}_lieu`] ?? ''} onChange={e => setText(`ceremony_${i}_lieu`, e.target.value)} placeholder={c.lieu || t.fairepart.placeholderVenueName}
-                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #d6d1cb', borderRadius: 8, fontSize: 14, color: '#3a3330', outline: 'none', boxSizing: 'border-box' }} />
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #e0d5c8', borderRadius: 8, fontSize: 14, color: '#3a3330', outline: 'none', boxSizing: 'border-box' }} />
                 </div>
               )
             })}
@@ -3756,14 +3726,14 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
         {/* TAB STYLE */}
         {tab === 'style' && (
           <div>
-            <p style={{ fontSize: 12, color: '#6a5040', marginBottom: 20, lineHeight: 1.6, background: '#f7f3ec', padding: 12, borderRadius: 8 }}>
+            <p style={{ fontSize: 12, color: '#6a5040', marginBottom: 20, lineHeight: 1.6, background: '#faf5ea', padding: 12, borderRadius: 8 }}>
               {`💡 ${t.fairepart.textEditStyleSub}`}
             </p>
 
             {TEXT_ZONES.map(zone => {
               const z = localStyles[zone] ?? {}
               return (
-                <div key={zone} style={{ marginBottom: 20, padding: 16, border: `1.5px solid ${theme.accent}33`, borderRadius: 12, background: '#f9f8f6' }}>
+                <div key={zone} style={{ marginBottom: 20, padding: 16, border: `1.5px solid ${theme.accent}33`, borderRadius: 12, background: '#fdf8f0' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                     <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: theme.accent, fontWeight: 600 }}>{t.fairepart.zones[zone] ?? zone}</div>
                     <button type="button" onClick={() => resetZone(zone)} style={{ ...BTN, background: 'none', border: 'none', color: '#9ca3af', fontSize: 11, textDecoration: 'underline' }}>{t.fairepart.cropReset}</button>
@@ -3772,7 +3742,7 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
                   {/* Police */}
                   <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>{t.fairepart.zoneFont}</label>
                   <select value={z.fontFamily ?? ''} onChange={e => setZoneStyle(zone, { fontFamily: e.target.value })}
-                    style={{ width: '100%', padding: '8px 10px', border: '1px solid #d6d1cb', borderRadius: 8, fontSize: 13, background: 'white', marginBottom: 12, color: '#3a3330' }}>
+                    style={{ width: '100%', padding: '8px 10px', border: '1px solid #e0d5c8', borderRadius: 8, fontSize: 13, background: 'white', marginBottom: 12, color: '#3a3330' }}>
                     <option value="">{t.fairepart.zoneFontDefault}</option>
                     {FONT_OPTIONS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
                   </select>
@@ -3806,7 +3776,7 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
                       return (
                         <button key={opt.v} type="button" onClick={() => setZoneStyle(zone, { sizeScale: opt.v })} style={{
                           ...BTN, flex: 1, padding: '8px', borderRadius: 8, fontSize: 12, fontWeight: sel ? 700 : 400,
-                          border: `2px solid ${sel ? theme.accent : '#d6d1cb'}`,
+                          border: `2px solid ${sel ? theme.accent : '#e0d5c8'}`,
                           background: sel ? `${theme.accent}18` : 'white',
                           color: sel ? theme.accent : '#3a3330',
                         }}>{opt.l}</button>
@@ -3818,13 +3788,13 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
                   <div style={{ display: 'flex', gap: 8 }}>
                     <button type="button" onClick={() => setZoneStyle(zone, { bold: !z.bold })} style={{
                       ...BTN, flex: 1, padding: '8px', borderRadius: 8, fontSize: 13, fontWeight: 700,
-                      border: `2px solid ${z.bold ? theme.accent : '#d6d1cb'}`,
+                      border: `2px solid ${z.bold ? theme.accent : '#e0d5c8'}`,
                       background: z.bold ? `${theme.accent}18` : 'white',
                       color: z.bold ? theme.accent : '#3a3330',
                     }}>{`𝐁 ${t.fairepart.zoneBold}`}</button>
                     <button type="button" onClick={() => setZoneStyle(zone, { italic: !z.italic })} style={{
                       ...BTN, flex: 1, padding: '8px', borderRadius: 8, fontSize: 13, fontStyle: 'italic',
-                      border: `2px solid ${z.italic ? theme.accent : '#d6d1cb'}`,
+                      border: `2px solid ${z.italic ? theme.accent : '#e0d5c8'}`,
                       background: z.italic ? `${theme.accent}18` : 'white',
                       color: z.italic ? theme.accent : '#3a3330',
                     }}>{`𝐼 ${t.fairepart.zoneItalic}`}</button>
@@ -4772,7 +4742,7 @@ function AnimParchemin({ data, theme, onDone }: { data: FormData; theme: ThemeOb
         </div>
 
         {/* Corps */}
-        <div style={{ background: 'linear-gradient(135deg, #f7f3ec 0%, #f5e6c8 50%, #f7f3ec 100%)', overflow: 'hidden', maxHeight: ouvert ? 600 : 80, animation: ouvert ? 'derouler 1.8s cubic-bezier(0.22,1,0.36,1) forwards' : 'none', boxShadow: '6px 0 16px rgba(0,0,0,0.4), -6px 0 16px rgba(0,0,0,0.4)' }}>
+        <div style={{ background: 'linear-gradient(135deg, #faf5ea 0%, #f5e6c8 50%, #faf5ea 100%)', overflow: 'hidden', maxHeight: ouvert ? 600 : 80, animation: ouvert ? 'derouler 1.8s cubic-bezier(0.22,1,0.36,1) forwards' : 'none', boxShadow: '6px 0 16px rgba(0,0,0,0.4), -6px 0 16px rgba(0,0,0,0.4)' }}>
           <div style={{ padding: '28px 32px', textAlign: 'center' }}>
             {data.mariageJuif && (
               <div style={{ fontFamily: 'serif', fontSize: 15, color: theme.accent, direction: 'rtl', marginBottom: 16, animation: 'parchTextIn 0.6s ease 0.8s forwards', opacity: 0 }}>בס״ד</div>
@@ -5493,7 +5463,7 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
   const [pwLoading, setPwLoading] = useState(false)
   const savedAccessCodeRef = useRef<string | null>(null)
 
-  const inputStyle: React.CSSProperties = { width: '100%', padding: '11px 14px', borderRadius: 8, border: `1.5px solid ${GOLD}33`, fontSize: 15, fontFamily: 'var(--font-cormorant-garamond)', outline: 'none', background: '#f9f8f6', boxSizing: 'border-box' }
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '11px 14px', borderRadius: 8, border: `1.5px solid ${GOLD}33`, fontSize: 15, fontFamily: 'var(--font-cormorant-garamond)', outline: 'none', background: '#fdf8f0', boxSizing: 'border-box' }
 
   const checkPromo = async () => {
     if (!promoInput.trim() || !promoEmail.trim()) { setError(t.fairepart.accessGateFillFields); return }
@@ -6031,7 +6001,7 @@ export default function FairePartPage() {
           <div style={{ width: 40, height: 1, background: 'rgba(201,168,76,0.3)' }} />
         </div>
       </div>
-      <div style={{ width: '100%', maxWidth: 600, background: 'white', borderRadius: 20, padding: '32px 24px', boxShadow: '0 12px 48px rgba(0,0,0,0.07)', border: '1px solid #eae6e1', boxSizing: 'border-box' }}>
+      <div style={{ width: '100%', maxWidth: 600, background: 'white', borderRadius: 20, padding: '32px 24px', boxShadow: '0 12px 48px rgba(0,0,0,0.07)', border: '1px solid #efe5d8', boxSizing: 'border-box' }}>
         <ProgressBar step={step} />
         {step === 1 && <Step1 data={formData} onChange={update} />}
         {step === 2 && <Step2 data={formData} onChange={update} />}
@@ -6043,7 +6013,7 @@ export default function FairePartPage() {
               type="button"
               onClick={prev}
               onTouchEnd={onTouchPrev}
-              style={{ ...BTN, flex: 1, padding: '18px 0', borderRadius: 9999, border: '1.5px solid #d6d1cb', background: 'white', color: '#d45050', fontSize: 14, fontWeight: 600 }}
+              style={{ ...BTN, flex: 1, padding: '18px 0', borderRadius: 9999, border: '1.5px solid #e0d5c8', background: 'white', color: '#d45050', fontSize: 14, fontWeight: 600 }}
             >← Précédent</button>
           )}
           <button

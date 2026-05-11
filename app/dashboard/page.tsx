@@ -80,7 +80,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Champ shareId */}
-      <div style={{ maxWidth: 560, margin: '0 auto 40px', background: 'white', borderRadius: 20, padding: '28px 24px', boxShadow: '0 8px 40px rgba(0,0,0,0.07)', border: '1px solid #eae6e1' }}>
+      <div style={{ maxWidth: 560, margin: '0 auto 40px', background: 'white', borderRadius: 20, padding: '28px 24px', boxShadow: '0 8px 40px rgba(0,0,0,0.07)', border: '1px solid #efe5d8' }}>
         <label style={{ display: 'block', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.15em', color: ACCENT, marginBottom: 8, fontWeight: 700 }}>
           Identifiant de votre faire-part
         </label>
@@ -90,7 +90,7 @@ export default function DashboardPage() {
             onChange={e => setShareId(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && load()}
             placeholder="Collez votre shareId ici…"
-            style={{ flex: 1, border: '1px solid #d6d1cb', borderRadius: 10, padding: '12px 14px', fontSize: 14, outline: 'none', color: '#3a3330' }}
+            style={{ flex: 1, border: '1px solid #e0d5c8', borderRadius: 10, padding: '12px 14px', fontSize: 14, outline: 'none', color: '#3a3330' }}
           />
           <button
             onClick={load}
@@ -114,7 +114,7 @@ export default function DashboardPage() {
               { label: 'Absents', value: absents.length, color: '#d45050', icon: '✗' },
               { label: 'Personnes au total', value: totalPersonnes, color: ACCENT, icon: '♦' },
             ].map(s => (
-              <div key={s.label} style={{ background: 'white', borderRadius: 16, padding: '20px 16px', textAlign: 'center', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #eae6e1' }}>
+              <div key={s.label} style={{ background: 'white', borderRadius: 16, padding: '20px 16px', textAlign: 'center', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #efe5d8' }}>
                 <div style={{ fontSize: 28, color: s.color, fontWeight: 700, marginBottom: 4 }}>{s.value}</div>
                 <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9ca3af', fontWeight: 600 }}>{s.label}</div>
               </div>
@@ -131,7 +131,7 @@ export default function DashboardPage() {
                   style={{
                     ...BTN,
                     padding: '8px 18px', borderRadius: 9999, fontSize: 13, fontWeight: 600,
-                    border: `1.5px solid ${activeTab === ev ? ACCENT : '#d6d1cb'}`,
+                    border: `1.5px solid ${activeTab === ev ? ACCENT : '#e0d5c8'}`,
                     background: activeTab === ev ? ACCENT : 'white',
                     color: activeTab === ev ? 'white' : '#3a3330',
                     transition: 'all 0.2s',
@@ -154,7 +154,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Tableau */}
-          <div style={{ background: 'white', borderRadius: 20, boxShadow: '0 8px 40px rgba(0,0,0,0.07)', border: '1px solid #eae6e1', overflow: 'hidden' }}>
+          <div style={{ background: 'white', borderRadius: 20, boxShadow: '0 8px 40px rgba(0,0,0,0.07)', border: '1px solid #efe5d8', overflow: 'hidden' }}>
             {filteredResponses.length === 0 ? (
               <div style={{ padding: 48, textAlign: 'center', color: '#9ca3af', fontStyle: 'italic' }}>
                 Aucune réponse pour cet événement
@@ -170,7 +170,7 @@ export default function DashboardPage() {
                 </thead>
                 <tbody>
                   {filteredResponses.map((r, i) => (
-                    <tr key={i} style={{ borderBottom: '1px solid #eae6e1', background: i % 2 === 0 ? 'white' : '#f9f8f6' }}>
+                    <tr key={i} style={{ borderBottom: '1px solid #efe5d8', background: i % 2 === 0 ? 'white' : '#fdf8f0' }}>
                       <td style={{ padding: '14px 16px', color: '#3a3330', fontWeight: 600, fontSize: 14 }}>{r.nom}</td>
                       <td style={{ padding: '14px 16px' }}>
                         <span style={{
