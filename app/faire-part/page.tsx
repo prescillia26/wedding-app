@@ -740,8 +740,14 @@ function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
     return () => { clearTimeout(timer); document.removeEventListener('pointerdown', close) }
   }, [selected])
 
+  const toolbarRef = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+
   const handlePointerDown = (e: React.PointerEvent) => {
     if (!editable) return
+    // Ne pas démarrer le drag si on clique sur la toolbar ou le panneau
+    if (toolbarRef.current?.contains(e.target as Node)) return
+    if (panelRef.current?.contains(e.target as Node)) return
     e.preventDefault()
     e.stopPropagation()
     setSelected(true)
@@ -787,7 +793,7 @@ function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
     >
       {/* Barre d'outils — visible quand sélectionné */}
       {editable && selected && (
-        <div style={{ position: 'absolute', top: -28, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 3, zIndex: 20, background: 'white', borderRadius: 8, padding: '3px 5px', boxShadow: '0 2px 12px rgba(0,0,0,0.15)', border: '1px solid #e0d5c8' }} onPointerDown={e => e.stopPropagation()}>
+        <div ref={toolbarRef} style={{ position: 'absolute', top: -28, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 3, zIndex: 20, background: 'white', borderRadius: 8, padding: '3px 5px', boxShadow: '0 2px 12px rgba(0,0,0,0.15)', border: '1px solid #e0d5c8' }}>
           <button type="button" onClick={() => update({ scale: Math.max(0.4, pos.scale - 0.1) })} style={{ ...BTN, width: 20, height: 20, borderRadius: 4, border: 'none', background: '#f5f0e8', color: '#C9A84C', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>−</button>
           <div style={{ fontSize: 8, color: '#8a7e72', display: 'flex', alignItems: 'center', padding: '0 3px', fontWeight: 600 }}>{Math.round(pos.scale * 100)}%</div>
           <button type="button" onClick={() => update({ scale: Math.min(2.5, pos.scale + 0.1) })} style={{ ...BTN, width: 20, height: 20, borderRadius: 4, border: 'none', background: '#f5f0e8', color: '#C9A84C', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>+</button>
@@ -797,7 +803,7 @@ function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
       )}
       {/* Panneau couleur + police */}
       {editable && selected && showPanel && (
-        <div style={{ position: 'absolute', top: -90, left: '50%', transform: 'translateX(-50%)', zIndex: 30, background: 'white', borderRadius: 10, padding: '10px 12px', boxShadow: '0 4px 20px rgba(0,0,0,0.18)', border: '1px solid #e0d5c8', minWidth: 200 }} onPointerDown={e => e.stopPropagation()}>
+        <div ref={panelRef} style={{ position: 'absolute', top: -90, left: '50%', transform: 'translateX(-50%)', zIndex: 30, background: 'white', borderRadius: 10, padding: '10px 12px', boxShadow: '0 4px 20px rgba(0,0,0,0.18)', border: '1px solid #e0d5c8', minWidth: 200 }}>
           <div style={{ fontSize: 9, color: '#8a7e72', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Couleur</div>
           <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 8 }}>
             {DRAG_COLORS.map(c => (
