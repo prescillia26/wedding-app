@@ -1517,13 +1517,33 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
   )
 }
 
+function AccordionSection({ title, defaultOpen = false, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
+  const [open, setOpen] = useState(defaultOpen)
+  return (
+    <div style={{ marginBottom: 12, border: '1px solid #e5e0db', borderRadius: 10, overflow: 'hidden', background: 'white' }}>
+      <button type="button" onClick={() => setOpen(!open)} style={{
+        ...BTN, width: '100%', padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        background: open ? '#f9f8f6' : 'white', border: 'none', borderBottom: open ? '1px solid #eae6e1' : 'none',
+        transition: 'background 0.2s',
+      }}>
+        <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 14, fontWeight: 600, color: '#3a3330', letterSpacing: '0.02em' }}>{title}</span>
+        <span style={{ fontSize: 18, color: '#b0a898', transition: 'transform 0.2s', transform: open ? 'rotate(45deg)' : 'rotate(0)' }}>+</span>
+      </button>
+      {open && <div style={{ padding: '18px 18px 14px' }}>{children}</div>}
+    </div>
+  )
+}
+
 function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
   const { t, locale } = useT()
   return (
     <div>
-      <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#3a3330', marginBottom: 24 }}>{t.fairepart.step4Title}</h2>
+      <h2 style={{ textAlign: 'center', fontFamily: 'var(--font-playfair-display)', fontSize: 20, fontWeight: 600, color: '#3a3330', marginBottom: 6 }}>{t.fairepart.step4Title}</h2>
+      <p style={{ textAlign: 'center', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9a928a', marginBottom: 24 }}>
+        {locale === 'en' ? 'Customize the look and feel of your invitation' : 'Personnalisez le style de votre invitation'}
+      </p>
 
-      <div style={{ marginBottom: 24 }}>
+      <AccordionSection title={locale === 'en' ? '📐 Layout' : '📐 Mise en page'} defaultOpen>
         <Label>{t.fairepart.presentationLabel}</Label>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
           {([
@@ -1581,9 +1601,10 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             )
           })}
         </div>
-      </div>
+      </AccordionSection>
 
-      <Label>Style visuel</Label>
+      <AccordionSection title={locale === 'en' ? '🎨 Theme & colors' : '🎨 Thème & couleurs'} defaultOpen>
+        <Label>{locale === 'en' ? 'Visual style' : 'Style visuel'}</Label>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 16 }}>
         {(Object.entries(THEMES) as [Theme, ThemeObj][]).map(([key, t]) => {
           const sel = data.style === key
@@ -1605,9 +1626,10 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         })}
       </div>
 
-      {/* ── Choix du cadre ── */}
-      <div style={{ marginBottom: 24 }}>
-        <Label>Choisissez votre cadre</Label>
+      </AccordionSection>
+
+      <AccordionSection title={locale === 'en' ? '🖼️ Decorative frame' : '🖼️ Cadre décoratif'}>
+        <Label>{locale === 'en' ? 'Choose your frame' : 'Choisissez votre cadre'}</Label>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
           {FRAMES.map(fr => {
             const accent = THEMES[data.style].accent
@@ -1631,8 +1653,10 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             )
           })}
         </div>
-      </div>
-<div style={{ marginBottom: 24 }}>
+      </AccordionSection>
+
+      <AccordionSection title={locale === 'en' ? '✨ Animations' : '✨ Animations'}>
+<div style={{ marginBottom: 16 }}>
   <Label>{t.fairepart.animationTextLabel}</Label>
   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
     {(Object.entries(t.fairepart.animationTextOptions).map(([key, label]) => ({ key, label }))).map(opt => {
@@ -1678,9 +1702,9 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         </div>
 
       </div>
+      </AccordionSection>
 
-      {/* ── Monogramme ── */}
-      <div style={{ marginBottom: 24 }}>
+      <AccordionSection title={locale === 'en' ? '✒️ Monogram' : '✒️ Monogramme'}>
         <Label>{t.fairepart.monogramStyleLabel}</Label>
         <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>{t.fairepart.monogramPreviewHint}</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 14 }}>
@@ -1742,13 +1766,10 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           <div style={{ flex: 1, height: 1, background: '#e5d5c5' }} />
         </div>
         <CustomLogoUpload logoUrl={data.customLogoUrl} logoSize={data.customLogoSize} logoColor={data.customLogoColor} onChange={onChange} accent={THEMES[data.style].accent} />
-      </div>
+      </AccordionSection>
 
-      <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 14, border: '1px solid #d6d1cb', borderRadius: 10, cursor: 'pointer', marginBottom: 20, fontSize: 14, color: '#3a3330' }}>
-        <input type="checkbox" checked={data.mariageJuif} onChange={e => onChange({ mariageJuif: e.target.checked })} />
-        {t.fairepart.jewishWedding}
-      </label>
-      <div style={{ marginBottom: 20 }}>
+      <AccordionSection title={locale === 'en' ? '🎵 Music & photos' : '🎵 Musique & photos'}>
+      <div style={{ marginBottom: 16 }}>
         <Label>{t.fairepart.musicLabel}</Label>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
           <p style={{ fontSize: 11, color: '#9ca3af', margin: 0, flex: 1 }}>{t.fairepart.musicHelp}</p>
@@ -1768,11 +1789,19 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       </div>
       <StyleAccueilSelector data={data} onChange={onChange} />
       <PhotoSection data={data} onChange={onChange} />
-      <div style={{ marginTop: 20 }}>
-        <Label>{t.fairepart.emailSectionTitle}</Label>
-        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>{t.fairepart.emailSectionHelp}</p>
-        <input type="email" value={data.emailMaries ?? ''} onChange={e => onChange({ emailMaries: e.target.value })} placeholder="marie@exemple.com" style={S.input} />
-      </div>
+      </AccordionSection>
+
+      <AccordionSection title={locale === 'en' ? '⚙️ Options' : '⚙️ Options'}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 14, border: '1px solid #d6d1cb', borderRadius: 10, cursor: 'pointer', marginBottom: 16, fontSize: 14, color: '#3a3330' }}>
+          <input type="checkbox" checked={data.mariageJuif} onChange={e => onChange({ mariageJuif: e.target.checked })} />
+          {t.fairepart.jewishWedding}
+        </label>
+        <div>
+          <Label>{t.fairepart.emailSectionTitle}</Label>
+          <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>{t.fairepart.emailSectionHelp}</p>
+          <input type="email" value={data.emailMaries ?? ''} onChange={e => onChange({ emailMaries: e.target.value })} placeholder="marie@exemple.com" style={S.input} />
+        </div>
+      </AccordionSection>
     </div>
   )
 }

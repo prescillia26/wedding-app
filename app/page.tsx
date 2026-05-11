@@ -5,10 +5,10 @@ import { useT } from '@/lib/i18n'
 import { LangSwitch } from './components/LangSwitch'
 
 const GOLD = '#C9A84C'
-const CREAM = '#fff8ed'
-const DARK = '#2d2416'
+const CREAM = '#faf8f4'
+const DARK = '#2a2520'
 const TEXT = '#3a3330'
-const LIGHT_GOLD = '#f5edda'
+const LIGHT_GOLD = '#f5f1e8'
 
 function useFadeIn() {
   const ref = useRef<HTMLDivElement>(null)
@@ -137,7 +137,7 @@ export default function Home() {
         </div>
 
         <div style={{ maxWidth: 380, margin: '0 auto', transform: 'rotate(-1.5deg)', boxShadow: '0 24px 80px rgba(0,0,0,0.14)', borderRadius: 16, overflow: 'hidden' }}>
-          <FakeCard name1="Léa" name2="Antoine" date="12 Juillet 2026 · Paris" accent={GOLD} fond="#fdf0f3" />
+          <FakeCard name1="Léa" name2="Antoine" date="12 Juillet 2026 · Paris" accent={GOLD} fond="#fdf8f0" />
         </div>
       </div>
 
@@ -180,7 +180,7 @@ export default function Home() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 28 }}>
             <div>
               <div style={{ textAlign: 'center', marginBottom: 10, fontFamily: 'var(--font-playfair-display)', fontSize: 13, color: TEXT, letterSpacing: 2, textTransform: 'uppercase' }}>{h.themeNames.classic}</div>
-              <FakeCard name1="Sophie" name2="Thomas" date="15 Juin 2026 · Lyon" accent="#C9A84C" fond="#fdf0f3" />
+              <FakeCard name1="Sophie" name2="Thomas" date="15 Juin 2026 · Lyon" accent="#C9A84C" fond="#fdf8f0" />
             </div>
             <div>
               <div style={{ textAlign: 'center', marginBottom: 10, fontFamily: 'var(--font-playfair-display)', fontSize: 13, color: TEXT, letterSpacing: 2, textTransform: 'uppercase' }}>{h.themeNames.country}</div>
