@@ -48,20 +48,20 @@ export async function POST(request: Request) {
     : ''
   return `
     <tr>
-      <td style="padding:10px 16px;font-size:14px;color:#4a3728;border-bottom:1px solid #fce7f3;">
+      <td style="padding:10px 16px;font-size:14px;color:#3a3330;border-bottom:1px solid #eae6e1;">
         ${r.ceremonie}
         ${accHtml}
       </td>
-      <td style="padding:10px 16px;font-size:14px;text-align:center;border-bottom:1px solid #fce7f3;vertical-align:top;">
-        <span style="color:${r.present ? '#22c55e' : '#fb7185'};font-weight:700;">${r.present ? et.rsvp.present : et.rsvp.absent}</span>
+      <td style="padding:10px 16px;font-size:14px;text-align:center;border-bottom:1px solid #eae6e1;vertical-align:top;">
+        <span style="color:${r.present ? '#22c55e' : '#d45050'};font-weight:700;">${r.present ? et.rsvp.present : et.rsvp.absent}</span>
       </td>
-      <td style="padding:10px 16px;font-size:14px;text-align:center;color:#6a5040;border-bottom:1px solid #fce7f3;vertical-align:top;">${r.present ? r.nbPersonnes : '—'}</td>
+      <td style="padding:10px 16px;font-size:14px;text-align:center;color:#6a5040;border-bottom:1px solid #eae6e1;vertical-align:top;">${r.present ? r.nbPersonnes : '—'}</td>
     </tr>
   `
 }).join('')
 
       const body = `
-              <p style="font-size:15px;color:#4a3728;margin:0 0 20px;">Bonne nouvelle ! <strong>${nom}</strong> a répondu à votre faire-part.</p>
+              <p style="font-size:15px;color:#3a3330;margin:0 0 20px;">Bonne nouvelle ! <strong>${nom}</strong> a répondu à votre faire-part.</p>
 
               <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
                 <thead>
@@ -75,9 +75,9 @@ export async function POST(request: Request) {
               </table>
 
               ${data.message ? `
-              <div style="background:#fdf8f9;border-left:3px solid #C9A84C;padding:14px 16px;border-radius:0 8px 8px 0;margin-bottom:24px;">
+              <div style="background:#f9f8f6;border-left:3px solid #C9A84C;padding:14px 16px;border-radius:0 8px 8px 0;margin-bottom:24px;">
                 <div style="font-size:11px;color:#C9A84C;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">${et.rsvp.message}</div>
-                <p style="margin:0;font-size:14px;color:#4a3728;font-style:italic;">"${data.message}"</p>
+                <p style="margin:0;font-size:14px;color:#3a3330;font-style:italic;">"${data.message}"</p>
               </div>
               ` : ''}
 

@@ -60,7 +60,7 @@ export default function ConnexionPage() {
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: GOLD, marginBottom: 4 }}>Lov&apos;it</div>
           </a>
           <div style={{ width: 40, height: 1, background: GOLD, opacity: 0.4, margin: '0 auto 16px' }} />
-          <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: '#4a3728' }}>
+          <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: '#3a3330' }}>
             {a.connectTitle}
           </p>
         </div>
@@ -74,7 +74,7 @@ export default function ConnexionPage() {
 
           {needsPassword && (
             <div style={{ background: '#fff8ed', border: `1px solid ${GOLD}44`, borderRadius: 12, padding: '16px 20px', marginBottom: 20, textAlign: 'center' }}>
-              <p style={{ fontSize: 14, color: '#4a3728', margin: '0 0 12px', lineHeight: 1.5, whiteSpace: 'pre-line' }}>
+              <p style={{ fontSize: 14, color: '#3a3330', margin: '0 0 12px', lineHeight: 1.5, whiteSpace: 'pre-line' }}>
                 {a.needsPasswordMsg}
               </p>
               {magicLinkSent ? (
@@ -108,7 +108,7 @@ export default function ConnexionPage() {
           )}
 
           <div style={{ marginBottom: 20 }}>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#4a3728', marginBottom: 6, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 6, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
               {a.email}
             </label>
             <input
@@ -117,12 +117,12 @@ export default function ConnexionPage() {
               onChange={e => setEmail(e.target.value)}
               required
               placeholder={a.emailPlaceholder}
-              style={{ width: '100%', padding: '12px 16px', borderRadius: 12, border: `1px solid ${GOLD}44`, fontSize: 15, color: '#4a3728', background: '#fefcf8', outline: 'none', boxSizing: 'border-box', fontFamily: 'Georgia, serif' }}
+              style={{ width: '100%', padding: '12px 16px', borderRadius: 12, border: `1px solid ${GOLD}44`, fontSize: 15, color: '#3a3330', background: '#fefcf8', outline: 'none', boxSizing: 'border-box', fontFamily: 'Georgia, serif' }}
             />
           </div>
 
           <div style={{ marginBottom: 8 }}>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#4a3728', marginBottom: 6, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 6, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
               {a.password}
             </label>
             <input
@@ -131,7 +131,7 @@ export default function ConnexionPage() {
               onChange={e => setPassword(e.target.value)}
               required
               placeholder={a.passwordPlaceholder}
-              style={{ width: '100%', padding: '12px 16px', borderRadius: 12, border: `1px solid ${GOLD}44`, fontSize: 15, color: '#4a3728', background: '#fefcf8', outline: 'none', boxSizing: 'border-box', fontFamily: 'Georgia, serif' }}
+              style={{ width: '100%', padding: '12px 16px', borderRadius: 12, border: `1px solid ${GOLD}44`, fontSize: 15, color: '#3a3330', background: '#fefcf8', outline: 'none', boxSizing: 'border-box', fontFamily: 'Georgia, serif' }}
             />
           </div>
 

@@ -114,7 +114,7 @@ export default function MonEspacePage() {
             <a href="/" style={{ textDecoration: 'none' }}>
               <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 36, color: GOLD, marginBottom: 4 }}>Lov&apos;it</div>
             </a>
-            <h1 style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 28, color: '#4a3728', fontWeight: 400, margin: 0 }}>
+            <h1 style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 28, color: '#3a3330', fontWeight: 400, margin: 0 }}>
               {d_.hello} {firstPrenom}
             </h1>
             <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', marginTop: 4 }}>
@@ -147,7 +147,7 @@ export default function MonEspacePage() {
         {data.faireparts.length === 0 ? (
           <div style={{ background: 'white', borderRadius: 20, padding: '48px 32px', boxShadow: '0 12px 48px rgba(201,168,76,0.1)', border: `1px solid ${GOLD}22`, textAlign: 'center' }}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>&#128141;</div>
-            <h2 style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, color: '#4a3728', fontWeight: 400, marginBottom: 12 }}>
+            <h2 style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, color: '#3a3330', fontWeight: 400, marginBottom: 12 }}>
               {d_.noFairepart}
             </h2>
             <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#9ca3af', marginBottom: 28 }}>
@@ -230,7 +230,7 @@ function FairepartCardComponent({ fp, locale, formatDate, t }: { fp: FairepartCa
 
       <div style={{ padding: '20px 24px 24px' }}>
         {!fp.photo && (
-          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 18, color: '#4a3728', fontWeight: 600, marginBottom: 4 }}>
+          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 18, color: '#3a3330', fontWeight: 600, marginBottom: 4 }}>
             {fp.marie1Prenom} & {fp.marie2Prenom}
           </div>
         )}
@@ -251,7 +251,7 @@ function FairepartCardComponent({ fp, locale, formatDate, t }: { fp: FairepartCa
           </div>
           <div style={{ width: 1, background: `${GOLD}33` }} />
           <div style={{ textAlign: 'center', flex: 1 }}>
-            <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, fontWeight: 700, color: '#4a3728' }}>{fp.rsvp.total}</div>
+            <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, fontWeight: 700, color: '#3a3330' }}>{fp.rsvp.total}</div>
             <div style={{ fontSize: 11, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t.responses}</div>
           </div>
         </div>

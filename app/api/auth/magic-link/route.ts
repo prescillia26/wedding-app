@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       const et = getEmailT(locale)
 
       const body = `
-        <p style="font-size:15px;color:#4a3728;margin:0 0 20px;">${et.magicLink.body}</p>
+        <p style="font-size:15px;color:#3a3330;margin:0 0 20px;">${et.magicLink.body}</p>
         ${emailButton(magicUrl, et.magicLink.cta)}
         <p style="font-size:12px;color:#9ca3af;margin:20px 0 0;text-align:center;">${et.magicLink.ignore}</p>
       `

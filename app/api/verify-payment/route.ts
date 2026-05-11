@@ -91,8 +91,8 @@ export async function GET(request: Request) {
         const et = getEmailT(locale)
 
         const body = `
-          <p style="font-size:16px;color:#4a3728;margin:0 0 8px;line-height:1.6;">${et.welcome.thanks}</p>
-          <p style="font-size:15px;color:#4a3728;margin:0 0 28px;line-height:1.6;">${et.welcome.body}</p>
+          <p style="font-size:16px;color:#3a3330;margin:0 0 8px;line-height:1.6;">${et.welcome.thanks}</p>
+          <p style="font-size:15px;color:#3a3330;margin:0 0 28px;line-height:1.6;">${et.welcome.body}</p>
           ${emailButton(magicUrl, et.welcome.cta)}
           <p style="font-size:13px;color:#8a7860;margin:0 0 20px;line-height:1.7;text-align:center;">${et.welcome.ctaSub}</p>
           <div style="border-top:1px solid #f0e6d3;margin:24px 0;padding-top:16px;text-align:center;">

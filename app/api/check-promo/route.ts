@@ -118,11 +118,11 @@ export async function POST(request: Request) {
       const et = getEmailT(locale)
 
       const bodyHtml = `
-        <p style="font-size:16px;color:#4a3728;margin:0 0 20px;line-height:1.6;">
+        <p style="font-size:16px;color:#3a3330;margin:0 0 20px;line-height:1.6;">
           ${et.promo.body}
         </p>
 
-        <p style="font-size:14px;color:#4a3728;margin:0 0 24px;line-height:1.6;">
+        <p style="font-size:14px;color:#3a3330;margin:0 0 24px;line-height:1.6;">
           ${et.promo.passwordBody}
         </p>
 

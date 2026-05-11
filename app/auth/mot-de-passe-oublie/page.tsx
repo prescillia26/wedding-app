@@ -48,7 +48,7 @@ export default function MotDePasseOubliePage() {
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: GOLD, marginBottom: 4 }}>Lov&apos;it</div>
           </a>
           <div style={{ width: 40, height: 1, background: GOLD, opacity: 0.4, margin: '0 auto 16px' }} />
-          <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: '#4a3728' }}>
+          <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: '#3a3330' }}>
             {t.auth.forgotTitle}
           </p>
         </div>
@@ -56,7 +56,7 @@ export default function MotDePasseOubliePage() {
         {sent ? (
           <div style={{ background: 'white', borderRadius: 20, padding: '36px 32px', boxShadow: '0 12px 48px rgba(201,168,76,0.12)', border: `1px solid ${GOLD}22`, textAlign: 'center' }}>
             <div style={{ fontSize: 40, marginBottom: 16 }}>&#9993;</div>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: '#4a3728', marginBottom: 12, lineHeight: 1.6 }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: '#3a3330', marginBottom: 12, lineHeight: 1.6 }}>
               {t.auth.forgotSuccess}
             </div>
             <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: '#9ca3af', marginBottom: 24 }}>
@@ -87,7 +87,7 @@ export default function MotDePasseOubliePage() {
             )}
 
             <div style={{ marginBottom: 24 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#4a3728', marginBottom: 6, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 6, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                 {t.auth.email}
               </label>
               <input
@@ -96,7 +96,7 @@ export default function MotDePasseOubliePage() {
                 onChange={e => setEmail(e.target.value)}
                 required
                 placeholder={t.auth.emailPlaceholder}
-                style={{ width: '100%', padding: '12px 16px', borderRadius: 12, border: `1px solid ${GOLD}44`, fontSize: 15, color: '#4a3728', background: '#fefcf8', outline: 'none', boxSizing: 'border-box', fontFamily: 'Georgia, serif' }}
+                style={{ width: '100%', padding: '12px 16px', borderRadius: 12, border: `1px solid ${GOLD}44`, fontSize: 15, color: '#3a3330', background: '#fefcf8', outline: 'none', boxSizing: 'border-box', fontFamily: 'Georgia, serif' }}
               />
             </div>
 

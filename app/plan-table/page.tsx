@@ -6,7 +6,7 @@ import { useT } from '@/lib/i18n'
 
 const GOLD = '#C9A84C'
 const CREAM = '#faf8f5'
-const TEXT = '#4a3728'
+const TEXT = '#3a3330'
 const BTN: React.CSSProperties = { cursor: 'pointer', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }
 
 interface RSVPEntry {

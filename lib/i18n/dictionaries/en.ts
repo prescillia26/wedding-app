@@ -297,7 +297,7 @@ const en: Dictionary = {
       '#2c4a7c': 'Navy',
       '#7a9e6e': 'Green',
       '#d4a574': 'Copper',
-      '#4a3728': 'Chocolate',
+      '#3a3330': 'Chocolate',
       '#ffffff': 'White',
       '#2a9a6a': 'Mint',
     },

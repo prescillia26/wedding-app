@@ -92,7 +92,7 @@ export default function DefinirMotDePassePage() {
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: GOLD, marginBottom: 16 }}>Lov&apos;it</div>
           <div style={{ fontSize: 48, marginBottom: 16 }}>&#10003;</div>
-          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, color: '#4a3728' }}>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, color: '#3a3330' }}>
             {t.auth.setPasswordDone}
           </div>
           <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', marginTop: 8 }}>
@@ -112,7 +112,7 @@ export default function DefinirMotDePassePage() {
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: GOLD, marginBottom: 4 }}>Lov&apos;it</div>
           </a>
           <div style={{ width: 40, height: 1, background: GOLD, opacity: 0.4, margin: '0 auto 16px' }} />
-          <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: '#4a3728' }}>
+          <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: '#3a3330' }}>
             {t.auth.setPasswordTitle}
           </p>
           <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', marginTop: 4 }}>
@@ -143,7 +143,7 @@ export default function DefinirMotDePassePage() {
             )}
 
             <div style={{ marginBottom: 20 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#4a3728', marginBottom: 6, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 6, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                 {t.auth.password}
               </label>
               <input
@@ -153,12 +153,12 @@ export default function DefinirMotDePassePage() {
                 required
                 minLength={8}
                 placeholder={t.auth.passwordPlaceholder}
-                style={{ width: '100%', padding: '12px 16px', borderRadius: 12, border: `1px solid ${GOLD}44`, fontSize: 15, color: '#4a3728', background: '#fefcf8', outline: 'none', boxSizing: 'border-box', fontFamily: 'Georgia, serif' }}
+                style={{ width: '100%', padding: '12px 16px', borderRadius: 12, border: `1px solid ${GOLD}44`, fontSize: 15, color: '#3a3330', background: '#fefcf8', outline: 'none', boxSizing: 'border-box', fontFamily: 'Georgia, serif' }}
               />
             </div>
 
             <div style={{ marginBottom: 28 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#4a3728', marginBottom: 6, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 6, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                 {t.auth.passwordPlaceholder}
               </label>
               <input
@@ -168,7 +168,7 @@ export default function DefinirMotDePassePage() {
                 required
                 minLength={8}
                 placeholder="••••••••"
-                style={{ width: '100%', padding: '12px 16px', borderRadius: 12, border: `1px solid ${GOLD}44`, fontSize: 15, color: '#4a3728', background: '#fefcf8', outline: 'none', boxSizing: 'border-box', fontFamily: 'Georgia, serif' }}
+                style={{ width: '100%', padding: '12px 16px', borderRadius: 12, border: `1px solid ${GOLD}44`, fontSize: 15, color: '#3a3330', background: '#fefcf8', outline: 'none', boxSizing: 'border-box', fontFamily: 'Georgia, serif' }}
               />
             </div>
 

@@ -76,7 +76,7 @@ export function LangSwitch({ color = '#C9A84C' }: { color?: string }) {
                 alignItems: 'center',
                 gap: 8,
                 fontSize: 13,
-                color: lang.code === locale ? color : '#4a3728',
+                color: lang.code === locale ? color : '#3a3330',
                 fontWeight: lang.code === locale ? 700 : 400,
                 fontFamily: 'var(--font-cormorant-garamond)',
               }}

@@ -8,7 +8,7 @@ const CREAM = '#fff8ed'
 
 const inputStyle: React.CSSProperties = {
   width: '100%', padding: '12px 16px', borderRadius: 12,
-  border: `1px solid ${GOLD}44`, fontSize: 15, color: '#4a3728',
+  border: `1px solid ${GOLD}44`, fontSize: 15, color: '#3a3330',
   background: '#fefcf8', outline: 'none', boxSizing: 'border-box',
   fontFamily: 'Georgia, serif',
 }
@@ -102,7 +102,7 @@ export default function SuccesPage() {
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: CREAM, padding: 24 }}>
       <div style={{ textAlign: 'center', maxWidth: 480 }}>
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 36, color: GOLD, marginBottom: 16 }}>Oops…</div>
-        <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 18, color: '#4a3728', marginBottom: 24 }}>{error}</p>
+        <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 18, color: '#3a3330', marginBottom: 24 }}>{error}</p>
         <a href="/paiement" style={{ padding: '12px 28px', borderRadius: 9999, background: GOLD, color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 600 }}>{c.back}</a>
       </div>
     </div>
@@ -119,13 +119,13 @@ export default function SuccesPage() {
         </div>
         <div style={{ width: 60, height: 1, background: GOLD, opacity: 0.4, margin: '0 auto 28px' }} />
 
-        <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, color: '#4a3728', lineHeight: 1.7, marginBottom: 36 }}>
+        <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, color: '#3a3330', lineHeight: 1.7, marginBottom: 36 }}>
           {s.packActive.replace('{pack}', pack || '')}
         </p>
 
         {!pwDone ? (
           <form onSubmit={handleSetPassword} style={{ background: 'white', borderRadius: 20, padding: '32px 32px', boxShadow: '0 12px 48px rgba(201,168,76,0.15)', border: `1px solid ${GOLD}33`, marginBottom: 28, textAlign: 'left' }}>
-            <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 17, color: '#4a3728', marginBottom: 4, textAlign: 'center' }}>
+            <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 17, color: '#3a3330', marginBottom: 4, textAlign: 'center' }}>
               {s.createAccountTitle}
             </div>
             <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', marginBottom: 24, textAlign: 'center' }}>
@@ -139,14 +139,14 @@ export default function SuccesPage() {
             )}
 
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#4a3728', marginBottom: 6, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#3a3330', marginBottom: 6, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                 {s.passwordLabel}
               </label>
               <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={8} placeholder={a.passwordPlaceholder} style={inputStyle} />
             </div>
 
             <div style={{ marginBottom: 20 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#4a3728', marginBottom: 6, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#3a3330', marginBottom: 6, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                 {s.confirmLabel}
               </label>
               <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required minLength={8} placeholder="••••••••" style={inputStyle} />
@@ -166,7 +166,7 @@ export default function SuccesPage() {
         ) : (
           <div style={{ background: 'white', borderRadius: 20, padding: '32px 32px', boxShadow: '0 12px 48px rgba(201,168,76,0.15)', border: `1px solid ${GOLD}33`, marginBottom: 28 }}>
             <div style={{ fontSize: 36, marginBottom: 12, color: '#16a34a' }}>&#10003;</div>
-            <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 17, color: '#4a3728', marginBottom: 8 }}>
+            <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 17, color: '#3a3330', marginBottom: 8 }}>
               {s.accountCreated}
             </div>
             <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af', margin: 0 }}>

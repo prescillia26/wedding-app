@@ -51,7 +51,7 @@ export default function VerifyPage() {
 
         {status === 'loading' && (
           <div>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, color: '#4a3728', marginBottom: 16 }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, color: '#3a3330', marginBottom: 16 }}>
               {t.auth.verifyLoading}
             </div>
             <div style={{ width: 40, height: 2, background: GOLD, opacity: 0.5, margin: '0 auto', borderRadius: 1, animation: 'pulse 1.5s ease-in-out infinite' }} />
@@ -61,7 +61,7 @@ export default function VerifyPage() {
         {status === 'success' && (
           <div>
             <div style={{ fontSize: 48, marginBottom: 16 }}>&#10003;</div>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, color: '#4a3728', marginBottom: 8 }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, color: '#3a3330', marginBottom: 8 }}>
               {t.auth.verifySuccess}
             </div>
             <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9ca3af' }}>

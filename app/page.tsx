@@ -7,7 +7,7 @@ import { LangSwitch } from './components/LangSwitch'
 const GOLD = '#C9A84C'
 const CREAM = '#fff8ed'
 const DARK = '#2d2416'
-const TEXT = '#4a3728'
+const TEXT = '#3a3330'
 const LIGHT_GOLD = '#f5edda'
 
 function useFadeIn() {
