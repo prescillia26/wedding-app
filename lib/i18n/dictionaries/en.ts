@@ -360,6 +360,8 @@ const en: Dictionary = {
       narratif: '📝 Narrative text',
       dateHeure: '📅 Date & time',
       lieu: '📍 Venue & address',
+      parents: '👨‍👩‍👧 Parents names',
+      infos: '📌 Practical info',
     },
     // Buttons
     generateBtn: 'Generate your invitation',

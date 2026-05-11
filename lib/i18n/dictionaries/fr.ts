@@ -360,6 +360,8 @@ const fr: Dictionary = {
       narratif: '📝 Textes narratifs',
       dateHeure: '📅 Date et heure',
       lieu: '📍 Lieu et adresse',
+      parents: '👨‍👩‍👧 Noms des parents',
+      infos: '📌 Infos pratiques',
     },
     // Buttons
     generateBtn: 'Générer votre faire-part',

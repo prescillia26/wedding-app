@@ -11,7 +11,7 @@ type PresentationStyle = 'page-unique' | 'cartes-scrollables' | 'cartes-separees
 const MAX_PHOTOS = 3
 // ── Styles personnalisables par zone ──────────────────────────────────────────
 
-const TEXT_ZONES = ['titres', 'prenoms', 'narratif', 'dateHeure', 'lieu'] as const
+const TEXT_ZONES = ['titres', 'prenoms', 'narratif', 'dateHeure', 'lieu', 'parents', 'infos'] as const
 type TextZone = typeof TEXT_ZONES[number]
 
 const ZONE_LABELS: Record<TextZone, string> = {
@@ -20,6 +20,8 @@ const ZONE_LABELS: Record<TextZone, string> = {
   narratif: '📝 Textes narratifs',
   dateHeure: '📅 Date et heure',
   lieu: '📍 Lieu et adresse',
+  parents: '👨‍👩‍👧 Noms des parents',
+  infos: '📌 Infos pratiques',
 }
 
 const FONT_OPTIONS = [
@@ -3766,7 +3768,7 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
                   {/* Taille */}
                   <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>{t.fairepart.zoneSize}</label>
                   <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
-                    {[{ v: 0.8, l: t.fairepart.zoneSizeSmall }, { v: 1, l: t.fairepart.zoneSizeNormal }, { v: 1.2, l: t.fairepart.zoneSizeLarge }].map(opt => {
+                    {[{ v: 0.7, l: 'XS' }, { v: 0.85, l: 'S' }, { v: 1, l: 'M' }, { v: 1.15, l: 'L' }, { v: 1.3, l: 'XL' }].map(opt => {
                       const sel = (z.sizeScale ?? 1) === opt.v
                       return (
                         <button key={opt.v} type="button" onClick={() => setZoneStyle(zone, { sizeScale: opt.v })} style={{
@@ -4311,124 +4313,128 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
 
   const textColor = theme.dark ? '#e8ddd0' : `color-mix(in srgb, ${a} 60%, #2a2018)`
 
+  // Couleur texte premium
+  const txtMain = theme.dark ? '#f0e8dc' : `color-mix(in srgb, ${a} 55%, #1a1008)`
+  const txtSoft = theme.dark ? '#c8b8a4' : `color-mix(in srgb, ${a} 35%, #3a3028)`
+
   return (
     <div onClick={phase === 0 ? handleOpen : undefined} style={{
       position: 'fixed', inset: 0, zIndex: 9999,
-      background: `radial-gradient(ellipse at 50% 40%, ${es.liner} 0%, ${fond} 70%)`,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: `radial-gradient(ellipse at 50% 38%, ${es.liner}80 0%, ${fond} 65%)`,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column',
       cursor: phase === 0 ? 'pointer' : 'default',
       opacity: phase >= 2 ? 0 : 1,
-      transition: phase >= 2 ? 'opacity 0.7s cubic-bezier(0.4,0,0.2,1)' : 'none',
+      transition: phase >= 2 ? 'opacity 0.8s cubic-bezier(0.4,0,0.2,1)' : 'none',
       pointerEvents: phase >= 2 ? 'none' : 'auto',
     }}>
       <style>{`
-        @keyframes envFloat{0%,100%{transform:translateY(0) rotate(-1.5deg)}50%{transform:translateY(-10px) rotate(-0.8deg)}}
-        @keyframes envAppear{from{opacity:0;transform:translateY(40px) scale(0.92) rotate(-1.5deg)}to{opacity:1;transform:translateY(0) scale(1) rotate(-1.5deg)}}
-        @keyframes tapPulse{0%,100%{opacity:0.4}50%{opacity:0.9}}
+        @keyframes envFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+        @keyframes envAppear{from{opacity:0;transform:translateY(30px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+        @keyframes tapPulse{0%,100%{opacity:0.35}50%{opacity:0.7}}
+        @keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
       `}</style>
 
       {/* Skip */}
       <button onClick={e => { e.stopPropagation(); onDone() }} style={{
         position: 'absolute', top: 20, right: 20, background: 'none', border: 'none',
-        color: theme.dark ? '#ffffff60' : `${a}50`, fontSize: 11, fontFamily: FP, letterSpacing: 3,
+        color: theme.dark ? '#ffffff40' : `${a}35`, fontSize: 10, fontFamily: FP, letterSpacing: 4,
         cursor: 'pointer', zIndex: 10, textTransform: 'uppercase',
       } as React.CSSProperties}>SKIP</button>
 
-      {/* ═══ ENVELOPPE ═══ */}
+      {/* ═══ CARTE LUXE ═══ */}
       <div style={{
-        position: 'relative', width: 300,
-        animation: phase === 0 ? 'envFloat 3.5s ease-in-out infinite' : 'none',
+        position: 'relative', width: 320, maxWidth: '85vw',
+        animation: phase === 0 ? 'envFloat 4s ease-in-out infinite' : 'none',
         willChange: 'transform',
       }}>
-        <div style={{ animation: 'envAppear 1s cubic-bezier(0.16,1,0.3,1) forwards' }}>
-
-          {/* Corps principal */}
+        <div style={{ animation: 'envAppear 1.2s cubic-bezier(0.16,1,0.3,1) forwards' }}>
           <div style={{
             position: 'relative', width: '100%',
-            background: `linear-gradient(165deg, ${es.bg} 0%, ${es.bgDark} 100%)`,
-            borderRadius: 16,
-            boxShadow: `0 35px 70px rgba(0,0,0,0.18), 0 15px 30px rgba(0,0,0,0.10), 0 0 0 1px ${a}10`,
+            background: `linear-gradient(170deg, ${es.bg} 0%, ${es.bgDark} 100%)`,
+            borderRadius: 3,
+            boxShadow: `0 40px 80px rgba(0,0,0,0.12), 0 16px 32px rgba(0,0,0,0.08), 0 0 0 0.5px ${a}15`,
             overflow: 'hidden',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            padding: '50px 30px 50px',
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
+            padding: '52px 36px 44px',
           }}>
-            {/* Texture papier subtile */}
-            <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.025, pointerEvents: 'none' }}>
-              <filter id="envPaper"><feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="4" /><feComposite in="SourceGraphic" operator="in" /></filter>
-              <rect width="100%" height="100%" filter="url(#envPaper)" />
+            {/* Texture papier vergé */}
+            <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.02, pointerEvents: 'none', mixBlendMode: 'multiply' }}>
+              <filter id="envLuxPaper"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="5" /><feComposite in="SourceGraphic" operator="in" /></filter>
+              <rect width="100%" height="100%" filter="url(#envLuxPaper)" />
             </svg>
 
-            {/* Liner intérieur — bande colorée subtile en haut */}
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 90, background: `linear-gradient(180deg, ${es.liner}40 0%, transparent 100%)`, pointerEvents: 'none' }} />
+            {/* Filet doré intérieur */}
+            <div style={{ position: 'absolute', inset: 10, borderRadius: 2, border: `0.5px solid ${a}15`, pointerEvents: 'none' }} />
 
-            {/* Bordure dorée intérieure */}
-            <div style={{ position: 'absolute', inset: 8, borderRadius: 10, border: `0.5px solid ${a}18`, pointerEvents: 'none', zIndex: 1 }} />
-            <div style={{ position: 'absolute', inset: 10, borderRadius: 9, border: `0.5px solid ${a}0c`, pointerEvents: 'none', zIndex: 1 }} />
-
-            {/* Filigrane diagonal */}
-            <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.04, pointerEvents: 'none' }} viewBox="0 0 300 420">
-              <path d="M-20,250 Q80,200 150,220 T320,180" fill="none" stroke={a} strokeWidth="0.8" />
-              <path d="M-20,280 Q100,230 170,250 T320,210" fill="none" stroke={a} strokeWidth="0.5" />
-              <path d="M-20,310 Q60,270 130,290 T320,250" fill="none" stroke={a} strokeWidth="0.3" />
+            {/* Cadre ornemental SVG — en haut */}
+            <svg width="200" height="30" viewBox="0 0 200 30" style={{ position: 'relative', zIndex: 2, opacity: 0.18, marginBottom: 20 }}>
+              <path d="M20,15 Q30,4 50,12 Q65,4 80,12 Q100,2 120,12 Q135,4 150,12 Q170,4 180,15" fill="none" stroke={a} strokeWidth="0.6" strokeLinecap="round" />
+              <path d="M40,18 Q55,10 70,16 Q85,10 100,15 Q115,10 130,16 Q145,10 160,18" fill="none" stroke={a} strokeWidth="0.4" strokeLinecap="round" />
+              <circle cx="100" cy="8" r="1.5" fill={a} opacity="0.4" />
+              <circle cx="60" cy="12" r="0.8" fill={a} opacity="0.3" />
+              <circle cx="140" cy="12" r="0.8" fill={a} opacity="0.3" />
             </svg>
 
-            {/* Petits ornements de coins */}
-            {[
-              { top: 14, left: 14, r: '' },
-              { top: 14, right: 14, r: 'scaleX(-1)' },
-              { bottom: 14, left: 14, r: 'scaleY(-1)' },
-              { bottom: 14, right: 14, r: 'scale(-1)' },
-            ].map((pos, idx) => (
-              <div key={idx} style={{ position: 'absolute', ...pos, zIndex: 1, transform: pos.r } as React.CSSProperties}>
-                <svg width="40" height="40" viewBox="0 0 40 40" style={{ opacity: 0.12 }}>
-                  <path d="M2,38 Q2,20 12,10 Q16,6 22,5" fill="none" stroke={a} strokeWidth="0.7" strokeLinecap="round" />
-                  <path d="M2,38 Q8,28 18,20 Q24,16 30,14" fill="none" stroke={a} strokeWidth="0.5" strokeLinecap="round" />
-                  <circle cx="22" cy="5" r="1.5" fill={a} opacity="0.25" />
-                  <circle cx="30" cy="14" r="1" fill={a} opacity="0.2" />
-                  <path d="M12,10 Q14,7 17,9 Q14,12 12,10Z" fill={a} opacity="0.1" />
-                </svg>
-              </div>
-            ))}
-
-            {/* ── Prénoms en calligraphie ── */}
-            <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', marginBottom: 10 }}>
-              {/* Petit ornement au-dessus */}
-              <svg width="60" height="20" viewBox="0 0 60 20" style={{ opacity: 0.15, marginBottom: 8 }}>
-                <path d="M5,16 Q15,2 30,10 Q45,2 55,16" fill="none" stroke={a} strokeWidth="0.8" strokeLinecap="round" />
-                <circle cx="30" cy="8" r="1.2" fill={a} opacity="0.5" />
-              </svg>
-              <div style={{ fontFamily: GV, fontSize: 36, color: textColor, lineHeight: 1.15, letterSpacing: 2 }}>
+            {/* ── Prénoms — calligraphie luxe ── */}
+            <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', marginBottom: 6 }}>
+              <div style={{
+                fontFamily: GV, fontSize: 42, color: txtMain, lineHeight: 1.1, letterSpacing: 3,
+                textShadow: theme.dark ? 'none' : `0 1px 2px ${a}12`,
+              }}>
                 {data.marie1Prenom || 'Prénom'}
               </div>
-              <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 18, color: textColor, opacity: 0.35, margin: '6px 0', letterSpacing: 3 }}>&</div>
-              <div style={{ fontFamily: GV, fontSize: 36, color: textColor, lineHeight: 1.15, letterSpacing: 2 }}>
+              <div style={{
+                fontFamily: CG, fontSize: 20, color: txtSoft, opacity: 0.4,
+                margin: '8px 0', letterSpacing: 6, fontStyle: 'italic',
+              }}>&</div>
+              <div style={{
+                fontFamily: GV, fontSize: 42, color: txtMain, lineHeight: 1.1, letterSpacing: 3,
+                textShadow: theme.dark ? 'none' : `0 1px 2px ${a}12`,
+              }}>
                 {data.marie2Prenom || 'Prénom'}
               </div>
             </div>
 
-            {/* ── Séparateur fin ── */}
-            <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, width: 180 }}>
-              <div style={{ flex: 1, height: '0.5px', background: `linear-gradient(90deg, transparent, ${a}25, transparent)` }} />
-              <svg width="14" height="14" viewBox="0 0 14 14" style={{ opacity: 0.2, flexShrink: 0 }}>
-                <path d="M7,0 L9,5 L14,7 L9,9 L7,14 L5,9 L0,7 L5,5Z" fill={a} />
+            {/* ── Ligne ornementale ── */}
+            <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18, width: 200 }}>
+              <div style={{ flex: 1, height: '0.5px', background: `linear-gradient(90deg, transparent, ${a}20, transparent)` }} />
+              <svg width="16" height="16" viewBox="0 0 16 16" style={{ opacity: 0.18, flexShrink: 0 }}>
+                <path d="M8,1 L10,6 L15,8 L10,10 L8,15 L6,10 L1,8 L6,6Z" fill="none" stroke={a} strokeWidth="0.6" />
+                <path d="M8,4 L9,7 L12,8 L9,9 L8,12 L7,9 L4,8 L7,7Z" fill={a} opacity="0.3" />
               </svg>
-              <div style={{ flex: 1, height: '0.5px', background: `linear-gradient(90deg, transparent, ${a}25, transparent)` }} />
+              <div style={{ flex: 1, height: '0.5px', background: `linear-gradient(90deg, transparent, ${a}20, transparent)` }} />
             </div>
 
-            {/* ── Phrase d'invitation chaleureuse ── */}
-            <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', maxWidth: 220 }}>
-              <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 12.5, color: textColor, opacity: 0.5, lineHeight: 1.6, letterSpacing: 0.5, animation: phase === 0 ? 'tapPulse 2.5s ease-in-out infinite' : 'none' }}>
+            {/* ── Phrase d'invitation ── */}
+            <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', maxWidth: 240, marginBottom: 8 }}>
+              <div style={{
+                fontFamily: CG, fontStyle: 'italic', fontSize: 13.5, color: txtSoft,
+                lineHeight: 1.7, letterSpacing: 0.3,
+                animation: phase === 0 ? 'tapPulse 3s ease-in-out infinite' : 'none',
+              }}>
                 {locale === 'en'
-                  ? 'are delighted to share their celebration with you'
-                  : 'ont le plaisir de vous convier à leur célébration'}
-              </div>
-              <div style={{ marginTop: 14, fontFamily: FP, fontSize: 9, color: textColor, opacity: 0.3, letterSpacing: 3, textTransform: 'uppercase' }}>
-                {locale === 'en' ? 'Tap to open' : 'Appuyez pour ouvrir'}
+                  ? 'are delighted to invite you to share in their joy'
+                  : 'ont la joie de vous convier à célébrer leur union'}
               </div>
             </div>
 
-          </div>
+            {/* ── Appuyez — très discret ── */}
+            <div style={{
+              fontFamily: FP, fontSize: 8.5, color: txtSoft, opacity: 0.25,
+              letterSpacing: 4, textTransform: 'uppercase', marginTop: 10,
+            }}>
+              {locale === 'en' ? 'Tap to open' : 'Appuyez pour ouvrir'}
+            </div>
 
+            {/* Cadre ornemental SVG — en bas */}
+            <svg width="200" height="30" viewBox="0 0 200 30" style={{ position: 'relative', zIndex: 2, opacity: 0.18, marginTop: 16, transform: 'scaleY(-1)' }}>
+              <path d="M20,15 Q30,4 50,12 Q65,4 80,12 Q100,2 120,12 Q135,4 150,12 Q170,4 180,15" fill="none" stroke={a} strokeWidth="0.6" strokeLinecap="round" />
+              <path d="M40,18 Q55,10 70,16 Q85,10 100,15 Q115,10 130,16 Q145,10 160,18" fill="none" stroke={a} strokeWidth="0.4" strokeLinecap="round" />
+              <circle cx="100" cy="8" r="1.5" fill={a} opacity="0.4" />
+              <circle cx="60" cy="12" r="0.8" fill={a} opacity="0.3" />
+              <circle cx="140" cy="12" r="0.8" fill={a} opacity="0.3" />
+            </svg>
+          </div>
         </div>
       </div>
     </div>
@@ -5000,10 +5006,10 @@ const firstDate = sorted[0]?.date
                         {/* Parents — toujours alignés */}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12, textAlign: 'center' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {parents1.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }}>{l}</div>)}
+                            {parents1.map((l,j)=><div key={j} style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles)}>{l}</div>)}
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {parents2.map((l,j)=><div key={j} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }}>{l}</div>)}
+                            {parents2.map((l,j)=><div key={j} style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles)}>{l}</div>)}
                           </div>
                         </div>
                         <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 24, lineHeight: 1.9, opacity: 0.82 }, 'narratif', data.zoneStyles)}>
@@ -5107,13 +5113,13 @@ const firstDate = sorted[0]?.date
                           {ceremony.transport && (
                             <div style={{ marginBottom: ceremony.hebergement ? 18 : 0, textAlign: 'center' }}>
                               <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: G, marginBottom: 6, fontWeight: 600 }}>{t.fairepart.transportIcon}</div>
-                              <div style={{ fontFamily: FC, fontSize: 13, color: TEXT, lineHeight: 1.7, whiteSpace: 'pre-wrap', opacity: 0.9 }}><Linkify text={ceremony.transport} color={G} /></div>
+                              <div style={applyZoneStyle({ fontFamily: FC, fontSize: 13, color: TEXT, lineHeight: 1.7, whiteSpace: 'pre-wrap', opacity: 0.9 }, 'infos', data.zoneStyles)}><Linkify text={ceremony.transport} color={G} /></div>
                             </div>
                           )}
                           {ceremony.hebergement && (
                             <div style={{ textAlign: 'center' }}>
                               <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: G, marginBottom: 6, fontWeight: 600 }}>{t.fairepart.hebergementIcon}</div>
-                              <div style={{ fontFamily: FC, fontSize: 13, color: TEXT, lineHeight: 1.7, whiteSpace: 'pre-wrap', opacity: 0.9 }}><Linkify text={ceremony.hebergement} color={G} /></div>
+                              <div style={applyZoneStyle({ fontFamily: FC, fontSize: 13, color: TEXT, lineHeight: 1.7, whiteSpace: 'pre-wrap', opacity: 0.9 }, 'infos', data.zoneStyles)}><Linkify text={ceremony.hebergement} color={G} /></div>
                             </div>
                           )}
                         </div>
