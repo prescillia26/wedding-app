@@ -98,21 +98,16 @@ const ILLUSTRATIONS_COUPLES = [
   { id: 'couple-06', label: '🌸 Arche florale rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878838/94_l7zjbv.png' },
 ] as const
 
+const FRAMES_STRONG_BG = new Set(['frame-80', 'frame-107', 'frame-108'])
 const FRAMES: { id: string; label: string; url: string | null }[] = [
   { id: 'frame-02', label: '🤍 Roses Crème Haut/Bas', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/51_m9vx96.png' },
   { id: 'frame-03', label: '🌺 Cadre Floral Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/53_ho1gq8.png' },
-  { id: 'frame-05', label: '💙 Fleurs Aquarelle Bleues', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785418/48_t9qh5k.png' },
-  { id: 'frame-06', label: '🌹 Cadre Géométrique Roses', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785416/50_iq0a5c.png' },
   { id: 'frame-07', label: '🌷 Fleurs Rose Aquarelle', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785416/49_ewrr8v.png' },
-  { id: 'frame-09', label: '🌻 Cadre Champêtre', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785415/46_g1yqw8.png' },
-  { id: 'frame-10', label: '🌸 Fleurs Roses Coins', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785414/45_roarfa.png' },
   { id: 'frame-30', label: '🌹 Floral 18', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778825/18_ushe4t.png' },
   { id: 'frame-34', label: '🌻 Floral 14', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778816/14_bzmmdm.png' },
   { id: 'frame-55', label: '🌸 Floral 55', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857011/55_l7xahl.png' },
-  { id: 'frame-56', label: '🌸 Floral 56', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857012/56_siwk5j.png' },
   { id: 'frame-61', label: '🌸 Floral 61', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857014/61_nnkips.png' },
   { id: 'frame-65', label: '🌸 Floral 65', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857017/65_hzdotl.png' },
-  { id: 'frame-67', label: '🌸 Floral 67', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857018/67_so3kot.png' },
   { id: 'frame-69', label: '🌸 Floral 69', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857021/69_vko7to.png' },
   { id: 'frame-70', label: '🌸 Floral 70', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857021/70_skvaop.png' },
   { id: 'frame-71', label: '🌸 Floral 71', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857022/71_ntcix8.png' },
@@ -1865,7 +1860,9 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
       {/* Zone texte avec voile blanc semi-transparent derrière pour garantir la lisibilité sur cadres chargés */}
       <div style={{ position: 'relative', zIndex: 10, paddingTop: `${framePaddingV}%`, paddingBottom: `${framePaddingV}%`, paddingLeft: `${framePaddingH}%`, paddingRight: `${framePaddingH}%`, textAlign: 'center', opacity: textOpacity }}>
         {hasFrame && (
-          <div style={{ position: 'absolute', inset: '8%', background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: -1 }} />
+          <div style={{ position: 'absolute', inset: FRAMES_STRONG_BG.has(frameId) ? '4%' : '8%', background: FRAMES_STRONG_BG.has(frameId)
+            ? 'radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 50%, rgba(255,255,255,0.4) 80%, rgba(255,255,255,0) 100%)'
+            : 'radial-gradient(ellipse at center, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: -1 }} />
         )}
         {children}
       </div>
@@ -5018,6 +5015,11 @@ const firstDate = sorted[0]?.date
                     <>
                       {i % 2 === 0 ? <><OrnTR /><OrnBL /></> : <><OrnTL /><OrnBR /></>}
                     </>
+                  )}
+                  {hasFrame && (
+                    <div style={{ position: 'absolute', inset: FRAMES_STRONG_BG.has(data.frameId ?? '') ? '3%' : '8%', background: FRAMES_STRONG_BG.has(data.frameId ?? '')
+                      ? 'radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 50%, rgba(255,255,255,0.35) 80%, rgba(255,255,255,0) 100%)'
+                      : 'radial-gradient(ellipse at center, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.5) 55%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: 0 }} />
                   )}
                   <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame) }}>
                     {data.mariageJuif && (
