@@ -5009,7 +5009,10 @@ const firstDate = sorted[0]?.date
         .lovit-btn:active{transform:translateY(0);filter:brightness(0.98)}
       `}</style>
 {/* SECTION 1 : Écran d'accueil */}
-      <div style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', maxWidth: 480, margin: '0 auto', boxShadow: '0 8px 60px rgba(0,0,0,0.15)' }}>
+      <div style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: data.styleAccueil === 'video' ? 'flex-start' : 'center',
+        paddingTop: data.styleAccueil === 'video' ? (() => { const v = VIDEO_BACKGROUNDS.find(x => x.id === data.videoAccueilId); return v?.textPosition === 'top' ? '6%' : v?.textPosition === 'center-top' ? '12%' : '18%' })() : undefined,
+        maxWidth: 480, margin: '0 auto', boxShadow: '0 8px 60px rgba(0,0,0,0.15)' }}>
         {/* Wrapper overflow:hidden pour le fond (photo carousel ou vidéo) */}
         {data.styleAccueil === 'video' && data.videoAccueilId ? (
           <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
@@ -5033,8 +5036,8 @@ const firstDate = sorted[0]?.date
         )}
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '0 32px', maxWidth: 480, width: '100%', margin: '0 auto' }}>
           {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 16, color: introTextColor, direction: 'rtl', marginBottom: 20, animation: 'sharedFadeIn 0.9s ease forwards' }}>בס״ד</div>}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
-            {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={140} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor}size={140} style={data.monogrammeStyle || 'cercle'} />}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: data.styleAccueil === 'video' ? 10 : 16, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
+            {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={data.styleAccueil === 'video' ? 110 : 140} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={data.styleAccueil === 'video' ? 110 : 140} style={data.monogrammeStyle || 'cercle'} />}
           </div>
           {data.styleAccueil === 'illustration' && data.illustrationCoupleId && (
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 30, animation: 'sharedFadeIn 1s 0.2s ease forwards', opacity: 0 }}>
