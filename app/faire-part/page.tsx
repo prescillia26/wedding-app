@@ -275,7 +275,8 @@ interface FormData {
   illustrationCoupleId?: string
   effetTexte?: 'aucun' | 'or' | 'aquarelle' | 'embosse'
   dateAccueilOverride?: string // Date affichée sur la page d'accueil (override manuel)
-  videoAccueilId?: string // ID vidéo animée pour page d'accueil
+  videoAccueilId?: string
+  accueilLayout?: Record<string, { x: number; y: number; scale: number }>
   customLogoUrl?: string
   customLogoSize?: number // 50-150, default 100
   customLogoColor?: string // '' = original, ou hex color
@@ -701,6 +702,74 @@ function applyZoneStyle(baseStyle: React.CSSProperties, zone: TextZone, zoneStyl
   }
   return result
 }
+// ── Drag & drop pour positionner les éléments sur la page d'accueil ──
+function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
+  id: string
+  layout?: Record<string, { x: number; y: number; scale: number }>
+  onLayoutChange?: (layout: Record<string, { x: number; y: number; scale: number }>) => void
+  editable: boolean
+  children: React.ReactNode
+}) {
+  const pos = layout?.[id] ?? { x: 0, y: 0, scale: 1 }
+  const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null)
+  const elRef = useRef<HTMLDivElement>(null)
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (!editable) return
+    e.preventDefault()
+    e.stopPropagation()
+    dragRef.current = { startX: e.clientX, startY: e.clientY, origX: pos.x, origY: pos.y }
+    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+  }
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!dragRef.current || !onLayoutChange) return
+    const dx = e.clientX - dragRef.current.startX
+    const dy = e.clientY - dragRef.current.startY
+    const newLayout = { ...layout, [id]: { ...pos, x: dragRef.current.origX + dx, y: dragRef.current.origY + dy } }
+    onLayoutChange(newLayout)
+  }
+
+  const handlePointerUp = () => { dragRef.current = null }
+
+  const handleWheel = (e: React.WheelEvent) => {
+    if (!editable || !onLayoutChange) return
+    e.preventDefault()
+    e.stopPropagation()
+    const delta = e.deltaY > 0 ? -0.05 : 0.05
+    const newScale = Math.max(0.4, Math.min(2.5, pos.scale + delta))
+    onLayoutChange({ ...layout, [id]: { ...pos, scale: newScale } })
+  }
+
+  return (
+    <div
+      ref={elRef}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onWheel={handleWheel}
+      style={{
+        transform: `translate(${pos.x}px, ${pos.y}px) scale(${pos.scale})`,
+        cursor: editable ? 'grab' : 'default',
+        position: 'relative',
+        outline: editable ? '1px dashed rgba(201,168,76,0.3)' : 'none',
+        outlineOffset: 4,
+        borderRadius: 4,
+        touchAction: editable ? 'none' : 'auto',
+        userSelect: editable ? 'none' : 'auto',
+        transition: dragRef.current ? 'none' : 'transform 0.15s ease',
+      } as React.CSSProperties}
+    >
+      {editable && (
+        <div style={{ position: 'absolute', top: -18, left: '50%', transform: 'translateX(-50%)', fontSize: 8, color: '#C9A84C', background: 'rgba(255,255,255,0.85)', padding: '1px 6px', borderRadius: 4, whiteSpace: 'nowrap', pointerEvents: 'none', opacity: 0.7 }}>
+          ↕ glisser · ⚙ molette = taille
+        </div>
+      )}
+      {children}
+    </div>
+  )
+}
+
 const S: Record<string, React.CSSProperties> = {
   input: {
     width: '100%', border: '1px solid #e0d5c8', borderRadius: 8, padding: '12px 15px',
@@ -4371,6 +4440,7 @@ interface SharedPageContentProps {
   onStartYoutube?: () => void
   ytIframeRef: React.RefObject<HTMLIFrameElement | null>
   ytMuted: boolean; onToggleYtMute: () => void
+  onUpdate?: (d: Partial<FormData>) => void
 }
 // ── 💌 ENVELOPPE PREMIUM ─────────────────────────────────────────────────────
 // Design : prénoms en haut, sceau au centre, "Touchez" en bas, ornements SVG
@@ -4917,7 +4987,7 @@ function EnveloppeAnimation({ data, theme, onDone }: { data: FormData; theme: Th
 }
 
 // ── ItineraireButtons : Google Maps + Waze avec design luxe ───────────────────
-function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute }: SharedPageContentProps) {
+function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute, onUpdate }: SharedPageContentProps) {
   const { t, locale } = useT()
   const contentRef = useRef<HTMLDivElement>(null)
   const [currentCeremonyIdx, setCurrentCeremonyIdx] = useState(0)
@@ -5036,16 +5106,24 @@ const firstDate = sorted[0]?.date
           </div>
         )}
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '0 32px', maxWidth: 480, width: '100%', margin: '0 auto' }}>
+          {(() => {
+            const canEdit = role !== 'guest' && !!onUpdate
+            const layout = data.accueilLayout ?? {}
+            const setLayout = (l: Record<string, { x: number; y: number; scale: number }>) => onUpdate?.({ accueilLayout: l })
+            return (<>
           {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 16, color: introTextColor, direction: 'rtl', marginBottom: 20, animation: 'sharedFadeIn 0.9s ease forwards' }}>בס״ד</div>}
+          <DraggableElement id="monogram" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: data.styleAccueil === 'video' ? 10 : 16, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
             {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={data.styleAccueil === 'video' ? 110 : 140} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={data.styleAccueil === 'video' ? 110 : 140} style={data.monogrammeStyle || 'cercle'} />}
           </div>
+          </DraggableElement>
           {data.styleAccueil === 'illustration' && data.illustrationCoupleId && (
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 30, animation: 'sharedFadeIn 1s 0.2s ease forwards', opacity: 0 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url} alt="" style={{ maxWidth: '70%', maxHeight: 280, objectFit: 'contain' }} />
             </div>
           )}
+          <DraggableElement id="names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', margin: '0 auto 16px', maxWidth: 160 }}>
             <div style={{ flex: 1, height: 0.5, background: introTextColor, opacity: 0.4 }} />
             <span style={{ color: introTextColor, fontSize: 10, opacity: 0.7 }}>◆</span>
@@ -5054,18 +5132,27 @@ const firstDate = sorted[0]?.date
           <div style={{ fontFamily: FS, fontSize: 'clamp(30px,8vw,46px)', color: introTextColor, marginBottom: 16, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.2, textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : readableShadow(theme) }}>
             {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
           </div>
+          </DraggableElement>
+          <DraggableElement id="phrase" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: introTextColor, marginBottom: 20, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}>
             {t.fairepart.pleaseJoin}
           </div>
+          </DraggableElement>
           {/* Compte à rebours intégré dans l'accueil */}
           {firstDate && (
+            <DraggableElement id="countdown" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
             <div style={{ marginBottom: 28, animation: 'sharedFadeIn 1s 0.65s ease forwards', opacity: 0 }}>
               <Countdown targetDate={firstDate} accent={hasIntroPhoto ? 'rgba(255,255,255,0.9)' : G} />
             </div>
+            </DraggableElement>
           )}
-          <button className="lovit-btn" onClick={handleDiscover} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '14px 40px', fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', boxShadow: `0 4px 20px ${G}44`, animation: 'sharedFadeIn 1s 0.8s ease forwards', opacity: 0 } as React.CSSProperties}>
+          <DraggableElement id="button" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
+          <button className="lovit-btn" onClick={canEdit ? undefined : handleDiscover} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '14px 40px', fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', boxShadow: `0 4px 20px ${G}44`, animation: 'sharedFadeIn 1s 0.8s ease forwards', opacity: 0 } as React.CSSProperties}>
             {t.fairepart.discoverInvitation}
           </button>
+          </DraggableElement>
+          </>)
+          })()}
         </div>
         </div>
       </div>
@@ -5500,6 +5587,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
           ytIframeRef={ytIframeRef}
           ytMuted={ytMuted}
           onToggleYtMute={toggleYtMute}
+          onUpdate={onUpdate}
         />
         {role === 'couple' && (
           <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -5546,7 +5634,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         data={{ ...data, textOverrides: { ...data.textOverrides, ...textOverrides }, zoneStyles }}
         theme={theme}
         sorted={sorted}
-        role="guest"
+        role="couple"
         lastShareId={lastShareId}
         onRsvpOpen={() => setRsvpOpen(true)}
         onRsvpListOpen={() => setRsvpListOpen(true)}
@@ -5554,6 +5642,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         ytIframeRef={ytIframeRef}
         ytMuted={ytMuted}
         onToggleYtMute={toggleYtMute}
+        onUpdate={onUpdate}
       />
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
         <button onClick={onEdit} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>{t.fairepart.editBtn}</button>
