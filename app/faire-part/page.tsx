@@ -712,12 +712,13 @@ function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
 }) {
   const pos = layout?.[id] ?? { x: 0, y: 0, scale: 1 }
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null)
-  const elRef = useRef<HTMLDivElement>(null)
+  const [selected, setSelected] = useState(false)
 
   const handlePointerDown = (e: React.PointerEvent) => {
     if (!editable) return
     e.preventDefault()
     e.stopPropagation()
+    setSelected(true)
     dragRef.current = { startX: e.clientX, startY: e.clientY, origX: pos.x, origY: pos.y }
     ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
   }
@@ -726,43 +727,39 @@ function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
     if (!dragRef.current || !onLayoutChange) return
     const dx = e.clientX - dragRef.current.startX
     const dy = e.clientY - dragRef.current.startY
-    const newLayout = { ...layout, [id]: { ...pos, x: dragRef.current.origX + dx, y: dragRef.current.origY + dy } }
-    onLayoutChange(newLayout)
+    onLayoutChange({ ...layout, [id]: { ...pos, x: dragRef.current.origX + dx, y: dragRef.current.origY + dy } })
   }
 
   const handlePointerUp = () => { dragRef.current = null }
 
-  const handleWheel = (e: React.WheelEvent) => {
-    if (!editable || !onLayoutChange) return
-    e.preventDefault()
-    e.stopPropagation()
-    const delta = e.deltaY > 0 ? -0.05 : 0.05
+  const changeScale = (delta: number) => {
+    if (!onLayoutChange) return
     const newScale = Math.max(0.4, Math.min(2.5, pos.scale + delta))
     onLayoutChange({ ...layout, [id]: { ...pos, scale: newScale } })
   }
 
   return (
     <div
-      ref={elRef}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      onWheel={handleWheel}
       style={{
         transform: `translate(${pos.x}px, ${pos.y}px) scale(${pos.scale})`,
         cursor: editable ? 'grab' : 'default',
         position: 'relative',
-        outline: editable ? '1px dashed rgba(201,168,76,0.3)' : 'none',
-        outlineOffset: 4,
+        outline: editable && selected ? '1.5px dashed rgba(201,168,76,0.5)' : editable ? '1px dashed rgba(201,168,76,0.15)' : 'none',
+        outlineOffset: 6,
         borderRadius: 4,
         touchAction: editable ? 'none' : 'auto',
         userSelect: editable ? 'none' : 'auto',
-        transition: dragRef.current ? 'none' : 'transform 0.15s ease',
       } as React.CSSProperties}
     >
-      {editable && (
-        <div style={{ position: 'absolute', top: -18, left: '50%', transform: 'translateX(-50%)', fontSize: 8, color: '#C9A84C', background: 'rgba(255,255,255,0.85)', padding: '1px 6px', borderRadius: 4, whiteSpace: 'nowrap', pointerEvents: 'none', opacity: 0.7 }}>
-          ↕ glisser · ⚙ molette = taille
+      {/* Boutons de taille — visibles quand sélectionné */}
+      {editable && selected && (
+        <div style={{ position: 'absolute', top: -24, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 4, zIndex: 20 }} onPointerDown={e => e.stopPropagation()}>
+          <button type="button" onClick={() => changeScale(-0.1)} style={{ ...BTN, width: 22, height: 22, borderRadius: '50%', border: '1px solid #C9A84C', background: 'white', color: '#C9A84C', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}>−</button>
+          <div style={{ fontSize: 9, color: '#C9A84C', background: 'white', border: '1px solid #C9A84C22', borderRadius: 4, padding: '3px 6px', fontWeight: 600, display: 'flex', alignItems: 'center' }}>{Math.round(pos.scale * 100)}%</div>
+          <button type="button" onClick={() => changeScale(0.1)} style={{ ...BTN, width: 22, height: 22, borderRadius: '50%', border: '1px solid #C9A84C', background: 'white', color: '#C9A84C', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}>+</button>
         </div>
       )}
       {children}
@@ -5475,6 +5472,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
   const [zoneStyles, setZoneStyles] = useState<ZoneStyles>(data.zoneStyles ?? {})
   const [textEditOpen, setTextEditOpen] = useState(false)
   const [shareModalOpen, setShareModalOpen] = useState(false)
+  const [previewMode, setPreviewMode] = useState(false)
   const [guestUrl, setGuestUrl] = useState<string | null>(null)
   const [coupleUrl, setCoupleUrl] = useState<string | null>(null)
   const [sharing, setSharing] = useState(false)
@@ -5634,7 +5632,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         data={{ ...data, textOverrides: { ...data.textOverrides, ...textOverrides }, zoneStyles }}
         theme={theme}
         sorted={sorted}
-        role="couple"
+        role={previewMode ? 'guest' : 'couple'}
         lastShareId={lastShareId}
         onRsvpOpen={() => setRsvpOpen(true)}
         onRsvpListOpen={() => setRsvpListOpen(true)}
@@ -5642,7 +5640,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         ytIframeRef={ytIframeRef}
         ytMuted={ytMuted}
         onToggleYtMute={toggleYtMute}
-        onUpdate={onUpdate}
+        onUpdate={previewMode ? undefined : onUpdate}
       />
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
         <button onClick={onEdit} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>{t.fairepart.editBtn}</button>
@@ -5654,6 +5652,9 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         {lastShareId && (
           <a href={`/plan-table?shareId=${lastShareId}`} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>{t.fairepart.tablesBtn}</a>
         )}
+        <button onClick={() => setPreviewMode(p => !p)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${previewMode ? '#22c55e' : theme.accent}`, background: previewMode ? '#22c55e15' : 'transparent', color: previewMode ? '#22c55e' : theme.accent, fontSize: 13, fontWeight: 600 }}>
+          {previewMode ? '✏️ Éditer' : '👁️ Preview'}
+        </button>
         <a href="/paiement" style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: '1.5px solid #e5d5c5', background: 'transparent', color: '#8a7860', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>{t.fairepart.newBtn}</a>
       </div>
       {rsvpOpen && (
