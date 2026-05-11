@@ -11,7 +11,7 @@ const BTN: React.CSSProperties = { cursor: 'pointer', touchAction: 'manipulation
 
 interface RSVPEntry {
   nom: string
-  reponses?: { present: boolean; nbPersonnes: number; accompagnants?: string[] }[]
+  reponses?: { ceremonie: string; present: boolean; nbPersonnes: number; accompagnants?: string[] }[]
 }
 
 interface TableData {
@@ -74,13 +74,33 @@ export default function PlanTablePage() {
   const { t } = useT()
   const [shareId, setShareId] = useState<string | null>(null)
   const [isGuest, setIsGuest] = useState(false)
-  const [guests, setGuests] = useState<string[]>([])
-  const [tables, setTables] = useState<TableData[]>(initTables())
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [editingTable, setEditingTable] = useState<string | null>(null)
   const [copyDone, setCopyDone] = useState(false)
+
+  // Per-ceremony data
+  const [ceremonies, setCeremonies] = useState<string[]>([])
+  const [activeCeremony, setActiveCeremony] = useState<string>('')
+  const [guestsByCeremony, setGuestsByCeremony] = useState<Record<string, string[]>>({})
+  const [tablesByCeremony, setTablesByCeremony] = useState<Record<string, TableData[]>>({})
+
+  // Current ceremony shortcuts
+  const guests = guestsByCeremony[activeCeremony] ?? []
+  const tables = tablesByCeremony[activeCeremony] ?? initTables()
+  const setTables = (updater: TableData[] | ((prev: TableData[]) => TableData[])) => {
+    setTablesByCeremony(prev => ({
+      ...prev,
+      [activeCeremony]: typeof updater === 'function' ? updater(prev[activeCeremony] ?? initTables()) : updater,
+    }))
+  }
+  const setGuests = (updater: string[] | ((prev: string[]) => string[])) => {
+    setGuestsByCeremony(prev => ({
+      ...prev,
+      [activeCeremony]: typeof updater === 'function' ? updater(prev[activeCeremony] ?? []) : updater,
+    }))
+  }
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -98,31 +118,73 @@ export default function PlanTablePage() {
           fetch(`/api/get-plan?shareId=${id}`).then(r => r.json()),
         ])
         const entries: RSVPEntry[] = Array.isArray(rsvpRes) ? rsvpRes : []
-        const presentGuests: string[] = []
+
+        // Extraire les cérémonies uniques depuis les RSVP
+        const ceremonySet = new Set<string>()
         for (const e of entries) {
-          const isPresent = e.reponses?.some(r => r.present)
-          if (!isPresent) continue
-          presentGuests.push(e.nom)
-          // Ajouter les accompagnants (+1) avec leurs noms
           for (const r of (e.reponses ?? [])) {
-            if (r.present && r.accompagnants) {
-              for (const acc of r.accompagnants) {
-                if (acc.trim() && !presentGuests.includes(acc.trim())) {
-                  presentGuests.push(acc.trim())
+            if (r.ceremonie) ceremonySet.add(r.ceremonie)
+          }
+        }
+        const ceremonyList = Array.from(ceremonySet)
+        if (ceremonyList.length === 0) ceremonyList.push('Tous les invités')
+        setCeremonies(ceremonyList)
+        setActiveCeremony(ceremonyList[0])
+
+        // Construire les invités par cérémonie
+        const gBC: Record<string, string[]> = {}
+        for (const ceremony of ceremonyList) {
+          const presentGuests: string[] = []
+          for (const e of entries) {
+            if (ceremony === 'Tous les invités') {
+              const isPresent = e.reponses?.some(r => r.present)
+              if (!isPresent) continue
+              if (!presentGuests.includes(e.nom)) presentGuests.push(e.nom)
+              for (const r of (e.reponses ?? [])) {
+                if (r.present && r.accompagnants) {
+                  for (const acc of r.accompagnants) {
+                    if (acc.trim() && !presentGuests.includes(acc.trim())) presentGuests.push(acc.trim())
+                  }
+                }
+              }
+            } else {
+              const rep = e.reponses?.find(r => r.ceremonie === ceremony)
+              if (!rep?.present) continue
+              if (!presentGuests.includes(e.nom)) presentGuests.push(e.nom)
+              if (rep.accompagnants) {
+                for (const acc of rep.accompagnants) {
+                  if (acc.trim() && !presentGuests.includes(acc.trim())) presentGuests.push(acc.trim())
                 }
               }
             }
           }
+          gBC[ceremony] = presentGuests
         }
-        setGuests(presentGuests)
+        setGuestsByCeremony(gBC)
 
-        const savedTables: TableData[] = Array.isArray(planRes) && planRes.length > 0 ? planRes : initTables()
-        setTables(savedTables)
-        // Compute next counter
-        const maxN = savedTables.reduce((m, t) => {
+        // Charger les tables sauvegardées (format: { [ceremony]: TableData[] } ou TableData[] pour rétrocompatibilité)
+        const tBC: Record<string, TableData[]> = {}
+        if (planRes && typeof planRes === 'object' && !Array.isArray(planRes)) {
+          // Nouveau format : objet par cérémonie
+          for (const ceremony of ceremonyList) {
+            tBC[ceremony] = planRes[ceremony] ?? initTables()
+          }
+        } else {
+          // Ancien format : tableau unique → assigner à la première cérémonie
+          const savedTables: TableData[] = Array.isArray(planRes) && planRes.length > 0 ? planRes : initTables()
+          tBC[ceremonyList[0]] = savedTables
+          for (let i = 1; i < ceremonyList.length; i++) {
+            tBC[ceremonyList[i]] = initTables()
+          }
+        }
+        setTablesByCeremony(tBC)
+
+        // Compute next counter from all tables
+        const allTables = Object.values(tBC).flat()
+        const maxN = allTables.reduce((m, t) => {
           const n = parseInt(t.nom.replace(/\D/g, '')) || 0
           return Math.max(m, n)
-        }, savedTables.length)
+        }, allTables.length)
         _tableCounter = maxN + 1
       } finally {
         setLoading(false)
@@ -187,7 +249,7 @@ export default function PlanTablePage() {
     if (!shareId) return
     setSaving(true)
     try {
-      await fetch('/api/save-plan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ shareId, tables }) })
+      await fetch('/api/save-plan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ shareId, tables: tablesByCeremony }) })
       setSaved(true)
       setTimeout(() => setSaved(false), 2500)
     } finally {
@@ -262,6 +324,19 @@ export default function PlanTablePage() {
         <div>
           <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 36, color: GOLD, lineHeight: 1 }}>{t.planTable.title}</div>
           <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 2 }}>{guests.length} {t.planTable.guests} · {tables.length} {t.planTable.tables} · {unassigned.length} {t.planTable.unassigned}</div>
+          {/* Onglets par cérémonie */}
+          {ceremonies.length > 1 && (
+            <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
+              {ceremonies.map(c => (
+                <button key={c} onClick={() => setActiveCeremony(c)} style={{
+                  ...BTN, padding: '6px 14px', borderRadius: 9999, fontSize: 12, fontWeight: activeCeremony === c ? 700 : 400,
+                  border: `1.5px solid ${activeCeremony === c ? GOLD : '#d1d5db'}`,
+                  background: activeCeremony === c ? `${GOLD}15` : 'white',
+                  color: activeCeremony === c ? GOLD : TEXT,
+                }}>{c} ({(guestsByCeremony[c] ?? []).length})</button>
+              ))}
+            </div>
+          )}
         </div>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <button onClick={() => setShowAutoPanel(p => !p)} style={{ ...BTN, padding: '9px 18px', borderRadius: 9999, border: `1px solid ${GOLD}`, background: showAutoPanel ? `${GOLD}15` : 'transparent', color: GOLD, fontSize: 13 }}>
