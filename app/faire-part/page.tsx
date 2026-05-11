@@ -4330,8 +4330,10 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
       <style>{`
         @keyframes envFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
         @keyframes envAppear{from{opacity:0;transform:translateY(30px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
-        @keyframes tapPulse{0%,100%{opacity:0.35}50%{opacity:0.7}}
-        @keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+        @keyframes tapPulse{0%,100%{opacity:0.5}50%{opacity:0.85}}
+        @keyframes nameSlideL{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes nameSlideR{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes ornFadeIn{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}
       `}</style>
 
       {/* Skip */}
@@ -4375,40 +4377,54 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
               <circle cx="140" cy="12" r="0.8" fill={a} opacity="0.3" />
             </svg>
 
-            {/* ── Prénoms — calligraphie luxe ── */}
-            <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', marginBottom: 6 }}>
+            {/* ── Prénoms décalés avec animation ── */}
+            <div style={{ position: 'relative', zIndex: 2, width: '100%', marginBottom: 4 }}>
+              {/* Premier prénom — décalé à droite */}
               <div style={{
-                fontFamily: GV, fontSize: 42, color: txtMain, lineHeight: 1.1, letterSpacing: 3,
-                textShadow: theme.dark ? 'none' : `0 1px 2px ${a}12`,
+                fontFamily: GV, fontSize: 44, color: txtMain, lineHeight: 1.1, letterSpacing: 2,
+                textAlign: 'right', paddingRight: 16,
+                animation: 'nameSlideL 1s cubic-bezier(0.16,1,0.3,1) 0.3s both',
               }}>
                 {data.marie1Prenom || 'Prénom'}
               </div>
+
+              {/* Ornement floral SVG entre les deux prénoms */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '10px 0', animation: 'ornFadeIn 0.8s ease 0.6s both' }}>
+                <svg width="120" height="24" viewBox="0 0 120 24" style={{ opacity: 0.22 }}>
+                  {/* Branche gauche */}
+                  <path d="M10,12 Q20,6 35,10 Q42,8 50,12" fill="none" stroke={a} strokeWidth="0.7" strokeLinecap="round" />
+                  <path d="M22,8 Q26,4 30,8" fill="none" stroke={a} strokeWidth="0.5" />
+                  <path d="M18,14 Q22,18 26,14" fill="none" stroke={a} strokeWidth="0.5" />
+                  <circle cx="35" cy="9" r="1" fill={a} opacity="0.4" />
+                  {/* Centre — petite fleur */}
+                  <ellipse cx="60" cy="12" rx="4" ry="3" fill="none" stroke={a} strokeWidth="0.6" />
+                  <ellipse cx="60" cy="12" rx="2" ry="1.5" fill={a} opacity="0.15" />
+                  <circle cx="60" cy="12" r="0.8" fill={a} opacity="0.4" />
+                  {/* Branche droite */}
+                  <path d="M110,12 Q100,6 85,10 Q78,8 70,12" fill="none" stroke={a} strokeWidth="0.7" strokeLinecap="round" />
+                  <path d="M98,8 Q94,4 90,8" fill="none" stroke={a} strokeWidth="0.5" />
+                  <path d="M102,14 Q98,18 94,14" fill="none" stroke={a} strokeWidth="0.5" />
+                  <circle cx="85" cy="9" r="1" fill={a} opacity="0.4" />
+                </svg>
+              </div>
+
+              {/* Deuxième prénom — décalé à gauche */}
               <div style={{
-                fontFamily: CG, fontSize: 20, color: txtSoft, opacity: 0.4,
-                margin: '8px 0', letterSpacing: 6, fontStyle: 'italic',
-              }}>&</div>
-              <div style={{
-                fontFamily: GV, fontSize: 42, color: txtMain, lineHeight: 1.1, letterSpacing: 3,
-                textShadow: theme.dark ? 'none' : `0 1px 2px ${a}12`,
+                fontFamily: GV, fontSize: 44, color: txtMain, lineHeight: 1.1, letterSpacing: 2,
+                textAlign: 'left', paddingLeft: 16,
+                animation: 'nameSlideR 1s cubic-bezier(0.16,1,0.3,1) 0.5s both',
               }}>
                 {data.marie2Prenom || 'Prénom'}
               </div>
             </div>
 
-            {/* ── Ligne ornementale ── */}
-            <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18, width: 200 }}>
-              <div style={{ flex: 1, height: '0.5px', background: `linear-gradient(90deg, transparent, ${a}20, transparent)` }} />
-              <svg width="16" height="16" viewBox="0 0 16 16" style={{ opacity: 0.18, flexShrink: 0 }}>
-                <path d="M8,1 L10,6 L15,8 L10,10 L8,15 L6,10 L1,8 L6,6Z" fill="none" stroke={a} strokeWidth="0.6" />
-                <path d="M8,4 L9,7 L12,8 L9,9 L8,12 L7,9 L4,8 L7,7Z" fill={a} opacity="0.3" />
-              </svg>
-              <div style={{ flex: 1, height: '0.5px', background: `linear-gradient(90deg, transparent, ${a}20, transparent)` }} />
-            </div>
+            {/* ── Ligne séparatrice ── */}
+            <div style={{ position: 'relative', zIndex: 2, width: 80, height: '0.5px', background: `linear-gradient(90deg, transparent, ${a}30, transparent)`, margin: '16px 0 18px' }} />
 
             {/* ── Phrase d'invitation ── */}
-            <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', maxWidth: 240, marginBottom: 8 }}>
+            <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', maxWidth: 230 }}>
               <div style={{
-                fontFamily: CG, fontStyle: 'italic', fontSize: 13.5, color: txtSoft,
+                fontFamily: CG, fontStyle: 'italic', fontSize: 13.5, color: txtMain, opacity: 0.65,
                 lineHeight: 1.7, letterSpacing: 0.3,
                 animation: phase === 0 ? 'tapPulse 3s ease-in-out infinite' : 'none',
               }}>
@@ -4418,10 +4434,10 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
               </div>
             </div>
 
-            {/* ── Appuyez — très discret ── */}
+            {/* ── Appuyez ── */}
             <div style={{
-              fontFamily: FP, fontSize: 8.5, color: txtSoft, opacity: 0.25,
-              letterSpacing: 4, textTransform: 'uppercase', marginTop: 10,
+              fontFamily: FP, fontSize: 8.5, color: txtMain, opacity: 0.35,
+              letterSpacing: 4, textTransform: 'uppercase', marginTop: 14,
             }}>
               {locale === 'en' ? 'Tap to open' : 'Appuyez pour ouvrir'}
             </div>
