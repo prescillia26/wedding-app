@@ -987,7 +987,8 @@ function StyleAccueilSelector({ data, onChange }: { data: FormData; onChange: (d
                   background: sel ? '#faf5ea' : '#fffdf9',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
                 }}>
-                  <video src={v.url} muted playsInline autoPlay loop style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', borderRadius: 6 }} />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={v.url.replace('/video/upload/', '/video/upload/so_2,w_200,h_260,c_fill,f_jpg/').replace('.mp4', '.jpg')} alt={v.label} style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', borderRadius: 6 }} />
                   <span style={{ fontSize: 8, color: sel ? '#C9A84C' : '#3a3330', fontWeight: sel ? 700 : 400, padding: '0 2px 2px', textAlign: 'center', lineHeight: 1.2 }}>{v.label.replace(/^.+?\s/, '')}</span>
                 </button>
               )
@@ -1695,7 +1696,8 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                 boxShadow: sel ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.08)',
               }}>
                 {fr.url && fr.video ? (
-                  <video src={fr.url} muted playsInline autoPlay loop style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={fr.url.replace('/video/upload/', '/video/upload/so_2,w_160,h_200,c_fill,f_jpg/').replace('.mp4', '.jpg')} alt={fr.label} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
                 ) : fr.url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={fr.url} alt={fr.label} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
