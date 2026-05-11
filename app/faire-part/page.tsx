@@ -768,10 +768,9 @@ function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
     onLayoutChange?.({ ...layout, [id]: { ...pos, ...patch } })
   }
 
-  // Appliquer couleur et police sur les enfants via un wrapper
-  const customStyle: React.CSSProperties = {}
-  if (pos.color) customStyle.color = pos.color
-  if (pos.fontFamily) customStyle.fontFamily = pos.fontFamily
+  // Appliquer couleur et police — force via !important en injectant un style
+  const customColor = pos.color || ''
+  const customFont = pos.fontFamily || ''
 
   return (
     <div
@@ -779,6 +778,7 @@ function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
+      className={`drag-el-${id}`}
       style={{
         transform: `translate(${pos.x}px, ${pos.y}px) scale(${pos.scale})`,
         cursor: editable ? 'grab' : 'default',
@@ -788,9 +788,16 @@ function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
         borderRadius: 4,
         touchAction: editable ? 'none' : 'auto',
         userSelect: editable ? 'none' : 'auto',
-        ...customStyle,
       } as React.CSSProperties}
     >
+      {(customColor || customFont) && (
+        <style>{`
+          .drag-el-${id}, .drag-el-${id} * {
+            ${customColor ? `color: ${customColor} !important;` : ''}
+            ${customFont ? `font-family: ${customFont} !important;` : ''}
+          }
+        `}</style>
+      )}
       {/* Barre d'outils — visible quand sélectionné */}
       {editable && selected && (
         <div ref={toolbarRef} style={{ position: 'absolute', top: -28, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 3, zIndex: 20, background: 'white', borderRadius: 8, padding: '3px 5px', boxShadow: '0 2px 12px rgba(0,0,0,0.15)', border: '1px solid #e0d5c8' }}>
