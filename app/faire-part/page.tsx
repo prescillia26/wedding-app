@@ -4308,9 +4308,9 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
 
   const handleOpen = () => {
     if (phase > 0) return
-    setPhase(1)
-    setTimeout(() => setPhase(2), 1800)
-    setTimeout(() => onDone(), 2600)
+    setPhase(1)                          // sceau/noeud disparaît
+    setTimeout(() => setPhase(2), 800)   // fondu global
+    setTimeout(() => onDone(), 1600)     // terminé
   }
 
   const textColor = theme.dark ? '#e8ddd0' : `color-mix(in srgb, ${a} 60%, #2a2018)`
@@ -4322,7 +4322,7 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       cursor: phase === 0 ? 'pointer' : 'default',
       opacity: phase >= 2 ? 0 : 1,
-      transition: phase >= 2 ? 'opacity 0.8s ease' : 'none',
+      transition: phase >= 2 ? 'opacity 0.7s cubic-bezier(0.4,0,0.2,1)' : 'none',
       pointerEvents: phase >= 2 ? 'none' : 'auto',
     }}>
       <style>{`
@@ -4333,7 +4333,6 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
         @keyframes ribbonFallL{0%{transform:rotate(0) translateY(0);opacity:1}100%{transform:rotate(-15deg) translateY(-40px) translateX(-20px);opacity:0}}
         @keyframes ribbonFallR{0%{transform:rotate(0) translateY(0);opacity:1}100%{transform:rotate(15deg) translateY(-40px) translateX(20px);opacity:0}}
         @keyframes ribbonLoopWiggle{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
-        @keyframes flapOpen{from{transform:perspective(800px) rotateX(0deg)}to{transform:perspective(800px) rotateX(-170deg)}}
         @keyframes sealShine{0%,100%{background-position:30% 25%}50%{background-position:60% 40%}}
         @keyframes gentleGlow{0%,100%{box-shadow:0 0 20px ${es.sealColor}30}50%{box-shadow:0 0 35px ${es.sealColor}50}}
       `}</style>
@@ -4361,7 +4360,7 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
             boxShadow: `0 35px 70px rgba(0,0,0,0.18), 0 15px 30px rgba(0,0,0,0.10), 0 0 0 1px ${a}10`,
             overflow: 'hidden',
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            padding: '130px 30px 50px',
+            padding: '50px 30px 50px',
           }}>
             {/* Texture papier subtile */}
             <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.025, pointerEvents: 'none' }}>
@@ -4545,48 +4544,8 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
               </div>
             </div>
 
-            {/* V pliure en bas */}
-            <svg style={{ position: 'absolute', bottom: 0, left: 0, right: 0, pointerEvents: 'none' }} viewBox="0 0 300 50" preserveAspectRatio="none">
-              <path d="M0 50 L150 12 L300 50" fill={`${a}05`} stroke={`${a}08`} strokeWidth="0.5" />
-            </svg>
           </div>
 
-          {/* Rabat triangulaire — 3D */}
-          <div style={{
-            position: 'absolute', top: -1, left: -1, right: -1, height: 110,
-            transformOrigin: 'top center',
-            transform: phase >= 1 ? 'perspective(800px) rotateX(-170deg)' : 'perspective(800px) rotateX(0)',
-            transition: 'transform 1.2s cubic-bezier(0.16,1,0.3,1)',
-            zIndex: 10,
-            transformStyle: 'preserve-3d',
-          } as React.CSSProperties}>
-            {/* Face avant */}
-            <div style={{
-              position: 'absolute', inset: 0,
-              background: `linear-gradient(175deg, ${es.bg} 10%, ${es.bgDark})`,
-              border: `0.5px solid ${a}10`, borderBottom: 'none',
-              borderRadius: '14px 14px 0 0',
-              clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
-              backfaceVisibility: 'hidden',
-            } as React.CSSProperties}>
-              {/* Motif subtil sur le rabat */}
-              <svg style={{ position: 'absolute', top: '25%', left: '50%', transform: 'translateX(-50%)', opacity: 0.06 }} width="90" height="40" viewBox="0 0 90 40">
-                <path d="M5,35 Q25,5 45,20 Q65,5 85,35" fill="none" stroke={a} strokeWidth="0.8" strokeLinecap="round" />
-                <path d="M20,28 Q35,10 50,22 Q65,10 80,28" fill="none" stroke={a} strokeWidth="0.5" strokeLinecap="round" />
-                <circle cx="45" cy="17" r="2" fill={a} opacity="0.3" />
-              </svg>
-            </div>
-            {/* Face arrière */}
-            <div style={{
-              position: 'absolute', inset: 0,
-              background: `linear-gradient(5deg, ${es.liner}80 20%, ${es.bgDark})`,
-              borderRadius: '14px 14px 0 0',
-              clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
-              backfaceVisibility: 'hidden',
-              transform: 'rotateX(180deg)',
-              boxShadow: `inset 0 -3px 10px rgba(0,0,0,0.06)`,
-            } as React.CSSProperties} />
-          </div>
         </div>
       </div>
     </div>
