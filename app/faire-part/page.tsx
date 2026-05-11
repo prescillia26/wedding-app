@@ -4391,30 +4391,39 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
             ))}
 
             {/* ── Prénoms en calligraphie ── */}
-            <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', marginBottom: 24 }}>
-              <div style={{ fontFamily: GV, fontSize: 30, color: textColor, lineHeight: 1.2, letterSpacing: 1 }}>
+            <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', marginBottom: 10 }}>
+              {/* Petit ornement au-dessus */}
+              <svg width="60" height="20" viewBox="0 0 60 20" style={{ opacity: 0.15, marginBottom: 8 }}>
+                <path d="M5,16 Q15,2 30,10 Q45,2 55,16" fill="none" stroke={a} strokeWidth="0.8" strokeLinecap="round" />
+                <circle cx="30" cy="8" r="1.2" fill={a} opacity="0.5" />
+              </svg>
+              <div style={{ fontFamily: GV, fontSize: 36, color: textColor, lineHeight: 1.15, letterSpacing: 2 }}>
                 {data.marie1Prenom || 'Prénom'}
               </div>
-              <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 15, color: textColor, opacity: 0.4, margin: '4px 0' }}>&</div>
-              <div style={{ fontFamily: GV, fontSize: 30, color: textColor, lineHeight: 1.2, letterSpacing: 1 }}>
+              <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 18, color: textColor, opacity: 0.35, margin: '6px 0', letterSpacing: 3 }}>&</div>
+              <div style={{ fontFamily: GV, fontSize: 36, color: textColor, lineHeight: 1.15, letterSpacing: 2 }}>
                 {data.marie2Prenom || 'Prénom'}
               </div>
             </div>
 
             {/* ── Séparateur fin ── */}
-            <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, width: 160 }}>
-              <div style={{ flex: 1, height: '0.5px', background: `linear-gradient(90deg, transparent, ${a}30, transparent)` }} />
-              <svg width="10" height="10" viewBox="0 0 10 10" style={{ opacity: 0.25, flexShrink: 0 }}>
-                <path d="M5,0 L7,3.5 L10,5 L7,6.5 L5,10 L3,6.5 L0,5 L3,3.5Z" fill={a} />
+            <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, width: 180 }}>
+              <div style={{ flex: 1, height: '0.5px', background: `linear-gradient(90deg, transparent, ${a}25, transparent)` }} />
+              <svg width="14" height="14" viewBox="0 0 14 14" style={{ opacity: 0.2, flexShrink: 0 }}>
+                <path d="M7,0 L9,5 L14,7 L9,9 L7,14 L5,9 L0,7 L5,5Z" fill={a} />
               </svg>
-              <div style={{ flex: 1, height: '0.5px', background: `linear-gradient(90deg, transparent, ${a}30, transparent)` }} />
+              <div style={{ flex: 1, height: '0.5px', background: `linear-gradient(90deg, transparent, ${a}25, transparent)` }} />
             </div>
 
-
-            {/* ── "Touchez pour découvrir" ── */}
-            <div style={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
-              <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 13, color: textColor, opacity: 0.55, letterSpacing: 1.5, animation: phase === 0 ? 'tapPulse 2.5s ease-in-out infinite' : 'none' }}>
-                {locale === 'en' ? 'Tap to discover' : 'Touchez pour découvrir'}
+            {/* ── Phrase d'invitation chaleureuse ── */}
+            <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', maxWidth: 220 }}>
+              <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 12.5, color: textColor, opacity: 0.5, lineHeight: 1.6, letterSpacing: 0.5, animation: phase === 0 ? 'tapPulse 2.5s ease-in-out infinite' : 'none' }}>
+                {locale === 'en'
+                  ? 'are delighted to share their celebration with you'
+                  : 'ont le plaisir de vous convier à leur célébration'}
+              </div>
+              <div style={{ marginTop: 14, fontFamily: FP, fontSize: 9, color: textColor, opacity: 0.3, letterSpacing: 3, textTransform: 'uppercase' }}>
+                {locale === 'en' ? 'Tap to open' : 'Appuyez pour ouvrir'}
               </div>
             </div>
 
