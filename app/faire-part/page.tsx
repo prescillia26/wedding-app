@@ -727,11 +727,16 @@ function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
   const [selected, setSelected] = useState(false)
   const [showPanel, setShowPanel] = useState(false)
 
-  // Fermer quand on clique ailleurs
+  // Fermer quand on clique ailleurs (mais pas sur la barre d'outils/panneau)
+  const containerRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (!selected) return
-    const close = () => { setSelected(false); setShowPanel(false) }
-    const timer = setTimeout(() => document.addEventListener('pointerdown', close, { once: true }), 0)
+    const close = (e: PointerEvent) => {
+      if (containerRef.current?.contains(e.target as Node)) return
+      setSelected(false)
+      setShowPanel(false)
+    }
+    const timer = setTimeout(() => document.addEventListener('pointerdown', close), 10)
     return () => { clearTimeout(timer); document.removeEventListener('pointerdown', close) }
   }, [selected])
 
@@ -764,6 +769,7 @@ function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
 
   return (
     <div
+      ref={containerRef}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
