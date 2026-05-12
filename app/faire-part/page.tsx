@@ -278,6 +278,7 @@ interface FormData {
   customLogoUrl?: string
   customLogoSize?: number // 50-150, default 100
   customLogoColor?: string // '' = original, ou hex color
+  blockOrder?: Record<number, string[]> // ordre des blocs par index de cérémonie
 }
 const defaultCeremony: Ceremony = {
   type: 'Cérémonie religieuse / Houppa',
@@ -321,6 +322,34 @@ const defaultFormData: FormData = {
   zoneStyles: {},
   styleAccueil: 'photo',
   illustrationCoupleId: '',
+}
+
+// ── Blocs de texte réordonnables ──────────────────────────────────────────────
+type BlockId = 'titre' | 'hebrewVerse' | 'defunts' | 'parents' | 'prenoms' | 'narratif' | 'dateHeure' | 'lieu' | 'note' | 'infos'
+
+const BLOCK_LABELS: Record<BlockId, string> = {
+  titre: 'Titre de cérémonie',
+  hebrewVerse: 'Verset hébraïque',
+  defunts: 'Pensées pour les défunts',
+  parents: 'Parents & grands-parents',
+  prenoms: 'Prénoms des mariés',
+  narratif: 'Texte d\'invitation',
+  dateHeure: 'Date & heure',
+  lieu: 'Lieu & adresse',
+  note: 'Note',
+  infos: 'Infos pratiques',
+}
+
+const DEFAULT_BLOCK_ORDER: Record<string, BlockId[]> = {
+  'Cérémonie religieuse / Houppa': ['titre', 'hebrewVerse', 'defunts', 'parents', 'prenoms', 'narratif', 'dateHeure', 'lieu', 'note', 'infos'],
+  'Shabbat Hatan': ['titre', 'parents', 'prenoms', 'narratif', 'dateHeure', 'lieu', 'note', 'infos'],
+  'Mairie': ['titre', 'prenoms', 'narratif', 'dateHeure', 'lieu', 'note', 'infos'],
+  'default': ['titre', 'narratif', 'dateHeure', 'lieu', 'note', 'infos'],
+}
+
+function getBlockOrder(ceremony: Ceremony, data: FormData, ceremonyIdx: number): BlockId[] {
+  if (data.blockOrder?.[ceremonyIdx]) return data.blockOrder[ceremonyIdx] as BlockId[]
+  return DEFAULT_BLOCK_ORDER[ceremony.type] || DEFAULT_BLOCK_ORDER['default']
 }
 
 // Propriétés mobiles partagées pour tous les boutons
@@ -3751,6 +3780,150 @@ function ShareModal({ accent, guestUrl, coupleUrl, onClose, data }: { accent: st
     </div>
   )
 }
+// ── Modal de réorganisation des blocs ──────────────────────────────────────────
+function BlockReorderModal({ ceremonies, blockOrder, onApply, onClose, theme, data }: {
+  ceremonies: Ceremony[]
+  blockOrder: Record<number, string[]>
+  onApply: (newOrder: Record<number, string[]>) => void
+  onClose: () => void
+  theme: ThemeObj
+  data: FormData
+}) {
+  const [localOrder, setLocalOrder] = useState<Record<number, string[]>>(() => {
+    const initial: Record<number, string[]> = {}
+    ceremonies.forEach((c, idx) => {
+      initial[idx] = blockOrder[idx] || getBlockOrder(c, { ...data, blockOrder: undefined } as FormData, idx)
+    })
+    return initial
+  })
+  const [activeCeremony, setActiveCeremony] = useState(0)
+  const [dragIdx, setDragIdx] = useState<number | null>(null)
+
+  const currentOrder = localOrder[activeCeremony] || []
+
+  const moveBlock = (fromIdx: number, toIdx: number) => {
+    if (toIdx < 0 || toIdx >= currentOrder.length) return
+    const newArr = [...currentOrder]
+    const [moved] = newArr.splice(fromIdx, 1)
+    newArr.splice(toIdx, 0, moved)
+    setLocalOrder(prev => ({ ...prev, [activeCeremony]: newArr }))
+  }
+
+  const getCeremonyName = (c: Ceremony) => c.type === 'Autre' ? (c.customName || 'Événement') : c.type
+
+  // Touch drag support
+  const touchStartY = useRef(0)
+  const touchStartIdx = useRef(-1)
+
+  const handleTouchStart = (idx: number, e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY
+    touchStartIdx.current = idx
+    setDragIdx(idx)
+  }
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartIdx.current < 0) return
+    const dy = e.touches[0].clientY - touchStartY.current
+    const threshold = 48
+    if (Math.abs(dy) > threshold) {
+      const dir = dy > 0 ? 1 : -1
+      const from = touchStartIdx.current
+      const to = from + dir
+      if (to >= 0 && to < currentOrder.length) {
+        moveBlock(from, to)
+        touchStartIdx.current = to
+        touchStartY.current = e.touches[0].clientY
+        setDragIdx(to)
+      }
+    }
+  }
+  const handleTouchEnd = () => {
+    touchStartIdx.current = -1
+    setDragIdx(null)
+  }
+
+  // Filtrer les blocs vides pour n'afficher que ceux qui ont du contenu
+  const isBlockRelevant = (blockId: string, ceremony: Ceremony): boolean => {
+    switch (blockId) {
+      case 'hebrewVerse': return ceremony.type === 'Cérémonie religieuse / Houppa' && !!data.mariageJuif
+      case 'defunts': return ceremony.type === 'Cérémonie religieuse / Houppa' && !!ceremony.penseesDefuntsActif
+      case 'parents': return ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Shabbat Hatan'
+      case 'prenoms': return ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Mairie' || ceremony.type === 'Shabbat Hatan'
+      case 'note': return !!ceremony.note
+      case 'infos': return !!(ceremony.transport || ceremony.hebergement)
+      default: return true
+    }
+  }
+
+  const ceremony = ceremonies[activeCeremony]
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 16, width: '100%', maxWidth: 400, maxHeight: '85vh', overflow: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+        <div style={{ padding: '20px 24px 12px', borderBottom: '1px solid #eee' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1a1a1a' }}>Réorganiser les blocs</h3>
+            <button onClick={onClose} style={{ ...BTN, background: 'none', border: 'none', fontSize: 22, color: '#999', padding: 4 }}>×</button>
+          </div>
+          <p style={{ margin: '8px 0 0', fontSize: 13, color: '#888' }}>Déplacez les blocs de texte pour personnaliser l&apos;ordre d&apos;affichage</p>
+        </div>
+
+        {ceremonies.length > 1 && (
+          <div style={{ display: 'flex', gap: 6, padding: '12px 24px', overflowX: 'auto' }}>
+            {ceremonies.map((c, idx) => (
+              <button key={idx} onClick={() => setActiveCeremony(idx)} style={{ ...BTN, padding: '6px 14px', borderRadius: 9999, border: `1.5px solid ${idx === activeCeremony ? theme.accent : '#ddd'}`, background: idx === activeCeremony ? `${theme.accent}15` : 'white', color: idx === activeCeremony ? theme.accent : '#666', fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap' }}>
+                {getCeremonyName(c)}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div style={{ padding: '12px 24px 16px' }} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
+          {currentOrder.map((blockId, idx) => {
+            const relevant = isBlockRelevant(blockId, ceremony)
+            if (!relevant) return null
+            const label = BLOCK_LABELS[blockId as BlockId] || blockId
+            return (
+              <div key={blockId} style={{
+                display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', marginBottom: 6,
+                borderRadius: 10, border: `1.5px solid ${dragIdx === idx ? theme.accent : '#e8e8e8'}`,
+                background: dragIdx === idx ? `${theme.accent}08` : '#fafafa',
+                transition: 'all 0.15s ease',
+                userSelect: 'none',
+              }}>
+                <div
+                  onTouchStart={e => handleTouchStart(idx, e)}
+                  style={{ cursor: 'grab', fontSize: 18, color: '#bbb', lineHeight: 1, padding: '4px 2px', touchAction: 'none' }}
+                >☰</div>
+                <span style={{ flex: 1, fontSize: 14, color: '#333', fontWeight: 500 }}>{label}</span>
+                <div style={{ display: 'flex', gap: 4 }}>
+                  <button onClick={() => moveBlock(idx, idx - 1)} disabled={idx === 0} style={{ ...BTN, width: 30, height: 30, borderRadius: 8, border: '1px solid #ddd', background: 'white', fontSize: 14, color: idx === 0 ? '#ddd' : '#666', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>▲</button>
+                  <button onClick={() => moveBlock(idx, idx + 1)} disabled={idx === currentOrder.length - 1} style={{ ...BTN, width: 30, height: 30, borderRadius: 8, border: '1px solid #ddd', background: 'white', fontSize: 14, color: idx === currentOrder.length - 1 ? '#ddd' : '#666', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>▼</button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        <div style={{ padding: '12px 24px 20px', borderTop: '1px solid #eee', display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+          <button onClick={() => {
+            // Réinitialiser l'ordre par défaut
+            const reset: Record<number, string[]> = {}
+            ceremonies.forEach((c, idx) => {
+              reset[idx] = getBlockOrder(c, { ...data, blockOrder: undefined } as FormData, idx)
+            })
+            setLocalOrder(reset)
+          }} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: '1px solid #ddd', background: 'white', color: '#666', fontSize: 13, fontWeight: 600 }}>
+            Réinitialiser
+          </button>
+          <button onClick={() => { onApply(localOrder); onClose() }} style={{ ...BTN, padding: '10px 24px', borderRadius: 9999, border: 'none', background: theme.accent, color: 'white', fontSize: 13, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44` }}>
+            Appliquer
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApplyStyles, onClose, theme }: {
   ceremonies: Ceremony[]
   textOverrides: Record<string, string>
@@ -4403,6 +4576,8 @@ interface SharedPageContentProps {
   onStartYoutube?: () => void
   ytIframeRef: React.RefObject<HTMLIFrameElement | null>
   ytMuted: boolean; onToggleYtMute: () => void
+  onBlockReorder?: (ceremonyIdx: number, newOrder: string[]) => void
+  editMode?: boolean
 }
 // ── 💌 ENVELOPPE PREMIUM ─────────────────────────────────────────────────────
 // Design : prénoms en haut, sceau au centre, "Touchez" en bas, ornements SVG
@@ -4949,7 +5124,7 @@ function EnveloppeAnimation({ data, theme, onDone }: { data: FormData; theme: Th
 }
 
 // ── ItineraireButtons : Google Maps + Waze avec design luxe ───────────────────
-function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute }: SharedPageContentProps) {
+function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute, onBlockReorder, editMode }: SharedPageContentProps) {
   const { t, locale } = useT()
   const contentRef = useRef<HTMLDivElement>(null)
   const [currentCeremonyIdx, setCurrentCeremonyIdx] = useState(0)
@@ -5143,187 +5318,195 @@ const firstDate = sorted[0]?.date
                     {data.mariageJuif && (
                       <div style={{ position: 'absolute', top: 18, right: 22, fontSize: 16, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, zIndex: 5, opacity: 0.85, letterSpacing: 1 }}>בס״ד</div>
                     )}
-                    <AnimSection animStyle={anim}>
-                     <div style={applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 16, lineHeight: 1.4 }, 'titres', data.zoneStyles)}>{ov[`ceremony_${i}_titre`] || title}</div>
-                      <OrnSep />
-                    </AnimSection>
-                    {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
-                      <AnimSection animStyle={anim} delay={100}>
-                        <div style={{ padding: '0 20px', marginBottom: 22 }}>
-                          <div style={{ fontFamily: 'serif', fontSize: 'clamp(10px, 3.2vw, 17px)', color: G, direction: 'rtl', textAlign: 'center', whiteSpace: 'nowrap', lineHeight: 1.9 }}>קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה</div>
-                        </div>
-                      </AnimSection>
-                    )}
-                    {/* ── Pensées pour les défunts (Houppa uniquement) ── */}
-                    {ceremony.type === 'Cérémonie religieuse / Houppa' && ceremony.penseesDefuntsActif && ceremony.penseesDefuntsNoms.filter(n => n.trim()).length > 0 && (
-                      <AnimSection animStyle={anim} delay={120}>
-                        <div style={{ textAlign: 'center', marginBottom: 32, paddingBottom: 24, borderBottom: `1px solid ${G}22` }}>
-                          {/* Séparateur ornemental haut */}
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: 16 }}>
-                            <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
-                            <span style={{ fontSize: 14, color: G }}>🕯</span>
-                            <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
-                          </div>
-                          {/* Formule introductive en italique */}
-                          {ceremony.penseesDefuntsIntro && (
-                            <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, opacity: 0.85, marginBottom: 14, lineHeight: 1.6, padding: '0 12px' }}>
-                              {ceremony.penseesDefuntsIntro}
+                    {(() => {
+                      const blockOrder = getBlockOrder(ceremony, data, realIdx)
+                      const blockRenderers: Record<string, () => React.ReactNode> = {
+                        titre: () => (
+                          <AnimSection animStyle={anim}>
+                            <div style={applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 16, lineHeight: 1.4 }, 'titres', data.zoneStyles)}>{ov[`ceremony_${i}_titre`] || title}</div>
+                            <OrnSep />
+                          </AnimSection>
+                        ),
+                        hebrewVerse: () => ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif ? (
+                          <AnimSection animStyle={anim} delay={100}>
+                            <div style={{ padding: '0 20px', marginBottom: 22 }}>
+                              <div style={{ fontFamily: 'serif', fontSize: 'clamp(10px, 3.2vw, 17px)', color: G, direction: 'rtl', textAlign: 'center', whiteSpace: 'nowrap', lineHeight: 1.9 }}>קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה</div>
                             </div>
-                          )}
-                          {/* Liste des noms */}
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: ceremony.penseesDefuntsFin ? 14 : 0 }}>
-                            {ceremony.penseesDefuntsNoms.filter(n => n.trim()).map((nom, k) => (
-                              <div key={k} style={{ fontFamily: FP, fontSize: 16, color: TEXT, fontWeight: 500, lineHeight: 1.6 }}>
-                                {nom} <span style={{ color: G, fontSize: 14, fontFamily: 'serif' }}>ז״ל</span>
+                          </AnimSection>
+                        ) : null,
+                        defunts: () => ceremony.type === 'Cérémonie religieuse / Houppa' && ceremony.penseesDefuntsActif && ceremony.penseesDefuntsNoms.filter(n => n.trim()).length > 0 ? (
+                          <AnimSection animStyle={anim} delay={120}>
+                            <div style={{ textAlign: 'center', marginBottom: 32, paddingBottom: 24, borderBottom: `1px solid ${G}22` }}>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: 16 }}>
+                                <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
+                                <span style={{ fontSize: 14, color: G }}>🕯</span>
+                                <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
                               </div>
-                            ))}
-                          </div>
-                          {/* Phrase de fin */}
-                          {ceremony.penseesDefuntsFin && (
-                            <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, opacity: 0.75, lineHeight: 1.6, padding: '0 12px' }}>
-                              {ceremony.penseesDefuntsFin}
-                            </div>
-                          )}
-                        </div>
-                      </AnimSection>
-                    )}
-                    {(parents1.length > 0 || parents2.length > 0) && ceremony.type === 'Cérémonie religieuse / Houppa' && (
-                      <AnimSection animStyle={anim} delay={150}>
-                        {/* Grands-parents — alignés : espace vide si un côté manque */}
-                        {hasGp && (
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 8, textAlign: 'center' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap', visibility: gpPa1 ? 'visible' : 'hidden' }}>{gpPa1 || '\u00A0'}</div>
-                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap', visibility: gpMa1 ? 'visible' : 'hidden' }}>{gpMa1 || '\u00A0'}</div>
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap', visibility: gpPa2 ? 'visible' : 'hidden' }}>{gpPa2 || '\u00A0'}</div>
-                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap', visibility: gpMa2 ? 'visible' : 'hidden' }}>{gpMa2 || '\u00A0'}</div>
-                            </div>
-                          </div>
-                        )}
-                        {/* Parents — toujours alignés */}
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12, textAlign: 'center' }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {parents1.map((l,j)=><div key={j} style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles)}>{l}</div>)}
-                          </div>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {parents2.map((l,j)=><div key={j} style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles)}>{l}</div>)}
-                          </div>
-                        </div>
-                        <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 24, lineHeight: 1.9, opacity: 0.82 }, 'narratif', data.zoneStyles)}>
-                          {ov[`ceremony_${i}_joie`] || (hasGp ? t.fairepart.joyMessageGp : t.fairepart.joyMessage)}
-                        </div>
-                      </AnimSection>
-                    )}
-                    <AnimSection animStyle={anim} delay={250}>
-                      {/* Gros prénoms calligraphiés : SEULEMENT pour Houppa et Mairie */}
-                      {(ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Mairie') && (
-                        <>
-                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.15, marginBottom: 8, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom}</div>
-                          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 22, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.55, letterSpacing: 2 }}>&</div>
-                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.15, marginBottom: 16, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom}</div>
-                        </>
-                      )}
-
-                      {/* Phrase narrative selon le type */}
-                      {ceremony.type === 'Mairie' ? (
-                        <>
-                          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78 }}>{t.fairepart.cardSeDiront}</div>
-                          <div style={{ fontFamily: FS, fontSize: 'clamp(48px,12vw,80px)', color: G, textAlign: 'center', lineHeight: 1, marginBottom: 28 }}>{t.fairepart.cardOui}</div>
-                        </>
-                      ) : ceremony.type === 'Cérémonie religieuse / Houppa' ? (
-                        <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginBottom: 28, opacity: 0.78 }, 'narratif', data.zoneStyles)}>{ov[`ceremony_${i}_honore`] || t.fairepart.cardHonore}</div>
-                      ) : (
-                        // Pour tous les autres types : phrase mise en page avec NOMS en valeur
-                        <div style={{ marginBottom: 28 }}>
-                          {ov[`ceremony_${i}_invitation`] ? (
-                            // Si les mariés ont édité la phrase → affichage simple en italique
-                            <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', opacity: 0.85, lineHeight: 1.7, padding: '0 8px', whiteSpace: 'pre-wrap' as const }, 'narratif', data.zoneStyles)}>
-                              {ov[`ceremony_${i}_invitation`]}
-                            </div>
-                          ) : (
-                            // Sinon → mise en page élégante avec NOMS en valeur
-                            <div style={applyZoneStyle({ padding: '0 8px' }, 'narratif', data.zoneStyles)}>
-                              {renderInvitationPhrase(ceremony, data, G, TEXT, t.fairepart)}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </AnimSection>
-                    <AnimSection animStyle={anim} delay={380}>
-                      <LineSep />
-                      {ceremony.date && (() => {
-                        const d = new Date(ceremony.date + 'T12:00:00')
-                        const parts = new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).formatToParts(d)
-                        const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
-                        const jourSemaine = cap(parts.find(p => p.type === 'weekday')?.value || '')
-                        const jour = parts.find(p => p.type === 'day')?.value || ''
-                        const mois = cap(parts.find(p => p.type === 'month')?.value || '')
-                        const annee = parts.find(p => p.type === 'year')?.value || ''
-                        return (
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '24px 0 8px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-                              <div style={{ width: 80, textAlign: 'right' }}>
-                                <div style={{ fontFamily: FP, borderBottom: `1px solid ${G}44`, paddingBottom: 4, letterSpacing: 4, fontSize: 10, fontWeight: 600, color: G, display: 'inline-block', textTransform: 'uppercase' }}>{jourSemaine}</div>
+                              {ceremony.penseesDefuntsIntro && (
+                                <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, opacity: 0.85, marginBottom: 14, lineHeight: 1.6, padding: '0 12px' }}>
+                                  {ceremony.penseesDefuntsIntro}
+                                </div>
+                              )}
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: ceremony.penseesDefuntsFin ? 14 : 0 }}>
+                                {ceremony.penseesDefuntsNoms.filter(n => n.trim()).map((nom, k) => (
+                                  <div key={k} style={{ fontFamily: FP, fontSize: 16, color: TEXT, fontWeight: 500, lineHeight: 1.6 }}>
+                                    {nom} <span style={{ color: G, fontSize: 14, fontFamily: 'serif' }}>ז״ל</span>
+                                  </div>
+                                ))}
                               </div>
-                              <div style={{ border: `1.5px solid ${G}`, borderRadius: 4, padding: '10px 18px', fontSize: 40, fontFamily: FP, color: G, fontWeight: 700, minWidth: 64, textAlign: 'center', lineHeight: 1 }}>{jour}</div>
-                              <div style={{ width: 80, textAlign: 'left' }}>
-                                <div style={{ fontFamily: FP, borderBottom: `1px solid ${G}44`, paddingBottom: 4, letterSpacing: 4, fontSize: 10, fontWeight: 600, color: G, display: 'inline-block', textTransform: 'uppercase' }}>{mois}</div>
+                              {ceremony.penseesDefuntsFin && (
+                                <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, opacity: 0.75, lineHeight: 1.6, padding: '0 12px' }}>
+                                  {ceremony.penseesDefuntsFin}
+                                </div>
+                              )}
+                            </div>
+                          </AnimSection>
+                        ) : null,
+                        parents: () => (parents1.length > 0 || parents2.length > 0) && (ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Shabbat Hatan') ? (
+                          <AnimSection animStyle={anim} delay={150}>
+                            {hasGp && (
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 8, textAlign: 'center' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                  <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap', visibility: gpPa1 ? 'visible' : 'hidden' }}>{gpPa1 || '\u00A0'}</div>
+                                  <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap', visibility: gpMa1 ? 'visible' : 'hidden' }}>{gpMa1 || '\u00A0'}</div>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                  <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap', visibility: gpPa2 ? 'visible' : 'hidden' }}>{gpPa2 || '\u00A0'}</div>
+                                  <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap', visibility: gpMa2 ? 'visible' : 'hidden' }}>{gpMa2 || '\u00A0'}</div>
+                                </div>
+                              </div>
+                            )}
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12, textAlign: 'center' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                {parents1.map((l,j)=><div key={j} style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles)}>{l}</div>)}
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                {parents2.map((l,j)=><div key={j} style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles)}>{l}</div>)}
                               </div>
                             </div>
-                            <div style={{ fontFamily: FC, fontSize: 12, color: TEXT, letterSpacing: 3, marginTop: 8, opacity: 0.7 }}>{annee}</div>
-                          </div>
-                        )
-                      })()}
-                      {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 15, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 8, opacity: 0.8 }}>{hebrewDate}</div>}
-                      {ceremony.heure && <div style={applyZoneStyle({ fontFamily: FP, fontSize: 20, fontWeight: 600, color: G, textAlign: 'center', marginBottom: 24, letterSpacing: 3, lineHeight: 1.2 }, 'dateHeure', data.zoneStyles)}>{formatHeure(ceremony.heure, locale)}</div>}
-                      {(ov[`ceremony_${i}_lieu`] || ceremony.lieu) && <div style={applyZoneStyle({ fontFamily: FP, fontWeight: 700, fontSize: 19, color: TEXT, textAlign: 'center', lineHeight: 1.5, marginBottom: 8, letterSpacing: 0.5 }, 'lieu', data.zoneStyles)}>{ceremony.type === 'Mairie' ? conjonctionLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu, locale) : formatLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu, locale)}</div>}
-                      {ceremony.adresse && <div style={{ fontFamily: FC, fontSize: 14, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.65, marginBottom: 24, letterSpacing: 0.3 }}>{ceremony.adresse}</div>}
-                      {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
-                        <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, textAlign: 'center', marginBottom: 16, borderTop: `1px solid ${G}22`, paddingTop: 14 }}>
-                          <div style={{ fontWeight: 700 }}>{t.fairepart.eventFollowedBy} {ceremony.evenementSuivantNom}</div>
-                          {ceremony.evenementSuivantAdresse && <div style={{ fontSize: 12, opacity: 0.75, marginTop: 4 }}>{ceremony.evenementSuivantAdresse}</div>}
-                        </div>
-                      )}
-                      {ceremony.note && (
-                        <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: theme.textSecondaire, textAlign: 'center', marginBottom: 16, padding: '12px 0', borderTop: `1px solid ${G}18` }}>{ceremony.note}</div>
-                      )}
-                      {ceremony.adresse && (
-                        <div style={{ marginTop: 32 }}>
-                          <div style={{ textAlign: 'center' }}>
-                            {/* Séparateur minimal avec dégradé */}
-                            <div style={{ width: 60, height: 0.5, background: `linear-gradient(to right, transparent, ${G}30, transparent)`, margin: '0 auto 16px' }} />
-                            <div style={{ fontFamily: FP, fontSize: 10, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, marginBottom: 16, opacity: 0.6 }}>
-                              {locale === 'en' ? 'Get there' : 'S\'y rendre'}
+                            <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 24, lineHeight: 1.9, opacity: 0.82 }, 'narratif', data.zoneStyles)}>
+                              {ov[`ceremony_${i}_joie`] || (hasGp ? t.fairepart.joyMessageGp : t.fairepart.joyMessage)}
                             </div>
-                            <ItineraireButtons adresse={ceremony.adresse} theme={theme} />
-                          </div>
-                        </div>
-                      )}
-
-                      {/* ── Encart Infos pratiques (transport / hébergement) ── */}
-                      {(ceremony.transport || ceremony.hebergement) && (
-                        <div style={{ marginTop: 32, paddingTop: 24 }}>
-                          <div style={{ width: 60, height: 0.5, background: `linear-gradient(to right, transparent, ${G}30, transparent)`, margin: '0 auto 16px' }} />
-                          <div style={{ fontFamily: FP, fontSize: 10, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 20, opacity: 0.6 }}>
-                            {t.fairepart.infoPratiques}
-                          </div>
-                          {ceremony.transport && (
-                            <div style={{ marginBottom: ceremony.hebergement ? 18 : 0, textAlign: 'center' }}>
-                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: G, marginBottom: 6, fontWeight: 600 }}>{t.fairepart.transportIcon}</div>
-                              <div style={applyZoneStyle({ fontFamily: FC, fontSize: 13, color: TEXT, lineHeight: 1.7, whiteSpace: 'pre-wrap', opacity: 0.9 }, 'infos', data.zoneStyles)}><Linkify text={ceremony.transport} color={G} /></div>
+                          </AnimSection>
+                        ) : null,
+                        prenoms: () => (ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Mairie' || ceremony.type === 'Shabbat Hatan') ? (
+                          <AnimSection animStyle={anim} delay={250}>
+                            <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.15, marginBottom: 8, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom}</div>
+                            <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 22, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.55, letterSpacing: 2 }}>&</div>
+                            <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.15, marginBottom: 16, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom}</div>
+                          </AnimSection>
+                        ) : null,
+                        narratif: () => (
+                          <AnimSection animStyle={anim} delay={280}>
+                            {ceremony.type === 'Mairie' ? (
+                              <>
+                                <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78 }}>{t.fairepart.cardSeDiront}</div>
+                                <div style={{ fontFamily: FS, fontSize: 'clamp(48px,12vw,80px)', color: G, textAlign: 'center', lineHeight: 1, marginBottom: 28 }}>{t.fairepart.cardOui}</div>
+                              </>
+                            ) : ceremony.type === 'Cérémonie religieuse / Houppa' ? (
+                              <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginBottom: 28, opacity: 0.78 }, 'narratif', data.zoneStyles)}>{ov[`ceremony_${i}_honore`] || t.fairepart.cardHonore}</div>
+                            ) : (
+                              <div style={{ marginBottom: 28 }}>
+                                {ov[`ceremony_${i}_invitation`] ? (
+                                  <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', opacity: 0.85, lineHeight: 1.7, padding: '0 8px', whiteSpace: 'pre-wrap' as const }, 'narratif', data.zoneStyles)}>
+                                    {ov[`ceremony_${i}_invitation`]}
+                                  </div>
+                                ) : (
+                                  <div style={applyZoneStyle({ padding: '0 8px' }, 'narratif', data.zoneStyles)}>
+                                    {renderInvitationPhrase(ceremony, data, G, TEXT, t.fairepart)}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </AnimSection>
+                        ),
+                        dateHeure: () => (
+                          <AnimSection animStyle={anim} delay={380}>
+                            <LineSep />
+                            {ceremony.date && (() => {
+                              const d = new Date(ceremony.date + 'T12:00:00')
+                              const parts = new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).formatToParts(d)
+                              const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+                              const jourSemaine = cap(parts.find(p => p.type === 'weekday')?.value || '')
+                              const jour = parts.find(p => p.type === 'day')?.value || ''
+                              const mois = cap(parts.find(p => p.type === 'month')?.value || '')
+                              const annee = parts.find(p => p.type === 'year')?.value || ''
+                              return (
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '24px 0 8px' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+                                    <div style={{ width: 80, textAlign: 'right' }}>
+                                      <div style={{ fontFamily: FP, borderBottom: `1px solid ${G}44`, paddingBottom: 4, letterSpacing: 4, fontSize: 10, fontWeight: 600, color: G, display: 'inline-block', textTransform: 'uppercase' }}>{jourSemaine}</div>
+                                    </div>
+                                    <div style={{ border: `1.5px solid ${G}`, borderRadius: 4, padding: '10px 18px', fontSize: 40, fontFamily: FP, color: G, fontWeight: 700, minWidth: 64, textAlign: 'center', lineHeight: 1 }}>{jour}</div>
+                                    <div style={{ width: 80, textAlign: 'left' }}>
+                                      <div style={{ fontFamily: FP, borderBottom: `1px solid ${G}44`, paddingBottom: 4, letterSpacing: 4, fontSize: 10, fontWeight: 600, color: G, display: 'inline-block', textTransform: 'uppercase' }}>{mois}</div>
+                                    </div>
+                                  </div>
+                                  <div style={{ fontFamily: FC, fontSize: 12, color: TEXT, letterSpacing: 3, marginTop: 8, opacity: 0.7 }}>{annee}</div>
+                                </div>
+                              )
+                            })()}
+                            {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 15, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 8, opacity: 0.8 }}>{hebrewDate}</div>}
+                            {ceremony.heure && <div style={applyZoneStyle({ fontFamily: FP, fontSize: 20, fontWeight: 600, color: G, textAlign: 'center', marginBottom: 24, letterSpacing: 3, lineHeight: 1.2 }, 'dateHeure', data.zoneStyles)}>{formatHeure(ceremony.heure, locale)}</div>}
+                          </AnimSection>
+                        ),
+                        lieu: () => (
+                          <AnimSection animStyle={anim} delay={420}>
+                            {(ov[`ceremony_${i}_lieu`] || ceremony.lieu) && <div style={applyZoneStyle({ fontFamily: FP, fontWeight: 700, fontSize: 19, color: TEXT, textAlign: 'center', lineHeight: 1.5, marginBottom: 8, letterSpacing: 0.5 }, 'lieu', data.zoneStyles)}>{ceremony.type === 'Mairie' ? conjonctionLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu, locale) : formatLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu, locale)}</div>}
+                            {ceremony.adresse && <div style={{ fontFamily: FC, fontSize: 14, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.65, marginBottom: 24, letterSpacing: 0.3 }}>{ceremony.adresse}</div>}
+                            {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
+                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, textAlign: 'center', marginBottom: 16, borderTop: `1px solid ${G}22`, paddingTop: 14 }}>
+                                <div style={{ fontWeight: 700 }}>{t.fairepart.eventFollowedBy} {ceremony.evenementSuivantNom}</div>
+                                {ceremony.evenementSuivantAdresse && <div style={{ fontSize: 12, opacity: 0.75, marginTop: 4 }}>{ceremony.evenementSuivantAdresse}</div>}
+                              </div>
+                            )}
+                            {ceremony.adresse && (
+                              <div style={{ marginTop: 32 }}>
+                                <div style={{ textAlign: 'center' }}>
+                                  <div style={{ width: 60, height: 0.5, background: `linear-gradient(to right, transparent, ${G}30, transparent)`, margin: '0 auto 16px' }} />
+                                  <div style={{ fontFamily: FP, fontSize: 10, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, marginBottom: 16, opacity: 0.6 }}>
+                                    {locale === 'en' ? 'Get there' : 'S\'y rendre'}
+                                  </div>
+                                  <ItineraireButtons adresse={ceremony.adresse} theme={theme} />
+                                </div>
+                              </div>
+                            )}
+                          </AnimSection>
+                        ),
+                        note: () => ceremony.note ? (
+                          <AnimSection animStyle={anim} delay={450}>
+                            <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: theme.textSecondaire, textAlign: 'center', marginBottom: 16, padding: '12px 0', borderTop: `1px solid ${G}18` }}>{ceremony.note}</div>
+                          </AnimSection>
+                        ) : null,
+                        infos: () => (ceremony.transport || ceremony.hebergement) ? (
+                          <AnimSection animStyle={anim} delay={480}>
+                            <div style={{ marginTop: 32, paddingTop: 24 }}>
+                              <div style={{ width: 60, height: 0.5, background: `linear-gradient(to right, transparent, ${G}30, transparent)`, margin: '0 auto 16px' }} />
+                              <div style={{ fontFamily: FP, fontSize: 10, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 20, opacity: 0.6 }}>
+                                {t.fairepart.infoPratiques}
+                              </div>
+                              {ceremony.transport && (
+                                <div style={{ marginBottom: ceremony.hebergement ? 18 : 0, textAlign: 'center' }}>
+                                  <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: G, marginBottom: 6, fontWeight: 600 }}>{t.fairepart.transportIcon}</div>
+                                  <div style={applyZoneStyle({ fontFamily: FC, fontSize: 13, color: TEXT, lineHeight: 1.7, whiteSpace: 'pre-wrap', opacity: 0.9 }, 'infos', data.zoneStyles)}><Linkify text={ceremony.transport} color={G} /></div>
+                                </div>
+                              )}
+                              {ceremony.hebergement && (
+                                <div style={{ textAlign: 'center' }}>
+                                  <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: G, marginBottom: 6, fontWeight: 600 }}>{t.fairepart.hebergementIcon}</div>
+                                  <div style={applyZoneStyle({ fontFamily: FC, fontSize: 13, color: TEXT, lineHeight: 1.7, whiteSpace: 'pre-wrap', opacity: 0.9 }, 'infos', data.zoneStyles)}><Linkify text={ceremony.hebergement} color={G} /></div>
+                                </div>
+                              )}
                             </div>
-                          )}
-                          {ceremony.hebergement && (
-                            <div style={{ textAlign: 'center' }}>
-                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: G, marginBottom: 6, fontWeight: 600 }}>{t.fairepart.hebergementIcon}</div>
-                              <div style={applyZoneStyle({ fontFamily: FC, fontSize: 13, color: TEXT, lineHeight: 1.7, whiteSpace: 'pre-wrap', opacity: 0.9 }, 'infos', data.zoneStyles)}><Linkify text={ceremony.hebergement} color={G} /></div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </AnimSection>
+                          </AnimSection>
+                        ) : null,
+                      }
+                      return blockOrder.map(blockId => {
+                        const node = blockRenderers[blockId]?.()
+                        if (!node) return null
+                        return <div key={blockId} data-block={blockId}>{node}</div>
+                      })
+                    })()}
                   </div>
                 </section>
               </CeremonyCard>
@@ -5418,6 +5601,8 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
   const [textOverrides, setTextOverrides] = useState<Record<string, string>>({})
   const [zoneStyles, setZoneStyles] = useState<ZoneStyles>(data.zoneStyles ?? {})
   const [textEditOpen, setTextEditOpen] = useState(false)
+  const [blockReorderOpen, setBlockReorderOpen] = useState(false)
+  const [blockOrder, setBlockOrder] = useState<Record<number, string[]>>(data.blockOrder ?? {})
   const [shareModalOpen, setShareModalOpen] = useState(false)
   const [guestUrl, setGuestUrl] = useState<string | null>(null)
   const [coupleUrl, setCoupleUrl] = useState<string | null>(null)
@@ -5520,7 +5705,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
       <div style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
         <FloatingPetals accent={theme.accent} />
         <SharedPageContent
-          data={{ ...data, zoneStyles: data.zoneStyles ?? {} }}
+          data={{ ...data, zoneStyles: data.zoneStyles ?? {}, blockOrder }}
           theme={theme}
           sorted={sorted}
           role={role}
@@ -5536,6 +5721,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
           <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
             <button onClick={onEdit} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>{t.fairepart.editBtn}</button>
             <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>{t.fairepart.textBtn}</button>
+            <button onClick={() => setBlockReorderOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>Réorganiser</button>
             <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{sharing ? (sharingStatus || 'Chargement...') : t.common.share}</button>
             {lastShareId && (
               <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>📋 RSVP</button>
@@ -5559,6 +5745,16 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
             theme={theme}
           />
         )}
+        {blockReorderOpen && (
+          <BlockReorderModal
+            ceremonies={sorted}
+            blockOrder={blockOrder}
+            onApply={(newOrder) => { setBlockOrder(newOrder); onUpdate?.({ blockOrder: newOrder }) }}
+            onClose={() => setBlockReorderOpen(false)}
+            theme={theme}
+            data={data}
+          />
+        )}
         {shareModalOpen && guestUrl && coupleUrl && (
           <ShareModal accent={theme.accent} guestUrl={guestUrl} coupleUrl={coupleUrl} onClose={() => setShareModalOpen(false)} data={data} />
         )}
@@ -5574,7 +5770,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
     <div id="faire-part-preview-target" style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
       <FloatingPetals accent={theme.accent} />
       <SharedPageContent
-        data={{ ...data, textOverrides: { ...data.textOverrides, ...textOverrides }, zoneStyles }}
+        data={{ ...data, textOverrides: { ...data.textOverrides, ...textOverrides }, zoneStyles, blockOrder }}
         theme={theme}
         sorted={sorted}
         role="guest"
@@ -5593,6 +5789,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
           <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>📋 RSVP</button>
         )}
         <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>{t.fairepart.textBtn}</button>
+        <button onClick={() => setBlockReorderOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>Réorganiser</button>
         {lastShareId && (
           <a href={`/plan-table?shareId=${lastShareId}`} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>{t.fairepart.tablesBtn}</a>
         )}
@@ -5605,16 +5802,26 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         <RSVPListModal accent={theme.accent} onClose={() => setRsvpListOpen(false)} shareId={lastShareId} ceremonies={sorted} />
       )}
       {textEditOpen && (
-  <TextEditModal 
-    ceremonies={sorted} 
-    textOverrides={textOverrides} 
+  <TextEditModal
+    ceremonies={sorted}
+    textOverrides={textOverrides}
     zoneStyles={zoneStyles}
     onApply={(t) => { setTextOverrides(t); onUpdate?.({ textOverrides: t }) }}
     onApplyStyles={(s) => { setZoneStyles(s); onUpdate?.({ zoneStyles: s }) }}
-    onClose={() => setTextEditOpen(false)} 
-    theme={theme} 
+    onClose={() => setTextEditOpen(false)}
+    theme={theme}
   />
 )}
+      {blockReorderOpen && (
+        <BlockReorderModal
+          ceremonies={sorted}
+          blockOrder={blockOrder}
+          onApply={(newOrder) => { setBlockOrder(newOrder); onUpdate?.({ blockOrder: newOrder }) }}
+          onClose={() => setBlockReorderOpen(false)}
+          theme={theme}
+          data={data}
+        />
+      )}
       {shareModalOpen && guestUrl && coupleUrl && (
         <ShareModal accent={theme.accent} guestUrl={guestUrl} coupleUrl={coupleUrl} onClose={() => setShareModalOpen(false)} data={data} />
       )}
