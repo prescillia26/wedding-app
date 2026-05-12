@@ -112,7 +112,7 @@ const VIDEO_BACKGROUNDS: { id: string; label: string; url: string; textPosition:
   { id: 'vid-194', label: '🕯️ Nuit & chandeliers', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511813/194_kvvbyk.mp4', textPosition: 'center', needsOverlay: true, dark: true },
 ]
 
-const FRAMES_STRONG_BG = new Set(['frame-80', 'frame-107', 'frame-108', 'frame-vid-173', 'frame-vid-177', 'frame-vid-178', 'frame-vid-180', 'frame-vid-183', 'frame-vid-186', 'frame-vid-188', 'frame-vid-190', 'frame-vid-193', 'frame-vid-194'])
+const FRAMES_STRONG_BG = new Set(['frame-80', 'frame-107', 'frame-108', 'frame-vid-180', 'frame-vid-188', 'frame-vid-193', 'frame-vid-194'])
 const FRAMES: { id: string; label: string; url: string | null; video?: boolean }[] = [
   { id: 'frame-02', label: '🤍 Roses Crème Haut/Bas', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/51_m9vx96.png' },
   { id: 'frame-03', label: '🌺 Cadre Floral Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/53_ho1gq8.png' },
