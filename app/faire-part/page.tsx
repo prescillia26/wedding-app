@@ -6130,7 +6130,7 @@ export default function FairePartPage() {
   // Gate d'accès
   if (!accessGranted && !isShared) return <AccessGate onGranted={() => { setAccessGranted(true); try { const draft = localStorage.getItem('wedding-draft'); if (draft) setHasDraft(true) } catch { /* ignore */ } }} />
 
-  if (showCards) return <CardsView data={formData} onEdit={() => { try { localStorage.setItem('wedding-draft', JSON.stringify(formData)) } catch { /* ignore */ } setShowCards(false); setStep(1) }} onReset={() => { setFormData(defaultFormData); setShowCards(false); setStep(1); try { localStorage.removeItem('wedding-draft') } catch { /* ignore */ } }} isShared={isShared} role={role} onUpdate={update} />
+  if (showCards) return <CardsView data={formData} onEdit={() => { try { localStorage.setItem('wedding-draft', JSON.stringify(formData)) } catch { /* ignore */ } setShowCards(false); setStep(4) }} onReset={() => { setFormData(defaultFormData); setShowCards(false); setStep(1); try { localStorage.removeItem('wedding-draft') } catch { /* ignore */ } }} isShared={isShared} role={role} onUpdate={update} />
 
   if (loadingShare) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fff8ed 0%, #fffaf4 50%, #fff8ed 100%)' }}>
