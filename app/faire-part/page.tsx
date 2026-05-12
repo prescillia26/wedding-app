@@ -783,7 +783,7 @@ function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
         outline: editable && selected ? '1.5px dashed rgba(201,168,76,0.5)' : editable ? '1px dashed rgba(201,168,76,0.15)' : 'none',
         outlineOffset: 6,
         borderRadius: 4,
-        touchAction: editable ? 'pan-y' : 'auto',
+        touchAction: editable ? 'none' : 'auto',
         userSelect: editable ? 'none' : 'auto',
       } as React.CSSProperties}
     >
@@ -5322,30 +5322,25 @@ const firstDate = sorted[0]?.date
                     const canEdit = role !== 'guest' && !!onUpdate
                     const layout = data.accueilLayout ?? {}
                     const setLayout = (l: LayoutMap) => onUpdate?.({ accueilLayout: l })
-                    const D = ({ id, children: ch }: { id: string; children: React.ReactNode }) => (
-                      <DraggableElement id={`c${realIdx}_${id}`} layout={layout} onLayoutChange={setLayout} editable={canEdit}>{ch}</DraggableElement>
-                    )
-                    const A = ({ children: ch, delay: dl }: { children: React.ReactNode; delay?: number }) => (
-                      <AnimSection animStyle={anim} delay={dl} skipAnim={canEdit}>{ch}</AnimSection>
-                    )
+                    const pre = `c${realIdx}_`
                     return (
                   <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame), transform: data.textOffsetY ? `translateY(${data.textOffsetY}px)` : undefined }}>
                     {data.mariageJuif && (
-                      <D id="bsd"><div style={{ position: 'absolute', top: 18, right: 22, fontSize: 16, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, zIndex: 5, opacity: 0.85, letterSpacing: 1 }}>בס״ד</div></D>
+                      <DraggableElement id={pre+"bsd"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><div style={{ position: 'absolute', top: 18, right: 22, fontSize: 16, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, zIndex: 5, opacity: 0.85, letterSpacing: 1 }}>בס״ד</div></DraggableElement>
                     )}
-                    <D id="titre"><A>
+                    <DraggableElement id={pre+"titre"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} skipAnim={canEdit}>
                       <div style={applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 16, lineHeight: 1.4 }, 'titres', data.zoneStyles)}>{ov[`ceremony_${i}_titre`] || title}</div>
                       <OrnSep />
-                    </A></D>
+                    </AnimSection></DraggableElement>
                     {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
-                      <D id="hebrewVerse"><A delay={100}>
+                      <DraggableElement id={pre+"hebrewVerse"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={100} skipAnim={canEdit}>
                         <div style={{ padding: '0 20px', marginBottom: 22 }}>
                           <div style={{ fontFamily: 'serif', fontSize: 'clamp(10px, 3.2vw, 17px)', color: G, direction: 'rtl', textAlign: 'center', whiteSpace: 'nowrap', lineHeight: 1.9 }}>קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה</div>
                         </div>
-                      </A></D>
+                      </AnimSection></DraggableElement>
                     )}
                     {ceremony.type === 'Cérémonie religieuse / Houppa' && ceremony.penseesDefuntsActif && ceremony.penseesDefuntsNoms.filter(n => n.trim()).length > 0 && (
-                      <D id="defunts"><A delay={120}>
+                      <DraggableElement id={pre+"defunts"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
                         <div style={{ textAlign: 'center', marginBottom: 32, paddingBottom: 24, borderBottom: `1px solid ${G}22` }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: 16 }}>
                             <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
@@ -5370,10 +5365,10 @@ const firstDate = sorted[0]?.date
                             </div>
                           )}
                         </div>
-                      </A></D>
+                      </AnimSection></DraggableElement>
                     )}
                     {(parents1.length > 0 || parents2.length > 0) && ceremony.type === 'Cérémonie religieuse / Houppa' && (
-                      <D id="parents"><A delay={150}>
+                      <DraggableElement id={pre+"parents"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={150} skipAnim={canEdit}>
                         {hasGp && (
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 8, textAlign: 'center' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -5397,16 +5392,16 @@ const firstDate = sorted[0]?.date
                         <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 24, lineHeight: 1.9, opacity: 0.82 }, 'narratif', data.zoneStyles)}>
                           {ov[`ceremony_${i}_joie`] || (hasGp ? t.fairepart.joyMessageGp : t.fairepart.joyMessage)}
                         </div>
-                      </A></D>
+                      </AnimSection></DraggableElement>
                     )}
                     {(ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Mairie') && (
-                      <D id="prenoms"><A delay={250}>
+                      <DraggableElement id={pre+"prenoms"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={250} skipAnim={canEdit}>
                         <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.15, marginBottom: 8, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom}</div>
                         <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 22, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.55, letterSpacing: 2 }}>&</div>
                         <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.15, marginBottom: 16, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom}</div>
-                      </A></D>
+                      </AnimSection></DraggableElement>
                     )}
-                    <D id="narratif"><A delay={280}>
+                    <DraggableElement id={pre+"narratif"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={280} skipAnim={canEdit}>
                       {ceremony.type === 'Mairie' ? (
                         <>
                           <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78 }}>{t.fairepart.cardSeDiront}</div>
@@ -5427,9 +5422,9 @@ const firstDate = sorted[0]?.date
                           )}
                         </div>
                       )}
-                    </A></D>
-                    <A delay={380}><LineSep /></A>
-                    <D id="date"><A delay={400}>{ceremony.date ? (() => {
+                    </AnimSection></DraggableElement>
+                    <AnimSection animStyle={anim} delay={380} skipAnim={canEdit}><LineSep /></AnimSection>
+                    <DraggableElement id={pre+"date"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={400} skipAnim={canEdit}>{ceremony.date ? (() => {
                         const d = new Date(ceremony.date + 'T12:00:00')
                         const parts = new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).formatToParts(d)
                         const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
@@ -5455,8 +5450,8 @@ const firstDate = sorted[0]?.date
                           {ceremony.heure && <div style={applyZoneStyle({ fontFamily: FP, fontSize: 20, fontWeight: 600, color: G, textAlign: 'center', marginBottom: 24, letterSpacing: 3, lineHeight: 1.2 }, 'dateHeure', data.zoneStyles)}>{formatHeure(ceremony.heure, locale)}</div>}
                           </>
                         )
-                      })() : null}</A></D>
-                    <D id="lieu"><A delay={440}>
+                      })() : null}</AnimSection></DraggableElement>
+                    <DraggableElement id={pre+"lieu"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={440} skipAnim={canEdit}>
                       {(ov[`ceremony_${i}_lieu`] || ceremony.lieu) && <div style={applyZoneStyle({ fontFamily: FP, fontWeight: 700, fontSize: 19, color: TEXT, textAlign: 'center', lineHeight: 1.5, marginBottom: 8, letterSpacing: 0.5 }, 'lieu', data.zoneStyles)}>{ceremony.type === 'Mairie' ? conjonctionLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu, locale) : formatLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu, locale)}</div>}
                       {ceremony.adresse && <div style={{ fontFamily: FC, fontSize: 14, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.65, marginBottom: 24, letterSpacing: 0.3 }}>{ceremony.adresse}</div>}
                       {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
@@ -5465,12 +5460,12 @@ const firstDate = sorted[0]?.date
                           {ceremony.evenementSuivantAdresse && <div style={{ fontSize: 12, opacity: 0.75, marginTop: 4 }}>{ceremony.evenementSuivantAdresse}</div>}
                         </div>
                       )}
-                    </A></D>
+                    </AnimSection></DraggableElement>
                     {ceremony.note && (
-                      <D id="note"><A delay={460}><div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: theme.textSecondaire, textAlign: 'center', marginBottom: 16, padding: '12px 0', borderTop: `1px solid ${G}18` }}>{ceremony.note}</div></A></D>
+                      <DraggableElement id={pre+"note"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={460} skipAnim={canEdit}><div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: theme.textSecondaire, textAlign: 'center', marginBottom: 16, padding: '12px 0', borderTop: `1px solid ${G}18` }}>{ceremony.note}</div></AnimSection></DraggableElement>
                     )}
                     {ceremony.adresse && (
-                      <A delay={480}><div style={{ marginTop: 32 }}>
+                      <AnimSection animStyle={anim} delay={480} skipAnim={canEdit}><div style={{ marginTop: 32 }}>
                           <div style={{ textAlign: 'center' }}>
                             <div style={{ width: 60, height: 0.5, background: `linear-gradient(to right, transparent, ${G}30, transparent)`, margin: '0 auto 16px' }} />
                             <div style={{ fontFamily: FP, fontSize: 10, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, marginBottom: 16, opacity: 0.6 }}>
@@ -5478,10 +5473,10 @@ const firstDate = sorted[0]?.date
                             </div>
                             <ItineraireButtons adresse={ceremony.adresse} theme={theme} />
                           </div>
-                      </div></A>
+                      </div></AnimSection>
                     )}
                     {(ceremony.transport || ceremony.hebergement) && (
-                      <D id="infos"><A delay={500}><div style={{ marginTop: 32, paddingTop: 24 }}>
+                      <DraggableElement id={pre+"infos"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={500} skipAnim={canEdit}><div style={{ marginTop: 32, paddingTop: 24 }}>
                           <div style={{ width: 60, height: 0.5, background: `linear-gradient(to right, transparent, ${G}30, transparent)`, margin: '0 auto 16px' }} />
                           <div style={{ fontFamily: FP, fontSize: 10, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 20, opacity: 0.6 }}>
                             {t.fairepart.infoPratiques}
@@ -5498,7 +5493,7 @@ const firstDate = sorted[0]?.date
                               <div style={applyZoneStyle({ fontFamily: FC, fontSize: 13, color: TEXT, lineHeight: 1.7, whiteSpace: 'pre-wrap', opacity: 0.9 }, 'infos', data.zoneStyles)}><Linkify text={ceremony.hebergement} color={G} /></div>
                             </div>
                           )}
-                      </div></A></D>
+                      </div></AnimSection></DraggableElement>
                     )}
                   </div>
                     )
