@@ -783,7 +783,7 @@ function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
         outline: editable && selected ? '1.5px dashed rgba(201,168,76,0.5)' : editable ? '1px dashed rgba(201,168,76,0.15)' : 'none',
         outlineOffset: 6,
         borderRadius: 4,
-        touchAction: editable ? 'none' : 'auto',
+        touchAction: editable ? 'pan-y' : 'auto',
         userSelect: editable ? 'none' : 'auto',
       } as React.CSSProperties}
     >
@@ -4422,13 +4422,13 @@ function PersistentParticles({ theme, style: themeStyle }: { theme: ThemeObj; st
 }
 
 // ── AnimSection : fade-in au scroll ───────────────────────────────────────────
-function AnimSection({ children, delay = 0, style, animStyle = 'slide-up' }: {
-  children: React.ReactNode; delay?: number; style?: React.CSSProperties; animStyle?: string
+function AnimSection({ children, delay = 0, style, animStyle = 'slide-up', skipAnim = false }: {
+  children: React.ReactNode; delay?: number; style?: React.CSSProperties; animStyle?: string; skipAnim?: boolean
 }) {
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const el = ref.current
-    if (!el) return
+    if (!el || skipAnim) return
     el.style.opacity = '0'
     const getAnim = () => {
       switch(animStyle) {
@@ -4454,9 +4454,9 @@ function AnimSection({ children, delay = 0, style, animStyle = 'slide-up' }: {
     }, { threshold: 0.12 })
     obs.observe(el)
     return () => obs.disconnect()
-  }, [animStyle, delay])
+  }, [animStyle, delay, skipAnim])
   return (
-    <div ref={ref} style={{ opacity: 0, ...style }}>
+    <div ref={ref} style={{ opacity: skipAnim ? 1 : 0, ...style }}>
       <style>{`
         @keyframes lovitFade { 
           from{opacity:0} to{opacity:1} 
@@ -5325,24 +5325,27 @@ const firstDate = sorted[0]?.date
                     const D = ({ id, children: ch }: { id: string; children: React.ReactNode }) => (
                       <DraggableElement id={`c${realIdx}_${id}`} layout={layout} onLayoutChange={setLayout} editable={canEdit}>{ch}</DraggableElement>
                     )
+                    const A = ({ children: ch, delay: dl }: { children: React.ReactNode; delay?: number }) => (
+                      <AnimSection animStyle={anim} delay={dl} skipAnim={canEdit}>{ch}</AnimSection>
+                    )
                     return (
                   <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame), transform: data.textOffsetY ? `translateY(${data.textOffsetY}px)` : undefined }}>
                     {data.mariageJuif && (
                       <D id="bsd"><div style={{ position: 'absolute', top: 18, right: 22, fontSize: 16, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, zIndex: 5, opacity: 0.85, letterSpacing: 1 }}>בס״ד</div></D>
                     )}
-                    <AnimSection animStyle={anim}>
+                    <A>
                       <D id="titre"><div style={applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 16, lineHeight: 1.4 }, 'titres', data.zoneStyles)}>{ov[`ceremony_${i}_titre`] || title}</div></D>
                       <OrnSep />
-                    </AnimSection>
+                    </A>
                     {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
-                      <AnimSection animStyle={anim} delay={100}>
+                      <A delay={100}>
                         <D id="hebrewVerse"><div style={{ padding: '0 20px', marginBottom: 22 }}>
                           <div style={{ fontFamily: 'serif', fontSize: 'clamp(10px, 3.2vw, 17px)', color: G, direction: 'rtl', textAlign: 'center', whiteSpace: 'nowrap', lineHeight: 1.9 }}>קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה</div>
                         </div></D>
-                      </AnimSection>
+                      </A>
                     )}
                     {ceremony.type === 'Cérémonie religieuse / Houppa' && ceremony.penseesDefuntsActif && ceremony.penseesDefuntsNoms.filter(n => n.trim()).length > 0 && (
-                      <AnimSection animStyle={anim} delay={120}>
+                      <A delay={120}>
                         <D id="defunts"><div style={{ textAlign: 'center', marginBottom: 32, paddingBottom: 24, borderBottom: `1px solid ${G}22` }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: 16 }}>
                             <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
@@ -5367,10 +5370,10 @@ const firstDate = sorted[0]?.date
                             </div>
                           )}
                         </div></D>
-                      </AnimSection>
+                      </A>
                     )}
                     {(parents1.length > 0 || parents2.length > 0) && ceremony.type === 'Cérémonie religieuse / Houppa' && (
-                      <AnimSection animStyle={anim} delay={150}>
+                      <A delay={150}>
                         <D id="parents"><>
                         {hasGp && (
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 8, textAlign: 'center' }}>
@@ -5396,9 +5399,9 @@ const firstDate = sorted[0]?.date
                           {ov[`ceremony_${i}_joie`] || (hasGp ? t.fairepart.joyMessageGp : t.fairepart.joyMessage)}
                         </div>
                         </></D>
-                      </AnimSection>
+                      </A>
                     )}
-                    <AnimSection animStyle={anim} delay={250}>
+                    <A delay={250}>
                       {(ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Mairie') && (
                         <D id="prenoms"><>
                           <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.15, marginBottom: 8, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom}</div>
@@ -5429,8 +5432,8 @@ const firstDate = sorted[0]?.date
                         </div>
                       )}
                       </></D>
-                    </AnimSection>
-                    <AnimSection animStyle={anim} delay={380}>
+                    </A>
+                    <A delay={380}>
                       <LineSep />
                       <D id="date">{ceremony.date ? (() => {
                         const d = new Date(ceremony.date + 'T12:00:00')
@@ -5504,7 +5507,7 @@ const firstDate = sorted[0]?.date
                           )}
                         </div></D>
                       )}
-                    </AnimSection>
+                    </A>
                   </div>
                     )
                   })()}
