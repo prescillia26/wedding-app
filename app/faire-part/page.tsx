@@ -5753,7 +5753,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         data={{ ...data, textOverrides: { ...data.textOverrides, ...textOverrides }, zoneStyles }}
         theme={theme}
         sorted={sorted}
-        role="guest"
+        role="couple"
         lastShareId={lastShareId}
         onRsvpOpen={() => setRsvpOpen(true)}
         onRsvpListOpen={() => setRsvpListOpen(true)}
