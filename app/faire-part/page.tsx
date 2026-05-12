@@ -371,8 +371,7 @@ function readableShadow(theme: ThemeObj, hasPhotoBg = false, hasFrame = false): 
     return '0 1px 3px rgba(255,255,255,0.95), 0 0 12px rgba(255,255,255,0.9), 0 0 24px rgba(255,255,255,0.6)'
   }
   if (hasFrame) {
-    // Cadre décoratif (peut être chargé visuellement) : halo blanc pour détacher le texte
-    return '0 0 6px rgba(255,255,255,0.9), 0 0 14px rgba(255,255,255,0.7), 0 1px 2px rgba(255,255,255,0.95)'
+    return 'none'
   }
   // Thème clair sans photo : halo blanc subtil pour la profondeur
   return '0 1px 2px rgba(255,255,255,0.8), 0 0 8px rgba(255,255,255,0.5)'
