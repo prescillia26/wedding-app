@@ -5465,7 +5465,7 @@ const firstDate = sorted[0]?.date
                       <DraggableElement id={pre+"note"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={460} skipAnim={canEdit}><div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: theme.textSecondaire, textAlign: 'center', marginBottom: 16, padding: '12px 0', borderTop: `1px solid ${G}18` }}>{ceremony.note}</div></AnimSection></DraggableElement>
                     )}
                     {ceremony.adresse && (
-                      <AnimSection animStyle={anim} delay={480} skipAnim={canEdit}><div style={{ marginTop: 32 }}>
+                      <DraggableElement id={pre+"itineraire"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={480} skipAnim={canEdit}><div style={{ marginTop: 32 }}>
                           <div style={{ textAlign: 'center' }}>
                             <div style={{ width: 60, height: 0.5, background: `linear-gradient(to right, transparent, ${G}30, transparent)`, margin: '0 auto 16px' }} />
                             <div style={{ fontFamily: FP, fontSize: 10, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, marginBottom: 16, opacity: 0.6 }}>
@@ -5473,7 +5473,7 @@ const firstDate = sorted[0]?.date
                             </div>
                             <ItineraireButtons adresse={ceremony.adresse} theme={theme} />
                           </div>
-                      </div></AnimSection>
+                      </div></AnimSection></DraggableElement>
                     )}
                     {(ceremony.transport || ceremony.hebergement) && (
                       <DraggableElement id={pre+"infos"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={500} skipAnim={canEdit}><div style={{ marginTop: 32, paddingTop: 24 }}>
@@ -5763,7 +5763,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
       />
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '8px 16px 12px' }}>
         <div style={{ textAlign: 'center', marginBottom: 6 }}>
-          <span style={{ fontSize: 10, color: '#b0a898', fontStyle: 'italic', lineHeight: 1.4 }}>
+          <span style={{ fontSize: 11, color: '#8a7e72', fontWeight: 700, lineHeight: 1.4 }}>
             Glissez chaque texte pour le repositionner. Cliquez dessus pour changer la taille, couleur et police.
           </span>
         </div>
