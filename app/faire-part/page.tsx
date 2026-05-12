@@ -278,6 +278,7 @@ interface FormData {
   customLogoUrl?: string
   customLogoSize?: number // 50-150, default 100
   customLogoColor?: string // '' = original, ou hex color
+  textOffsetY?: number // décalage vertical du texte en px (négatif = plus haut)
 }
 const defaultCeremony: Ceremony = {
   type: 'Cérémonie religieuse / Houppa',
@@ -1743,6 +1744,26 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         </div>
       </AccordionSection>
 
+      <AccordionSection title={locale === 'en' ? '↕️ Text position' : '↕️ Position du texte'}>
+        <Label>{locale === 'en' ? 'Vertical offset' : 'Décalage vertical'}</Label>
+        <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 12 }}>
+          {locale === 'en' ? 'Move all the text up or down on the invitation cards.' : 'Déplacez tout le texte vers le haut ou le bas sur les cartes d\'invitation.'}
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ fontSize: 11, color: '#9a928a', whiteSpace: 'nowrap' }}>{locale === 'en' ? 'Up' : 'Haut'}</span>
+          <input type="range" min={-80} max={80} step={2} value={data.textOffsetY ?? 0} onChange={e => onChange({ textOffsetY: Number(e.target.value) })} style={{ flex: 1, accentColor: THEMES[data.style].accent }} />
+          <span style={{ fontSize: 11, color: '#9a928a', whiteSpace: 'nowrap' }}>{locale === 'en' ? 'Down' : 'Bas'}</span>
+        </div>
+        <div style={{ textAlign: 'center', marginTop: 8 }}>
+          <span style={{ fontSize: 11, color: '#b0a898' }}>{data.textOffsetY ?? 0}px</span>
+          {(data.textOffsetY ?? 0) !== 0 && (
+            <button type="button" onClick={() => onChange({ textOffsetY: 0 })} style={{ ...BTN, marginLeft: 12, fontSize: 11, color: THEMES[data.style].accent, background: 'none', border: 'none', textDecoration: 'underline' }}>
+              {locale === 'en' ? 'Reset' : 'Réinitialiser'}
+            </button>
+          )}
+        </div>
+      </AccordionSection>
+
       <AccordionSection title={locale === 'en' ? '✨ Text animations' : '✨ Animations de texte'}>
         <Label>{t.fairepart.animationTextLabel}</Label>
         <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 12 }}>
@@ -1939,9 +1960,9 @@ function OrnementCorner({ url, corner, size = 130 }: {
   )
 }
 
-function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, frameSize = 100, framePaddingV = 22, framePaddingH = 18, textOpacity = 1, textBg = 0.5, children }: {
+function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, frameSize = 100, framePaddingV = 22, framePaddingH = 18, textOpacity = 1, textBg = 0.5, textOffsetY = 0, children }: {
   frameId: string; ornamentId: string; themeCardBg: string
-  frameOpacity?: number; frameSize?: number; framePaddingV?: number; framePaddingH?: number; textOpacity?: number; textBg?: number
+  frameOpacity?: number; frameSize?: number; framePaddingV?: number; framePaddingH?: number; textOpacity?: number; textBg?: number; textOffsetY?: number
   children: React.ReactNode
 }) {
   const frame = FRAMES.find(f => f.id === frameId) ?? FRAMES[FRAMES.length - 1]
@@ -1960,7 +1981,7 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
       <OrnementCorner url={ornUrl} corner="top-right" size={130} />
       <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
       {/* Zone texte avec voile blanc semi-transparent derrière pour garantir la lisibilité sur cadres chargés */}
-      <div style={{ position: 'relative', zIndex: 10, paddingTop: `${framePaddingV}%`, paddingBottom: `${framePaddingV}%`, paddingLeft: `${framePaddingH}%`, paddingRight: `${framePaddingH}%`, textAlign: 'center', opacity: textOpacity }}>
+      <div style={{ position: 'relative', zIndex: 10, paddingTop: `${framePaddingV}%`, paddingBottom: `${framePaddingV}%`, paddingLeft: `${framePaddingH}%`, paddingRight: `${framePaddingH}%`, textAlign: 'center', opacity: textOpacity, transform: textOffsetY ? `translateY(${textOffsetY}px)` : undefined }}>
         {hasFrame && FRAMES_STRONG_BG.has(frameId) && (
           <div style={{ position: 'absolute', inset: '12% 18%', background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: -1 }} />
         )}
@@ -2145,7 +2166,7 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const honore = ov[`ceremony_${ci}_honore`] || t.fairepart.cardHonore
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5}>
+    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{t.fairepart.cardLaHouppa}</div>
@@ -2236,7 +2257,7 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const ci = cardIdx ?? 0
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5}>
+    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{t.fairepart.cardLaMairie}</div>
@@ -2295,7 +2316,7 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const ci = cardIdx ?? 0
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5}>
+    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{t.fairepart.cardLeHenne}</div>
@@ -2342,7 +2363,7 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const titreDisplay = ov[`ceremony_${ci}_titre`] || name
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5}>
+    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{titreDisplay}</div>
@@ -2393,7 +2414,7 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
   const parents2 = fmtParentsLines(data.famille2PerePrenom, data.famille2PereNom, data.famille2MerePrenom, data.famille2MereNom, titles)
   const joie = ov[`ceremony_${ci}_joie`] || (hasGp ? t.fairepart.joyMessageGp : t.fairepart.joyMessage)
   return (
-    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5}>
+    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{t.fairepart.cardShabbatHatan}</div>
@@ -5139,7 +5160,7 @@ const firstDate = sorted[0]?.date
                   {hasFrame && FRAMES_STRONG_BG.has(data.frameId ?? '') && (
                     <div style={{ position: 'absolute', inset: '12% 18%', background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: 0 }} />
                   )}
-                  <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame) }}>
+                  <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame), transform: data.textOffsetY ? `translateY(${data.textOffsetY}px)` : undefined }}>
                     {data.mariageJuif && (
                       <div style={{ position: 'absolute', top: 18, right: 22, fontSize: 16, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, zIndex: 5, opacity: 0.85, letterSpacing: 1 }}>בס״ד</div>
                     )}
