@@ -275,6 +275,7 @@ interface FormData {
   effetTexte?: 'aucun' | 'or' | 'aquarelle' | 'embosse'
   dateAccueilOverride?: string // Date affichée sur la page d'accueil (override manuel)
   videoAccueilId?: string // ID vidéo animée pour page d'accueil
+  accueilLayout?: Record<string, { x: number; y: number; scale: number; color?: string; fontFamily?: string }>
   customLogoUrl?: string
   customLogoSize?: number // 50-150, default 100
   customLogoColor?: string // '' = original, ou hex color
@@ -701,6 +702,141 @@ function applyZoneStyle(baseStyle: React.CSSProperties, zone: TextZone, zoneStyl
   }
   return result
 }
+// ── Drag & drop pour positionner les éléments sur la page d'accueil ──
+type LayoutEntry = { x: number; y: number; scale: number; color?: string; fontFamily?: string }
+type LayoutMap = Record<string, LayoutEntry>
+
+const DRAG_COLORS = ['', '#ffffff', '#000000', '#C9A84C', '#d4829a', '#8b0000', '#2c4a7c', '#7a9e6e', '#d4a574', '#2a9a6a']
+const DRAG_FONTS = [
+  { value: '', label: 'Défaut' },
+  { value: 'var(--font-great-vibes)', label: 'Calligraphie' },
+  { value: 'var(--font-cormorant-garamond)', label: 'Élégant' },
+  { value: 'var(--font-playfair-display)', label: 'Serif' },
+  { value: 'Georgia, serif', label: 'Georgia' },
+]
+
+function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
+  id: string
+  layout?: LayoutMap
+  onLayoutChange?: (layout: LayoutMap) => void
+  editable: boolean
+  children: React.ReactNode
+}) {
+  const pos = layout?.[id] ?? { x: 0, y: 0, scale: 1 }
+  const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null)
+  const [selected, setSelected] = useState(false)
+  const [showPanel, setShowPanel] = useState(false)
+
+  const containerRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!selected) return
+    const close = (e: PointerEvent) => {
+      if (containerRef.current?.contains(e.target as Node)) return
+      setSelected(false)
+      setShowPanel(false)
+    }
+    const timer = setTimeout(() => document.addEventListener('pointerdown', close), 10)
+    return () => { clearTimeout(timer); document.removeEventListener('pointerdown', close) }
+  }, [selected])
+
+  const toolbarRef = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (!editable) return
+    if (toolbarRef.current?.contains(e.target as Node)) return
+    if (panelRef.current?.contains(e.target as Node)) return
+    e.preventDefault()
+    e.stopPropagation()
+    setSelected(true)
+    dragRef.current = { startX: e.clientX, startY: e.clientY, origX: pos.x, origY: pos.y }
+    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+  }
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!dragRef.current || !onLayoutChange) return
+    const dx = e.clientX - dragRef.current.startX
+    const dy = e.clientY - dragRef.current.startY
+    onLayoutChange({ ...layout, [id]: { ...pos, x: dragRef.current.origX + dx, y: dragRef.current.origY + dy } })
+  }
+
+  const handlePointerUp = () => { dragRef.current = null }
+
+  const update = (patch: Partial<LayoutEntry>) => {
+    onLayoutChange?.({ ...layout, [id]: { ...pos, ...patch } })
+  }
+
+  const customColor = pos.color || ''
+  const customFont = pos.fontFamily || ''
+
+  return (
+    <div
+      ref={containerRef}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      className={`drag-el-${id}`}
+      style={{
+        transform: `translate(${pos.x}px, ${pos.y}px) scale(${pos.scale})`,
+        cursor: editable ? 'grab' : 'default',
+        position: 'relative',
+        outline: editable && selected ? '1.5px dashed rgba(201,168,76,0.5)' : editable ? '1px dashed rgba(201,168,76,0.15)' : 'none',
+        outlineOffset: 6,
+        borderRadius: 4,
+        touchAction: editable ? 'none' : 'auto',
+        userSelect: editable ? 'none' : 'auto',
+      } as React.CSSProperties}
+    >
+      {(customColor || customFont) && (
+        <style>{`
+          .drag-el-${id}, .drag-el-${id} * {
+            ${customColor ? `color: ${customColor} !important;` : ''}
+            ${customFont ? `font-family: ${customFont} !important;` : ''}
+          }
+        `}</style>
+      )}
+      {editable && selected && (
+        <div ref={toolbarRef} style={{ position: 'absolute', top: -28, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 3, zIndex: 20, background: 'white', borderRadius: 8, padding: '3px 5px', boxShadow: '0 2px 12px rgba(0,0,0,0.15)', border: '1px solid #e0d5c8' }}>
+          <button type="button" onClick={() => update({ scale: Math.max(0.4, pos.scale - 0.1) })} style={{ ...BTN, width: 20, height: 20, borderRadius: 4, border: 'none', background: '#f5f0e8', color: '#C9A84C', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>−</button>
+          <div style={{ fontSize: 8, color: '#8a7e72', display: 'flex', alignItems: 'center', padding: '0 3px', fontWeight: 600 }}>{Math.round(pos.scale * 100)}%</div>
+          <button type="button" onClick={() => update({ scale: Math.min(2.5, pos.scale + 0.1) })} style={{ ...BTN, width: 20, height: 20, borderRadius: 4, border: 'none', background: '#f5f0e8', color: '#C9A84C', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>+</button>
+          <div style={{ width: 1, background: '#e0d5c8', margin: '2px 2px' }} />
+          <button type="button" onClick={() => setShowPanel(p => !p)} style={{ ...BTN, width: 20, height: 20, borderRadius: 4, border: 'none', background: showPanel ? '#C9A84C' : '#f5f0e8', color: showPanel ? 'white' : '#C9A84C', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>🎨</button>
+        </div>
+      )}
+      {editable && selected && showPanel && (
+        <div ref={panelRef} style={{ position: 'absolute', top: -90, left: '50%', transform: 'translateX(-50%)', zIndex: 30, background: 'white', borderRadius: 10, padding: '10px 12px', boxShadow: '0 4px 20px rgba(0,0,0,0.18)', border: '1px solid #e0d5c8', minWidth: 200 }}>
+          <div style={{ fontSize: 9, color: '#8a7e72', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Couleur</div>
+          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 8 }}>
+            {DRAG_COLORS.map(c => (
+              <button key={c || 'def'} type="button" onClick={() => update({ color: c })} style={{
+                ...BTN, width: 18, height: 18, borderRadius: '50%', padding: 0,
+                background: c || 'linear-gradient(135deg, #ccc 25%, #fff 25%, #fff 50%, #ccc 50%, #ccc 75%, #fff 75%)',
+                backgroundSize: c ? undefined : '6px 6px',
+                border: (pos.color ?? '') === c ? '2px solid #C9A84C' : '1px solid #d6d1cb',
+                boxShadow: (pos.color ?? '') === c ? '0 0 0 1px #C9A84C' : 'none',
+              }} />
+            ))}
+          </div>
+          <div style={{ fontSize: 9, color: '#8a7e72', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Police</div>
+          <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+            {DRAG_FONTS.map(f => (
+              <button key={f.value || 'def'} type="button" onClick={() => update({ fontFamily: f.value })} style={{
+                ...BTN, padding: '3px 8px', borderRadius: 6, fontSize: 9, fontWeight: (pos.fontFamily ?? '') === f.value ? 700 : 400,
+                border: `1px solid ${(pos.fontFamily ?? '') === f.value ? '#C9A84C' : '#e0d5c8'}`,
+                background: (pos.fontFamily ?? '') === f.value ? '#faf5ea' : 'white',
+                color: (pos.fontFamily ?? '') === f.value ? '#C9A84C' : '#3a3330',
+                fontFamily: f.value || 'inherit',
+              }}>{f.label}</button>
+            ))}
+          </div>
+        </div>
+      )}
+      {children}
+    </div>
+  )
+}
+
 const S: Record<string, React.CSSProperties> = {
   input: {
     width: '100%', border: '1px solid #e0d5c8', borderRadius: 8, padding: '12px 15px',
@@ -4424,6 +4560,7 @@ interface SharedPageContentProps {
   onStartYoutube?: () => void
   ytIframeRef: React.RefObject<HTMLIFrameElement | null>
   ytMuted: boolean; onToggleYtMute: () => void
+  onUpdate?: (d: Partial<FormData>) => void
 }
 // ── 💌 ENVELOPPE PREMIUM ─────────────────────────────────────────────────────
 // Design : prénoms en haut, sceau au centre, "Touchez" en bas, ornements SVG
@@ -4970,7 +5107,7 @@ function EnveloppeAnimation({ data, theme, onDone }: { data: FormData; theme: Th
 }
 
 // ── ItineraireButtons : Google Maps + Waze avec design luxe ───────────────────
-function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute }: SharedPageContentProps) {
+function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute, onUpdate }: SharedPageContentProps) {
   const { t, locale } = useT()
   const contentRef = useRef<HTMLDivElement>(null)
   const [currentCeremonyIdx, setCurrentCeremonyIdx] = useState(0)
@@ -5088,16 +5225,24 @@ const firstDate = sorted[0]?.date
           </div>
         )}
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '0 32px', maxWidth: 480, width: '100%', margin: '0 auto' }}>
+          {(() => {
+            const canEdit = role !== 'guest' && !!onUpdate
+            const layout = data.accueilLayout ?? {}
+            const setLayout = (l: LayoutMap) => onUpdate?.({ accueilLayout: l })
+            return (<>
           {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 16, color: introTextColor, direction: 'rtl', marginBottom: 20, animation: 'sharedFadeIn 0.9s ease forwards' }}>בס״ד</div>}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
-            {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={140} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor}size={140} style={data.monogrammeStyle || 'cercle'} />}
+          <DraggableElement id="monogram" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: data.styleAccueil === 'video' ? 10 : 16, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
+            {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={data.styleAccueil === 'video' ? 110 : 140} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={data.styleAccueil === 'video' ? 110 : 140} style={data.monogrammeStyle || 'cercle'} />}
           </div>
+          </DraggableElement>
           {data.styleAccueil === 'illustration' && data.illustrationCoupleId && (
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 30, animation: 'sharedFadeIn 1s 0.2s ease forwards', opacity: 0 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url} alt="" style={{ maxWidth: '70%', maxHeight: 280, objectFit: 'contain' }} />
             </div>
           )}
+          <DraggableElement id="names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', margin: '0 auto 16px', maxWidth: 160 }}>
             <div style={{ flex: 1, height: 0.5, background: introTextColor, opacity: 0.4 }} />
             <span style={{ color: introTextColor, fontSize: 10, opacity: 0.7 }}>◆</span>
@@ -5106,18 +5251,27 @@ const firstDate = sorted[0]?.date
           <div style={{ fontFamily: FS, fontSize: 'clamp(30px,8vw,46px)', color: introTextColor, marginBottom: 16, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.2, textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : readableShadow(theme) }}>
             {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
           </div>
+          </DraggableElement>
+          <DraggableElement id="phrase" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: introTextColor, marginBottom: 20, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}>
             {t.fairepart.pleaseJoin}
           </div>
+          </DraggableElement>
           {/* Compte à rebours intégré dans l'accueil */}
           {firstDate && (
+            <DraggableElement id="countdown" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
             <div style={{ marginBottom: 28, animation: 'sharedFadeIn 1s 0.65s ease forwards', opacity: 0 }}>
               <Countdown targetDate={firstDate} accent={hasIntroPhoto ? 'rgba(255,255,255,0.9)' : G} />
             </div>
+            </DraggableElement>
           )}
-          <button className="lovit-btn" onClick={handleDiscover} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '14px 40px', fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', boxShadow: `0 4px 20px ${G}44`, animation: 'sharedFadeIn 1s 0.8s ease forwards', opacity: 0 } as React.CSSProperties}>
+          <DraggableElement id="button" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
+          <button className="lovit-btn" onClick={canEdit ? undefined : handleDiscover} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '14px 40px', fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', boxShadow: `0 4px 20px ${G}44`, animation: 'sharedFadeIn 1s 0.8s ease forwards', opacity: 0 } as React.CSSProperties}>
             {t.fairepart.discoverInvitation}
           </button>
+          </DraggableElement>
+          </>)
+          })()}
         </div>
         </div>
       </div>
@@ -5552,6 +5706,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
           ytIframeRef={ytIframeRef}
           ytMuted={ytMuted}
           onToggleYtMute={toggleYtMute}
+          onUpdate={onUpdate}
         />
         {role === 'couple' && (
           <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -5606,6 +5761,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         ytIframeRef={ytIframeRef}
         ytMuted={ytMuted}
         onToggleYtMute={toggleYtMute}
+        onUpdate={onUpdate}
       />
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
         <button onClick={onEdit} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>{t.fairepart.editBtn}</button>
