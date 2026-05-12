@@ -5230,7 +5230,11 @@ const firstDate = sorted[0]?.date
             const layout = data.accueilLayout ?? {}
             const setLayout = (l: LayoutMap) => onUpdate?.({ accueilLayout: l })
             return (<>
-          {data.mariageJuif && <div style={{ fontFamily: 'serif', fontSize: 16, color: introTextColor, direction: 'rtl', marginBottom: 20, animation: 'sharedFadeIn 0.9s ease forwards' }}>בס״ד</div>}
+          {data.mariageJuif && (
+            <DraggableElement id="bsd" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
+              <div style={{ fontFamily: 'serif', fontSize: 16, color: introTextColor, direction: 'rtl', marginBottom: 20, animation: 'sharedFadeIn 0.9s ease forwards' }}>בס״ד</div>
+            </DraggableElement>
+          )}
           <DraggableElement id="monogram" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: data.styleAccueil === 'video' ? 10 : 16, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
             {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={data.styleAccueil === 'video' ? 110 : 140} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={data.styleAccueil === 'video' ? 110 : 140} style={data.monogrammeStyle || 'cercle'} />}
