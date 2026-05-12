@@ -1899,6 +1899,31 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
         </div>
       </AccordionSection>
 
+      <AccordionSection title={locale === 'en' ? '🎬 Opening animation' : '🎬 Animation d\'ouverture'}>
+        <Label>{locale === 'en' ? 'Choose the opening animation' : 'Choisissez l\'animation d\'ouverture'}</Label>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 8 }}>
+          {([
+            { key: 'enveloppe', label: locale === 'en' ? '💌 Envelope' : '💌 Enveloppe', desc: locale === 'en' ? 'Elegant envelope that opens' : 'Enveloppe élégante qui s\'ouvre' },
+            { key: 'petales', label: locale === 'en' ? '🌹 Falling petals' : '🌹 Pétales', desc: locale === 'en' ? 'Rose petals falling softly' : 'Pétales de roses qui tombent' },
+            { key: 'coeur', label: locale === 'en' ? '💕 Petal heart' : '💕 Coeur de pétales', desc: locale === 'en' ? 'Petals forming a heart' : 'Pétales qui forment un coeur' },
+            { key: 'parchemin', label: locale === 'en' ? '📜 Scroll' : '📜 Parchemin', desc: locale === 'en' ? 'Elegant opening scroll' : 'Parchemin qui se déroule' },
+            { key: 'none', label: locale === 'en' ? '⏭️ None' : '⏭️ Aucune', desc: locale === 'en' ? 'Skip intro animation' : 'Pas d\'animation d\'intro' },
+          ]).map(opt => {
+            const sel = (data.introAnimation || 'petales') === opt.key
+            return (
+              <button key={opt.key} type="button" onClick={() => onChange({ introAnimation: opt.key })} style={{
+                ...BTN, padding: '14px 10px', borderRadius: 12, textAlign: 'center',
+                border: `2px solid ${sel ? THEMES[data.style].accent : '#e0d5c8'}`,
+                background: sel ? `${THEMES[data.style].accent}12` : 'white',
+              }}>
+                <div style={{ fontSize: 14, marginBottom: 4 }}>{opt.label}</div>
+                <div style={{ fontSize: 9, color: sel ? THEMES[data.style].accent : '#9a928a', lineHeight: 1.3 }}>{opt.desc}</div>
+              </button>
+            )
+          })}
+        </div>
+      </AccordionSection>
+
       <AccordionSection title={locale === 'en' ? '✨ Text animations' : '✨ Animations de texte'}>
         <Label>{t.fairepart.animationTextLabel}</Label>
         <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 12 }}>
@@ -5096,12 +5121,216 @@ function AnimParchemin({ data, theme, onDone }: { data: FormData; theme: ThemeOb
     </div>
   )
 }
+// ── 💕 COEUR DE PÉTALES (animation d'ouverture) ──────────────────────────────
+function AnimCoeurPetales({ data, theme, onDone }: { data: FormData; theme: ThemeObj; onDone: () => void }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [phase, setPhase] = useState(0) // 0=scatter, 1=forming, 2=formed, 3=fadeout
+  const [showText, setShowText] = useState(false)
+  const GV = 'var(--font-great-vibes)'
+  const FP = 'var(--font-playfair-display)'
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const dpr = window.devicePixelRatio || 1
+    const W = Math.min(480, window.innerWidth)
+    const H = window.innerHeight
+    canvas.width = W * dpr
+    canvas.height = H * dpr
+    canvas.style.width = W + 'px'
+    canvas.style.height = H + 'px'
+    ctx.scale(dpr, dpr)
+
+    // Heart curve parametric — centered
+    const heartX = (t: number) => 16 * Math.pow(Math.sin(t), 3)
+    const heartY = (t: number) => -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t))
+    const heartScale = Math.min(W, H) * 0.018
+    const cx = W / 2, cy = H * 0.44
+
+    const PETAL_COUNT = 120
+    const petals: { x: number; y: number; tx: number; ty: number; sx: number; sy: number; r: number; tr: number; sr: number; size: number; hue: number; sat: number; light: number; opacity: number }[] = []
+
+    for (let i = 0; i < PETAL_COUNT; i++) {
+      const t = (i / PETAL_COUNT) * Math.PI * 2 + (Math.random() - 0.5) * 0.3
+      const jitter = 0.7 + Math.random() * 0.6
+      const tx = cx + heartX(t) * heartScale * jitter
+      const ty = cy + heartY(t) * heartScale * jitter
+      // Also fill inside the heart
+      const fillFactor = Math.random()
+      const innerTx = fillFactor < 0.4 ? cx + heartX(t) * heartScale * fillFactor * 1.5 : tx
+      const innerTy = fillFactor < 0.4 ? cy + heartY(t) * heartScale * fillFactor * 1.5 : ty
+      const finalTx = fillFactor < 0.4 ? innerTx : tx
+      const finalTy = fillFactor < 0.4 ? innerTy : ty
+
+      petals.push({
+        x: Math.random() * W,
+        y: -30 - Math.random() * H * 0.5,
+        tx: finalTx, ty: finalTy,
+        sx: Math.random() * W,
+        sy: -30 - Math.random() * H * 0.5,
+        r: Math.random() * Math.PI * 2,
+        tr: Math.random() * Math.PI * 2,
+        sr: Math.random() * Math.PI * 2,
+        size: 6 + Math.random() * 10,
+        hue: 350 + Math.random() * 20, // red-rose range
+        sat: 65 + Math.random() * 25,
+        light: 40 + Math.random() * 20,
+        opacity: 0.7 + Math.random() * 0.3,
+      })
+    }
+
+    // Falling petals on top
+    const fallingPetals: { x: number; y: number; r: number; vy: number; vr: number; vx: number; size: number; hue: number; sat: number; light: number; opacity: number }[] = []
+    for (let i = 0; i < 25; i++) {
+      fallingPetals.push({
+        x: Math.random() * W,
+        y: -20 - Math.random() * H * 0.3,
+        r: Math.random() * Math.PI * 2,
+        vy: 0.4 + Math.random() * 1.2,
+        vr: (Math.random() - 0.5) * 0.04,
+        vx: (Math.random() - 0.5) * 0.5,
+        size: 8 + Math.random() * 12,
+        hue: 345 + Math.random() * 25,
+        sat: 60 + Math.random() * 30,
+        light: 38 + Math.random() * 22,
+        opacity: 0.5 + Math.random() * 0.4,
+      })
+    }
+
+    function drawPetal(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, rotation: number, hue: number, sat: number, light: number, opacity: number) {
+      ctx.save()
+      ctx.translate(x, y)
+      ctx.rotate(rotation)
+      ctx.globalAlpha = opacity
+
+      // Main petal shape
+      ctx.beginPath()
+      ctx.moveTo(0, -size * 0.6)
+      ctx.bezierCurveTo(size * 0.5, -size * 0.5, size * 0.6, size * 0.1, 0, size * 0.6)
+      ctx.bezierCurveTo(-size * 0.6, size * 0.1, -size * 0.5, -size * 0.5, 0, -size * 0.6)
+      ctx.fillStyle = `hsl(${hue}, ${sat}%, ${light}%)`
+      ctx.fill()
+
+      // Darker center vein
+      ctx.beginPath()
+      ctx.moveTo(0, -size * 0.45)
+      ctx.quadraticCurveTo(size * 0.08, 0, 0, size * 0.45)
+      ctx.strokeStyle = `hsl(${hue}, ${sat + 10}%, ${light - 12}%)`
+      ctx.lineWidth = 0.5
+      ctx.globalAlpha = opacity * 0.4
+      ctx.stroke()
+
+      // Light reflection
+      ctx.beginPath()
+      ctx.ellipse(-size * 0.12, -size * 0.15, size * 0.15, size * 0.25, -0.3, 0, Math.PI * 2)
+      ctx.fillStyle = `hsl(${hue}, ${sat - 20}%, ${light + 20}%)`
+      ctx.globalAlpha = opacity * 0.25
+      ctx.fill()
+
+      ctx.restore()
+    }
+
+    let startTime = Date.now()
+    let animFrame = 0
+    let currentPhase = 0
+
+    function animate() {
+      if (!ctx) return
+      const elapsed = (Date.now() - startTime) / 1000
+      ctx.clearRect(0, 0, W, H)
+
+      // Phase transitions
+      if (elapsed > 0.3 && currentPhase === 0) currentPhase = 1  // start forming
+      if (elapsed > 2.8 && currentPhase === 1) currentPhase = 2  // formed
+
+      // Easing
+      const formProgress = currentPhase >= 1 ? Math.min(1, (elapsed - 0.3) / 2.5) : 0
+      const ease = formProgress < 1 ? 1 - Math.pow(1 - formProgress, 3) : 1 // easeOutCubic
+
+      // Draw heart petals
+      for (const p of petals) {
+        const px = p.sx + (p.tx - p.sx) * ease
+        const py = p.sy + (p.ty - p.sy) * ease + (1 - ease) * Math.sin(elapsed * 2 + p.sr) * 15
+        const pr = p.sr + (p.tr - p.sr) * ease
+        p.x = px
+        p.y = py
+        p.r = pr
+        drawPetal(ctx, px, py, p.size, pr, p.hue, p.sat, p.light, p.opacity)
+      }
+
+      // Falling petals (continuous)
+      for (const fp of fallingPetals) {
+        fp.y += fp.vy
+        fp.x += fp.vx + Math.sin(elapsed * 1.5 + fp.r) * 0.3
+        fp.r += fp.vr
+        if (fp.y > H + 20) {
+          fp.y = -20
+          fp.x = Math.random() * W
+        }
+        drawPetal(ctx, fp.x, fp.y, fp.size, fp.r, fp.hue, fp.sat, fp.light, fp.opacity * 0.6)
+      }
+
+      animFrame = requestAnimationFrame(animate)
+    }
+
+    animate()
+
+    // Timing
+    setTimeout(() => setShowText(true), 2000)
+    setTimeout(() => setPhase(3), 4500)
+    setTimeout(() => onDone(), 5200)
+
+    return () => cancelAnimationFrame(animFrame)
+  }, [onDone])
+
+  return (
+    <div onClick={() => { setPhase(3); setTimeout(onDone, 500) }} style={{
+      position: 'fixed', inset: 0, zIndex: 9999,
+      background: `linear-gradient(170deg, #fff5f5 0%, #fff0f2 40%, #ffeef0 100%)`,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column',
+      cursor: 'pointer',
+      opacity: phase >= 3 ? 0 : 1,
+      transition: phase >= 3 ? 'opacity 0.7s ease' : 'none',
+      pointerEvents: phase >= 3 ? 'none' : 'auto',
+    }}>
+      <button onClick={e => { e.stopPropagation(); onDone() }} style={{
+        position: 'absolute', top: 20, right: 20, background: 'none', border: 'none',
+        color: 'rgba(180,100,120,0.35)', fontSize: 10, fontFamily: FP, letterSpacing: 4,
+        cursor: 'pointer', zIndex: 10, textTransform: 'uppercase',
+      } as React.CSSProperties}>SKIP</button>
+
+      <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
+
+      {/* Text overlay */}
+      {showText && (
+        <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', animation: 'coeurTextIn 1.2s cubic-bezier(0.22,1,0.36,1) forwards' }}>
+          <style>{`@keyframes coeurTextIn{from{opacity:0;transform:scale(0.85) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}`}</style>
+          <div style={{ fontFamily: FP, fontSize: 11, letterSpacing: 5, textTransform: 'uppercase', color: 'rgba(160,80,100,0.5)', marginBottom: 12 }}>
+            Save the Date
+          </div>
+          <div style={{ fontFamily: GV, fontSize: 'clamp(38px,10vw,60px)', color: theme.accent || '#c4829a', lineHeight: 1.15 }}>
+            {data.marie1Prenom || 'Prénom'}
+          </div>
+          <div style={{ fontFamily: GV, fontSize: 22, color: 'rgba(180,100,120,0.5)', margin: '4px 0' }}>&</div>
+          <div style={{ fontFamily: GV, fontSize: 'clamp(38px,10vw,60px)', color: theme.accent || '#c4829a', lineHeight: 1.15 }}>
+            {data.marie2Prenom || 'Prénom'}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── DISPATCHER ────────────────────────────────────────────────────────────────
 function EnveloppeAnimation({ data, theme, onDone }: { data: FormData; theme: ThemeObj; onDone: () => void }) {
   const anim = data.introAnimation || 'enveloppe'
   if (anim === 'none') { onDone(); return null }
   if (anim === 'petales')   return <AnimPetales   data={data} theme={theme} onDone={onDone} />
   if (anim === 'parchemin') return <AnimParchemin data={data} theme={theme} onDone={onDone} />
+  if (anim === 'coeur')     return <AnimCoeurPetales data={data} theme={theme} onDone={onDone} />
   return <AnimEnveloppe data={data} theme={theme} onDone={onDone} />
 }
 
