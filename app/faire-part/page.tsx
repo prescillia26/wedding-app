@@ -280,6 +280,7 @@ interface FormData {
   customLogoSize?: number // 50-150, default 100
   customLogoColor?: string // '' = original, ou hex color
   textOffsetY?: number // décalage vertical du texte en px (négatif = plus haut)
+  petalsEnabled?: boolean // pétales/particules sur le faire-part (false par défaut)
 }
 const defaultCeremony: Ceremony = {
   type: 'Cérémonie religieuse / Houppa',
@@ -1896,6 +1897,23 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
               {locale === 'en' ? 'Reset' : 'Réinitialiser'}
             </button>
           )}
+        </div>
+      </AccordionSection>
+
+      <AccordionSection title={locale === 'en' ? '🌸 Falling petals' : '🌸 Pétales décoratifs'}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: '#3a3330' }}>{locale === 'en' ? 'Falling petals / sparkles' : 'Pétales et paillettes'}</div>
+            <div style={{ fontSize: 11, color: '#9a928a', marginTop: 2 }}>{locale === 'en' ? 'Decorative particles floating on the invitation' : 'Particules décoratives qui flottent sur l\'invitation'}</div>
+          </div>
+          <button type="button" onClick={() => onChange({ petalsEnabled: !data.petalsEnabled })} style={{
+            ...BTN, width: 48, height: 28, borderRadius: 14, padding: 2, border: 'none',
+            background: data.petalsEnabled ? THEMES[data.style].accent : '#d1d5db',
+            display: 'flex', alignItems: 'center', justifyContent: data.petalsEnabled ? 'flex-end' : 'flex-start',
+            transition: 'background 0.2s ease',
+          }}>
+            <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.2)', transition: 'transform 0.2s ease' }} />
+          </button>
         </div>
       </AccordionSection>
 
@@ -5213,7 +5231,7 @@ const firstDate = sorted[0]?.date
 
   return (
     <div style={{ backgroundColor: '#f5f0e8', minHeight: '100vh' }}>
-      <PersistentParticles theme={theme} style={data.style} />
+      {data.petalsEnabled && <PersistentParticles theme={theme} style={data.style} />}
       <div style={{ backgroundColor: theme.fond, color: TEXT, minHeight: '100vh', maxWidth: 480, margin: '0 auto', boxShadow: '0 0 40px rgba(0,0,0,0.08)' }}>
       <FloatingEventMenu ceremonies={sorted} accent={G} theme={theme} />
       <style>{`
@@ -5715,7 +5733,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
     }
     return (
       <div style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
-        <FloatingPetals accent={theme.accent} />
+        {data.petalsEnabled && <FloatingPetals accent={theme.accent} />}
         <SharedPageContent
           data={{ ...data, zoneStyles: data.zoneStyles ?? {} }}
           theme={theme}
@@ -5770,7 +5788,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
 
   return (
     <div id="faire-part-preview-target" style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
-      <FloatingPetals accent={theme.accent} />
+      {data.petalsEnabled && <FloatingPetals accent={theme.accent} />}
       <SharedPageContent
         data={{ ...data, textOverrides: { ...data.textOverrides, ...textOverrides }, zoneStyles }}
         theme={theme}
