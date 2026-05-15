@@ -2431,13 +2431,13 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(32px, 10vw, 68px)', color: theme.accent, lineHeight: 1.1 }}>{data.marie1Prenom || 'Prénom'}</div>
             {data.mariageJuif && data.marie1PrenomHebreu && <div dir="rtl" lang="he" style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 'clamp(14px, 3.5vw, 22px)', color: theme.accent, opacity: 0.7, marginTop: 2 }}>{data.marie1PrenomHebreu}</div>}
-            {data.marie1Prenom2 && <div style={{ fontSize: 11, letterSpacing: 2, color: theme.textSecondaire, marginTop: 4 }}>{data.marie1Prenom2}</div>}
+            {data.marie1Prenom2 && <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(14px, 3.5vw, 20px)', letterSpacing: '0.04em', color: theme.accent, marginTop: -2, lineHeight: 1.3 }}>{data.marie1Prenom2}</div>}
           </div>
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 'clamp(24px, 5vw, 36px)', color: theme.accent }}>&</div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(32px, 10vw, 68px)', color: theme.accent, lineHeight: 1.1 }}>{data.marie2Prenom || 'Prénom'}</div>
             {data.mariageJuif && data.marie2PrenomHebreu && <div dir="rtl" lang="he" style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 'clamp(14px, 3.5vw, 22px)', color: theme.accent, opacity: 0.7, marginTop: 2 }}>{data.marie2PrenomHebreu}</div>}
-            {data.marie2Prenom2 && <div style={{ fontSize: 11, letterSpacing: 2, color: theme.textSecondaire, marginTop: 4 }}>{data.marie2Prenom2}</div>}
+            {data.marie2Prenom2 && <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(14px, 3.5vw, 20px)', letterSpacing: '0.04em', color: theme.accent, marginTop: -2, lineHeight: 1.3 }}>{data.marie2Prenom2}</div>}
           </div>
         </div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, textAlign: 'center', color: theme.texte, marginBottom: 16, lineHeight: 1.6 }}>
@@ -2673,13 +2673,13 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(32px, 10vw, 68px)', color: theme.accent, lineHeight: 1.1 }}>{data.marie1Prenom || 'Prénom'}</div>
             {data.mariageJuif && data.marie1PrenomHebreu && <div dir="rtl" lang="he" style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 'clamp(14px, 3.5vw, 22px)', color: theme.accent, opacity: 0.7, marginTop: 2 }}>{data.marie1PrenomHebreu}</div>}
-            {data.marie1Prenom2 && <div style={{ fontSize: 11, letterSpacing: 2, color: theme.textSecondaire, marginTop: 4 }}>{data.marie1Prenom2}</div>}
+            {data.marie1Prenom2 && <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(14px, 3.5vw, 20px)', letterSpacing: '0.04em', color: theme.accent, marginTop: -2, lineHeight: 1.3 }}>{data.marie1Prenom2}</div>}
           </div>
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 'clamp(24px, 5vw, 36px)', color: theme.accent }}>&</div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(32px, 10vw, 68px)', color: theme.accent, lineHeight: 1.1 }}>{data.marie2Prenom || 'Prénom'}</div>
             {data.mariageJuif && data.marie2PrenomHebreu && <div dir="rtl" lang="he" style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 'clamp(14px, 3.5vw, 22px)', color: theme.accent, opacity: 0.7, marginTop: 2 }}>{data.marie2PrenomHebreu}</div>}
-            {data.marie2Prenom2 && <div style={{ fontSize: 11, letterSpacing: 2, color: theme.textSecondaire, marginTop: 4 }}>{data.marie2Prenom2}</div>}
+            {data.marie2Prenom2 && <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(14px, 3.5vw, 20px)', letterSpacing: '0.04em', color: theme.accent, marginTop: -2, lineHeight: 1.3 }}>{data.marie2Prenom2}</div>}
           </div>
         </div>
         <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, color: theme.accent, textAlign: 'center', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 12 }}>{formatDateFr(ceremony.date)}</div>
@@ -5495,13 +5495,13 @@ const firstDate = sorted[0]?.date
                           <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, lineHeight: 1.15, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom}</div>
                           {data.mariageJuif && data.marie1PrenomHebreu && <div dir="rtl" lang="he" style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 'clamp(18px,4.5vw,28px)', color: G, opacity: 0.7, lineHeight: 1.2 }}>{data.marie1PrenomHebreu}</div>}
                         </div>
-                        {data.marie1Prenom2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(12px,3vw,16px)', letterSpacing: 2, color: G, textAlign: 'center', marginBottom: 4, opacity: 0.7 }}>{data.marie1Prenom2}</div>}
+                        {data.marie1Prenom2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(18px,5vw,28px)', letterSpacing: '0.04em', color: G, textAlign: 'center', marginTop: -4, marginBottom: 4, lineHeight: 1.3 }}>{data.marie1Prenom2}</div>}
                         <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 22, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.55, letterSpacing: 2 }}>&</div>
                         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
                           <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, lineHeight: 1.15, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom}</div>
                           {data.mariageJuif && data.marie2PrenomHebreu && <div dir="rtl" lang="he" style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 'clamp(18px,4.5vw,28px)', color: G, opacity: 0.7, lineHeight: 1.2 }}>{data.marie2PrenomHebreu}</div>}
                         </div>
-                        {data.marie2Prenom2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(12px,3vw,16px)', letterSpacing: 2, color: G, textAlign: 'center', marginBottom: 12, opacity: 0.7 }}>{data.marie2Prenom2}</div>}
+                        {data.marie2Prenom2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(18px,5vw,28px)', letterSpacing: '0.04em', color: G, textAlign: 'center', marginTop: -4, marginBottom: 8, lineHeight: 1.3 }}>{data.marie2Prenom2}</div>}
                       </AnimSection></DraggableElement>
                     )}
                     <DraggableElement id={pre+"narratif"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={280} skipAnim={canEdit}>
