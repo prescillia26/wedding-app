@@ -38,7 +38,7 @@ const FONT_OPTIONS = [
 const COLOR_OPTIONS = [
   { value: '',        label: 'Thème',    swatch: '#C9A84C' },
   { value: '#C9A84C', label: 'Doré',     swatch: '#C9A84C' },
-  { value: '#1a1a1a', label: 'Noir',     swatch: '#1a1a1a' },
+  { value: '#000000', label: 'Noir',     swatch: '#000000' },
   { value: '#9e9e9e', label: 'Argent',   swatch: '#9e9e9e' },
   { value: '#d4829a', label: 'Rose',     swatch: '#d4829a' },
   { value: '#8b0000', label: 'Bordeaux', swatch: '#8b0000' },
