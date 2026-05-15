@@ -4028,6 +4028,13 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
                         style={{ width: '100%', padding: '10px 12px', border: '1px solid #e0d5c8', borderRadius: 8, fontSize: 14, color: '#3a3330', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 56, marginBottom: 12 }} />
                     </>
                   )}
+                  {c.type === 'Mairie' && (
+                    <>
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Phrase narrative</label>
+                      <input value={localText[`ceremony_${i}_sediront`] ?? ''} onChange={e => setText(`ceremony_${i}_sediront`, e.target.value)} placeholder={t.fairepart.cardSeDiront}
+                        style={{ width: '100%', padding: '10px 12px', border: '1px solid #e0d5c8', borderRadius: 8, fontSize: 14, color: '#3a3330', outline: 'none', boxSizing: 'border-box', marginBottom: 12 }} />
+                    </>
+                  )}
                   {c.type !== 'Mairie' && c.type !== 'Cérémonie religieuse / Houppa' && (
                     <>
                       <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>{t.fairepart.textEditInvitationLabel}</label>
@@ -5448,7 +5455,7 @@ const firstDate = sorted[0]?.date
                     <DraggableElement id={pre+"narratif"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={280} skipAnim={canEdit}>
                       {ceremony.type === 'Mairie' ? (
                         <>
-                          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78 }}>{t.fairepart.cardSeDiront}</div>
+                          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78 }}>{ov[`ceremony_${i}_sediront`] || t.fairepart.cardSeDiront}</div>
                           <div style={{ fontFamily: FS, fontSize: 'clamp(48px,12vw,80px)', color: G, textAlign: 'center', lineHeight: 1, marginBottom: 28 }}>{t.fairepart.cardOui}</div>
                         </>
                       ) : ceremony.type === 'Cérémonie religieuse / Houppa' ? (
