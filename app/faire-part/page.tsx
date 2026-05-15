@@ -968,10 +968,10 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           <Field label={t.fairepart.firstName} value={data.marie1Prenom} onChange={v => onChange({ marie1Prenom: v })} placeholder={t.fairepart.placeholderFirstName1} />
           <Field label={t.fairepart.lastName} value={data.marie1Nom} onChange={v => onChange({ marie1Nom: v })} placeholder={t.fairepart.placeholderLastName1} />
         </div>
-        <Field label={data.mariageJuif ? 'Prénom hébraïque (en français)' : t.fairepart.secondName} value={data.marie1Prenom2} onChange={v => onChange({ marie1Prenom2: v })} placeholder={data.mariageJuif ? 'Ex: Leana, Ilana...' : ''} />
+        {!data.mariageJuif && <Field label={t.fairepart.secondName} value={data.marie1Prenom2} onChange={v => onChange({ marie1Prenom2: v })} placeholder="" />}
         {data.mariageJuif && (
-          <div style={{ marginTop: 4 }}>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 4 }}>En hébreu (optionnel)</label>
+          <div style={{ marginTop: 8 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 4 }}>Prénom hébraïque (optionnel)</label>
             <input dir="rtl" lang="he" value={data.marie1PrenomHebreu ?? ''} onChange={e => onChange({ marie1PrenomHebreu: e.target.value })} placeholder="שרה"
               style={{ ...S.input, fontFamily: 'var(--font-bellefair), serif', fontSize: 18, textAlign: 'right' }} />
             <HebrewKeyboard value={data.marie1PrenomHebreu ?? ''} onChange={v => onChange({ marie1PrenomHebreu: v })} />
@@ -989,10 +989,10 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           <Field label={t.fairepart.firstName} value={data.marie2Prenom} onChange={v => onChange({ marie2Prenom: v })} placeholder={t.fairepart.placeholderFirstName2} />
           <Field label={t.fairepart.lastName} value={data.marie2Nom} onChange={v => onChange({ marie2Nom: v })} placeholder={t.fairepart.placeholderLastName2} />
         </div>
-        <Field label={data.mariageJuif ? 'Prénom hébraïque (en français)' : t.fairepart.secondName} value={data.marie2Prenom2} onChange={v => onChange({ marie2Prenom2: v })} placeholder={data.mariageJuif ? 'Ex: David, Yossef...' : ''} />
+        {!data.mariageJuif && <Field label={t.fairepart.secondName} value={data.marie2Prenom2} onChange={v => onChange({ marie2Prenom2: v })} placeholder="" />}
         {data.mariageJuif && (
-          <div style={{ marginTop: 4 }}>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 4 }}>En hébreu (optionnel)</label>
+          <div style={{ marginTop: 8 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 4 }}>Prénom hébraïque (optionnel)</label>
             <input dir="rtl" lang="he" value={data.marie2PrenomHebreu ?? ''} onChange={e => onChange({ marie2PrenomHebreu: e.target.value })} placeholder="דוד"
               style={{ ...S.input, fontFamily: 'var(--font-bellefair), serif', fontSize: 18, textAlign: 'right' }} />
             <HebrewKeyboard value={data.marie2PrenomHebreu ?? ''} onChange={v => onChange({ marie2PrenomHebreu: v })} />
