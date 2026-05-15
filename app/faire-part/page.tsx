@@ -86,7 +86,7 @@ const ORNEMENTS_LIBRARY: { id: string; url: string; nom: string }[] = [
   { id: 'orn9', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776783658/Design_sans_titre_tzwipm.png', nom: 'Floral 9' },
   { id: 'none', url: '', nom: 'Sans ornement' },
 ]
-
+\
 // ── Illustrations aquarelles Canva ────────────────────────────────────────────
 
 const ILLUSTRATIONS_COUPLES = [
@@ -5781,8 +5781,6 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
   const [shareModalOpen, setShareModalOpen] = useState(false)
   const [restoreModalOpen, setRestoreModalOpen] = useState(false)
   const [restoring, setRestoring] = useState(false)
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  const [deleting, setDeleting] = useState(false)
   const [guestUrl, setGuestUrl] = useState<string | null>(null)
   const [coupleUrl, setCoupleUrl] = useState<string | null>(null)
   const [sharing, setSharing] = useState(false)
@@ -5972,9 +5970,6 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         {lastShareId && (
           <button onClick={() => setRestoreModalOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: '1.5px solid #e0c8c8', background: 'transparent', color: '#a07070', fontSize: 12, fontWeight: 500 }}>Restaurer version initiale</button>
         )}
-        {lastShareId && (
-          <button onClick={() => setDeleteModalOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: '1.5px solid #e8c8c8', background: 'transparent', color: '#c06060', fontSize: 11, fontWeight: 500 }}>Supprimer ce faire-part</button>
-        )}
         </div>
       </div>
       {rsvpOpen && (
@@ -6034,37 +6029,6 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
                 setRestoreModalOpen(false)
               }} style={{ ...BTN, padding: '12px 24px', borderRadius: 9999, border: 'none', background: '#dc2626', color: 'white', fontSize: 14, fontWeight: 600, opacity: restoring ? 0.6 : 1 }}>
                 {restoring ? 'Restauration...' : 'Oui, restaurer'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {deleteModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={() => setDeleteModalOpen(false)}>
-          <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 16, padding: '28px 24px', maxWidth: 380, width: '100%', textAlign: 'center', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>🗑️</div>
-            <h3 style={{ margin: '0 0 12px', fontSize: 18, fontWeight: 700, color: '#1a1a1a' }}>Supprimer ce faire-part ?</h3>
-            <p style={{ fontSize: 14, color: '#666', lineHeight: 1.6, marginBottom: 24 }}>
-              Cette action est irréversible. Le faire-part, son lien de partage et toutes les réponses seront supprimés définitivement.
-            </p>
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-              <button onClick={() => setDeleteModalOpen(false)} style={{ ...BTN, padding: '12px 24px', borderRadius: 9999, border: '1.5px solid #ddd', background: 'white', color: '#666', fontSize: 14, fontWeight: 600 }}>Annuler</button>
-              <button disabled={deleting} onClick={async () => {
-                if (!lastShareId) return
-                setDeleting(true)
-                try {
-                  const res = await fetch('/api/delete-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ shareId: lastShareId }) })
-                  const json = await res.json()
-                  if (json.success) {
-                    try { localStorage.removeItem('wedding-draft'); localStorage.removeItem('lovit_share_id'); localStorage.removeItem('lovit_draft_time') } catch { /* ignore */ }
-                    showToast('Faire-part supprimé', 'success')
-                    window.location.href = '/faire-part'
-                  } else { showToast(json.error || 'Erreur', 'error') }
-                } catch { showToast('Erreur réseau', 'error') }
-                setDeleting(false)
-                setDeleteModalOpen(false)
-              }} style={{ ...BTN, padding: '12px 24px', borderRadius: 9999, border: 'none', background: '#dc2626', color: 'white', fontSize: 14, fontWeight: 600, opacity: deleting ? 0.6 : 1 }}>
-                {deleting ? 'Suppression...' : 'Oui, supprimer'}
               </button>
             </div>
           </div>
@@ -6332,28 +6296,21 @@ export default function FairePartPage() {
     }
 
     if (id) {
-      // Vue partagée — charger depuis Redis uniquement
+      // Vue partagée — pas de protection
       setIsShared(true)
+      setRole(r)
       setAccessGranted(true)
       setCheckingAccess(false)
       setLoadingShare(true)
-      // Pour role=edit ou role=couple, vérifier la propriété via l'auth
-      const needsAuth = r === 'edit' || r === 'couple'
-      const authCheck = needsAuth ? fetch('/api/auth/me').then(res => res.ok ? res.json() : null).catch(() => null) : Promise.resolve(null)
-      Promise.all([
-        fetch(`/api/get-share?id=${id}`).then(res => res.json()),
-        authCheck
-      ]).then(([d, authData]: [FormData & { ownerEmail?: string }, { email?: string } | null]) => {
-          // Reconstruire photosData.url depuis photosFond
+      fetch(`/api/get-share?id=${id}`)
+        .then(res => res.json())
+        .then((d: FormData) => {
+          // Reconstruire photosData.url depuis photosFond (supprimé avant envoi pour économiser de l'espace)
           if (d.photosFond?.length && d.photosData?.length) {
             d.photosData = d.photosData.map((c, i) => ({ ...c, url: d.photosFond![i] ?? '' }))
           }
-          // Vérifier la propriété pour edit/couple
-          const isOwner = authData?.email && d.ownerEmail && authData.email === d.ownerEmail
-          const safeRole = (r === 'edit' || r === 'couple') && !isOwner ? 'guest' : r
-          setRole(safeRole)
           setFormData(d)
-          if (safeRole === 'edit') {
+          if (r === 'edit') {
             // Mode édition : revenir au formulaire local (pas en mode partagé)
             setIsShared(false)
             setRole(null)
@@ -6462,22 +6419,14 @@ export default function FairePartPage() {
         // Si connecté et qu'on a des faire-parts, tenter de charger le brouillon serveur
         const faireparts: string[] = data.faireparts ?? []
         if (faireparts.length > 0) {
+          // Charger le dernier faire-part
           const shareId = faireparts[faireparts.length - 1]
           try {
             const draftRes = await fetch(`/api/get-draft?shareId=${shareId}`)
             if (draftRes.ok) {
               const draftData = await draftRes.json()
               if (!cancelled && draftData.formData) {
-                // Comparer timestamps : prendre la version la plus récente
-                const serverTime = draftData.savedAt ? new Date(draftData.savedAt).getTime() : 0
-                let localTime = 0
-                try {
-                  const localTs = localStorage.getItem('lovit_draft_time')
-                  if (localTs) localTime = parseInt(localTs, 10)
-                } catch { /* ignore */ }
-                if (serverTime >= localTime) {
-                  setFormData(draftData.formData as FormData)
-                }
+                setFormData(draftData.formData as FormData)
                 setHasDraft(true)
                 setAccessGranted(true)
                 setCheckingAccess(false)
@@ -6524,7 +6473,6 @@ export default function FairePartPage() {
       // pour ne JAMAIS perdre le travail si l'onglet est fermé
       try {
         localStorage.setItem('wedding-draft', JSON.stringify(next))
-        localStorage.setItem('lovit_draft_time', String(Date.now()))
         setSavedAt(new Date())
       } catch { /* quota localStorage dépassé, ignore */ }
       // ✅ Sauvegarde serveur (debounced) si connecté
