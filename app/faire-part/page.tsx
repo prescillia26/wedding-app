@@ -6426,14 +6426,22 @@ export default function FairePartPage() {
         // Si connecté et qu'on a des faire-parts, tenter de charger le brouillon serveur
         const faireparts: string[] = data.faireparts ?? []
         if (faireparts.length > 0) {
-          // Charger le dernier faire-part
           const shareId = faireparts[faireparts.length - 1]
           try {
             const draftRes = await fetch(`/api/get-draft?shareId=${shareId}`)
             if (draftRes.ok) {
               const draftData = await draftRes.json()
               if (!cancelled && draftData.formData) {
-                setFormData(draftData.formData as FormData)
+                // Comparer timestamps : prendre la version la plus récente
+                const serverTime = draftData.savedAt ? new Date(draftData.savedAt).getTime() : 0
+                let localTime = 0
+                try {
+                  const localTs = localStorage.getItem('lovit_draft_time')
+                  if (localTs) localTime = parseInt(localTs, 10)
+                } catch { /* ignore */ }
+                if (serverTime >= localTime) {
+                  setFormData(draftData.formData as FormData)
+                }
                 setHasDraft(true)
                 setAccessGranted(true)
                 setCheckingAccess(false)
@@ -6480,6 +6488,7 @@ export default function FairePartPage() {
       // pour ne JAMAIS perdre le travail si l'onglet est fermé
       try {
         localStorage.setItem('wedding-draft', JSON.stringify(next))
+        localStorage.setItem('lovit_draft_time', String(Date.now()))
         setSavedAt(new Date())
       } catch { /* quota localStorage dépassé, ignore */ }
       // ✅ Sauvegarde serveur (debounced) si connecté
