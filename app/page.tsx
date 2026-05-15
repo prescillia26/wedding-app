@@ -299,7 +299,7 @@ export default function Home() {
           <a href="/mentions-legales" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>{c.legalNotice}</a>
           <a href="/cgv" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>{c.terms}</a>
           <a href="/politique-de-confidentialite" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>{c.privacyPolicy}</a>
-          <a href="mailto:contact@getlovit.fr" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>{c.contact}</a>
+          <a href="/contact" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>{c.contact}</a>
         </div>
         <Separator />
         <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: 'rgba(255,255,255,0.3)', marginTop: 24, marginBottom: 0 }}>

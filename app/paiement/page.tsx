@@ -210,7 +210,7 @@ export default function PaiementPage() {
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 28, color: `${GOLD}66`, marginBottom: 8 }}>Lov&apos;it</div>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 8 }}>
           <a href="/mentions-legales" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: '#8a7860', textDecoration: 'none' }}>{t.common.legalNotice}</a>
-          <a href="mailto:contact@getlovit.fr" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: '#8a7860', textDecoration: 'none' }}>{t.common.contact}</a>
+          <a href="/contact" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: '#8a7860', textDecoration: 'none' }}>{t.common.contact}</a>
         </div>
         <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 12, color: '#c4b5a0', margin: 0 }}>
           © 2026 Lov&apos;it — faire-parts de mariage digitaux
