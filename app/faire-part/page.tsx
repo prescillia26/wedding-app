@@ -902,6 +902,31 @@ function ProgressBar({ step }: { step: number }) {
   )
 }
 
+function HebrewKeyboardHelp() {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)} style={{ ...BTN, background: 'none', border: 'none', fontSize: 11, color: '#9ca3af', textDecoration: 'underline', marginTop: 8, padding: 0 }}>
+        Comment écrire en hébreu ?
+      </button>
+      {open && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={() => setOpen(false)}>
+          <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 16, padding: '24px', maxWidth: 380, width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 700 }}>Pour saisir votre prénom en hébreu</h3>
+            <div style={{ fontSize: 13, color: '#444', lineHeight: 1.8 }}>
+              <p style={{ marginBottom: 10 }}><strong>Sur iPhone :</strong> Réglages → Général → Clavier → Ajouter clavier → Hébreu, puis appuyez sur le globe pour basculer</p>
+              <p style={{ marginBottom: 10 }}><strong>Sur Mac :</strong> Préférences Système → Clavier → Sources de saisie → + → Hébreu</p>
+              <p style={{ marginBottom: 10 }}><strong>Sur Android :</strong> Paramètres → Langues et saisie → Clavier → Ajouter → עברית</p>
+              <p>Vous pouvez aussi copier-coller depuis Google Translate</p>
+            </div>
+            <button type="button" onClick={() => setOpen(false)} style={{ ...BTN, marginTop: 16, width: '100%', padding: '12px', borderRadius: 9999, border: 'none', background: '#C9A84C', color: 'white', fontSize: 14, fontWeight: 600 }}>Compris</button>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
 function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
   const { t } = useT()
   return (
@@ -914,6 +939,13 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           <Field label={t.fairepart.lastName} value={data.marie1Nom} onChange={v => onChange({ marie1Nom: v })} placeholder={t.fairepart.placeholderLastName1} />
         </div>
         <Field label={t.fairepart.secondName} value={data.marie1Prenom2} onChange={v => onChange({ marie1Prenom2: v })} placeholder="" />
+        {data.mariageJuif && (
+          <div style={{ marginTop: 8 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 4 }}>Prénom hébraïque (optionnel)</label>
+            <input dir="rtl" lang="he" value={data.marie1PrenomHebreu ?? ''} onChange={e => onChange({ marie1PrenomHebreu: e.target.value })} placeholder="שרה"
+              style={{ ...S.input, fontFamily: 'var(--font-bellefair), serif', fontSize: 18, textAlign: 'right' }} />
+          </div>
+        )}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '16px 0' }}>
         <div style={{ flex: 1, height: 1, background: '#e0d5c8' }} />
@@ -927,7 +959,17 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           <Field label={t.fairepart.lastName} value={data.marie2Nom} onChange={v => onChange({ marie2Nom: v })} placeholder={t.fairepart.placeholderLastName2} />
         </div>
         <Field label={t.fairepart.secondName} value={data.marie2Prenom2} onChange={v => onChange({ marie2Prenom2: v })} placeholder="" />
+        {data.mariageJuif && (
+          <div style={{ marginTop: 8 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 4 }}>Prénom hébraïque (optionnel)</label>
+            <input dir="rtl" lang="he" value={data.marie2PrenomHebreu ?? ''} onChange={e => onChange({ marie2PrenomHebreu: e.target.value })} placeholder="דוד"
+              style={{ ...S.input, fontFamily: 'var(--font-bellefair), serif', fontSize: 18, textAlign: 'right' }} />
+          </div>
+        )}
       </div>
+      {data.mariageJuif && (
+        <HebrewKeyboardHelp />
+      )}
       <div style={{ marginTop: 20, padding: 16, background: '#fdf8f0', borderRadius: 12 }}>
   <Label>{t.fairepart.customLink} (optionnel)</Label>
   <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Ex: sarah-et-david → lovit.fr/sarah-et-david</p>
@@ -2388,11 +2430,13 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 8, marginBottom: 24 }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(32px, 10vw, 68px)', color: theme.accent, lineHeight: 1.1 }}>{data.marie1Prenom || 'Prénom'}</div>
+            {data.mariageJuif && data.marie1PrenomHebreu && <div dir="rtl" lang="he" style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 'clamp(14px, 3.5vw, 22px)', color: theme.accent, opacity: 0.7, marginTop: 2 }}>{data.marie1PrenomHebreu}</div>}
             {data.marie1Prenom2 && <div style={{ fontSize: 11, letterSpacing: 2, color: theme.textSecondaire, marginTop: 4 }}>{data.marie1Prenom2}</div>}
           </div>
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 'clamp(24px, 5vw, 36px)', color: theme.accent }}>&</div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(32px, 10vw, 68px)', color: theme.accent, lineHeight: 1.1 }}>{data.marie2Prenom || 'Prénom'}</div>
+            {data.mariageJuif && data.marie2PrenomHebreu && <div dir="rtl" lang="he" style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 'clamp(14px, 3.5vw, 22px)', color: theme.accent, opacity: 0.7, marginTop: 2 }}>{data.marie2PrenomHebreu}</div>}
             {data.marie2Prenom2 && <div style={{ fontSize: 11, letterSpacing: 2, color: theme.textSecondaire, marginTop: 4 }}>{data.marie2Prenom2}</div>}
           </div>
         </div>
@@ -2628,11 +2672,13 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 8, marginBottom: 28 }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(32px, 10vw, 68px)', color: theme.accent, lineHeight: 1.1 }}>{data.marie1Prenom || 'Prénom'}</div>
+            {data.mariageJuif && data.marie1PrenomHebreu && <div dir="rtl" lang="he" style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 'clamp(14px, 3.5vw, 22px)', color: theme.accent, opacity: 0.7, marginTop: 2 }}>{data.marie1PrenomHebreu}</div>}
             {data.marie1Prenom2 && <div style={{ fontSize: 11, letterSpacing: 2, color: theme.textSecondaire, marginTop: 4 }}>{data.marie1Prenom2}</div>}
           </div>
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 'clamp(24px, 5vw, 36px)', color: theme.accent }}>&</div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(32px, 10vw, 68px)', color: theme.accent, lineHeight: 1.1 }}>{data.marie2Prenom || 'Prénom'}</div>
+            {data.mariageJuif && data.marie2PrenomHebreu && <div dir="rtl" lang="he" style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 'clamp(14px, 3.5vw, 22px)', color: theme.accent, opacity: 0.7, marginTop: 2 }}>{data.marie2PrenomHebreu}</div>}
             {data.marie2Prenom2 && <div style={{ fontSize: 11, letterSpacing: 2, color: theme.textSecondaire, marginTop: 4 }}>{data.marie2Prenom2}</div>}
           </div>
         </div>
@@ -5445,10 +5491,16 @@ const firstDate = sorted[0]?.date
                     )}
                     {(ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Mairie') && (
                       <DraggableElement id={pre+"prenoms"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={250} skipAnim={canEdit}>
-                        <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.15, marginBottom: 4, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom}</div>
+                        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
+                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, lineHeight: 1.15, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom}</div>
+                          {data.mariageJuif && data.marie1PrenomHebreu && <div dir="rtl" lang="he" style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 'clamp(18px,4.5vw,28px)', color: G, opacity: 0.7, lineHeight: 1.2 }}>{data.marie1PrenomHebreu}</div>}
+                        </div>
                         {data.marie1Prenom2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(12px,3vw,16px)', letterSpacing: 2, color: G, textAlign: 'center', marginBottom: 4, opacity: 0.7 }}>{data.marie1Prenom2}</div>}
                         <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 22, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.55, letterSpacing: 2 }}>&</div>
-                        <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.15, marginBottom: 4, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom}</div>
+                        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
+                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, lineHeight: 1.15, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom}</div>
+                          {data.mariageJuif && data.marie2PrenomHebreu && <div dir="rtl" lang="he" style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 'clamp(18px,4.5vw,28px)', color: G, opacity: 0.7, lineHeight: 1.2 }}>{data.marie2PrenomHebreu}</div>}
+                        </div>
                         {data.marie2Prenom2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(12px,3vw,16px)', letterSpacing: 2, color: G, textAlign: 'center', marginBottom: 12, opacity: 0.7 }}>{data.marie2Prenom2}</div>}
                       </AnimSection></DraggableElement>
                     )}
