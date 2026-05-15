@@ -87,6 +87,7 @@ const ORNEMENTS_LIBRARY: { id: string; url: string; nom: string }[] = [
   { id: 'none', url: '', nom: 'Sans ornement' },
 ]
 
+
 // ── Illustrations aquarelles Canva ────────────────────────────────────────────
 
 const ILLUSTRATIONS_COUPLES = [
@@ -2227,10 +2228,10 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
     <div style={{ position: 'relative', width: '100%', margin: 0, padding: 0, background: hasFrame ? '#ffffff' : themeCardBg, overflow: 'hidden' }}>
       {hasFrame && !isVideo && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: frameOpacity, transform: `scale(${frameSize / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
+        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: frameOpacity, transform: `scale(${frameSize / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
       )}
       {hasFrame && isVideo && (
-        <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', opacity: frameOpacity, pointerEvents: 'none', zIndex: 1 }} />
+        <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: frameOpacity, pointerEvents: 'none', zIndex: 1 }} />
       )}
       <OrnementCorner url={ornUrl} corner="top-right" size={130} />
       <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
@@ -4400,88 +4401,40 @@ const OrnementDentelleDore = ({ style = {} }: { style?: React.CSSProperties }) =
 type CropData = { url: string; cropX: number; cropY: number; cropScale: number }
 function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; themeAccent: string; photosData?: CropData[] }) {
   const valid = photos.filter(p => p && p.length > 0)
-  const [idx, setIdx] = useState(0)
-  const [fading, setFading] = useState(false)
+  const [activeIdx, setActiveIdx] = useState(0)
 
   useEffect(() => {
     if (valid.length <= 1) return
     const t = setInterval(() => {
-      setFading(true) // commence le fade-out
-      setTimeout(() => {
-        setIdx(p => (p + 1) % valid.length) // change la photo PENDANT le fade
-        setFading(false) // fade-in de la nouvelle photo
-      }, 500)
+      setActiveIdx(p => (p + 1) % valid.length)
     }, 4500)
     return () => clearInterval(t)
   }, [valid.length])
-  const visible = !fading
 
   if (valid.length === 0) return null
 
-  // Récupère le crop manuel pour la photo courante (si recadrée manuellement)
-  const crop = photosData?.[idx]
-  const hasCustomCrop = crop && (crop.cropX !== 0 || crop.cropY !== 0 || (crop.cropScale && crop.cropScale !== 1))
-
-  // ── Source de la photo ──
-  // - Si crop manuel : on utilise l'URL originale (le transform CSS gère le crop)
-  // - Sinon : on utilise l'URL avec recadrage IA automatique sur les visages
-  const photoSrc = hasCustomCrop ? valid[idx] : toCloudinaryFaceCrop(valid[idx])
-
   return (
     <>
-      {hasCustomCrop ? (
-        // ── Mode crop manuel : photo recadrée manuellement ──────────────
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            overflow: 'hidden',
-            zIndex: 0,
-            pointerEvents: 'none',
-          }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={photoSrc}
-            alt=""
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              width: 'auto',
-              height: '100%',
-              transform: `translate(calc(-50% + ${crop!.cropX}px), calc(-50% + ${crop!.cropY}px)) scale(${crop!.cropScale})`,
-              transformOrigin: 'center center',
-              opacity: visible ? 1 : 0,
-              transition: 'opacity 0.6s ease',
-              maxWidth: 'none',
-            }}
-          />
-        </div>
-      ) : (
-        // ── Mode IA automatique : crop sur les visages par Cloudinary ────
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={photoSrc}
-          alt=""
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center',
-            opacity: visible ? 1 : 0,
-            transition: 'opacity 0.6s ease',
-            zIndex: 0,
-            pointerEvents: 'none',
-          }}
-        />
-      )}
+      {/* Toutes les photos empilées — seule l'active a opacity 1 */}
+      {valid.map((photo, i) => {
+        const crop = photosData?.[i]
+        const hasCustomCrop = crop && (crop.cropX !== 0 || crop.cropY !== 0 || (crop.cropScale && crop.cropScale !== 1))
+        const photoSrc = hasCustomCrop ? photo : toCloudinaryFaceCrop(photo)
+        const isActive = i === activeIdx
+
+        if (hasCustomCrop) {
+          return (
+            <div key={i} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', zIndex: 0, pointerEvents: 'none', opacity: isActive ? 1 : 0, transition: 'opacity 1s ease' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={photoSrc} alt="" style={{ position: 'absolute', top: '50%', left: '50%', width: 'auto', height: '100%', transform: `translate(calc(-50% + ${crop!.cropX}px), calc(-50% + ${crop!.cropY}px)) scale(${crop!.cropScale})`, transformOrigin: 'center center', maxWidth: 'none' }} />
+            </div>
+          )
+        }
+        return (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img key={i} src={photoSrc} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', opacity: isActive ? 1 : 0, transition: 'opacity 1s ease', zIndex: 0, pointerEvents: 'none' }} />
+        )
+      })}
       {/* Voile sombre couvrant tout l'écran pour la lisibilité du texte sur n'importe quelle photo */}
       <div
         style={{
@@ -4495,7 +4448,7 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
       {valid.length > 1 && (
         <div style={{ position: 'absolute', bottom: 80, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6, zIndex: 5, pointerEvents: 'none' }}>
           {valid.map((_, i) => (
-            <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: i === idx ? themeAccent : 'rgba(255,255,255,0.5)', transition: 'background 0.3s' }} />
+            <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: i === activeIdx ? themeAccent : 'rgba(255,255,255,0.5)', transition: 'background 0.3s' }} />
           ))}
         </div>
       )}
@@ -5450,10 +5403,10 @@ const firstDate = sorted[0]?.date
               <CeremonyCard isCard={isCard} accent={G}>
                 <section id={`ceremony-${realIdx}`} style={{ paddingTop: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingBottom: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingLeft: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: (role !== 'guest' && !!onUpdate) ? 'visible' : 'hidden', scrollMarginTop: 60, ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
                   {hasFrame && frame.video ? (
-                    <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
+                    <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
                   ) : hasFrame ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', mixBlendMode: 'multiply', opacity: data.frameOpacity ?? 1, transform: `scale(${(data.frameSize ?? 100) / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+                    <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: data.frameOpacity ?? 1, transform: `scale(${(data.frameSize ?? 100) / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
                   ) : usePhotoBg ? (
                     <>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
