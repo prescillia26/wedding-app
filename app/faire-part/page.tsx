@@ -5438,9 +5438,11 @@ const firstDate = sorted[0]?.date
                     )}
                     {(ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Mairie') && (
                       <DraggableElement id={pre+"prenoms"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={250} skipAnim={canEdit}>
-                        <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.15, marginBottom: 8, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom}</div>
+                        <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.15, marginBottom: 4, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom}</div>
+                        {data.marie1Prenom2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(12px,3vw,16px)', letterSpacing: 2, color: G, textAlign: 'center', marginBottom: 4, opacity: 0.7 }}>{data.marie1Prenom2}</div>}
                         <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 22, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.55, letterSpacing: 2 }}>&</div>
-                        <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.15, marginBottom: 16, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom}</div>
+                        <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(38px,9vw,56px)', color: G, textAlign: 'center', lineHeight: 1.15, marginBottom: 4, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom}</div>
+                        {data.marie2Prenom2 && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(12px,3vw,16px)', letterSpacing: 2, color: G, textAlign: 'center', marginBottom: 12, opacity: 0.7 }}>{data.marie2Prenom2}</div>}
                       </AnimSection></DraggableElement>
                     )}
                     <DraggableElement id={pre+"narratif"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={280} skipAnim={canEdit}>
