@@ -16,6 +16,14 @@ export async function POST(request: Request) {
     const shareId = data.shareId
     if (!shareId) return Response.json({ error: 'shareId manquant' }, { status: 400 })
 
+    // Rate limiting : 5 RSVP par shareId par minute
+    const rlKey = `ratelimit:rsvp:${shareId}`
+    const rlAttempts = await redis.get<number>(rlKey) ?? 0
+    if (rlAttempts >= 5) {
+      return Response.json({ error: 'Trop de soumissions. Réessayez dans une minute.' }, { status: 429 })
+    }
+    await redis.set(rlKey, rlAttempts + 1, { ex: 60 })
+
     const key = `rsvp:${shareId}`
     const existing = await redis.get<Record<string, unknown>[]>(key) ?? []
     // Déduplication : si même nom (insensible casse), on REMPLACE l'ancienne réponse

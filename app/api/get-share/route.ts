@@ -1,4 +1,5 @@
 import { Redis } from '@upstash/redis'
+import { getSession } from '@/lib/auth'
 
 const redis = new Redis({
   url: process.env.KV_REST_API_URL!,
@@ -12,11 +13,18 @@ export async function GET(request: Request) {
     if (!id || !/^[0-9a-f-]+$/i.test(id)) {
       return Response.json({ error: 'ID invalide' }, { status: 400 })
     }
-    const data = await redis.get(id)
+    const data = await redis.get<Record<string, unknown>>(id)
     if (!data) {
       return Response.json({ error: 'Faire-part introuvable' }, { status: 404 })
     }
-    return Response.json(data)
+    // Retourner ownerEmail SEULEMENT si le requester est le propriétaire
+    const session = await getSession()
+    if (session?.email && data.ownerEmail === session.email) {
+      return Response.json(data) // Propriétaire → données complètes
+    }
+    // Visiteur → cacher ownerEmail
+    const { ownerEmail: _owner, ...safeData } = data
+    return Response.json(safeData)
   } catch (err) {
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
   }
