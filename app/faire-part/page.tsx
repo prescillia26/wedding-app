@@ -2228,10 +2228,10 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
     <div style={{ position: 'relative', width: '100%', margin: 0, padding: 0, background: hasFrame ? '#ffffff' : themeCardBg, overflow: 'hidden' }}>
       {hasFrame && !isVideo && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply', opacity: frameOpacity, transform: `scale(${frameSize / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
+        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: frameOpacity, transform: `scale(${frameSize / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
       )}
       {hasFrame && isVideo && (
-        <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain', opacity: frameOpacity, pointerEvents: 'none', zIndex: 1 }} />
+        <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: frameOpacity, pointerEvents: 'none', zIndex: 1 }} />
       )}
       <OrnementCorner url={ornUrl} corner="top-right" size={130} />
       <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
@@ -5403,10 +5403,10 @@ const firstDate = sorted[0]?.date
               <CeremonyCard isCard={isCard} accent={G}>
                 <section id={`ceremony-${realIdx}`} style={{ paddingTop: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingBottom: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingLeft: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: (role !== 'guest' && !!onUpdate) ? 'visible' : 'hidden', scrollMarginTop: 60, ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
                   {hasFrame && frame.video ? (
-                    <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
+                    <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
                   ) : hasFrame ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply', opacity: data.frameOpacity ?? 1, transform: `scale(${(data.frameSize ?? 100) / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+                    <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: data.frameOpacity ?? 1, transform: `scale(${(data.frameSize ?? 100) / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
                   ) : usePhotoBg ? (
                     <>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
