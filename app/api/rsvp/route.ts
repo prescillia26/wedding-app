@@ -17,9 +17,12 @@ export async function POST(request: Request) {
     if (!shareId) return Response.json({ error: 'shareId manquant' }, { status: 400 })
 
     const key = `rsvp:${shareId}`
-    const existing = await redis.get<unknown[]>(key) ?? []
-    existing.push(data)
-    await redis.set(key, existing)
+    const existing = await redis.get<Record<string, unknown>[]>(key) ?? []
+    // Déduplication : si même nom (insensible casse), on REMPLACE l'ancienne réponse
+    const guestName = (data.nom ?? '').trim().toLowerCase()
+    const deduped = guestName ? existing.filter(e => (e.nom as string ?? '').trim().toLowerCase() !== guestName) : existing
+    deduped.push(data)
+    await redis.set(key, deduped)
 
     // Envoyer email de notification aux mariés
     const emailMaries = await redis.get<string>(`email:${shareId}`)
