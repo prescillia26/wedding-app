@@ -6,9 +6,21 @@ const redis = new Redis({
 })
 
 // Vérifie si un code d'accès (généré après paiement Stripe) est valide
-// Accepte GET ?code=XXX (pour l'auto-validation) et POST (pour compat future)
+// Rate limiting par IP pour empêcher le brute-force
+async function rateLimit(request: Request): Promise<boolean> {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  const rlKey = `ratelimit:access:${ip}`
+  const attempts = await redis.get<number>(rlKey) ?? 0
+  if (attempts >= 10) return false
+  await redis.set(rlKey, attempts + 1, { ex: 60 })
+  return true
+}
+
 export async function GET(request: Request) {
   try {
+    if (!(await rateLimit(request))) {
+      return Response.json({ valid: false, reason: 'Trop de tentatives. Réessayez dans une minute.' }, { status: 429 })
+    }
     const { searchParams } = new URL(request.url)
     const code = searchParams.get('code')
     if (!code) return Response.json({ valid: false, reason: 'Code manquant' })
@@ -25,6 +37,9 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    if (!(await rateLimit(request))) {
+      return Response.json({ valid: false, reason: 'Trop de tentatives. Réessayez dans une minute.' }, { status: 429 })
+    }
     const { code } = await request.json() as { code: string }
     const normalized = code?.toUpperCase().trim()
     if (!normalized) return Response.json({ valid: false, reason: 'Code manquant' })

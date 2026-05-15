@@ -86,7 +86,7 @@ const ORNEMENTS_LIBRARY: { id: string; url: string; nom: string }[] = [
   { id: 'orn9', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776783658/Design_sans_titre_tzwipm.png', nom: 'Floral 9' },
   { id: 'none', url: '', nom: 'Sans ornement' },
 ]
-\
+
 // ── Illustrations aquarelles Canva ────────────────────────────────────────────
 
 const ILLUSTRATIONS_COUPLES = [
