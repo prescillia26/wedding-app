@@ -903,28 +903,57 @@ function ProgressBar({ step }: { step: number }) {
   )
 }
 
-function HebrewKeyboardHelp() {
+const HEBREW_ROWS = [
+  ['ק', 'ר', 'א', 'ט', 'ו', 'ן', 'ם', 'פ'],
+  ['ש', 'ד', 'ג', 'כ', 'ע', 'י', 'ח', 'ל'],
+  ['ז', 'ס', 'ב', 'ה', 'נ', 'מ', 'צ', 'ת'],
+]
+const HEBREW_NIQQUD = ['ָ', 'ַ', 'ִ', 'ֵ', 'ֶ', 'ֹ', 'ּ', 'ְ']
+
+function HebrewKeyboard({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [open, setOpen] = useState(false)
+  const addChar = (ch: string) => onChange(value + ch)
+  const backspace = () => onChange(value.slice(0, -1))
+
+  if (!open) return (
+    <button type="button" onClick={() => setOpen(true)} style={{ ...BTN, background: 'none', border: 'none', fontSize: 11, color: '#C9A84C', textDecoration: 'underline', marginTop: 4, padding: 0 }}>
+      Ouvrir le clavier hébreu
+    </button>
+  )
+
+  const keyStyle: React.CSSProperties = {
+    ...BTN, minWidth: 32, height: 36, borderRadius: 6, border: '1px solid #e0d5c8',
+    background: 'white', fontFamily: 'var(--font-bellefair), serif', fontSize: 18,
+    color: '#3a3330', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    boxShadow: '0 1px 2px rgba(0,0,0,0.06)', padding: '0 4px',
+  }
+  const niqqudStyle: React.CSSProperties = {
+    ...keyStyle, minWidth: 28, height: 30, fontSize: 20, color: '#C9A84C', border: '1px solid #f0e8d8',
+  }
+
   return (
-    <>
-      <button type="button" onClick={() => setOpen(true)} style={{ ...BTN, background: 'none', border: 'none', fontSize: 11, color: '#9ca3af', textDecoration: 'underline', marginTop: 8, padding: 0 }}>
-        Comment écrire en hébreu ?
-      </button>
-      {open && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={() => setOpen(false)}>
-          <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 16, padding: '24px', maxWidth: 380, width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
-            <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 700 }}>Pour saisir votre prénom en hébreu</h3>
-            <div style={{ fontSize: 13, color: '#444', lineHeight: 1.8 }}>
-              <p style={{ marginBottom: 10 }}><strong>Sur iPhone :</strong> Réglages → Général → Clavier → Ajouter clavier → Hébreu, puis appuyez sur le globe pour basculer</p>
-              <p style={{ marginBottom: 10 }}><strong>Sur Mac :</strong> Préférences Système → Clavier → Sources de saisie → + → Hébreu</p>
-              <p style={{ marginBottom: 10 }}><strong>Sur Android :</strong> Paramètres → Langues et saisie → Clavier → Ajouter → עברית</p>
-              <p>Vous pouvez aussi copier-coller depuis Google Translate</p>
-            </div>
-            <button type="button" onClick={() => setOpen(false)} style={{ ...BTN, marginTop: 16, width: '100%', padding: '12px', borderRadius: 9999, border: 'none', background: '#C9A84C', color: 'white', fontSize: 14, fontWeight: 600 }}>Compris</button>
-          </div>
+    <div style={{ marginTop: 8, padding: 12, background: '#f8f4ee', borderRadius: 12, border: '1px solid #e8e0d4' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <span style={{ fontSize: 11, color: '#8a7e72', fontWeight: 600 }}>Clavier hébreu</span>
+        <button type="button" onClick={() => setOpen(false)} style={{ ...BTN, background: 'none', border: 'none', fontSize: 14, color: '#9ca3af', padding: 0 }}>✕</button>
+      </div>
+      {HEBREW_ROWS.map((row, ri) => (
+        <div key={ri} style={{ display: 'flex', gap: 4, justifyContent: 'center', marginBottom: 4 }}>
+          {row.map(ch => (
+            <button key={ch} type="button" onClick={() => addChar(ch)} style={keyStyle}>{ch}</button>
+          ))}
         </div>
-      )}
-    </>
+      ))}
+      <div style={{ display: 'flex', gap: 4, justifyContent: 'center', marginTop: 4, marginBottom: 4 }}>
+        {HEBREW_NIQQUD.map(ch => (
+          <button key={ch} type="button" onClick={() => addChar(ch)} style={niqqudStyle}>{'א' + ch}</button>
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 6 }}>
+        <button type="button" onClick={() => addChar(' ')} style={{ ...keyStyle, flex: 1, fontSize: 11, color: '#9ca3af' }}>Espace</button>
+        <button type="button" onClick={backspace} style={{ ...keyStyle, minWidth: 60, fontSize: 13, color: '#dc2626' }}>← Effacer</button>
+      </div>
+    </div>
   )
 }
 
@@ -945,6 +974,7 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 4 }}>Prénom hébraïque (optionnel)</label>
             <input dir="rtl" lang="he" value={data.marie1PrenomHebreu ?? ''} onChange={e => onChange({ marie1PrenomHebreu: e.target.value })} placeholder="שרה"
               style={{ ...S.input, fontFamily: 'var(--font-bellefair), serif', fontSize: 18, textAlign: 'right' }} />
+            <HebrewKeyboard value={data.marie1PrenomHebreu ?? ''} onChange={v => onChange({ marie1PrenomHebreu: v })} />
           </div>
         )}
       </div>
@@ -965,12 +995,10 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 4 }}>Prénom hébraïque (optionnel)</label>
             <input dir="rtl" lang="he" value={data.marie2PrenomHebreu ?? ''} onChange={e => onChange({ marie2PrenomHebreu: e.target.value })} placeholder="דוד"
               style={{ ...S.input, fontFamily: 'var(--font-bellefair), serif', fontSize: 18, textAlign: 'right' }} />
+            <HebrewKeyboard value={data.marie2PrenomHebreu ?? ''} onChange={v => onChange({ marie2PrenomHebreu: v })} />
           </div>
         )}
       </div>
-      {data.mariageJuif && (
-        <HebrewKeyboardHelp />
-      )}
       <div style={{ marginTop: 20, padding: 16, background: '#fdf8f0', borderRadius: 12 }}>
   <Label>{t.fairepart.customLink} (optionnel)</Label>
   <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Ex: sarah-et-david → lovit.fr/sarah-et-david</p>
