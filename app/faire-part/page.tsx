@@ -6296,21 +6296,28 @@ export default function FairePartPage() {
     }
 
     if (id) {
-      // Vue partagée — pas de protection
+      // Vue partagée — charger depuis Redis uniquement
       setIsShared(true)
-      setRole(r)
       setAccessGranted(true)
       setCheckingAccess(false)
       setLoadingShare(true)
-      fetch(`/api/get-share?id=${id}`)
-        .then(res => res.json())
-        .then((d: FormData) => {
-          // Reconstruire photosData.url depuis photosFond (supprimé avant envoi pour économiser de l'espace)
+      // Pour role=edit ou role=couple, vérifier la propriété via l'auth
+      const needsAuth = r === 'edit' || r === 'couple'
+      const authCheck = needsAuth ? fetch('/api/auth/me').then(res => res.ok ? res.json() : null).catch(() => null) : Promise.resolve(null)
+      Promise.all([
+        fetch(`/api/get-share?id=${id}`).then(res => res.json()),
+        authCheck
+      ]).then(([d, authData]: [FormData & { ownerEmail?: string }, { email?: string } | null]) => {
+          // Reconstruire photosData.url depuis photosFond
           if (d.photosFond?.length && d.photosData?.length) {
             d.photosData = d.photosData.map((c, i) => ({ ...c, url: d.photosFond![i] ?? '' }))
           }
+          // Vérifier la propriété pour edit/couple
+          const isOwner = authData?.email && d.ownerEmail && authData.email === d.ownerEmail
+          const safeRole = (r === 'edit' || r === 'couple') && !isOwner ? 'guest' : r
+          setRole(safeRole)
           setFormData(d)
-          if (r === 'edit') {
+          if (safeRole === 'edit') {
             // Mode édition : revenir au formulaire local (pas en mode partagé)
             setIsShared(false)
             setRole(null)
