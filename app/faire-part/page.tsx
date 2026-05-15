@@ -5643,6 +5643,8 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
   const [zoneStyles, setZoneStyles] = useState<ZoneStyles>(data.zoneStyles ?? {})
   const [textEditOpen, setTextEditOpen] = useState(false)
   const [shareModalOpen, setShareModalOpen] = useState(false)
+  const [restoreModalOpen, setRestoreModalOpen] = useState(false)
+  const [restoring, setRestoring] = useState(false)
   const [guestUrl, setGuestUrl] = useState<string | null>(null)
   const [coupleUrl, setCoupleUrl] = useState<string | null>(null)
   const [sharing, setSharing] = useState(false)
@@ -5829,6 +5831,9 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
           <a href={`/plan-table?shareId=${lastShareId}`} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>{t.fairepart.tablesBtn}</a>
         )}
         <a href="/paiement" style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: '1.5px solid #e5d5c5', background: 'transparent', color: '#8a7860', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>{t.fairepart.newBtn}</a>
+        {lastShareId && (
+          <button onClick={() => setRestoreModalOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: '1.5px solid #e0c8c8', background: 'transparent', color: '#a07070', fontSize: 12, fontWeight: 500 }}>Restaurer version initiale</button>
+        )}
         </div>
       </div>
       {rsvpOpen && (
@@ -5838,18 +5843,60 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         <RSVPListModal accent={theme.accent} onClose={() => setRsvpListOpen(false)} shareId={lastShareId} ceremonies={sorted} />
       )}
       {textEditOpen && (
-  <TextEditModal 
-    ceremonies={sorted} 
-    textOverrides={textOverrides} 
+  <TextEditModal
+    ceremonies={sorted}
+    textOverrides={textOverrides}
     zoneStyles={zoneStyles}
     onApply={(t) => { setTextOverrides(t); onUpdate?.({ textOverrides: t }) }}
     onApplyStyles={(s) => { setZoneStyles(s); onUpdate?.({ zoneStyles: s }) }}
-    onClose={() => setTextEditOpen(false)} 
-    theme={theme} 
+    onClose={() => setTextEditOpen(false)}
+    theme={theme}
   />
 )}
       {shareModalOpen && guestUrl && coupleUrl && (
         <ShareModal accent={theme.accent} guestUrl={guestUrl} coupleUrl={coupleUrl} onClose={() => setShareModalOpen(false)} data={data} />
+      )}
+      {restoreModalOpen && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={() => setRestoreModalOpen(false)}>
+          <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 16, padding: '28px 24px', maxWidth: 380, width: '100%', textAlign: 'center', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            <div style={{ fontSize: 32, marginBottom: 12 }}>⚠️</div>
+            <h3 style={{ margin: '0 0 12px', fontSize: 18, fontWeight: 700, color: '#1a1a1a' }}>Restaurer la version initiale ?</h3>
+            <p style={{ fontSize: 14, color: '#666', lineHeight: 1.6, marginBottom: 24 }}>
+              Toutes vos modifications depuis la première génération seront perdues. Le lien de partage restera le même.
+            </p>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+              <button onClick={() => setRestoreModalOpen(false)} style={{ ...BTN, padding: '12px 24px', borderRadius: 9999, border: '1.5px solid #ddd', background: 'white', color: '#666', fontSize: 14, fontWeight: 600 }}>Annuler</button>
+              <button disabled={restoring} onClick={async () => {
+                if (!lastShareId) return
+                setRestoring(true)
+                try {
+                  const res = await fetch('/api/restore-initial', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ shareId: lastShareId }) })
+                  const json = await res.json()
+                  if (json.success) {
+                    // Recharger le faire-part restauré
+                    const shareRes = await fetch(`/api/get-share?id=${lastShareId}`)
+                    const restored = await shareRes.json()
+                    if (restored && !restored.error) {
+                      if (restored.photosFond?.length && restored.photosData?.length) {
+                        restored.photosData = restored.photosData.map((c: { cropX?: number; cropY?: number; cropScale?: number }, idx: number) => ({ ...c, url: restored.photosFond[idx] ?? '' }))
+                      }
+                      onUpdate?.(restored)
+                      setTextOverrides({})
+                      setZoneStyles({})
+                      showToast('Votre faire-part a été restauré à sa version initiale', 'success')
+                    }
+                  } else {
+                    showToast(json.error || 'Erreur lors de la restauration', 'error')
+                  }
+                } catch { showToast('Erreur réseau', 'error') }
+                setRestoring(false)
+                setRestoreModalOpen(false)
+              }} style={{ ...BTN, padding: '12px 24px', borderRadius: 9999, border: 'none', background: '#dc2626', color: 'white', fontSize: 14, fontWeight: 600, opacity: restoring ? 0.6 : 1 }}>
+                {restoring ? 'Restauration...' : 'Oui, restaurer'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

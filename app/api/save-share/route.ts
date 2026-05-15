@@ -41,6 +41,12 @@ export async function POST(request: Request) {
     shareData.ogVersion = Date.now()
     await redis.set(id, shareData, { ex: 31536000 })
 
+    // Sauvegarder un snapshot initial (uniquement à la première génération)
+    const initialExists = await redis.exists(`${id}:initial`)
+    if (!initialExists) {
+      await redis.set(`${id}:initial`, shareData, { ex: 31536000 })
+    }
+
     if (shareData.emailMaries) {
       await redis.set(`email:${id}`, shareData.emailMaries, { ex: 31536000 })
     }
