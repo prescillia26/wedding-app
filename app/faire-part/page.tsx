@@ -4056,6 +4056,13 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
         {/* TAB TEXTE */}
         {tab === 'texte' && (
           <div>
+            {/* Texte global page d'accueil */}
+            <div style={{ marginBottom: 24, paddingBottom: 20, borderBottom: `1px solid ${theme.accent}33` }}>
+              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: theme.accent, marginBottom: 12 }}>Page d&apos;accueil</div>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Phrase d&apos;invitation</label>
+              <textarea value={localText['global_pleaseJoin'] ?? ''} onChange={e => setText('global_pleaseJoin', e.target.value)} placeholder={t.fairepart.pleaseJoin}
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #e0d5c8', borderRadius: 8, fontSize: 14, color: '#3a3330', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 56 }} />
+            </div>
             {ceremonies.map((c, i) => {
               const name = c.type === 'Autre' ? (c.customName || t.fairepart.cardAutreDefaultEvent) : c.type
               return (
@@ -5353,7 +5360,7 @@ const firstDate = sorted[0]?.date
           </DraggableElement>
           <DraggableElement id="phrase" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: introTextColor, marginBottom: 20, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}>
-            {t.fairepart.pleaseJoin}
+            {(data.textOverrides?.['global_pleaseJoin']) || t.fairepart.pleaseJoin}
           </div>
           </DraggableElement>
           {/* Compte à rebours intégré dans l'accueil */}
