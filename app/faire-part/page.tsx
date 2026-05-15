@@ -6175,6 +6175,11 @@ export default function FairePartPage() {
 
   // ✅ Vérifier l'authentification au chargement + charger brouillon serveur
   useEffect(() => {
+    // ⚠️ En mode partagé (?share=XXX), ne JAMAIS charger le brouillon de l'utilisateur connecté
+    // pour ne pas écraser le faire-part partagé avec les données de l'utilisateur B
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('share')) return // Vue partagée → skip auth loading
+
     let cancelled = false
     async function checkAuth() {
       try {
@@ -6211,9 +6216,6 @@ export default function FairePartPage() {
             if (draftRes.ok) {
               const draftData = await draftRes.json()
               if (!cancelled && draftData.formData) {
-                // Le brouillon serveur a la priorité sur le localStorage
-                // sauf si le localStorage est plus récent (on ne peut pas le savoir,
-                // donc on privilégie le serveur)
                 setFormData(draftData.formData as FormData)
                 setHasDraft(true)
                 setAccessGranted(true)
