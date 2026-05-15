@@ -5781,6 +5781,8 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
   const [shareModalOpen, setShareModalOpen] = useState(false)
   const [restoreModalOpen, setRestoreModalOpen] = useState(false)
   const [restoring, setRestoring] = useState(false)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [guestUrl, setGuestUrl] = useState<string | null>(null)
   const [coupleUrl, setCoupleUrl] = useState<string | null>(null)
   const [sharing, setSharing] = useState(false)
@@ -5970,6 +5972,9 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         {lastShareId && (
           <button onClick={() => setRestoreModalOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: '1.5px solid #e0c8c8', background: 'transparent', color: '#a07070', fontSize: 12, fontWeight: 500 }}>Restaurer version initiale</button>
         )}
+        {lastShareId && (
+          <button onClick={() => setDeleteModalOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: '1.5px solid #e8c8c8', background: 'transparent', color: '#c06060', fontSize: 11, fontWeight: 500 }}>Supprimer ce faire-part</button>
+        )}
         </div>
       </div>
       {rsvpOpen && (
@@ -6029,6 +6034,37 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
                 setRestoreModalOpen(false)
               }} style={{ ...BTN, padding: '12px 24px', borderRadius: 9999, border: 'none', background: '#dc2626', color: 'white', fontSize: 14, fontWeight: 600, opacity: restoring ? 0.6 : 1 }}>
                 {restoring ? 'Restauration...' : 'Oui, restaurer'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {deleteModalOpen && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={() => setDeleteModalOpen(false)}>
+          <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 16, padding: '28px 24px', maxWidth: 380, width: '100%', textAlign: 'center', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            <div style={{ fontSize: 32, marginBottom: 12 }}>🗑️</div>
+            <h3 style={{ margin: '0 0 12px', fontSize: 18, fontWeight: 700, color: '#1a1a1a' }}>Supprimer ce faire-part ?</h3>
+            <p style={{ fontSize: 14, color: '#666', lineHeight: 1.6, marginBottom: 24 }}>
+              Cette action est irréversible. Le faire-part, son lien de partage et toutes les réponses seront supprimés définitivement.
+            </p>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+              <button onClick={() => setDeleteModalOpen(false)} style={{ ...BTN, padding: '12px 24px', borderRadius: 9999, border: '1.5px solid #ddd', background: 'white', color: '#666', fontSize: 14, fontWeight: 600 }}>Annuler</button>
+              <button disabled={deleting} onClick={async () => {
+                if (!lastShareId) return
+                setDeleting(true)
+                try {
+                  const res = await fetch('/api/delete-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ shareId: lastShareId }) })
+                  const json = await res.json()
+                  if (json.success) {
+                    try { localStorage.removeItem('wedding-draft'); localStorage.removeItem('lovit_share_id'); localStorage.removeItem('lovit_draft_time') } catch { /* ignore */ }
+                    showToast('Faire-part supprimé', 'success')
+                    window.location.href = '/faire-part'
+                  } else { showToast(json.error || 'Erreur', 'error') }
+                } catch { showToast('Erreur réseau', 'error') }
+                setDeleting(false)
+                setDeleteModalOpen(false)
+              }} style={{ ...BTN, padding: '12px 24px', borderRadius: 9999, border: 'none', background: '#dc2626', color: 'white', fontSize: 14, fontWeight: 600, opacity: deleting ? 0.6 : 1 }}>
+                {deleting ? 'Suppression...' : 'Oui, supprimer'}
               </button>
             </div>
           </div>
