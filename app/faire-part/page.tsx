@@ -281,6 +281,7 @@ interface FormData {
   customLogoColor?: string // '' = original, ou hex color
   textOffsetY?: number // décalage vertical du texte en px (négatif = plus haut)
   petalsEnabled?: boolean // pétales/particules sur le faire-part (false par défaut)
+  rsvpDeadline?: string // date limite de confirmation (YYYY-MM-DD)
 }
 const defaultCeremony: Ceremony = {
   type: 'Cérémonie religieuse / Houppa',
@@ -2137,6 +2138,11 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>{t.fairepart.emailSectionHelp}</p>
           <input type="email" value={data.emailMaries ?? ''} onChange={e => onChange({ emailMaries: e.target.value })} placeholder="marie@exemple.com" style={S.input} />
         </div>
+        <div style={{ marginTop: 16 }}>
+          <Label>Date limite de confirmation</Label>
+          <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Les invités verront cette date sur la section de confirmation de présence</p>
+          <input type="date" value={data.rsvpDeadline ?? ''} onChange={e => onChange({ rsvpDeadline: e.target.value })} style={S.input} />
+        </div>
       </AccordionSection>
     </div>
   )
@@ -3135,7 +3141,7 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
       <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: '32px 36px', width: '100%', maxWidth: 480, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
         <button onClick={onClose} style={{ ...BTN, position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 20, color: '#9ca3af' }}>✕</button>
 
-        <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 22, color: accent, textAlign: 'center', marginBottom: 4 }}>RSVP</div>
+        <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 20, color: accent, textAlign: 'center', marginBottom: 4 }}>Confirmer ma présence</div>
         <div style={{ fontSize: 13, color: '#9ca3af', textAlign: 'center', marginBottom: 20 }}>{mariee1} & {mariee2}</div>
 
         <div style={{ height: 4, background: '#f3e8ff', borderRadius: 9999, marginBottom: 28, overflow: 'hidden' }}>
@@ -5630,18 +5636,31 @@ const firstDate = sorted[0]?.date
           </div>
         )}
 
-        {/* SECTION 5 : RSVP invité */}
+        {/* SECTION 5 : Confirmer sa présence (invités) */}
         {role === 'guest' && (
           <section id="rsvp-section" style={{ paddingTop: 60, paddingBottom: 52, borderBottom: `1px solid ${G}1a`, scrollMarginTop: 60 }}>
             <AnimSection animStyle={anim}>
-              <div style={{ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>{t.fairepart.yourResponse}</div>
+              <div style={{ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>
+                {locale === 'en' ? 'Confirm your attendance' : 'Confirmez votre présence'}
+              </div>
               <OrnSep />
               <div style={{ border: `1px solid ${G}33`, borderRadius: 4, padding: '32px 24px', textAlign: 'center' }}>
                 <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, marginBottom: 28, lineHeight: 1.8, opacity: 0.85 }}>
-                  {t.fairepart.rsvpInviteText}
+                  {data.textOverrides?.['global_rsvpText'] || (() => {
+                    if (data.rsvpDeadline) {
+                      const dl = new Date(data.rsvpDeadline + 'T12:00:00')
+                      const fmt = new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(dl)
+                      return locale === 'en'
+                        ? `Your presence would mean the world to us. Please confirm your attendance before ${fmt} by clicking the button below.`
+                        : `Votre présence à nos côtés serait un immense bonheur. Merci de nous confirmer votre venue avant le ${fmt} en cliquant sur le bouton ci-dessous.`
+                    }
+                    return locale === 'en'
+                      ? 'Your presence would mean the world to us. Please confirm your attendance as soon as possible by clicking the button below.'
+                      : 'Votre présence à nos côtés serait un immense bonheur. Merci de nous confirmer votre venue dès que possible en cliquant sur le bouton ci-dessous.'
+                  })()}
                 </div>
                 <button onClick={onRsvpOpen} style={{ ...BTN, background: `linear-gradient(135deg,${G},${G}cc)`, color: 'white', border: 'none', borderRadius: 2, padding: '14px 48px', fontFamily: FP, fontSize: 12, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase' as const, boxShadow: `0 4px 20px ${G}44` }}>
-                  RSVP
+                  {locale === 'en' ? 'CONFIRM MY ATTENDANCE' : 'CONFIRMER MA PRÉSENCE'}
                 </button>
               </div>
             </AnimSection>
@@ -5653,7 +5672,7 @@ const firstDate = sorted[0]?.date
           <section style={{ paddingTop: 52, paddingBottom: 40, borderBottom: `1px solid ${G}1a`, textAlign: 'center' }}>
             <AnimSection animStyle={anim}>
               <button onClick={onRsvpListOpen} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '13px 28px', fontFamily: FP, fontSize: 12, fontWeight: 700, letterSpacing: 2, boxShadow: `0 4px 16px ${G}44` }}>
-                📋 Voir les RSVP
+                📋 Voir les réponses
               </button>
             </AnimSection>
           </section>
@@ -5824,7 +5843,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
             <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>{t.fairepart.textBtn}</button>
             <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{sharing ? (sharingStatus || 'Chargement...') : t.common.share}</button>
             {lastShareId && (
-              <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>📋 RSVP</button>
+              <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>📋 Réponses</button>
             )}
           </div>
         )}
@@ -5883,7 +5902,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         <button onClick={onEdit} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>{t.fairepart.editBtn}</button>
         <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{sharing ? (sharingStatus || 'Chargement...') : t.common.share}</button>
         {lastShareId && (
-          <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>📋 RSVP</button>
+          <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>📋 Réponses</button>
         )}
         <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>{t.fairepart.textBtn}</button>
         {lastShareId && (
