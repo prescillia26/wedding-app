@@ -2468,7 +2468,7 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(16px, 4vw, 24px)', color: theme.accent, opacity: 0.45 }}>&</div>
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(28px, 8vw, 56px)', color: theme.accent, lineHeight: 1.1 }}>{data.marie2Prenom || 'Prénom'}</div>
           </div>
-          {(data.marie1Prenom2 || data.marie2Prenom2) && (
+          {!data.mariageJuif && (data.marie1Prenom2 || data.marie2Prenom2) && (
             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(16px,4vw,32px)', marginTop: 2 }}>
               <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(12px,3vw,18px)', letterSpacing: '0.04em', color: theme.accent, opacity: 0.7 }}>{data.marie1Prenom2 || ''}</div>
               {(data.marie1Prenom2 && data.marie2Prenom2) && <div style={{ width: 1, height: 14, background: theme.accent, opacity: 0.2 }} />}
@@ -2717,7 +2717,7 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(16px, 4vw, 24px)', color: theme.accent, opacity: 0.45 }}>&</div>
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(28px, 8vw, 56px)', color: theme.accent, lineHeight: 1.1 }}>{data.marie2Prenom || 'Prénom'}</div>
           </div>
-          {(data.marie1Prenom2 || data.marie2Prenom2) && (
+          {!data.mariageJuif && (data.marie1Prenom2 || data.marie2Prenom2) && (
             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(16px,4vw,32px)', marginTop: 2 }}>
               <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(12px,3vw,18px)', letterSpacing: '0.04em', color: theme.accent, opacity: 0.7 }}>{data.marie1Prenom2 || ''}</div>
               {(data.marie1Prenom2 && data.marie2Prenom2) && <div style={{ width: 1, height: 14, background: theme.accent, opacity: 0.2 }} />}
@@ -5505,8 +5505,8 @@ const firstDate = sorted[0]?.date
                           <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(18px,4vw,28px)', color: G, opacity: 0.45, letterSpacing: 2 }}>&</div>
                           <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(32px,8vw,52px)', color: G, lineHeight: 1.15, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom}</div>
                         </div>
-                        {/* Deuxièmes prénoms côte à côte */}
-                        {(data.marie1Prenom2 || data.marie2Prenom2) && (
+                        {/* Deuxièmes prénoms côte à côte (masqués si prénoms hébraïques remplis pour éviter doublon) */}
+                        {!data.mariageJuif && (data.marie1Prenom2 || data.marie2Prenom2) && (
                           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(24px,6vw,48px)', marginBottom: 6 }}>
                             <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(14px,3.5vw,22px)', letterSpacing: '0.04em', color: G, opacity: 0.75, lineHeight: 1.3 }}>{data.marie1Prenom2 || ''}</div>
                             {(data.marie1Prenom2 && data.marie2Prenom2) && <div style={{ width: 1, height: 16, background: G, opacity: 0.2 }} />}
