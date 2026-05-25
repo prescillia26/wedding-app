@@ -5722,7 +5722,15 @@ const firstDate = sorted[0]?.date
 function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: FormData; onEdit: () => void; onReset: () => void; isShared: boolean; role: string | null; onUpdate?: (d: Partial<FormData>) => void }) {
   const { t } = useT()
   const theme = THEMES[data.style]
-  const sorted = sortByDate(data.ceremonies)
+  const allSorted = sortByDate(data.ceremonies)
+  // Filtrer par ?events= pour ne montrer que les cérémonies du lien
+  const sorted = (() => {
+    if (typeof window === 'undefined') return allSorted
+    const eventsParam = new URLSearchParams(window.location.search).get('events')
+    if (!eventsParam) return allSorted
+    const indices = eventsParam.split(',').map(Number).filter(i => !isNaN(i) && i >= 0 && i < allSorted.length)
+    return indices.length > 0 ? indices.map(i => allSorted[i]) : allSorted
+  })()
   const [rsvpOpen, setRsvpOpen] = useState(false)
   const [rsvpListOpen, setRsvpListOpen] = useState(false)
   const [lastShareId, setLastShareId] = useState<string | null>(null)
