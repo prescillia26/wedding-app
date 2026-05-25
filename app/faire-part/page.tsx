@@ -321,7 +321,7 @@ const defaultFormData: FormData = {
   textOpacity: 1,
   textBg: 0.5,
   animationStyle: 'slide-up',
-  introAnimation: 'petales',
+  introAnimation: 'enveloppe',
   slug: '',
   zoneStyles: {},
   styleAccueil: 'photo',
