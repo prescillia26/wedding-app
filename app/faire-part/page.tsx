@@ -5724,7 +5724,7 @@ const firstDate = sorted[0]?.date
 }
 
 // ── CardsView ─────────────────────────────────────────────────────────────────
-function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: FormData; onEdit: () => void; onReset: () => void; isShared: boolean; role: string | null; onUpdate?: (d: Partial<FormData>) => void }) {
+function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = true }: { data: FormData; onEdit: () => void; onReset: () => void; isShared: boolean; role: string | null; onUpdate?: (d: Partial<FormData>) => void; isPaid?: boolean }) {
   const { t } = useT()
   const theme = THEMES[data.style]
   const allSorted = sortByDate(data.ceremonies)
@@ -5798,6 +5798,10 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
   }, [isShared])
 
  const handleShare = async () => {
+    if (!isPaid) {
+      window.location.href = '/paiement'
+      return
+    }
     if (sharing) return
     setSharing(true)
     try {
@@ -5902,7 +5906,14 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
   }
 
   return (
-    <div id="faire-part-preview-target" style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
+    <div id="faire-part-preview-target" style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte, position: 'relative' }}>
+      {!isPaid && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 40, pointerEvents: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(60px,15vw,120px)', color: 'rgba(201,168,76,0.08)', fontWeight: 700, letterSpacing: 8, transform: 'rotate(-30deg)', whiteSpace: 'nowrap', userSelect: 'none' }}>
+            LOV&apos;IT
+          </div>
+        </div>
+      )}
       {data.petalsEnabled && <FloatingPetals accent={theme.accent} />}
       <SharedPageContent
         data={{ ...data, textOverrides: { ...data.textOverrides, ...textOverrides }, zoneStyles }}
@@ -5926,7 +5937,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
         </div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
         <button onClick={onEdit} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>{t.fairepart.editBtn}</button>
-        <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{sharing ? (sharingStatus || 'Chargement...') : t.common.share}</button>
+        <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: isPaid ? theme.accent : 'linear-gradient(135deg, #C9A84C, #e8c96a)', color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{!isPaid ? 'Débloquer le partage' : sharing ? (sharingStatus || 'Chargement...') : t.common.share}</button>
         {lastShareId && (
           <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>📋 Réponses</button>
         )}
@@ -6238,8 +6249,9 @@ export default function FairePartPage() {
   const [loadingShare, setLoadingShare] = useState(false)
   const [hasDraft, setHasDraft] = useState(false)
   const [savedAt, setSavedAt] = useState<Date | null>(null)
-  const [accessGranted, setAccessGranted] = useState(false)
-  const [checkingAccess, setCheckingAccess] = useState(true)
+  const [accessGranted, setAccessGranted] = useState(true) // Freemium : accès ouvert à tous
+  const [checkingAccess, setCheckingAccess] = useState(false) // Plus de gate
+  const [isPaid, setIsPaid] = useState(false)
   // Auth & sauvegarde serveur
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [userFaireparts, setUserFaireparts] = useState<string[]>([])
@@ -6300,6 +6312,7 @@ export default function FairePartPage() {
         const d = await res.json()
         if (d.valid) {
           setAccessGranted(true)
+          setIsPaid(true)
           try { localStorage.setItem('lovit_access_code', code) } catch { /* ignore */ }
 
           // 1) D'abord essayer le brouillon localStorage
@@ -6371,6 +6384,7 @@ export default function FairePartPage() {
         // Utilisateur connecté = a payé → accès au formulaire
         setAccessGranted(true)
         setCheckingAccess(false)
+        setIsPaid(true)
 
         // Vérifier que le localStorage appartient au compte connecté
         try {
@@ -6509,10 +6523,10 @@ export default function FairePartPage() {
     </div>
   )
 
-  // Gate d'accès
-  if (!accessGranted && !isShared) return <AccessGate onGranted={() => { setAccessGranted(true); try { const draft = localStorage.getItem('wedding-draft'); if (draft) setHasDraft(true) } catch { /* ignore */ } }} />
+  // Freemium : plus de gate d'accès, tout le monde peut créer
+  // Le partage est bloqué si pas payé (isPaid=false)
 
-  if (showCards) return <CardsView data={formData} onEdit={() => { try { localStorage.setItem('wedding-draft', JSON.stringify(formData)) } catch { /* ignore */ } setShowCards(false); setStep(4) }} onReset={() => { setFormData(defaultFormData); setShowCards(false); setStep(1); try { localStorage.removeItem('wedding-draft') } catch { /* ignore */ } }} isShared={isShared} role={role} onUpdate={update} />
+  if (showCards) return <CardsView data={formData} onEdit={() => { try { localStorage.setItem('wedding-draft', JSON.stringify(formData)) } catch { /* ignore */ } setShowCards(false); setStep(4) }} onReset={() => { setFormData(defaultFormData); setShowCards(false); setStep(1); try { localStorage.removeItem('wedding-draft') } catch { /* ignore */ } }} isShared={isShared} role={role} onUpdate={update} isPaid={isPaid} />
 
   if (loadingShare) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fff8ed 0%, #fffaf4 50%, #fff8ed 100%)' }}>
