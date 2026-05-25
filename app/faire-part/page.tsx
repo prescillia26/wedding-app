@@ -5799,7 +5799,9 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate }: { data: 
       const originalPhotos = data.photosFond ?? []
       let compressedPhotos: string[] = originalPhotos
       const photosDataToSend = (data.photosData ?? []).map(({ cropX, cropY, cropScale }) => ({ cropX, cropY, cropScale }))
-      const buildPayload = () => ({ ...data, photosFond: compressedPhotos, photoFond: compressedPhotos[0] ?? '', photosData: photosDataToSend })
+      // Merger les modifications locales (textOverrides, zoneStyles) avec les données du formulaire
+      const mergedData = { ...data, textOverrides: { ...data.textOverrides, ...textOverrides }, zoneStyles }
+      const buildPayload = () => ({ ...mergedData, photosFond: compressedPhotos, photoFond: compressedPhotos[0] ?? '', photosData: photosDataToSend })
       compressedPhotos = originalPhotos
       setSharingStatus('Envoi...')
       const dataToSend = buildPayload()
