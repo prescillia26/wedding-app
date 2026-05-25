@@ -87,7 +87,7 @@ export default function Home() {
     btnOutline: { display: 'inline-block', padding: '14px 36px', borderRadius: 9999, background: 'transparent', color: GOLD, fontSize: 15, fontWeight: 600, textDecoration: 'none', letterSpacing: '0.08em', fontFamily: 'var(--font-playfair-display)', border: `1.5px solid ${GOLD}` },
   }
 
-  const ctaHref = isLoggedIn ? '/faire-part' : '/paiement'
+  const ctaHref = '/faire-part'
   const h = t.home
   const c = t.common
 
