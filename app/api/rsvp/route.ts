@@ -16,6 +16,11 @@ export async function POST(request: Request) {
     const shareId = data.shareId
     if (!shareId) return Response.json({ error: 'shareId manquant' }, { status: 400 })
 
+    // Valider que le nom n'est pas vide
+    const nom = (data.nom ?? '').trim()
+    if (!nom) return Response.json({ error: 'Nom manquant' }, { status: 400 })
+    data.nom = nom // Normaliser le nom (trimmed)
+
     // Rate limiting : 5 RSVP par shareId par minute
     const rlKey = `ratelimit:rsvp:${shareId}`
     const rlAttempts = await redis.get<number>(rlKey) ?? 0

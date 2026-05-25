@@ -13,9 +13,10 @@ export async function GET(request: Request) {
 
     // Vérifier que l'utilisateur est propriétaire
     const session = await getSession()
-    if (session?.email) {
-      const shareData = await redis.get<Record<string, unknown>>(shareId)
-      if (shareData && shareData.ownerEmail && shareData.ownerEmail !== session.email) {
+    const shareData = await redis.get<Record<string, unknown>>(shareId)
+    if (!shareData) return Response.json({ error: 'Faire-part introuvable' }, { status: 404 })
+    if (shareData.ownerEmail) {
+      if (!session?.email || session.email !== shareData.ownerEmail) {
         return Response.json({ error: 'Accès non autorisé' }, { status: 403 })
       }
     }

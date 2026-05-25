@@ -14,9 +14,11 @@ export async function GET(request: Request) {
 
     // Vérifier que l'utilisateur est propriétaire du faire-part
     const session = await getSession()
-    if (session?.email) {
-      const shareData = await redis.get<Record<string, unknown>>(shareId)
-      if (shareData && shareData.ownerEmail && shareData.ownerEmail !== session.email) {
+    const shareData = await redis.get<Record<string, unknown>>(shareId)
+    if (!shareData) return Response.json({ error: 'Faire-part introuvable' }, { status: 404 })
+    // Si le faire-part a un owner, seul cet owner peut voir les RSVP
+    if (shareData.ownerEmail) {
+      if (!session?.email || session.email !== shareData.ownerEmail) {
         return Response.json({ error: 'Accès non autorisé' }, { status: 403 })
       }
     }

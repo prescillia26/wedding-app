@@ -3075,8 +3075,8 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
     try { return new URLSearchParams(window.location.search).get('guest') || '' } catch { return '' }
   })
   const [email, setEmail] = useState('')
-  const [reponses, setReponses] = useState<{ ceremonie: string; date: string; present: boolean | null; nbPersonnes: number }[]>(
-    ceremonies.map(c => ({ ceremonie: getCeremonyName(c), date: c.date || '', present: null, nbPersonnes: 1 }))
+  const [reponses, setReponses] = useState<{ ceremonie: string; ceremonieIdx: number; date: string; present: boolean | null; nbPersonnes: number }[]>(
+    ceremonies.map((c, idx) => ({ ceremonie: getCeremonyName(c), ceremonieIdx: idx, date: c.date || '', present: null, nbPersonnes: 1 }))
   )
   const [message, setMessage] = useState('')
   const [sent, setSent] = useState(false)
@@ -3100,6 +3100,7 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
         message: message || undefined,
         reponses: reponses.map((r, i) => ({
           ceremonie: r.ceremonie,
+          ceremonieIdx: r.ceremonieIdx,
           date: r.date,
           present: r.present ?? false,
           nbPersonnes: r.present ? r.nbPersonnes : 0,
@@ -3302,6 +3303,10 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
   const { t } = useT()
   const [entries, setEntries] = useState<RSVPEntry[]>([])
   const [loading, setLoading] = useState(true)
+  // Matcher une réponse par nom OU par index (fallback si le nom de cérémonie a changé)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const findRep = (e: RSVPEntry, nomEvt: string, evtIdx: number) =>
+    e.reponses?.find(r => r.ceremonie === nomEvt || (r as any).ceremonieIdx === evtIdx)
   const [views, setViews] = useState<{ timestamp: string; pays: string }[]>([])
 
   useEffect(() => {
@@ -3339,10 +3344,10 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
       ['DÉTAIL PAR CÉRÉMONIE'],
       [''],
     ]
-    ceremonies.forEach(c => {
+    ceremonies.forEach((c, ci) => {
       const nomEvt = getCeremonyName(c)
-      const presents = entries.filter(e => e.reponses?.find(r => r.ceremonie === nomEvt && r.present))
-      const nbPers = presents.reduce((s, e) => s + (e.reponses?.find(r => r.ceremonie === nomEvt)?.nbPersonnes || 0), 0)
+      const presents = entries.filter(e => findRep(e, nomEvt, ci)?.present)
+      const nbPers = presents.reduce((s, e) => s + (findRep(e, nomEvt, ci)?.nbPersonnes || 0), 0)
       resumeData.push([nomEvt, `${presents.length} foyers · ${nbPers} personnes`])
     })
     const wsResume = XLSX.utils.aoa_to_sheet(resumeData)
@@ -3350,13 +3355,13 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
     XLSX.utils.book_append_sheet(wb, wsResume, 'Résumé')
 
     // Une feuille par cérémonie
-    ceremonies.forEach(c => {
+    ceremonies.forEach((c, ci) => {
       const nomEvt = getCeremonyName(c)
       const rows: (string | number)[][] = [
-        ['Nom', 'Email', 'Présence', 'Nb personnes', 'Accompagnants', 'Message'],
+        ['Nom', 'Email', 'Présence', 'Nb personnes', 'Accompagnants', 'Message', 'Date de réponse'],
       ]
       entries.forEach(e => {
-        const rep = e.reponses?.find(r => r.ceremonie === nomEvt)
+        const rep = findRep(e, nomEvt, ci)
         const acc = (rep?.accompagnants ?? []).filter(Boolean).join(' / ')
         rows.push([
           e.nom,
@@ -3468,7 +3473,7 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
             ceremonies.map((c, ci) => {
               const nomEvt = getCeremonyName(c)
               const tableRows = entries.map(e => {
-                const rep = e.reponses?.find(r => r.ceremonie === nomEvt)
+                const rep = findRep(e, nomEvt, ci)
                 return { e, present: rep ? rep.present : null, nb: rep?.present ? rep.nbPersonnes : 0 }
               })
               const presentRows = tableRows.filter(x => x.present === true)
@@ -3492,7 +3497,7 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
                     </thead>
                     <tbody>
                       {tableRows.map(({ e, present, nb }, i) => {
-                        const rep = e.reponses?.find(r => r.ceremonie === nomEvt)
+                        const rep = findRep(e, nomEvt, ci)
                         const acc = rep?.accompagnants?.filter(Boolean) ?? []
                         return (
                           <tr key={i} style={{ borderBottom: '1px solid #efe5d8', background: i % 2 === 0 ? 'white' : '#fdf8f0' }}>
