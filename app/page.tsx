@@ -93,48 +93,44 @@ function ShowcaseCarousel() {
         {/* Cadre décoratif en fond */}
         {c.frame && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={c.frame} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: 0.85, pointerEvents: 'none', zIndex: 0 }} />
+          <img src={c.frame} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: c.dark ? 'normal' : 'multiply', opacity: c.dark ? 0.3 : 0.8, pointerEvents: 'none', zIndex: 0 }} />
         )}
-        {/* Voile pour lisibilité du texte sur les cadres */}
-        {c.frame && <div style={{ position: 'absolute', inset: '8% 10%', background: c.dark
-          ? 'radial-gradient(ellipse at center, rgba(44,26,14,0.92) 0%, rgba(44,26,14,0.6) 70%, transparent 100%)'
-          : 'radial-gradient(ellipse at center, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.65) 70%, transparent 100%)', pointerEvents: 'none', zIndex: 0 }} />}
         <div key={active} style={{ padding: '40px 36px', textAlign: 'center', position: 'relative', zIndex: 1, animation: 'showcaseFade 0.6s ease', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 320 }}>
           <style>{`@keyframes showcaseFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`}</style>
           {/* בס״ד */}
           {c.bsd && <div style={{ position: 'absolute', top: 14, right: 18, fontFamily: 'serif', fontSize: 12, color: textColor, direction: 'rtl', opacity: 0.7 } as React.CSSProperties}>בס״ד</div>}
-          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 10, letterSpacing: 5, textTransform: 'uppercase', color: textColor, marginBottom: 10, opacity: 0.7 }}>{c.event}</div>
-          {c.verse && <div style={{ fontFamily: 'serif', fontSize: 11, color: textColor, direction: 'rtl', marginBottom: 12, opacity: 0.55, lineHeight: 1.6 } as React.CSSProperties}>{c.verse}</div>}
+          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 11, fontWeight: 700, letterSpacing: 5, textTransform: 'uppercase', color: textColor, marginBottom: 10 }}>{c.event}</div>
+          {c.verse && <div style={{ fontFamily: 'serif', fontSize: 12, color: textColor, direction: 'rtl', marginBottom: 12, opacity: 0.7, lineHeight: 1.6 } as React.CSSProperties}>{c.verse}</div>}
           {c.defunt && (
             <div style={{ marginBottom: 12, paddingBottom: 10, borderBottom: `1px solid ${textColor}22` }}>
-              <div style={{ fontSize: 11, color: textColor, opacity: 0.4, marginBottom: 4 }}>🕯</div>
-              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 10, color: textColor, opacity: 0.5 }}>{c.defunt}</div>
+              <div style={{ fontSize: 12, color: textColor, opacity: 0.5, marginBottom: 4 }}>🕯</div>
+              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: textColor, opacity: 0.65 }}>{c.defunt}</div>
             </div>
           )}
-          {c.parents && <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 10, color: textColor, marginBottom: 10, opacity: 0.55 }}>{c.parents}</div>}
+          {c.parents && <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: textColor, marginBottom: 10, opacity: 0.7 }}>{c.parents}</div>}
           {/* Prénoms avec hébreu à côté */}
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 38, color: textColor, lineHeight: 1.15 }}>{c.name1}</div>
-            {c.he1 && <div style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 18, color: textColor, opacity: 0.55, direction: 'rtl' } as React.CSSProperties}>{c.he1}</div>}
+            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 42, color: textColor, lineHeight: 1.15 }}>{c.name1}</div>
+            {c.he1 && <div style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 20, color: textColor, opacity: 0.7, direction: 'rtl' } as React.CSSProperties}>{c.he1}</div>}
           </div>
-          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 18, color: textColor, opacity: 0.4, margin: '2px 0' }}>&</div>
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
-            {c.he2 && <div style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 18, color: textColor, opacity: 0.55, direction: 'rtl' } as React.CSSProperties}>{c.he2}</div>}
-            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 38, color: textColor, lineHeight: 1.15 }}>{c.name2}</div>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 20, color: textColor, opacity: 0.5, margin: '2px 0' }}>&</div>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
+            {c.he2 && <div style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 20, color: textColor, opacity: 0.7, direction: 'rtl' } as React.CSSProperties}>{c.he2}</div>}
+            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 42, color: textColor, lineHeight: 1.15 }}>{c.name2}</div>
           </div>
           {c.oui && (
             <>
-              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: textColor, opacity: 0.7, marginBottom: 2 }}>se diront</div>
-              <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: textColor, lineHeight: 1, marginBottom: 14 }}>&laquo; Oui &raquo;</div>
+              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: textColor, opacity: 0.8, marginBottom: 2 }}>se diront</div>
+              <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: textColor, lineHeight: 1, marginBottom: 14 }}>&laquo; Oui &raquo;</div>
             </>
           )}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', marginBottom: 10 }}>
-            <div style={{ width: 20, height: '0.5px', background: textColor, opacity: 0.35 }} />
-            <span style={{ color: textColor, fontSize: 7, opacity: 0.4 }}>✦</span>
-            <div style={{ width: 20, height: '0.5px', background: textColor, opacity: 0.35 }} />
+            <div style={{ width: 24, height: '0.5px', background: textColor, opacity: 0.4 }} />
+            <span style={{ color: textColor, fontSize: 8, opacity: 0.5 }}>✦</span>
+            <div style={{ width: 24, height: '0.5px', background: textColor, opacity: 0.4 }} />
           </div>
-          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 11, color: textColor, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 4, opacity: 0.85 }}>{c.date}</div>
-          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 12, color: textColor, opacity: 0.55, marginBottom: c.buttons ? 14 : 0 }}>{c.lieu}</div>
+          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 12, fontWeight: 700, color: textColor, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 4 }}>{c.date}</div>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: textColor, opacity: 0.7, marginBottom: c.buttons ? 14 : 0 }}>{c.lieu}</div>
           {/* Boutons Maps / Waze */}
           {c.buttons && (
             <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 10 }}>
