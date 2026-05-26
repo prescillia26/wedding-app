@@ -52,13 +52,13 @@ function FakeCard({ name1, name2, date, accent, fond }: { name1: string; name2: 
 
 function ShowcaseCarousel() {
   const [active, setActive] = useState(0)
-  const cards = [
-    { event: 'LA HOUPPA', name1: 'Sarah', name2: 'David', date: '15 Juin 2026', lieu: 'Synagogue Beth-El, Paris', accent: '#8b1a2a', fond: '#fdf8f8', verse: 'קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה', parents: 'M. & Mme Cohen · M. & Mme Lévy' },
-    { event: 'LA MAIRIE', name1: 'Léa', name2: 'Antoine', date: '12 Juillet 2026', lieu: 'Mairie du 16e, Paris', accent: '#C9A84C', fond: '#fdf8f0', oui: true },
-    { event: 'SHABBAT HATAN', name1: 'Esther', name2: 'Nathan', date: '20 Mars 2026', lieu: 'Synagogue Buffault, Paris', accent: '#2c4a7c', fond: '#f0f4f8', verse: '✡ ✦ ✡' },
-    { event: 'LE HENNÉ', name1: 'Yaël', name2: 'Jonathan', date: '5 Septembre 2026', lieu: 'Salle des Oliviers, Sarcelles', accent: '#d4a574', fond: '#2c1a0e', dark: true },
-    { event: 'SOIRÉE', name1: 'Emma', name2: 'Raphaël', date: '28 Août 2026', lieu: 'Domaine de Montceau', accent: '#7a9e6e', fond: '#f4f7f0' },
-    { event: 'BEACH PARTY', name1: 'Inès', name2: 'Michaël', date: '10 Juillet 2026', lieu: 'Plage de Pampelonne', accent: '#d4006a', fond: '#fff0f8' },
+  const cards: { event: string; name1: string; name2: string; he1?: string; he2?: string; date: string; lieu: string; accent: string; fond: string; verse?: string; parents?: string; oui?: boolean; dark?: boolean; bsd?: boolean; defunt?: string; buttons?: boolean }[] = [
+    { event: 'LA HOUPPA', name1: 'Sarah', name2: 'David', he1: 'שרה', he2: 'דוד', date: '15 Juin 2026', lieu: 'Synagogue Beth-El, Paris', accent: '#8b1a2a', fond: '#fdf8f8', verse: 'קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה', parents: 'M. & Mme Cohen · M. & Mme Lévy', bsd: true, defunt: 'Marie Cohen ז״ל', buttons: true },
+    { event: 'LA MAIRIE', name1: 'Léa', name2: 'Antoine', date: '12 Juillet 2026', lieu: 'Mairie du 16e, Paris', accent: '#C9A84C', fond: '#fdf8f0', oui: true, buttons: true },
+    { event: 'SHABBAT HATAN', name1: 'Esther', name2: 'Nathan', he1: 'אסתר', he2: 'נתן', date: '20 Mars 2026', lieu: 'Synagogue Buffault, Paris', accent: '#2c4a7c', fond: '#f0f4f8', verse: '✡ ✦ ✡', bsd: true, buttons: true },
+    { event: 'LE HENNÉ', name1: 'Yaël', name2: 'Jonathan', date: '5 Septembre 2026', lieu: 'Salle des Oliviers, Sarcelles', accent: '#d4a574', fond: '#2c1a0e', dark: true, buttons: true },
+    { event: 'SOIRÉE', name1: 'Emma', name2: 'Raphaël', date: '28 Août 2026', lieu: 'Domaine de Montceau', accent: '#7a9e6e', fond: '#f4f7f0', buttons: true },
+    { event: 'BEACH PARTY', name1: 'Inès', name2: 'Michaël', date: '10 Juillet 2026', lieu: 'Plage de Pampelonne', accent: '#d4006a', fond: '#fff0f8', buttons: true },
   ]
 
   useEffect(() => {
@@ -72,27 +72,54 @@ function ShowcaseCarousel() {
   return (
     <div style={{ maxWidth: 380, margin: '0 auto' }}>
       <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', boxShadow: '0 24px 80px rgba(0,0,0,0.14)', background: c.fond, transition: 'background 0.6s ease', minHeight: 340 }}>
-        <div style={{ padding: '36px 28px', textAlign: 'center', animation: 'showcaseFade 0.6s ease' }}>
+        <div key={active} style={{ padding: '32px 24px', textAlign: 'center', position: 'relative', animation: 'showcaseFade 0.6s ease' }}>
           <style>{`@keyframes showcaseFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`}</style>
-          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 11, letterSpacing: 5, textTransform: 'uppercase', color: textColor, marginBottom: 14, opacity: 0.7 }}>{c.event}</div>
-          {c.verse && <div style={{ fontFamily: 'serif', fontSize: 13, color: textColor, direction: 'rtl', marginBottom: 16, opacity: 0.6 } as React.CSSProperties}>{c.verse}</div>}
-          {c.parents && <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: textColor, marginBottom: 14, opacity: 0.6 }}>{c.parents}</div>}
-          <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 42, color: textColor, lineHeight: 1.15 }}>{c.name1}</div>
-          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 20, color: textColor, opacity: 0.45, margin: '4px 0' }}>&</div>
-          <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 42, color: textColor, lineHeight: 1.15, marginBottom: 16 }}>{c.name2}</div>
+          {/* בס״ד */}
+          {c.bsd && <div style={{ position: 'absolute', top: 14, right: 18, fontFamily: 'serif', fontSize: 12, color: textColor, direction: 'rtl', opacity: 0.7 } as React.CSSProperties}>בס״ד</div>}
+          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 10, letterSpacing: 5, textTransform: 'uppercase', color: textColor, marginBottom: 10, opacity: 0.7 }}>{c.event}</div>
+          {c.verse && <div style={{ fontFamily: 'serif', fontSize: 11, color: textColor, direction: 'rtl', marginBottom: 12, opacity: 0.55, lineHeight: 1.6 } as React.CSSProperties}>{c.verse}</div>}
+          {c.defunt && (
+            <div style={{ marginBottom: 12, paddingBottom: 10, borderBottom: `1px solid ${textColor}22` }}>
+              <div style={{ fontSize: 11, color: textColor, opacity: 0.4, marginBottom: 4 }}>🕯</div>
+              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 10, color: textColor, opacity: 0.5 }}>{c.defunt}</div>
+            </div>
+          )}
+          {c.parents && <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 10, color: textColor, marginBottom: 10, opacity: 0.55 }}>{c.parents}</div>}
+          {/* Prénoms avec hébreu à côté */}
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 38, color: textColor, lineHeight: 1.15 }}>{c.name1}</div>
+            {c.he1 && <div style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 18, color: textColor, opacity: 0.55, direction: 'rtl' } as React.CSSProperties}>{c.he1}</div>}
+          </div>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 18, color: textColor, opacity: 0.4, margin: '2px 0' }}>&</div>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+            {c.he2 && <div style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 18, color: textColor, opacity: 0.55, direction: 'rtl' } as React.CSSProperties}>{c.he2}</div>}
+            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 38, color: textColor, lineHeight: 1.15 }}>{c.name2}</div>
+          </div>
           {c.oui && (
             <>
-              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: textColor, opacity: 0.7, marginBottom: 4 }}>se diront</div>
-              <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: textColor, lineHeight: 1, marginBottom: 16 }}>Oui</div>
+              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: textColor, opacity: 0.7, marginBottom: 2 }}>se diront</div>
+              <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: textColor, lineHeight: 1, marginBottom: 14 }}>Oui</div>
             </>
           )}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', marginBottom: 12 }}>
-            <div style={{ width: 24, height: '0.5px', background: textColor, opacity: 0.4 }} />
-            <span style={{ color: textColor, fontSize: 8, opacity: 0.5 }}>✦</span>
-            <div style={{ width: 24, height: '0.5px', background: textColor, opacity: 0.4 }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', marginBottom: 10 }}>
+            <div style={{ width: 20, height: '0.5px', background: textColor, opacity: 0.35 }} />
+            <span style={{ color: textColor, fontSize: 7, opacity: 0.4 }}>✦</span>
+            <div style={{ width: 20, height: '0.5px', background: textColor, opacity: 0.35 }} />
           </div>
-          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 12, color: textColor, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 6, opacity: 0.85 }}>{c.date}</div>
-          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: textColor, opacity: 0.6 }}>{c.lieu}</div>
+          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 11, color: textColor, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 4, opacity: 0.85 }}>{c.date}</div>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 12, color: textColor, opacity: 0.55, marginBottom: c.buttons ? 14 : 0 }}>{c.lieu}</div>
+          {/* Boutons Maps / Waze */}
+          {c.buttons && (
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 10 }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '6px 14px', borderRadius: 2, background: textColor, color: c.dark ? c.fond : 'white', fontSize: 9, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', fontFamily: 'var(--font-playfair-display)' }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>
+                Maps
+              </div>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '6px 14px', borderRadius: 2, border: `1px solid ${textColor}`, color: textColor, fontSize: 9, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', fontFamily: 'var(--font-playfair-display)' }}>
+                Waze
+              </div>
+            </div>
+          )}
         </div>
       </div>
       {/* Dots */}
