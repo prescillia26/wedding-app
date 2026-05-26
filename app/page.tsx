@@ -59,8 +59,8 @@ function ShowcaseCarousel() {
     { event: 'LA MAIRIE', name1: 'Léa', name2: 'Antoine', date: '12 Juillet 2026', lieu: 'Mairie du 16e, Paris', accent: '#C9A84C', fond: '#fdf8f0', oui: true, buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857011/55_l7xahl.png' },
     // 3 — Shabbat Hatan bleu
     { event: 'SHABBAT HATAN', name1: 'Esther', name2: 'Nathan', he1: 'אסתר', he2: 'נתן', date: '20 Mars 2026', lieu: 'Synagogue Buffault, Paris', accent: '#2c4a7c', fond: '#f0f4f8', verse: '✡ ✦ ✡', bsd: true, buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857017/65_hzdotl.png' },
-    // 4 — Henné chocolat
-    { event: 'LE HENNÉ', name1: 'Yaël', name2: 'Jonathan', date: '5 Septembre 2026', lieu: 'Salle des Oliviers, Sarcelles', accent: '#d4a574', fond: '#2c1a0e', dark: true, buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878854/104_mafsu8.png' },
+    // 4 — Henné chocolat (pas de cadre sur fond sombre — bordure dorée)
+    { event: 'LE HENNÉ', name1: 'Yaël', name2: 'Jonathan', date: '5 Septembre 2026', lieu: 'Salle des Oliviers, Sarcelles', accent: '#d4a574', fond: '#2c1a0e', dark: true, buttons: true },
     // 5 — Houppa rose fleuri (autre template)
     { event: 'LA HOUPPA', name1: 'Rachel', name2: 'Yossef', he1: 'רחל', he2: 'יוסף', date: '8 Mai 2026', lieu: 'Espace Rachi, Paris', accent: '#c4829a', fond: '#faf6f4', verse: 'קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה', parents: 'M. & Mme Benaim · M. & Mme Toledano', bsd: true, defunt: 'Simha Benaim ז״ל', buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/53_ho1gq8.png' },
     // 6 — Soirée champêtre
@@ -69,8 +69,8 @@ function ShowcaseCarousel() {
     { event: 'LA MAIRIE', name1: 'Chloé', name2: 'Alexandre', date: '3 Avril 2026', lieu: 'Mairie du 8e, Paris', accent: '#888888', fond: '#f8f8f8', oui: true, buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878824/77_rnfcni.png' },
     // 8 — Beach party fuchsia
     { event: 'BEACH PARTY', name1: 'Inès', name2: 'Michaël', date: '10 Juillet 2026', lieu: 'Plage de Pampelonne', accent: '#d4006a', fond: '#fff0f8', buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878845/95_w9natp.png' },
-    // 9 — Houppa marine & or
-    { event: 'LA HOUPPA', name1: 'Déborah', name2: 'Élie', he1: 'דבורה', he2: 'אליהו', date: '22 Décembre 2026', lieu: 'Grande Synagogue, Paris', accent: '#C9A84C', fond: '#0a1628', dark: true, verse: 'קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה', parents: 'M. & Mme Abecassis · M. & Mme Sebag', bsd: true, defunt: 'Jacob Abecassis ז״ל', buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878852/100_kzuxzq.png' },
+    // 9 — Houppa marine & or (pas de cadre sur fond sombre)
+    { event: 'LA HOUPPA', name1: 'Déborah', name2: 'Élie', he1: 'דבורה', he2: 'אליהו', date: '22 Décembre 2026', lieu: 'Grande Synagogue, Paris', accent: '#C9A84C', fond: '#0a1628', dark: true, verse: 'קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה', parents: 'M. & Mme Abecassis · M. & Mme Sebag', bsd: true, defunt: 'Jacob Abecassis ז״ל', buttons: true },
     // 10 — Cocktail menthe
     { event: 'COCKTAIL', name1: 'Julie', name2: 'Thomas', date: '14 Juin 2026', lieu: 'Jardin du Luxembourg', accent: '#2a9a6a', fond: '#f0faf5', buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896741/150_rzlu80.png' },
     // 11 — Shabbat Hatan rose
@@ -89,11 +89,11 @@ function ShowcaseCarousel() {
 
   return (
     <div style={{ maxWidth: 380, margin: '0 auto' }}>
-      <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', boxShadow: '0 24px 80px rgba(0,0,0,0.14)', background: c.fond, transition: 'background 0.6s ease', minHeight: 340 }}>
+      <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', boxShadow: '0 24px 80px rgba(0,0,0,0.14)', background: c.fond, transition: 'background 0.6s ease', minHeight: 340, border: c.dark && !c.frame ? `1px solid ${textColor}33` : 'none' }}>
         {/* Cadre décoratif en fond */}
         {c.frame && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={c.frame} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: c.dark ? 'normal' : 'multiply', opacity: c.dark ? 0.3 : 0.8, pointerEvents: 'none', zIndex: 0 }} />
+          <img src={c.frame} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: 0.8, pointerEvents: 'none', zIndex: 0 }} />
         )}
         <div key={active} style={{ padding: '40px 36px', textAlign: 'center', position: 'relative', zIndex: 1, animation: 'showcaseFade 0.6s ease', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 320 }}>
           <style>{`@keyframes showcaseFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`}</style>
