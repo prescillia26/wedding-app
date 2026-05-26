@@ -53,12 +53,30 @@ function FakeCard({ name1, name2, date, accent, fond }: { name1: string; name2: 
 function ShowcaseCarousel() {
   const [active, setActive] = useState(0)
   const cards: { event: string; name1: string; name2: string; he1?: string; he2?: string; date: string; lieu: string; accent: string; fond: string; verse?: string; parents?: string; oui?: boolean; dark?: boolean; bsd?: boolean; defunt?: string; buttons?: boolean; frame?: string }[] = [
+    // 1 — Houppa bordeaux
     { event: 'LA HOUPPA', name1: 'Sarah', name2: 'David', he1: 'שרה', he2: 'דוד', date: '15 Juin 2026', lieu: 'Synagogue Beth-El, Paris', accent: '#8b1a2a', fond: '#fdf8f8', verse: 'קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה', parents: 'M. & Mme Cohen · M. & Mme Lévy', bsd: true, defunt: 'Marie Cohen ז״ל', buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878823/75_qc4gsm.png' },
+    // 2 — Mairie doré
     { event: 'LA MAIRIE', name1: 'Léa', name2: 'Antoine', date: '12 Juillet 2026', lieu: 'Mairie du 16e, Paris', accent: '#C9A84C', fond: '#fdf8f0', oui: true, buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857011/55_l7xahl.png' },
+    // 3 — Shabbat Hatan bleu
     { event: 'SHABBAT HATAN', name1: 'Esther', name2: 'Nathan', he1: 'אסתר', he2: 'נתן', date: '20 Mars 2026', lieu: 'Synagogue Buffault, Paris', accent: '#2c4a7c', fond: '#f0f4f8', verse: '✡ ✦ ✡', bsd: true, buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857017/65_hzdotl.png' },
+    // 4 — Henné chocolat
     { event: 'LE HENNÉ', name1: 'Yaël', name2: 'Jonathan', date: '5 Septembre 2026', lieu: 'Salle des Oliviers, Sarcelles', accent: '#d4a574', fond: '#2c1a0e', dark: true, buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878854/104_mafsu8.png' },
+    // 5 — Houppa rose fleuri (autre template)
+    { event: 'LA HOUPPA', name1: 'Rachel', name2: 'Yossef', he1: 'רחל', he2: 'יוסף', date: '8 Mai 2026', lieu: 'Espace Rachi, Paris', accent: '#c4829a', fond: '#faf6f4', verse: 'קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה', parents: 'M. & Mme Benaim · M. & Mme Toledano', bsd: true, defunt: 'Simha Benaim ז״ל', buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/53_ho1gq8.png' },
+    // 6 — Soirée champêtre
     { event: 'SOIRÉE', name1: 'Emma', name2: 'Raphaël', date: '28 Août 2026', lieu: 'Domaine de Montceau', accent: '#7a9e6e', fond: '#f4f7f0', buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896746/149_jwshu6.png' },
+    // 7 — Mairie autre template
+    { event: 'LA MAIRIE', name1: 'Chloé', name2: 'Alexandre', date: '3 Avril 2026', lieu: 'Mairie du 8e, Paris', accent: '#888888', fond: '#f8f8f8', oui: true, buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878824/77_rnfcni.png' },
+    // 8 — Beach party fuchsia
     { event: 'BEACH PARTY', name1: 'Inès', name2: 'Michaël', date: '10 Juillet 2026', lieu: 'Plage de Pampelonne', accent: '#d4006a', fond: '#fff0f8', buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878845/95_w9natp.png' },
+    // 9 — Houppa marine & or
+    { event: 'LA HOUPPA', name1: 'Déborah', name2: 'Élie', he1: 'דבורה', he2: 'אליהו', date: '22 Décembre 2026', lieu: 'Grande Synagogue, Paris', accent: '#C9A84C', fond: '#0a1628', dark: true, verse: 'קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה', parents: 'M. & Mme Abecassis · M. & Mme Sebag', bsd: true, defunt: 'Jacob Abecassis ז״ל', buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878852/100_kzuxzq.png' },
+    // 10 — Cocktail menthe
+    { event: 'COCKTAIL', name1: 'Julie', name2: 'Thomas', date: '14 Juin 2026', lieu: 'Jardin du Luxembourg', accent: '#2a9a6a', fond: '#f0faf5', buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896741/150_rzlu80.png' },
+    // 11 — Shabbat Hatan rose
+    { event: 'SHABBAT HATAN', name1: 'Léa', name2: 'Ariel', he1: 'לאה', he2: 'אריאל', date: '11 Octobre 2026', lieu: 'Synagogue de Boulogne', accent: '#8b1a2a', fond: '#fdf8f8', verse: '✡ ✦ ✡', bsd: true, buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878824/79_msrbl6.png' },
+    // 12 — Henné fuchsia
+    { event: 'LE HENNÉ', name1: 'Myriam', name2: 'Samuel', date: '18 Novembre 2026', lieu: 'Salle Gaveau, Paris', accent: '#d4006a', fond: '#fff0f8', buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857021/69_vko7to.png' },
   ]
 
   useEffect(() => {
@@ -107,7 +125,7 @@ function ShowcaseCarousel() {
           {c.oui && (
             <>
               <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: textColor, opacity: 0.7, marginBottom: 2 }}>se diront</div>
-              <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: textColor, lineHeight: 1, marginBottom: 14 }}>Oui</div>
+              <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 48, color: textColor, lineHeight: 1, marginBottom: 14 }}>&laquo; Oui &raquo;</div>
             </>
           )}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', marginBottom: 10 }}>
