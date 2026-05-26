@@ -50,6 +50,64 @@ function FakeCard({ name1, name2, date, accent, fond }: { name1: string; name2: 
   )
 }
 
+function ShowcaseCarousel() {
+  const [active, setActive] = useState(0)
+  const cards = [
+    { event: 'LA HOUPPA', name1: 'Sarah', name2: 'David', date: '15 Juin 2026', lieu: 'Synagogue Beth-El, Paris', accent: '#8b1a2a', fond: '#fdf8f8', verse: 'קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה', parents: 'M. & Mme Cohen · M. & Mme Lévy' },
+    { event: 'LA MAIRIE', name1: 'Léa', name2: 'Antoine', date: '12 Juillet 2026', lieu: 'Mairie du 16e, Paris', accent: '#C9A84C', fond: '#fdf8f0', oui: true },
+    { event: 'SHABBAT HATAN', name1: 'Esther', name2: 'Nathan', date: '20 Mars 2026', lieu: 'Synagogue Buffault, Paris', accent: '#2c4a7c', fond: '#f0f4f8', verse: '✡ ✦ ✡' },
+    { event: 'LE HENNÉ', name1: 'Yaël', name2: 'Jonathan', date: '5 Septembre 2026', lieu: 'Salle des Oliviers, Sarcelles', accent: '#d4a574', fond: '#2c1a0e', dark: true },
+    { event: 'SOIRÉE', name1: 'Emma', name2: 'Raphaël', date: '28 Août 2026', lieu: 'Domaine de Montceau', accent: '#7a9e6e', fond: '#f4f7f0' },
+    { event: 'BEACH PARTY', name1: 'Inès', name2: 'Michaël', date: '10 Juillet 2026', lieu: 'Plage de Pampelonne', accent: '#d4006a', fond: '#fff0f8' },
+  ]
+
+  useEffect(() => {
+    const t = setInterval(() => setActive(p => (p + 1) % cards.length), 3500)
+    return () => clearInterval(t)
+  }, [cards.length])
+
+  const c = cards[active]
+  const textColor = c.dark ? '#f5e6d0' : c.accent
+
+  return (
+    <div style={{ maxWidth: 380, margin: '0 auto' }}>
+      <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', boxShadow: '0 24px 80px rgba(0,0,0,0.14)', background: c.fond, transition: 'background 0.6s ease', minHeight: 340 }}>
+        <div style={{ padding: '36px 28px', textAlign: 'center', animation: 'showcaseFade 0.6s ease' }}>
+          <style>{`@keyframes showcaseFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`}</style>
+          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 11, letterSpacing: 5, textTransform: 'uppercase', color: textColor, marginBottom: 14, opacity: 0.7 }}>{c.event}</div>
+          {c.verse && <div style={{ fontFamily: 'serif', fontSize: 13, color: textColor, direction: 'rtl', marginBottom: 16, opacity: 0.6 } as React.CSSProperties}>{c.verse}</div>}
+          {c.parents && <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: textColor, marginBottom: 14, opacity: 0.6 }}>{c.parents}</div>}
+          <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 42, color: textColor, lineHeight: 1.15 }}>{c.name1}</div>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 20, color: textColor, opacity: 0.45, margin: '4px 0' }}>&</div>
+          <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 42, color: textColor, lineHeight: 1.15, marginBottom: 16 }}>{c.name2}</div>
+          {c.oui && (
+            <>
+              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: textColor, opacity: 0.7, marginBottom: 4 }}>se diront</div>
+              <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: textColor, lineHeight: 1, marginBottom: 16 }}>Oui</div>
+            </>
+          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', marginBottom: 12 }}>
+            <div style={{ width: 24, height: '0.5px', background: textColor, opacity: 0.4 }} />
+            <span style={{ color: textColor, fontSize: 8, opacity: 0.5 }}>✦</span>
+            <div style={{ width: 24, height: '0.5px', background: textColor, opacity: 0.4 }} />
+          </div>
+          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 12, color: textColor, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 6, opacity: 0.85 }}>{c.date}</div>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: textColor, opacity: 0.6 }}>{c.lieu}</div>
+        </div>
+      </div>
+      {/* Dots */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 16 }}>
+        {cards.map((_, i) => (
+          <button key={i} onClick={() => setActive(i)} style={{ width: i === active ? 20 : 6, height: 6, borderRadius: 3, background: i === active ? GOLD : `${GOLD}44`, border: 'none', cursor: 'pointer', transition: 'all 0.3s ease', padding: 0 }} />
+        ))}
+      </div>
+      <div style={{ textAlign: 'center', marginTop: 8 }}>
+        <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 12, color: `${TEXT}88` }}>{c.event.charAt(0) + c.event.slice(1).toLowerCase()}</span>
+      </div>
+    </div>
+  )
+}
+
 function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false)
   return (
@@ -136,9 +194,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div style={{ maxWidth: 380, margin: '0 auto', transform: 'rotate(-1.5deg)', boxShadow: '0 24px 80px rgba(0,0,0,0.14)', borderRadius: 16, overflow: 'hidden' }}>
-          <FakeCard name1="Léa" name2="Antoine" date="12 Juillet 2026 · Paris" accent={GOLD} fond="#fdf8f0" />
-        </div>
+        <ShowcaseCarousel />
       </div>
 
       {/* ── PREUVE SOCIALE ── */}
