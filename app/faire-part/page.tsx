@@ -5502,37 +5502,54 @@ const firstDate = sorted[0]?.date
                         </div>
                       </AnimSection></DraggableElement>
                     )}
-                    {(ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Mairie') && (
-                      <DraggableElement id={pre+"prenoms"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={250} skipAnim={canEdit}>
-                        {/* Prénoms principaux sur la même ligne */}
-                        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(8px,2vw,14px)', flexWrap: 'wrap', marginBottom: (data.marie1Prenom2 || data.marie2Prenom2) ? 2 : 8 }}>
-                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(32px,8vw,52px)', color: G, lineHeight: 1.15, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom}</div>
-                          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(18px,4vw,28px)', color: G, opacity: 0.45, letterSpacing: 2 }}>&</div>
-                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(32px,8vw,52px)', color: G, lineHeight: 1.15, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom}</div>
-                        </div>
-                        {/* Deuxièmes prénoms côte à côte (masqués si prénoms hébraïques remplis pour éviter doublon) */}
-                        {!data.mariageJuif && (data.marie1Prenom2 || data.marie2Prenom2) && (
+                    {(ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Mairie') && (<>
+                      {/* Prénom 1 français */}
+                      <DraggableElement id={pre+"prenom1"} layout={layout} onLayoutChange={setLayout} editable={canEdit}>
+                        <AnimSection animStyle={anim} delay={240} skipAnim={canEdit}>
+                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(32px,8vw,52px)', color: G, textAlign: 'center', lineHeight: 1.15, whiteSpace: 'nowrap' as const, marginBottom: 4 }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom}</div>
+                        </AnimSection>
+                      </DraggableElement>
+                      {/* Prénom 1 hébreu */}
+                      {data.mariageJuif && data.marie1PrenomHebreu && (
+                        <DraggableElement id={pre+"prenom1he"} layout={layout} onLayoutChange={setLayout} editable={canEdit}>
+                          <div dir="rtl" lang="he" style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 'clamp(18px,4.5vw,26px)', color: G, opacity: 0.65, textAlign: 'center', lineHeight: 1.2, marginBottom: 4 }}>{data.marie1PrenomHebreu}</div>
+                        </DraggableElement>
+                      )}
+                      {/* & */}
+                      <AnimSection animStyle={anim} delay={260} skipAnim={canEdit}>
+                        <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(18px,4vw,28px)', color: G, opacity: 0.45, letterSpacing: 2, textAlign: 'center', margin: '2px 0' }}>&</div>
+                      </AnimSection>
+                      {/* Prénom 2 français */}
+                      <DraggableElement id={pre+"prenom2"} layout={layout} onLayoutChange={setLayout} editable={canEdit}>
+                        <AnimSection animStyle={anim} delay={280} skipAnim={canEdit}>
+                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(32px,8vw,52px)', color: G, textAlign: 'center', lineHeight: 1.15, whiteSpace: 'nowrap' as const, marginBottom: 4 }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom}</div>
+                        </AnimSection>
+                      </DraggableElement>
+                      {/* Prénom 2 hébreu */}
+                      {data.mariageJuif && data.marie2PrenomHebreu && (
+                        <DraggableElement id={pre+"prenom2he"} layout={layout} onLayoutChange={setLayout} editable={canEdit}>
+                          <div dir="rtl" lang="he" style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 'clamp(18px,4.5vw,26px)', color: G, opacity: 0.65, textAlign: 'center', lineHeight: 1.2, marginBottom: 4 }}>{data.marie2PrenomHebreu}</div>
+                        </DraggableElement>
+                      )}
+                      {/* Deuxièmes prénoms (civil uniquement) */}
+                      {!data.mariageJuif && (data.marie1Prenom2 || data.marie2Prenom2) && (
+                        <DraggableElement id={pre+"prenoms2"} layout={layout} onLayoutChange={setLayout} editable={canEdit}>
                           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(24px,6vw,48px)', marginBottom: 6 }}>
                             <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(14px,3.5vw,22px)', letterSpacing: '0.04em', color: G, opacity: 0.75, lineHeight: 1.3 }}>{data.marie1Prenom2 || ''}</div>
                             {(data.marie1Prenom2 && data.marie2Prenom2) && <div style={{ width: 1, height: 16, background: G, opacity: 0.2 }} />}
                             <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(14px,3.5vw,22px)', letterSpacing: '0.04em', color: G, opacity: 0.75, lineHeight: 1.3 }}>{data.marie2Prenom2 || ''}</div>
                           </div>
-                        )}
-                        {/* Prénoms hébraïques côte à côte */}
-                        {data.mariageJuif && (data.marie1PrenomHebreu || data.marie2PrenomHebreu) && (
-                          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(20px,5vw,40px)', marginBottom: 8 }}>
-                            {data.marie1PrenomHebreu && <div dir="rtl" lang="he" style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 'clamp(16px,4vw,24px)', color: G, opacity: 0.6, lineHeight: 1.2 }}>{data.marie1PrenomHebreu}</div>}
-                            {data.marie2PrenomHebreu && <div dir="rtl" lang="he" style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 'clamp(16px,4vw,24px)', color: G, opacity: 0.6, lineHeight: 1.2 }}>{data.marie2PrenomHebreu}</div>}
-                          </div>
-                        )}
-                        {/* Séparateur fin */}
+                        </DraggableElement>
+                      )}
+                      {/* Séparateur */}
+                      <AnimSection animStyle={anim} delay={300} skipAnim={canEdit}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, margin: '4px 0 12px' }}>
                           <div style={{ width: 28, height: '0.5px', background: G, opacity: 0.3 }} />
                           <span style={{ color: G, fontSize: 7, opacity: 0.4 }}>&#9670;</span>
                           <div style={{ width: 28, height: '0.5px', background: G, opacity: 0.3 }} />
                         </div>
-                      </AnimSection></DraggableElement>
-                    )}
+                      </AnimSection>
+                    </>)}
                     <DraggableElement id={pre+"narratif"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={280} skipAnim={canEdit}>
                       {ceremony.type === 'Mairie' ? (
                         <>
