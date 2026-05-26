@@ -85,13 +85,13 @@ function ShowcaseCarousel() {
 
   return (
     <div style={{ maxWidth: 380, margin: '0 auto' }}>
-      <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', boxShadow: '0 24px 80px rgba(0,0,0,0.14)', background: c.fond, transition: 'background 0.6s ease', minHeight: 340, border: c.dark && !c.frame ? `1px solid ${textColor}33` : 'none' }}>
+      <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', boxShadow: '0 24px 80px rgba(0,0,0,0.14)', background: c.fond, transition: 'background 0.6s ease', height: 480, border: c.dark && !c.frame ? `1px solid ${textColor}33` : 'none' }}>
         {/* Cadre décoratif en fond */}
         {c.frame && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={c.frame} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: 0.8, pointerEvents: 'none', zIndex: 0 }} />
         )}
-        <div key={active} style={{ padding: '40px 36px', textAlign: 'center', position: 'relative', zIndex: 1, animation: 'showcaseFade 0.6s ease', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 320 }}>
+        <div key={active} style={{ padding: '36px 32px', textAlign: 'center', position: 'relative', zIndex: 1, animation: 'showcaseFade 0.6s ease', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', boxSizing: 'border-box' }}>
           <style>{`@keyframes showcaseFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`}</style>
           {/* בס״ד */}
           {c.bsd && <div style={{ position: 'absolute', top: 14, right: 18, fontFamily: 'serif', fontSize: 12, color: textColor, direction: 'rtl', opacity: 0.7 } as React.CSSProperties}>בס״ד</div>}
