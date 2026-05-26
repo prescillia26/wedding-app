@@ -52,13 +52,13 @@ function FakeCard({ name1, name2, date, accent, fond }: { name1: string; name2: 
 
 function ShowcaseCarousel() {
   const [active, setActive] = useState(0)
-  const cards: { event: string; name1: string; name2: string; he1?: string; he2?: string; date: string; lieu: string; accent: string; fond: string; verse?: string; parents?: string; oui?: boolean; dark?: boolean; bsd?: boolean; defunt?: string; buttons?: boolean }[] = [
-    { event: 'LA HOUPPA', name1: 'Sarah', name2: 'David', he1: 'שרה', he2: 'דוד', date: '15 Juin 2026', lieu: 'Synagogue Beth-El, Paris', accent: '#8b1a2a', fond: '#fdf8f8', verse: 'קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה', parents: 'M. & Mme Cohen · M. & Mme Lévy', bsd: true, defunt: 'Marie Cohen ז״ל', buttons: true },
-    { event: 'LA MAIRIE', name1: 'Léa', name2: 'Antoine', date: '12 Juillet 2026', lieu: 'Mairie du 16e, Paris', accent: '#C9A84C', fond: '#fdf8f0', oui: true, buttons: true },
-    { event: 'SHABBAT HATAN', name1: 'Esther', name2: 'Nathan', he1: 'אסתר', he2: 'נתן', date: '20 Mars 2026', lieu: 'Synagogue Buffault, Paris', accent: '#2c4a7c', fond: '#f0f4f8', verse: '✡ ✦ ✡', bsd: true, buttons: true },
-    { event: 'LE HENNÉ', name1: 'Yaël', name2: 'Jonathan', date: '5 Septembre 2026', lieu: 'Salle des Oliviers, Sarcelles', accent: '#d4a574', fond: '#2c1a0e', dark: true, buttons: true },
-    { event: 'SOIRÉE', name1: 'Emma', name2: 'Raphaël', date: '28 Août 2026', lieu: 'Domaine de Montceau', accent: '#7a9e6e', fond: '#f4f7f0', buttons: true },
-    { event: 'BEACH PARTY', name1: 'Inès', name2: 'Michaël', date: '10 Juillet 2026', lieu: 'Plage de Pampelonne', accent: '#d4006a', fond: '#fff0f8', buttons: true },
+  const cards: { event: string; name1: string; name2: string; he1?: string; he2?: string; date: string; lieu: string; accent: string; fond: string; verse?: string; parents?: string; oui?: boolean; dark?: boolean; bsd?: boolean; defunt?: string; buttons?: boolean; frame?: string }[] = [
+    { event: 'LA HOUPPA', name1: 'Sarah', name2: 'David', he1: 'שרה', he2: 'דוד', date: '15 Juin 2026', lieu: 'Synagogue Beth-El, Paris', accent: '#8b1a2a', fond: '#fdf8f8', verse: 'קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה', parents: 'M. & Mme Cohen · M. & Mme Lévy', bsd: true, defunt: 'Marie Cohen ז״ל', buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878823/75_qc4gsm.png' },
+    { event: 'LA MAIRIE', name1: 'Léa', name2: 'Antoine', date: '12 Juillet 2026', lieu: 'Mairie du 16e, Paris', accent: '#C9A84C', fond: '#fdf8f0', oui: true, buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857011/55_l7xahl.png' },
+    { event: 'SHABBAT HATAN', name1: 'Esther', name2: 'Nathan', he1: 'אסתר', he2: 'נתן', date: '20 Mars 2026', lieu: 'Synagogue Buffault, Paris', accent: '#2c4a7c', fond: '#f0f4f8', verse: '✡ ✦ ✡', bsd: true, buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896737/147_vmtvha.png' },
+    { event: 'LE HENNÉ', name1: 'Yaël', name2: 'Jonathan', date: '5 Septembre 2026', lieu: 'Salle des Oliviers, Sarcelles', accent: '#d4a574', fond: '#2c1a0e', dark: true, buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878854/104_mafsu8.png' },
+    { event: 'SOIRÉE', name1: 'Emma', name2: 'Raphaël', date: '28 Août 2026', lieu: 'Domaine de Montceau', accent: '#7a9e6e', fond: '#f4f7f0', buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896746/149_jwshu6.png' },
+    { event: 'BEACH PARTY', name1: 'Inès', name2: 'Michaël', date: '10 Juillet 2026', lieu: 'Plage de Pampelonne', accent: '#d4006a', fond: '#fff0f8', buttons: true, frame: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878845/95_w9natp.png' },
   ]
 
   useEffect(() => {
@@ -72,7 +72,12 @@ function ShowcaseCarousel() {
   return (
     <div style={{ maxWidth: 380, margin: '0 auto' }}>
       <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', boxShadow: '0 24px 80px rgba(0,0,0,0.14)', background: c.fond, transition: 'background 0.6s ease', minHeight: 340 }}>
-        <div key={active} style={{ padding: '32px 24px', textAlign: 'center', position: 'relative', animation: 'showcaseFade 0.6s ease' }}>
+        {/* Cadre décoratif en fond */}
+        {c.frame && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={c.frame} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: 0.9, pointerEvents: 'none', zIndex: 0 }} />
+        )}
+        <div key={active} style={{ padding: '32px 24px', textAlign: 'center', position: 'relative', zIndex: 1, animation: 'showcaseFade 0.6s ease' }}>
           <style>{`@keyframes showcaseFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`}</style>
           {/* בס״ד */}
           {c.bsd && <div style={{ position: 'absolute', top: 14, right: 18, fontFamily: 'serif', fontSize: 12, color: textColor, direction: 'rtl', opacity: 0.7 } as React.CSSProperties}>בס״ד</div>}
