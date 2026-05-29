@@ -230,18 +230,61 @@ export default function Home() {
           {h.heroSubtitle}
         </p>
 
-        <div style={{ margin: '32px auto 40px', maxWidth: 400 }}>
-          <div style={{ marginBottom: 16 }}>
-            <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: TEXT, marginRight: 6 }}>{locale === 'en' ? 'From' : 'À partir de'}</span>
-            <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 36, color: DARK, fontWeight: 700 }}>{c.price}</span>
-            <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: TEXT, marginLeft: 6 }}>{c.singlePayment}</span>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, maxWidth: 800, margin: '32px auto 40px' }}>
+
+          {/* ── Pack Premium — 69€ ── */}
+          <div style={{ background: 'white', borderRadius: 24, padding: '36px 28px', boxShadow: `0 16px 64px ${GOLD}22`, border: `1.5px solid ${GOLD}66`, textAlign: 'center', position: 'relative' }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: GOLD, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>Premium</div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 4, marginBottom: 4 }}>
+              <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 18, color: '#9ca3af', textDecoration: 'line-through', marginTop: 8, marginRight: 4 }}>{h.priceBefore}</span>
+              <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 48, color: DARK, lineHeight: 1, fontWeight: 700 }}>{c.price}</span>
+            </div>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: TEXT, marginBottom: 20 }}>{c.singlePayment} — {c.lifetimeAccess}</div>
+            <div style={{ textAlign: 'left', marginBottom: 24 }}>
+              {h.pricingFeatures.map(item => (
+                <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                  <span style={{ color: GOLD, fontSize: 13 }}>✓</span>
+                  <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: TEXT }}>{item}</span>
+                </div>
+              ))}
+            </div>
+            <a href={ctaHref} style={{ ...S.btnPrimary, display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontSize: 14 }}>
+              {isLoggedIn ? c.createYourFairepart : c.startNow}
+            </a>
+            <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: `${TEXT}77`, marginTop: 10, marginBottom: 0 }}>
+              {c.satisfiedOrRefunded}
+            </p>
           </div>
-          <a href={ctaHref} style={{ ...S.btnPrimary, display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontSize: 16 }}>
-            {isLoggedIn ? c.createYourFairepart : c.startNow}
-          </a>
-          <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: `${TEXT}77`, marginTop: 10 }}>
-            {c.satisfiedOrRefunded} · {c.lifetimeAccess}
-          </p>
+
+          {/* ── Pack Luxe Aquarelle — 99€ ── */}
+          <div style={{ background: 'white', borderRadius: 24, padding: '36px 28px', boxShadow: `0 24px 72px ${GOLD}33`, border: `2.5px solid ${GOLD}`, textAlign: 'center', position: 'relative' }}>
+            <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`, color: 'white', fontSize: 9, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', padding: '5px 16px', borderRadius: 9999, whiteSpace: 'nowrap', boxShadow: `0 4px 16px ${GOLD}55` }}>
+              Recommandé
+            </div>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: GOLD, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>Luxe Aquarelle</div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 4, marginBottom: 4 }}>
+              <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 48, color: DARK, lineHeight: 1, fontWeight: 700 }}>99&euro;</span>
+            </div>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: TEXT, marginBottom: 20 }}>{c.singlePayment} — {c.lifetimeAccess}</div>
+            <div style={{ textAlign: 'left', marginBottom: 24 }}>
+              {[
+                locale === 'en' ? 'Everything in Premium' : 'Tout le pack Premium',
+                locale === 'en' ? 'AI watercolors per event (real venue)' : 'Aquarelles IA par événement (lieu réel)',
+                locale === 'en' ? 'Decorative illustrations (rings, doves…)' : 'Illustrations décoratives (bagues, colombes…)',
+                locale === 'en' ? 'Custom color palette' : 'Palette de couleurs personnalisée',
+                locale === 'en' ? 'AI-personalized Luxe design' : 'Design Luxe personnalisé par l\'IA',
+              ].map(item => (
+                <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                  <span style={{ color: GOLD, fontSize: 13 }}>✓</span>
+                  <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: TEXT }}>{item}</span>
+                </div>
+              ))}
+            </div>
+            <a href="/paiement" style={{ ...S.btnPrimary, display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontSize: 14, textDecoration: 'none' }}>
+              {locale === 'en' ? 'Choose Luxe — 99€' : 'Choisir le Luxe — 99€'}
+            </a>
+          </div>
+
         </div>
 
         <ShowcaseCarousel />
@@ -342,69 +385,8 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ── PRICING ── */}
-      <div ref={pricing.ref} style={pricing.style}>
-        <div style={S.section}>
-          <div style={S.sectionTitle}>{h.pricing}</div>
-          <p style={S.sectionSub}>{h.pricingSub}</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24, maxWidth: 800, margin: '0 auto' }}>
-
-            {/* ── Pack Premium — 69€ ── */}
-            <div style={{ background: 'white', borderRadius: 24, padding: '40px 32px', boxShadow: `0 16px 64px ${GOLD}22`, border: `1.5px solid ${GOLD}66`, textAlign: 'center', position: 'relative' }}>
-              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: GOLD, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>Premium</div>
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 4, marginBottom: 4 }}>
-                <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 20, color: '#9ca3af', textDecoration: 'line-through', marginTop: 10, marginRight: 4 }}>{h.priceBefore}</span>
-                <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 56, color: DARK, lineHeight: 1, fontWeight: 700 }}>{c.price}</span>
-              </div>
-              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 15, color: TEXT, marginBottom: 24 }}>{c.singlePayment} — {c.lifetimeAccess}</div>
-              <div style={{ textAlign: 'left', marginBottom: 28 }}>
-                {h.pricingFeatures.map(item => (
-                  <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                    <span style={{ color: GOLD, fontSize: 14 }}>✓</span>
-                    <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 15, color: TEXT }}>{item}</span>
-                  </div>
-                ))}
-              </div>
-              <a href={ctaHref} style={{ ...S.btnPrimary, display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontSize: 14 }}>
-                {isLoggedIn ? c.createYourFairepart : c.startNow}
-              </a>
-              <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 12, color: `${TEXT}77`, marginTop: 12, marginBottom: 0 }}>
-                {c.satisfiedOrRefunded}
-              </p>
-            </div>
-
-            {/* ── Pack Luxe Aquarelle — 99€ ── */}
-            <div style={{ background: 'white', borderRadius: 24, padding: '40px 32px', boxShadow: `0 24px 72px ${GOLD}33`, border: `2.5px solid ${GOLD}`, textAlign: 'center', position: 'relative' }}>
-              <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`, color: 'white', fontSize: 9, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', padding: '5px 16px', borderRadius: 9999, whiteSpace: 'nowrap', boxShadow: `0 4px 16px ${GOLD}55` }}>
-                Recommandé
-              </div>
-              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: GOLD, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>Luxe Aquarelle</div>
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 4, marginBottom: 4 }}>
-                <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 56, color: DARK, lineHeight: 1, fontWeight: 700 }}>99&euro;</span>
-              </div>
-              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 15, color: TEXT, marginBottom: 24 }}>{c.singlePayment} — {c.lifetimeAccess}</div>
-              <div style={{ textAlign: 'left', marginBottom: 28 }}>
-                {[
-                  'Tout le pack Premium',
-                  'Aquarelles IA par événement (lieu réel)',
-                  'Illustrations décoratives (bagues, colombes, coupes…)',
-                  'Palette de couleurs personnalisée',
-                  'Design Luxe personnalisé par l\'IA',
-                ].map(item => (
-                  <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                    <span style={{ color: GOLD, fontSize: 14 }}>✓</span>
-                    <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 15, color: TEXT }}>{item}</span>
-                  </div>
-                ))}
-              </div>
-              <a href="/paiement" style={{ ...S.btnPrimary, display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontSize: 14, textDecoration: 'none' }}>
-                Choisir le Luxe — 99&euro;
-              </a>
-            </div>
-
-          </div>
-        </div>
-      </div>
+      {/* ── PRICING (ancre pour le scroll) ── */}
+      <div ref={pricing.ref} style={pricing.style} />
 
       {/* ── FAQ ── */}
       <div ref={faq.ref} style={{ ...faq.style, background: LIGHT_GOLD }}>
