@@ -5,6 +5,7 @@ import { showToast } from '../components/Toast'
 import { useT } from '@/lib/i18n'
 import CeremonyWatercolorPanel from '../components/CeremonyWatercolorPanel'
 import DecoIllustrationPanel from '../components/DecoIllustrationPanel'
+import LuxeFairePartRenderer from '../components/LuxeFairePartRenderer'
 import type { Palette } from '@/lib/watercolorPrompt'
 
 
@@ -6649,7 +6650,31 @@ export default function FairePartPage() {
   // Freemium : plus de gate d'accès, tout le monde peut créer
   // Le partage est bloqué si pas payé (isPaid=false)
 
-  if (showCards) return <CardsView data={formData} onEdit={() => { try { localStorage.setItem('wedding-draft', JSON.stringify(formData)) } catch { /* ignore */ } setShowCards(false); setStep(4) }} onReset={() => { setFormData(defaultFormData); setShowCards(false); setStep(1); try { localStorage.removeItem('wedding-draft') } catch { /* ignore */ } }} isShared={isShared} role={role} onUpdate={update} isPaid={isPaid} />
+  if (showCards) {
+    const isLuxePack = userPack === 'premium'
+    const onEdit = () => { try { localStorage.setItem('wedding-draft', JSON.stringify(formData)) } catch { /* ignore */ } setShowCards(false); setStep(4) }
+    const onReset = () => { setFormData(defaultFormData); setShowCards(false); setStep(1); try { localStorage.removeItem('wedding-draft') } catch { /* ignore */ } }
+
+    if (isLuxePack && !isShared) {
+      // ── Pack Luxe : rendu multi-sections ──
+      return (
+        <div style={{ position: 'relative' }}>
+          {!isPaid && (
+            <div style={{ position: 'fixed', inset: 0, zIndex: 40, pointerEvents: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+              <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(60px,15vw,120px)', color: 'rgba(201,168,76,0.08)', fontWeight: 700, letterSpacing: 8, transform: 'rotate(-30deg)', whiteSpace: 'nowrap', userSelect: 'none' }}>LOV&apos;IT</div>
+            </div>
+          )}
+          <LuxeFairePartRenderer data={formData} />
+          <div style={{ position: 'sticky', bottom: 0, zIndex: 50, background: 'white', borderTop: '1px solid #e8e0d8', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center' }}>
+            <button onClick={onEdit} style={{ padding: '10px 20px', borderRadius: 9999, border: '1.5px solid #C9A84C', background: 'transparent', color: '#C9A84C', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Modifier</button>
+            <button onClick={() => { if (!isPaid) { window.location.href = '/paiement'; return } }} style={{ padding: '10px 20px', borderRadius: 9999, background: isPaid ? '#C9A84C' : 'linear-gradient(135deg, #C9A84C, #e8c96a)', color: 'white', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>{!isPaid ? 'Débloquer le partage' : 'Partager'}</button>
+          </div>
+        </div>
+      )
+    }
+
+    return <CardsView data={formData} onEdit={onEdit} onReset={onReset} isShared={isShared} role={role} onUpdate={update} isPaid={isPaid} />
+  }
 
   if (loadingShare) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #fff8ed 0%, #fffaf4 50%, #fff8ed 100%)' }}>
