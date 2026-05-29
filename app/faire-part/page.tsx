@@ -2311,9 +2311,9 @@ function OrnementCorner({ url, corner, size = 130 }: {
   )
 }
 
-function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, frameSize = 100, framePaddingV = 22, framePaddingH = 18, textOpacity = 1, textBg = 0.5, textOffsetY = 0, illustrationUrl, children }: {
+function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, frameSize = 100, framePaddingV = 22, framePaddingH = 18, textOpacity = 1, textBg = 0.5, textOffsetY = 0, children }: {
   frameId: string; ornamentId: string; themeCardBg: string
-  frameOpacity?: number; frameSize?: number; framePaddingV?: number; framePaddingH?: number; textOpacity?: number; textBg?: number; textOffsetY?: number; illustrationUrl?: string
+  frameOpacity?: number; frameSize?: number; framePaddingV?: number; framePaddingH?: number; textOpacity?: number; textBg?: number; textOffsetY?: number
   children: React.ReactNode
 }) {
   const frame = FRAMES.find(f => f.id === frameId) ?? FRAMES[FRAMES.length - 1]
@@ -2331,11 +2331,6 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
       )}
       <OrnementCorner url={ornUrl} corner="top-right" size={130} />
       <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
-      {/* Aquarelle IA en fond décoratif */}
-      {illustrationUrl && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={illustrationUrl} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.25, pointerEvents: 'none', zIndex: 0 }} />
-      )}
       {/* Zone texte avec voile blanc semi-transparent derrière pour garantir la lisibilité sur cadres chargés */}
       <div style={{ position: 'relative', zIndex: 10, paddingTop: `${framePaddingV}%`, paddingBottom: `${framePaddingV}%`, paddingLeft: `${framePaddingH}%`, paddingRight: `${framePaddingH}%`, textAlign: 'center', opacity: textOpacity, transform: textOffsetY ? `translateY(${textOffsetY}px)` : undefined }}>
         {hasFrame && FRAMES_STRONG_BG.has(frameId) && (
@@ -2522,7 +2517,7 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const honore = ov[`ceremony_${ci}_honore`] || t.fairepart.cardHonore
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0} illustrationUrl={data.illustrationUrl}>
+    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{t.fairepart.cardLaHouppa}</div>
@@ -2622,7 +2617,7 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const ci = cardIdx ?? 0
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0} illustrationUrl={data.illustrationUrl}>
+    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{t.fairepart.cardLaMairie}</div>
@@ -2681,7 +2676,7 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const ci = cardIdx ?? 0
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0} illustrationUrl={data.illustrationUrl}>
+    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{t.fairepart.cardLeHenne}</div>
@@ -2728,7 +2723,7 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const titreDisplay = ov[`ceremony_${ci}_titre`] || name
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0} illustrationUrl={data.illustrationUrl}>
+    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{titreDisplay}</div>
@@ -2779,7 +2774,7 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
   const parents2 = fmtParentsLines(data.famille2PerePrenom, data.famille2PereNom, data.famille2MerePrenom, data.famille2MereNom, titles)
   const joie = ov[`ceremony_${ci}_joie`] || (hasGp ? t.fairepart.joyMessageGp : t.fairepart.joyMessage)
   return (
-    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0} illustrationUrl={data.illustrationUrl}>
+    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{t.fairepart.cardShabbatHatan}</div>
@@ -2863,9 +2858,7 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
 function renderCard(ceremony: Ceremony, data: FormData, theme: ThemeObj, photoIdx = 0, isShared = false) {
   const photos = data.photosFond ?? []
   const photoFond = photos[photoIdx] ?? photos[photos.length - 1] ?? data.photoFond ?? ''
-  // Aquarelle par cérémonie (v2) ou globale (v1 rétrocompat)
-  const illustrationUrl = ceremony.illustrationUrl || data.illustrationUrl
-  const props = { ceremony, data: { ...data, photoFond, illustrationUrl }, theme, isShared, cardIdx: photoIdx }
+  const props = { ceremony, data: { ...data, photoFond }, theme, isShared, cardIdx: photoIdx }
   if (ceremony.type === 'Mairie') return <CardMairie {...props} />
   if (ceremony.type === 'Cérémonie religieuse / Houppa') return <CardHouppa {...props} />
   if (ceremony.type === 'Shabbat Hatan') return <CarteShabbatHatan {...props} />
@@ -3123,14 +3116,24 @@ function ElegantCardsContent({ data, theme, isShared }: { data: FormData; theme:
       <ElegantSeparator color={theme.accent} initial1={i1} initial2={i2} />
       <ElegantPage2 data={data} theme={theme} />
       <ElegantSeparator color={theme.accent} initial1={i1} initial2={i2} />
-      {sorted.map((ceremony, i) => (
-        <div key={i}>
-          <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden' }}>
-            {renderCard(ceremony, data, theme, i, isShared)}
+      {sorted.map((ceremony, i) => {
+        const aquarelleUrl = ceremony.illustrationUrl || ''
+        return (
+          <div key={i}>
+            {/* Aquarelle IA du lieu — image pleine entre les sections */}
+            {aquarelleUrl && (
+              <div style={{ maxWidth: 600, margin: '0 auto', overflow: 'hidden' }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={aquarelleUrl} alt={ceremony.lieu || ''} style={{ width: '100%', display: 'block', objectFit: 'cover' }} />
+              </div>
+            )}
+            <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden' }}>
+              {renderCard(ceremony, data, theme, i, isShared)}
+            </div>
+            {i < sorted.length - 1 && <CeremoniesDivider themeAccent={theme.accent} />}
           </div>
-          {i < sorted.length - 1 && <CeremoniesDivider themeAccent={theme.accent} />}
-        </div>
-      ))}
+        )
+      })}
     </>
   )
 }
@@ -5508,6 +5511,13 @@ const firstDate = sorted[0]?.date
           const isCard = (data.presentationStyle ?? 'page-unique') !== 'page-unique'
           return (
             <React.Fragment key={realIdx}>
+              {/* Aquarelle IA du lieu — image pleine entre les sections */}
+              {ceremony.illustrationUrl && (
+                <div style={{ maxWidth: isCard ? undefined : 600, margin: '0 auto', overflow: 'hidden' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={ceremony.illustrationUrl} alt={ceremony.lieu || ''} style={{ width: '100%', display: 'block', objectFit: 'cover' }} />
+                </div>
+              )}
               <CeremonyCard isCard={isCard} accent={G}>
                 <section id={`ceremony-${realIdx}`} style={{ paddingTop: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingBottom: hasFrame ? `${data.framePaddingV ?? 22}%` : 96, paddingLeft: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: (role !== 'guest' && !!onUpdate) ? 'visible' : 'hidden', scrollMarginTop: 60, ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
                   {hasFrame && frame.video ? (
@@ -5529,13 +5539,6 @@ const firstDate = sorted[0]?.date
                   {hasFrame && FRAMES_STRONG_BG.has(data.frameId ?? '') && (
                     <div style={{ position: 'absolute', inset: '12% 18%', background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: 0 }} />
                   )}
-                  {/* Aquarelle IA en fond décoratif (cover = 1ère cérémonie ou global) */}
-                  {(() => {
-                    const coverIllustration = data.ceremonies?.find(c => c.illustrationUrl)?.illustrationUrl || data.illustrationUrl
-                    if (!coverIllustration) return null
-                    // eslint-disable-next-line @next/next/no-img-element
-                    return <img src={coverIllustration} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.25, pointerEvents: 'none', zIndex: 0 }} />
-                  })()}
                   {(() => {
                     const canEdit = role !== 'guest' && !!onUpdate
                     const layout = data.accueilLayout ?? {}

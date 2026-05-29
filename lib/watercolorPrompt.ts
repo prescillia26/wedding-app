@@ -64,15 +64,13 @@ export function buildVenueWatercolorPrompt(opts: {
   const location = adresse ? `${lieu}, ${adresse}` : lieu;
 
   return [
-    "A stunning hand-painted WATERCOLOR illustration, fine art wedding invitation style.",
-    "NOT a poster, NOT a template, NO text, NO words, NO letters, NO logo, NO icons, no solid color blocks.",
-    `Subject: a faithful and recognizable watercolor painting of the REAL venue "${location}".`,
-    `The painting MUST accurately depict the actual architecture, facade, distinctive features, and surroundings of "${lieu}" as it really looks in reality.`,
-    `If this is a famous or well-known venue, show its iconic and recognizable architectural elements precisely.`,
-    `The venue is prepared for ${context}, with subtle elegant wedding decorations that complement but do not hide the architecture.`,
+    `A beautiful hand-painted WATERCOLOR painting of the real place "${location}".`,
+    "The painting is a realistic and RECOGNIZABLE depiction of this specific real-world location.",
+    `Show the actual building, architecture, landscape and distinctive features of "${lieu}" exactly as it looks in real life — someone who has visited this place should immediately recognize it.`,
+    `The scene shows the venue set up for ${context}, with subtle elegant wedding decorations.`,
     `Color palette: ${colors}.`,
-    "Style: delicate watercolor with fine black ink linework, visible brush strokes, soft washes and transparencies.",
-    "Beautiful romantic lighting, the painting fills the entire frame edge to edge. Timeless fine art elegance.",
+    "Style: fine art watercolor, delicate brush strokes, soft washes, ink linework details, romantic light.",
+    "NOT a poster, NO text, NO words, NO letters, NO logo. The painting fills the entire frame.",
   ].join(" ");
 }
 
