@@ -70,27 +70,48 @@ export function buildLuxeComposition(
   luxeDecoUrls?: Record<string, string>,
 ): LuxeComposition {
   const sections: LuxeSection[] = []
+  const decoUrls = luxeDecoUrls || {}
+  const allDecoIds = Object.keys(decoUrls).filter(k => decoUrls[k])
 
-  // 1. COVER — utilise l'aquarelle de la première cérémonie qui en a une
-  const firstWithScene = ceremonies.find(c => c.illustrationUrl)
+  // 1. COVER — texte seul (pas d'aquarelle pour éviter le doublon avec la 1ère cérémonie)
   sections.push({
     kind: 'cover',
-    sceneUrl: firstWithScene?.illustrationUrl,
   })
 
   // 2. UNE SECTION PAR CÉRÉMONIE
   ceremonies.forEach((ceremony, i) => {
+    // Motif entre cérémonies : utiliser le motif par défaut pour ce type de cérémonie
     const defaultMotif = DEFAULT_MOTIFS[ceremony.type] || 'colombes'
     const isLast = i === ceremonies.length - 1
+    // Chercher un motif généré qui correspond, sinon prendre un motif disponible
+    let motifUrl: string | undefined
+    if (!isLast) {
+      motifUrl = decoUrls[defaultMotif]
+      // Si pas de motif par défaut, prendre le premier deco disponible non encore utilisé
+      if (!motifUrl && allDecoIds.length > 0) {
+        const fallbackId = allDecoIds[i % allDecoIds.length]
+        motifUrl = decoUrls[fallbackId]
+      }
+    }
 
     sections.push({
       kind: 'ceremony',
       ceremonyIndex: i,
       sceneUrl: ceremony.illustrationUrl,
-      motifAfterUrl: !isLast ? (luxeDecoUrls?.[defaultMotif] || undefined) : undefined,
+      motifAfterUrl: motifUrl,
       motifAfterType: !isLast ? defaultMotif : undefined,
     })
   })
+
+  // 2b. Si une seule cérémonie et des décos existent, ajouter les motifs après la cérémonie
+  // (avant infos pratiques) pour qu'ils soient visibles
+  if (ceremonies.length === 1 && allDecoIds.length > 0) {
+    // Le premier motif va après la cérémonie (avant infos)
+    const firstDecoUrl = decoUrls[allDecoIds[0]]
+    if (firstDecoUrl && sections.length > 1) {
+      sections[1].motifAfterUrl = firstDecoUrl
+    }
+  }
 
   // 3. INFOS PRATIQUES
   sections.push({ kind: 'infos' })

@@ -341,6 +341,7 @@ export default function LuxeFairePartRenderer({
   const paletteId = data.luxeColor || 'mauve'
   const palette = getLuxePalette(paletteId)
   const composition = buildLuxeComposition(data.ceremonies, paletteId, data.luxeDecoUrls)
+  const decoImages = Object.entries(data.luxeDecoUrls || {}).filter(([, url]) => url).map(([id, url]) => ({ id, url }))
 
   return (
     <div style={{ background: palette.cream, minHeight: '100vh', maxWidth: 600, margin: '0 auto', boxShadow: '0 0 60px rgba(0,0,0,0.08)' }}>
@@ -361,6 +362,16 @@ export default function LuxeFairePartRenderer({
 
           {section.kind === 'infos' && (
             <InfosSection data={data} palette={palette} />
+          )}
+
+          {/* Galerie d'illustrations décoratives avant le RSVP */}
+          {section.kind === 'rsvp' && decoImages.length > 0 && (
+            <div style={{ background: palette.cream, padding: '20px 24px', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 16 }}>
+              {decoImages.map(({ id, url }) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={id} src={url} alt="" style={{ height: 70, maxWidth: 100, objectFit: 'contain' }} />
+              ))}
+            </div>
           )}
 
           {section.kind === 'rsvp' && (
