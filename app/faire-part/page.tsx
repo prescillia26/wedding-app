@@ -1809,6 +1809,7 @@ function AccordionSection({ title, defaultOpen = false, children }: { title: str
 
 function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
   const { t, locale } = useT()
+  const [isPremium] = useState(() => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('premium') === 'true')
   return (
     <div>
       <h2 style={{ textAlign: 'center', fontFamily: 'var(--font-playfair-display)', fontSize: 20, fontWeight: 600, color: '#3a3330', marginBottom: 6 }}>{t.fairepart.step4Title}</h2>
@@ -1901,6 +1902,25 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       </div>
 
       </AccordionSection>
+
+      {isPremium && (
+        <AccordionSection title={locale === 'en' ? '🎨 AI Watercolor' : '🎨 Aquarelle IA'} defaultOpen>
+          <p style={{ fontSize: 12, color: '#6a5040', marginBottom: 12, lineHeight: 1.6 }}>
+            {locale === 'en'
+              ? 'Generate a unique watercolor for each of your events, based on the venue you entered in step 3.'
+              : 'Générez une aquarelle unique pour chacun de vos événements, basée sur le lieu renseigné à l\u2019étape 3.'}
+          </p>
+          <CeremonyWatercolorPanel
+            ceremonies={data.ceremonies}
+            palette={themeToWatercolorPalette(data.style)}
+            onUpdateCeremony={(i, updates) => {
+              const newCeremonies = [...data.ceremonies]
+              newCeremonies[i] = { ...newCeremonies[i], ...updates }
+              onChange({ ceremonies: newCeremonies })
+            }}
+          />
+        </AccordionSection>
+      )}
 
       <AccordionSection title={locale === 'en' ? '🖼️ Decorative frame' : '🖼️ Cadre décoratif'}>
         {/* Cadres statiques (images) */}
