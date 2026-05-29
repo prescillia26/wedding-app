@@ -7,6 +7,7 @@ import CeremonyWatercolorPanel from '../components/CeremonyWatercolorPanel'
 import DecoIllustrationPanel from '../components/DecoIllustrationPanel'
 import LuxeFairePartRenderer from '../components/LuxeFairePartRenderer'
 import type { Palette } from '@/lib/watercolorPrompt'
+import { toTitleCase } from '@/lib/titleCase'
 
 
 type Theme = 'rose-fleuri' | 'ivoire-or' | 'bleu-floral' | 'champetre' | 'blanc-gris' | 'noir-blanc' | 'chocolat' | 'bordeaux' | 'bordeaux-nuit' | 'fuchsia' | 'marine-or' | 'menthe'
@@ -894,13 +895,16 @@ function Label({ children }: { children: React.ReactNode }) {
   return <label style={S.label}>{children}</label>
 }
 
-function Field({ label, value, onChange, placeholder, type = 'text' }: {
-  label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string
+function Field({ label, value, onChange, placeholder, type = 'text', autoCapitalize: shouldCapitalize = false }: {
+  label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string; autoCapitalize?: boolean
 }) {
   return (
     <div style={{ marginBottom: 16 }}>
       <Label>{label}</Label>
-      <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={S.input} />
+      <input
+        type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={S.input}
+        onBlur={shouldCapitalize ? () => { const tc = toTitleCase(value); if (tc !== value) onChange(tc) } : undefined}
+      />
     </div>
   )
 }
@@ -1005,8 +1009,8 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       <div style={{ background: '#fdf8f0', borderRadius: 12, padding: 20, marginBottom: 16 }}>
         <div style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>{t.fairepart.person1}</div>
         <div style={{ display: 'flex', gap: 12 }}>
-          <Field label={t.fairepart.firstName} value={data.marie1Prenom} onChange={v => onChange({ marie1Prenom: v })} placeholder={t.fairepart.placeholderFirstName1} />
-          <Field label={t.fairepart.lastName} value={data.marie1Nom} onChange={v => onChange({ marie1Nom: v })} placeholder={t.fairepart.placeholderLastName1} />
+          <Field label={t.fairepart.firstName} value={data.marie1Prenom} onChange={v => onChange({ marie1Prenom: v })} placeholder={t.fairepart.placeholderFirstName1} autoCapitalize />
+          <Field label={t.fairepart.lastName} value={data.marie1Nom} onChange={v => onChange({ marie1Nom: v })} placeholder={t.fairepart.placeholderLastName1} autoCapitalize />
         </div>
         {!data.mariageJuif && <Field label={t.fairepart.secondName} value={data.marie1Prenom2} onChange={v => onChange({ marie1Prenom2: v })} placeholder="" />}
         <div style={{ marginTop: 8 }}>
@@ -1024,8 +1028,8 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       <div style={{ background: '#fdf8f0', borderRadius: 12, padding: 20 }}>
         <div style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>{t.fairepart.person2}</div>
         <div style={{ display: 'flex', gap: 12 }}>
-          <Field label={t.fairepart.firstName} value={data.marie2Prenom} onChange={v => onChange({ marie2Prenom: v })} placeholder={t.fairepart.placeholderFirstName2} />
-          <Field label={t.fairepart.lastName} value={data.marie2Nom} onChange={v => onChange({ marie2Nom: v })} placeholder={t.fairepart.placeholderLastName2} />
+          <Field label={t.fairepart.firstName} value={data.marie2Prenom} onChange={v => onChange({ marie2Prenom: v })} placeholder={t.fairepart.placeholderFirstName2} autoCapitalize />
+          <Field label={t.fairepart.lastName} value={data.marie2Nom} onChange={v => onChange({ marie2Nom: v })} placeholder={t.fairepart.placeholderLastName2} autoCapitalize />
         </div>
         {!data.mariageJuif && <Field label={t.fairepart.secondName} value={data.marie2Prenom2} onChange={v => onChange({ marie2Prenom2: v })} placeholder="" />}
         <div style={{ marginTop: 8 }}>
@@ -1110,15 +1114,15 @@ function Step2({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             <div style={{ marginBottom: 14 }}>
               <Label>{t.fairepart.fatherLabel}</Label>
               <div style={{ display: 'flex', gap: 6 }}>
-                <input type="text" value={data[col.pereKey] as string} placeholder={t.fairepart.firstName} onChange={e => onChange({ [col.pereKey]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1 }} />
-                <input type="text" value={data[col.pereNomKey] as string} placeholder={t.fairepart.lastName} onChange={e => onChange({ [col.pereNomKey]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1 }} />
+                <input type="text" value={data[col.pereKey] as string} placeholder={t.fairepart.firstName} onChange={e => onChange({ [col.pereKey]: e.target.value } as Partial<FormData>)} onBlur={() => { const v = data[col.pereKey] as string; const tc = toTitleCase(v); if (tc !== v) onChange({ [col.pereKey]: tc } as Partial<FormData>) }} style={{ ...S.input, flex: 1 }} />
+                <input type="text" value={data[col.pereNomKey] as string} placeholder={t.fairepart.lastName} onChange={e => onChange({ [col.pereNomKey]: e.target.value } as Partial<FormData>)} onBlur={() => { const v = data[col.pereNomKey] as string; const tc = toTitleCase(v); if (tc !== v) onChange({ [col.pereNomKey]: tc } as Partial<FormData>) }} style={{ ...S.input, flex: 1 }} />
               </div>
             </div>
             <div style={{ marginBottom: 14 }}>
               <Label>{t.fairepart.motherLabel}</Label>
               <div style={{ display: 'flex', gap: 6 }}>
-                <input type="text" value={data[col.mereKey] as string} placeholder={t.fairepart.firstName} onChange={e => onChange({ [col.mereKey]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1 }} />
-                <input type="text" value={data[col.mereNomKey] as string} placeholder={t.fairepart.lastName} onChange={e => onChange({ [col.mereNomKey]: e.target.value } as Partial<FormData>)} style={{ ...S.input, flex: 1 }} />
+                <input type="text" value={data[col.mereKey] as string} placeholder={t.fairepart.firstName} onChange={e => onChange({ [col.mereKey]: e.target.value } as Partial<FormData>)} onBlur={() => { const v = data[col.mereKey] as string; const tc = toTitleCase(v); if (tc !== v) onChange({ [col.mereKey]: tc } as Partial<FormData>) }} style={{ ...S.input, flex: 1 }} />
+                <input type="text" value={data[col.mereNomKey] as string} placeholder={t.fairepart.lastName} onChange={e => onChange({ [col.mereNomKey]: e.target.value } as Partial<FormData>)} onBlur={() => { const v = data[col.mereNomKey] as string; const tc = toTitleCase(v); if (tc !== v) onChange({ [col.mereNomKey]: tc } as Partial<FormData>) }} style={{ ...S.input, flex: 1 }} />
               </div>
             </div>
           </div>
@@ -1494,8 +1498,8 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             ))}
           </div>
           {c.type === 'Autre' && <Field label={t.fairepart.customEventName} value={c.customName} onChange={v => update(i, { customName: v })} />}
-          <Field label={t.fairepart.venue} value={c.lieu} onChange={v => update(i, { lieu: v })} placeholder={t.fairepart.placeholderVenue} />
-          <Field label={t.fairepart.address} value={c.adresse} onChange={v => update(i, { adresse: v })} />
+          <Field label={t.fairepart.venue} value={c.lieu} onChange={v => update(i, { lieu: v })} placeholder={t.fairepart.placeholderVenue} autoCapitalize />
+          <Field label={t.fairepart.address} value={c.adresse} onChange={v => update(i, { adresse: v })} autoCapitalize />
           <div style={{ display: 'flex', gap: 12 }}>
             <Field label={t.fairepart.date} value={c.date} onChange={v => update(i, { date: v })} type="date" />
             <Field label={t.fairepart.time} value={c.heure} onChange={v => update(i, { heure: v })} type="time" />
