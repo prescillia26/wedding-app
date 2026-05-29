@@ -248,7 +248,7 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <a href={ctaHref} style={{ ...S.btnPrimary, display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontSize: 14 }}>
+            <a href="/faire-part?pack=premium" style={{ ...S.btnPrimary, display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontSize: 14, textDecoration: 'none' }}>
               {isLoggedIn ? c.createYourFairepart : c.startNow}
             </a>
             <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: `${TEXT}77`, marginTop: 10, marginBottom: 0 }}>
@@ -280,8 +280,8 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <a href="/paiement" style={{ ...S.btnPrimary, display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontSize: 14, textDecoration: 'none' }}>
-              {locale === 'en' ? 'Choose Luxe — 99€' : 'Choisir le Luxe — 99€'}
+            <a href="/faire-part?pack=luxe" style={{ ...S.btnPrimary, display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontSize: 14, textDecoration: 'none' }}>
+              {locale === 'en' ? 'Create my Luxe invitation' : 'Créer mon faire-part Luxe'}
             </a>
           </div>
 

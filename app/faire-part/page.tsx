@@ -1973,31 +1973,6 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
             }}
           />
         </AccordionSection>
-
-        {/* Thème pour les couleurs de texte (simplifié pour Luxe) */}
-        <AccordionSection title={locale === 'en' ? '🎨 Theme & colors' : '🎨 Thème & couleurs'}>
-          <Label>{locale === 'en' ? 'Visual style' : 'Style visuel'}</Label>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 16 }}>
-            {(Object.entries(THEMES) as [Theme, ThemeObj][]).map(([key, t]) => {
-              const sel = data.style === key
-              return (
-                <button key={key} type="button" onClick={() => onChange({ style: key })} style={{
-                  ...BTN, padding: 0, borderRadius: 8, overflow: 'hidden',
-                  border: `2px solid ${sel ? t.accent : '#e8e0d8'}`,
-                  background: 'transparent', textAlign: 'center',
-                  boxShadow: sel ? `0 0 0 1px ${t.accent}` : 'none',
-                }}>
-                  <div style={{ background: t.fond, width: '100%', height: 55, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: t.accent, letterSpacing: 0.5 }}>A &amp; B</span>
-                  </div>
-                  <div style={{ padding: '4px 2px 5px', background: sel ? t.accent : '#faf8f6', fontSize: 8, fontWeight: sel ? 700 : 400, color: sel ? 'white' : '#3a3330', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {t.nom}
-                  </div>
-                </button>
-              )
-            })}
-          </div>
-        </AccordionSection>
       </>) : (<>
         {/* ── Pack Premium : Thème + Cadres décoratifs ── */}
         <AccordionSection title={locale === 'en' ? '🎨 Theme & colors' : '🎨 Thème & couleurs'} defaultOpen>
@@ -2109,22 +2084,6 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
         </div>
       </AccordionSection>
 
-      <AccordionSection title={locale === 'en' ? '🌸 Falling petals' : '🌸 Pétales décoratifs'}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div>
-            <div style={{ fontSize: 14, fontWeight: 600, color: '#3a3330' }}>{locale === 'en' ? 'Falling petals / sparkles' : 'Pétales et paillettes'}</div>
-            <div style={{ fontSize: 11, color: '#9a928a', marginTop: 2 }}>{locale === 'en' ? 'Decorative particles floating on the invitation' : 'Particules décoratives qui flottent sur l\'invitation'}</div>
-          </div>
-          <button type="button" onClick={() => onChange({ petalsEnabled: !data.petalsEnabled })} style={{
-            ...BTN, width: 48, height: 28, borderRadius: 14, padding: 2, border: 'none',
-            background: data.petalsEnabled ? THEMES[data.style].accent : '#d1d5db',
-            display: 'flex', alignItems: 'center', justifyContent: data.petalsEnabled ? 'flex-end' : 'flex-start',
-            transition: 'background 0.2s ease',
-          }}>
-            <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.2)', transition: 'transform 0.2s ease' }} />
-          </button>
-        </div>
-      </AccordionSection>
 
       <AccordionSection title={locale === 'en' ? '🎬 Opening animation' : '🎬 Animation d\'ouverture'}>
         <Label>{locale === 'en' ? 'Choose the opening animation' : 'Choisissez l\'animation d\'ouverture'}</Label>
@@ -6404,7 +6363,13 @@ export default function FairePartPage() {
   const [checkingAccess, setCheckingAccess] = useState(false) // Plus de gate
   const [isPaid, setIsPaid] = useState(false)
   const [userPack, setUserPack] = useState<'essentiel' | 'premium'>(() => {
-    try { return (localStorage.getItem('lovit_pack') === 'premium' ? 'premium' : 'essentiel') } catch { return 'essentiel' }
+    try {
+      // URL ?pack=luxe → interne 'premium', ?pack=premium → interne 'essentiel'
+      const urlPack = new URLSearchParams(window.location.search).get('pack')
+      if (urlPack === 'luxe') { localStorage.setItem('lovit_pack', 'premium'); return 'premium' }
+      if (urlPack === 'premium') { localStorage.setItem('lovit_pack', 'essentiel'); return 'essentiel' }
+      return (localStorage.getItem('lovit_pack') === 'premium' ? 'premium' : 'essentiel')
+    } catch { return 'essentiel' }
   })
   // Auth & sauvegarde serveur
   const [userEmail, setUserEmail] = useState<string | null>(null)
