@@ -40,13 +40,13 @@ const fr: Dictionary = {
   },
 
   home: {
-    badge: 'Choisi par plus de 200 couples',
-    heroTitle1: 'Votre faire-part de mariage digital,',
-    heroTitle2: 'prêt en 5 minutes',
-    heroSubtitle: "Partagez par WhatsApp, recevez les RSVP en temps réel, et impressionnez vos invités avec un design digne d'un faire-part haut de gamme.",
+    badge: 'Déjà adopté par plus de 200 couples',
+    heroTitle1: 'Le faire-part digital que vos invités',
+    heroTitle2: 'n\'oublieront pas',
+    heroSubtitle: "Créez un faire-part élégant en 5 minutes. RSVP intégré, plan de table, musique, prénoms hébraïques — partagez sur WhatsApp et suivez les réponses en temps réel.",
     priceBefore: '149€',
     stats: { couples: '200+', time: '5 min', rsvp: '80%', rating: '4.9/5' },
-    statsLabels: { couples: 'Couples conquis', time: 'Pour créer', rsvp: 'De RSVP en 48h', rating: 'Satisfaction' },
+    statsLabels: { couples: 'Couples conquis', time: 'Pour créer', rsvp: 'De réponses en 48h', rating: 'Satisfaction' },
     howItWorks: 'Simple comme bonjour',
     howItWorksSub: 'Trois étapes, cinq minutes, un résultat bluffant.',
     steps: [
