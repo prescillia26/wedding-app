@@ -881,7 +881,7 @@ const S: Record<string, React.CSSProperties> = {
   input: {
     width: '100%', border: '1px solid #e0d5c8', borderRadius: 8, padding: '12px 15px',
     background: '#fffdf9', fontSize: 14, outline: 'none', color: '#2c2622', boxSizing: 'border-box',
-    transition: 'border-color 0.2s',
+    transition: 'border-color 0.2s', textTransform: 'capitalize',
   },
   label: {
     display: 'block', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.14em',

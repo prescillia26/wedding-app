@@ -23,10 +23,10 @@ const PREMIUM_FEATURES = [
   'Design élégant et personnalisable',
   '12 thèmes au choix',
   'Cadres décoratifs & cadres vidéo animés',
-  'Photos carrousel, musique, compte à rebours',
-  'Dashboard RSVP complet + export Excel',
+  'RSVP intégré + notifications email',
+  'Musique de fond, photos carrousel',
+  'Clavier hébreu intégré',
   'Modifications illimitées — valable à vie',
-  'Lien de partage WhatsApp optimisé',
 ]
 
 const LUXE_FEATURES = [
@@ -158,6 +158,9 @@ export default function PaiementPage() {
             Luxe Aquarelle
           </div>
           <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
+            <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, color: '#aaa', textDecoration: 'line-through' }}>
+              169&euro;
+            </span>
             <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 64, fontWeight: 700, color: GOLD, lineHeight: 1 }}>
               99&euro;
             </span>
@@ -190,6 +193,9 @@ export default function PaiementPage() {
           >
             {loading === 'premium' ? 'Redirection…' : 'Choisir le Luxe — 99€'}
           </button>
+          <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: `${TEXT}77`, marginTop: 10, marginBottom: 0 }}>
+            {t.common.satisfiedOrRefunded}
+          </p>
         </div>
       </div>
 
@@ -228,6 +234,8 @@ export default function PaiementPage() {
         <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 28, color: `${GOLD}66`, marginBottom: 8 }}>Lov&apos;it</div>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 8 }}>
           <a href="/mentions-legales" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: '#8a7860', textDecoration: 'none' }}>{t.common.legalNotice}</a>
+          <a href="/cgv" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: '#8a7860', textDecoration: 'none' }}>{t.common.terms}</a>
+          <a href="/politique-de-confidentialite" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: '#8a7860', textDecoration: 'none' }}>{t.common.privacyPolicy}</a>
           <a href="/contact" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: '#8a7860', textDecoration: 'none' }}>{t.common.contact}</a>
         </div>
         <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 12, color: '#c4b5a0', margin: 0 }}>

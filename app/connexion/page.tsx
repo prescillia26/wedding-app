@@ -160,7 +160,7 @@ export default function ConnexionPage() {
         <div style={{ textAlign: 'center', marginTop: 28 }}>
           <p style={{ fontSize: 14, color: '#8a7860', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic' }}>
             {a.noAccount}{' '}
-            <a href="/paiement" style={{ color: GOLD, fontWeight: 600, textDecoration: 'none' }}>
+            <a href="/faire-part" style={{ color: GOLD, fontWeight: 600, textDecoration: 'none' }}>
               {c.createYourFairepart}
             </a>
           </p>

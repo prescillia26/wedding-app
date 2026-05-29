@@ -249,7 +249,7 @@ export default function Home() {
               ))}
             </div>
             <a href="/faire-part?pack=premium" style={{ ...S.btnPrimary, display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontSize: 14, textDecoration: 'none' }}>
-              {isLoggedIn ? c.createYourFairepart : c.startNow}
+              {locale === 'en' ? 'Create my Premium invitation' : 'Créer mon faire-part Premium'}
             </a>
             <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: `${TEXT}77`, marginTop: 10, marginBottom: 0 }}>
               {c.satisfiedOrRefunded}
@@ -263,6 +263,7 @@ export default function Home() {
             </div>
             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: GOLD, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>Luxe Aquarelle</div>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 4, marginBottom: 4 }}>
+              <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 18, color: '#9ca3af', textDecoration: 'line-through', marginTop: 8, marginRight: 4 }}>169&euro;</span>
               <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 48, color: DARK, lineHeight: 1, fontWeight: 700 }}>99&euro;</span>
             </div>
             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: TEXT, marginBottom: 20 }}>{c.singlePayment} — {c.lifetimeAccess}</div>
@@ -283,6 +284,9 @@ export default function Home() {
             <a href="/faire-part?pack=luxe" style={{ ...S.btnPrimary, display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontSize: 14, textDecoration: 'none' }}>
               {locale === 'en' ? 'Create my Luxe invitation' : 'Créer mon faire-part Luxe'}
             </a>
+            <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: `${TEXT}77`, marginTop: 10, marginBottom: 0 }}>
+              {c.satisfiedOrRefunded}
+            </p>
           </div>
 
         </div>
@@ -329,15 +333,15 @@ export default function Home() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 28 }}>
             <div>
               <div style={{ textAlign: 'center', marginBottom: 10, fontFamily: 'var(--font-playfair-display)', fontSize: 13, color: TEXT, letterSpacing: 2, textTransform: 'uppercase' }}>{h.themeNames.classic}</div>
-              <FakeCard name1="Sophie" name2="Thomas" date="15 Juin 2026 · Lyon" accent="#C9A84C" fond="#fdf8f0" />
+              <FakeCard name1="Sarah" name2="David" date="15 Juin 2026 · Paris" accent="#C9A84C" fond="#fdf8f0" />
             </div>
             <div>
               <div style={{ textAlign: 'center', marginBottom: 10, fontFamily: 'var(--font-playfair-display)', fontSize: 13, color: TEXT, letterSpacing: 2, textTransform: 'uppercase' }}>{h.themeNames.country}</div>
-              <FakeCard name1="Camille" name2="Julien" date="4 Mai 2026 · Bordeaux" accent="#8fad6a" fond="#f5f0e8" />
+              <FakeCard name1="Noa" name2="Élie" date="4 Mai 2026 · Lyon" accent="#8fad6a" fond="#f5f0e8" />
             </div>
             <div>
               <div style={{ textAlign: 'center', marginBottom: 10, fontFamily: 'var(--font-playfair-display)', fontSize: 13, color: TEXT, letterSpacing: 2, textTransform: 'uppercase' }}>{h.themeNames.oriental}</div>
-              <FakeCard name1="Yasmine" name2="Karim" date="8 Août 2026 · Marseille" accent="#D4A847" fond="#1a0a00" />
+              <FakeCard name1="Esther" name2="Mendel" date="8 Août 2026 · Marseille" accent="#D4A847" fond="#1a0a00" />
             </div>
           </div>
         </div>
@@ -405,8 +409,8 @@ export default function Home() {
         <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: TEXT, maxWidth: 500, margin: '0 auto 28px', lineHeight: 1.7 }}>
           {h.ctaSub}
         </p>
-        <a href={ctaHref} style={S.btnPrimary}>
-          {isLoggedIn ? c.yourSpace : c.createYourFairepart}
+        <a href="/faire-part" style={S.btnPrimary}>
+          {c.createYourFairepart}
         </a>
       </div>
 
@@ -422,6 +426,10 @@ export default function Home() {
           <a href="/cgv" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>{c.terms}</a>
           <a href="/politique-de-confidentialite" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>{c.privacyPolicy}</a>
           <a href="/contact" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>{c.contact}</a>
+        </div>
+        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginBottom: 16 }}>
+          <a href="https://instagram.com/getlovit" target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>Instagram</a>
+          <a href="https://wa.me/33600000000" target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>WhatsApp</a>
         </div>
         <Separator />
         <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: 'rgba(255,255,255,0.3)', marginTop: 24, marginBottom: 0 }}>
