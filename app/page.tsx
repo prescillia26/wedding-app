@@ -347,27 +347,59 @@ export default function Home() {
         <div style={S.section}>
           <div style={S.sectionTitle}>{h.pricing}</div>
           <p style={S.sectionSub}>{h.pricingSub}</p>
-          <div style={{ maxWidth: 480, margin: '0 auto', background: 'white', borderRadius: 24, padding: '48px 40px', boxShadow: `0 16px 64px ${GOLD}22`, border: `1.5px solid ${GOLD}66`, textAlign: 'center' }}>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: GOLD, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>{h.pricingLabel}</div>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 4, marginBottom: 4 }}>
-              <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 22, color: '#9ca3af', textDecoration: 'line-through', marginTop: 12, marginRight: 4 }}>{h.priceBefore}</span>
-              <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 72, color: DARK, lineHeight: 1, fontWeight: 700 }}>{c.price}</span>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24, maxWidth: 800, margin: '0 auto' }}>
+
+            {/* ── Pack Essentiel — 69€ ── */}
+            <div style={{ background: 'white', borderRadius: 24, padding: '40px 32px', boxShadow: `0 16px 64px ${GOLD}22`, border: `1.5px solid ${GOLD}66`, textAlign: 'center', position: 'relative' }}>
+              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: GOLD, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>{h.pricingLabel}</div>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 4, marginBottom: 4 }}>
+                <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 20, color: '#9ca3af', textDecoration: 'line-through', marginTop: 10, marginRight: 4 }}>{h.priceBefore}</span>
+                <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 56, color: DARK, lineHeight: 1, fontWeight: 700 }}>{c.price}</span>
+              </div>
+              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 15, color: TEXT, marginBottom: 24 }}>{c.singlePayment} — {c.lifetimeAccess}</div>
+              <div style={{ textAlign: 'left', marginBottom: 28 }}>
+                {h.pricingFeatures.map(item => (
+                  <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                    <span style={{ color: GOLD, fontSize: 14 }}>✓</span>
+                    <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 15, color: TEXT }}>{item}</span>
+                  </div>
+                ))}
+              </div>
+              <a href={ctaHref} style={{ ...S.btnPrimary, display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontSize: 14 }}>
+                {isLoggedIn ? c.createYourFairepart : c.startNow}
+              </a>
+              <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 12, color: `${TEXT}77`, marginTop: 12, marginBottom: 0 }}>
+                {c.satisfiedOrRefunded}
+              </p>
             </div>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 16, color: TEXT, marginBottom: 28 }}>{c.singlePayment} — {c.lifetimeAccess}</div>
-            <div style={{ textAlign: 'left', marginBottom: 32 }}>
-              {h.pricingFeatures.map(item => (
-                <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-                  <span style={{ color: GOLD, fontSize: 16 }}>✓</span>
-                  <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 17, color: TEXT }}>{item}</span>
-                </div>
-              ))}
+
+            {/* ── Pack Premium — 99€ (Coming Soon) ── */}
+            <div style={{ background: 'white', borderRadius: 24, padding: '40px 32px', boxShadow: `0 16px 64px ${GOLD}22`, border: `2px solid ${GOLD}`, textAlign: 'center', position: 'relative', opacity: 0.92 }}>
+              <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`, color: 'white', fontSize: 9, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', padding: '5px 16px', borderRadius: 9999, whiteSpace: 'nowrap' }}>
+                Coming soon
+              </div>
+              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: GOLD, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>Premium</div>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 4, marginBottom: 4 }}>
+                <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 56, color: DARK, lineHeight: 1, fontWeight: 700 }}>99&euro;</span>
+              </div>
+              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 15, color: TEXT, marginBottom: 24 }}>{c.singlePayment} — {c.lifetimeAccess}</div>
+              <div style={{ textAlign: 'left', marginBottom: 28 }}>
+                {[
+                  ...(h.pricingFeatures),
+                  'Aquarelles IA par événement (lieu réel)',
+                  'Illustrations décoratives (bagues, colombes, coupes...)',
+                ].map(item => (
+                  <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                    <span style={{ color: GOLD, fontSize: 14 }}>✓</span>
+                    <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 15, color: TEXT }}>{item}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', padding: '16px 40px', borderRadius: 9999, background: '#e8e0d8', color: '#9a928a', fontSize: 14, fontWeight: 700, letterSpacing: '0.05em', fontFamily: 'var(--font-playfair-display)' }}>
+                Bientôt disponible
+              </div>
             </div>
-            <a href={ctaHref} style={{ ...S.btnPrimary, display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center' }}>
-              {isLoggedIn ? c.createYourFairepart : c.startNow}
-            </a>
-            <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: `${TEXT}77`, marginTop: 14, marginBottom: 0 }}>
-              {c.satisfiedOrRefunded}
-            </p>
+
           </div>
         </div>
       </div>
