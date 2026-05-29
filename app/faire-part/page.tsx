@@ -283,9 +283,22 @@ interface FormData {
   customLogoColor?: string // '' = original, ou hex color
   textOffsetY?: number // décalage vertical du texte en px (négatif = plus haut)
   petalsEnabled?: boolean // pétales/particules sur le faire-part (false par défaut)
-  illustrationUrl?: string // aquarelle IA générée (URL Cloudinary permanente)
+  illustrationUrl?: string // aquarelle IA v1 (rétrocompat)
+  illustrations?: IllustrationElement[] // v2 : tableau d'illustrations (scènes + motifs)
   rsvpDeadline?: string // date limite de confirmation (YYYY-MM-DD)
 }
+
+type IllustrationKind = 'scene' | 'motif'
+interface IllustrationElement {
+  id: string
+  kind: IllustrationKind
+  url: string
+  sectionId?: string   // ex: 'c0', 'c1', 'accueil'
+  x: number; y: number; width: number; height: number
+  rotation?: number
+  zIndex?: number
+}
+
 const defaultCeremony: Ceremony = {
   type: 'Cérémonie religieuse / Houppa',
   customName: '', lieu: '', adresse: '', date: '', heure: '',
@@ -972,14 +985,12 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           <Field label={t.fairepart.lastName} value={data.marie1Nom} onChange={v => onChange({ marie1Nom: v })} placeholder={t.fairepart.placeholderLastName1} />
         </div>
         {!data.mariageJuif && <Field label={t.fairepart.secondName} value={data.marie1Prenom2} onChange={v => onChange({ marie1Prenom2: v })} placeholder="" />}
-        {data.mariageJuif && (
-          <div style={{ marginTop: 8 }}>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 4 }}>Prénom hébraïque (optionnel)</label>
-            <input dir="rtl" lang="he" value={data.marie1PrenomHebreu ?? ''} onChange={e => onChange({ marie1PrenomHebreu: e.target.value })} placeholder="שרה"
-              style={{ ...S.input, fontFamily: 'var(--font-bellefair), serif', fontSize: 18, textAlign: 'right' }} />
-            <HebrewKeyboard value={data.marie1PrenomHebreu ?? ''} onChange={v => onChange({ marie1PrenomHebreu: v })} />
-          </div>
-        )}
+        <div style={{ marginTop: 8 }}>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 4 }}>Prénom hébraïque (optionnel)</label>
+          <input dir="rtl" lang="he" value={data.marie1PrenomHebreu ?? ''} onChange={e => onChange({ marie1PrenomHebreu: e.target.value })} placeholder="שרה"
+            style={{ ...S.input, fontFamily: 'var(--font-bellefair), serif', fontSize: 18, textAlign: 'right' }} />
+          <HebrewKeyboard value={data.marie1PrenomHebreu ?? ''} onChange={v => onChange({ marie1PrenomHebreu: v })} />
+        </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '16px 0' }}>
         <div style={{ flex: 1, height: 1, background: '#e0d5c8' }} />
@@ -993,14 +1004,12 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           <Field label={t.fairepart.lastName} value={data.marie2Nom} onChange={v => onChange({ marie2Nom: v })} placeholder={t.fairepart.placeholderLastName2} />
         </div>
         {!data.mariageJuif && <Field label={t.fairepart.secondName} value={data.marie2Prenom2} onChange={v => onChange({ marie2Prenom2: v })} placeholder="" />}
-        {data.mariageJuif && (
-          <div style={{ marginTop: 8 }}>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 4 }}>Prénom hébraïque (optionnel)</label>
-            <input dir="rtl" lang="he" value={data.marie2PrenomHebreu ?? ''} onChange={e => onChange({ marie2PrenomHebreu: e.target.value })} placeholder="דוד"
-              style={{ ...S.input, fontFamily: 'var(--font-bellefair), serif', fontSize: 18, textAlign: 'right' }} />
-            <HebrewKeyboard value={data.marie2PrenomHebreu ?? ''} onChange={v => onChange({ marie2PrenomHebreu: v })} />
-          </div>
-        )}
+        <div style={{ marginTop: 8 }}>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 4 }}>Prénom hébraïque (optionnel)</label>
+          <input dir="rtl" lang="he" value={data.marie2PrenomHebreu ?? ''} onChange={e => onChange({ marie2PrenomHebreu: e.target.value })} placeholder="דוד"
+            style={{ ...S.input, fontFamily: 'var(--font-bellefair), serif', fontSize: 18, textAlign: 'right' }} />
+          <HebrewKeyboard value={data.marie2PrenomHebreu ?? ''} onChange={v => onChange({ marie2PrenomHebreu: v })} />
+        </div>
       </div>
       <div style={{ marginTop: 20, padding: 16, background: '#fdf8f0', borderRadius: 12 }}>
   <Label>{t.fairepart.customLink} (optionnel)</Label>
