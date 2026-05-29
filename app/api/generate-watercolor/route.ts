@@ -37,6 +37,7 @@ export async function POST(req: Request) {
 
       prompt = buildVenueWatercolorPrompt({ lieu, adresse, ceremonyType, palette });
       numOutputs = 2;
+      aspectRatio = "3:2";
     } else {
       // ── V1 : mode ambiance (rétrocompat) ──
       const { ambiance, palette, freeText } = body;

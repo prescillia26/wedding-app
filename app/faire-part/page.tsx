@@ -3120,11 +3120,11 @@ function ElegantCardsContent({ data, theme, isShared }: { data: FormData; theme:
         const aquarelleUrl = ceremony.illustrationUrl || ''
         return (
           <div key={i}>
-            {/* Aquarelle IA du lieu — image pleine entre les sections */}
+            {/* Aquarelle IA du lieu — image décorative entre les sections */}
             {aquarelleUrl && (
-              <div style={{ maxWidth: 600, margin: '0 auto', overflow: 'hidden' }}>
+              <div style={{ maxWidth: 600, margin: '0 auto', padding: '8px 24px' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={aquarelleUrl} alt={ceremony.lieu || ''} style={{ width: '100%', display: 'block', objectFit: 'cover' }} />
+                <img src={aquarelleUrl} alt={ceremony.lieu || ''} style={{ width: '100%', maxHeight: 280, display: 'block', objectFit: 'cover', borderRadius: 16 }} />
               </div>
             )}
             <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, boxShadow: '0 8px 40px rgba(0,0,0,0.13)', overflow: 'hidden' }}>
@@ -5511,11 +5511,11 @@ const firstDate = sorted[0]?.date
           const isCard = (data.presentationStyle ?? 'page-unique') !== 'page-unique'
           return (
             <React.Fragment key={realIdx}>
-              {/* Aquarelle IA du lieu — image pleine entre les sections */}
+              {/* Aquarelle IA du lieu — image décorative entre les sections */}
               {ceremony.illustrationUrl && (
-                <div style={{ maxWidth: isCard ? undefined : 600, margin: '0 auto', overflow: 'hidden' }}>
+                <div style={{ maxWidth: isCard ? undefined : 600, margin: '0 auto', padding: '8px 24px' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={ceremony.illustrationUrl} alt={ceremony.lieu || ''} style={{ width: '100%', display: 'block', objectFit: 'cover' }} />
+                  <img src={ceremony.illustrationUrl} alt={ceremony.lieu || ''} style={{ width: '100%', maxHeight: 280, display: 'block', objectFit: 'cover', borderRadius: 16 }} />
                 </div>
               )}
               <CeremonyCard isCard={isCard} accent={G}>
