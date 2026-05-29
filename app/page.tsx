@@ -349,9 +349,9 @@ export default function Home() {
           <p style={S.sectionSub}>{h.pricingSub}</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24, maxWidth: 800, margin: '0 auto' }}>
 
-            {/* ── Pack Essentiel — 69€ ── */}
+            {/* ── Pack Premium — 69€ ── */}
             <div style={{ background: 'white', borderRadius: 24, padding: '40px 32px', boxShadow: `0 16px 64px ${GOLD}22`, border: `1.5px solid ${GOLD}66`, textAlign: 'center', position: 'relative' }}>
-              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: GOLD, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>{h.pricingLabel}</div>
+              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: GOLD, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>Premium</div>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 4, marginBottom: 4 }}>
                 <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 20, color: '#9ca3af', textDecoration: 'line-through', marginTop: 10, marginRight: 4 }}>{h.priceBefore}</span>
                 <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 56, color: DARK, lineHeight: 1, fontWeight: 700 }}>{c.price}</span>
@@ -373,21 +373,23 @@ export default function Home() {
               </p>
             </div>
 
-            {/* ── Pack Premium — 99€ ── */}
+            {/* ── Pack Luxe Aquarelle — 99€ ── */}
             <div style={{ background: 'white', borderRadius: 24, padding: '40px 32px', boxShadow: `0 24px 72px ${GOLD}33`, border: `2.5px solid ${GOLD}`, textAlign: 'center', position: 'relative' }}>
               <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`, color: 'white', fontSize: 9, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', padding: '5px 16px', borderRadius: 9999, whiteSpace: 'nowrap', boxShadow: `0 4px 16px ${GOLD}55` }}>
                 Recommandé
               </div>
-              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: GOLD, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>Premium</div>
+              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: GOLD, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>Luxe Aquarelle</div>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 4, marginBottom: 4 }}>
                 <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 56, color: DARK, lineHeight: 1, fontWeight: 700 }}>99&euro;</span>
               </div>
               <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 15, color: TEXT, marginBottom: 24 }}>{c.singlePayment} — {c.lifetimeAccess}</div>
               <div style={{ textAlign: 'left', marginBottom: 28 }}>
                 {[
-                  ...(h.pricingFeatures),
+                  'Tout le pack Premium',
                   'Aquarelles IA par événement (lieu réel)',
-                  'Illustrations décoratives (bagues, colombes, coupes...)',
+                  'Illustrations décoratives (bagues, colombes, coupes…)',
+                  'Palette de couleurs personnalisée',
+                  'Design Luxe personnalisé par l\'IA',
                 ].map(item => (
                   <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
                     <span style={{ color: GOLD, fontSize: 14 }}>✓</span>
@@ -396,7 +398,7 @@ export default function Home() {
                 ))}
               </div>
               <a href="/paiement" style={{ ...S.btnPrimary, display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontSize: 14, textDecoration: 'none' }}>
-                Choisir le Premium — 99&euro;
+                Choisir le Luxe — 99&euro;
               </a>
             </div>
 

@@ -19,21 +19,22 @@ function CheckIcon({ color, big }: { color: string; big?: boolean }) {
   )
 }
 
-const ESSENTIEL_FEATURES = [
+const PREMIUM_FEATURES = [
   'Design élégant et personnalisable',
   '12 thèmes au choix',
+  'Cadres décoratifs & cadres vidéo animés',
   'Photos carrousel, musique, compte à rebours',
   'Dashboard RSVP complet + export Excel',
   'Modifications illimitées — valable à vie',
   'Lien de partage WhatsApp optimisé',
 ]
 
-const PREMIUM_FEATURES = [
-  'Tout le pack Essentiel',
+const LUXE_FEATURES = [
+  'Tout le pack Premium',
   'Aquarelles IA par événement (lieu réel)',
-  'Illustrations décoratives (bagues, colombes, coupes...)',
-  'Cadres & ornements exclusifs',
-  'Design Premium personnalisé par l\'IA',
+  'Illustrations décoratives (bagues, colombes, coupes…)',
+  'Palette de couleurs personnalisée',
+  'Design Luxe personnalisé par l\'IA',
 ]
 
 export default function PaiementPage() {
@@ -84,7 +85,7 @@ export default function PaiementPage() {
       {/* ── 2 Packs ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24, maxWidth: 820, margin: '0 auto 40px' }}>
 
-        {/* ── Essentiel — 69€ ── */}
+        {/* ── Premium — 69€ ── */}
         <div style={{
           background: `linear-gradient(160deg, #fff 0%, ${CREAM} 100%)`,
           borderRadius: 28, padding: '40px 32px',
@@ -93,7 +94,7 @@ export default function PaiementPage() {
           position: 'relative', textAlign: 'center',
         }}>
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: GOLD, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>
-            Essentiel
+            Premium
           </div>
           <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
             <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, color: '#aaa', textDecoration: 'line-through' }}>
@@ -108,7 +109,7 @@ export default function PaiementPage() {
           </div>
 
           <div style={{ background: 'white', borderRadius: 16, padding: '24px 24px 20px', marginBottom: 28, border: `1px solid ${GOLD}22`, textAlign: 'left' }}>
-            {ESSENTIEL_FEATURES.map(f => (
+            {PREMIUM_FEATURES.map(f => (
               <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 12, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 16, color: DARK, lineHeight: 1.4 }}>
                 <CheckIcon color={GOLD} big />
                 {f}
@@ -129,11 +130,11 @@ export default function PaiementPage() {
               opacity: loading && loading !== 'essentiel' ? 0.5 : 1,
             }}
           >
-            {loading === 'essentiel' ? 'Redirection…' : `Choisir l'Essentiel — ${t.common.price}`}
+            {loading === 'essentiel' ? 'Redirection…' : `Choisir le Premium — ${t.common.price}`}
           </button>
         </div>
 
-        {/* ── Premium — 99€ ── */}
+        {/* ── Luxe Aquarelle — 99€ ── */}
         <div style={{
           background: `linear-gradient(160deg, #fff 0%, ${CREAM} 100%)`,
           borderRadius: 28, padding: '40px 32px',
@@ -154,7 +155,7 @@ export default function PaiementPage() {
           </div>
 
           <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: GOLD, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>
-            Premium
+            Luxe Aquarelle
           </div>
           <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
             <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 64, fontWeight: 700, color: GOLD, lineHeight: 1 }}>
@@ -166,7 +167,7 @@ export default function PaiementPage() {
           </div>
 
           <div style={{ background: 'white', borderRadius: 16, padding: '24px 24px 20px', marginBottom: 28, border: `1px solid ${GOLD}22`, textAlign: 'left' }}>
-            {PREMIUM_FEATURES.map(f => (
+            {LUXE_FEATURES.map(f => (
               <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 12, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 16, color: DARK, lineHeight: 1.4 }}>
                 <CheckIcon color={GOLD} big />
                 {f}
@@ -187,7 +188,7 @@ export default function PaiementPage() {
               opacity: loading && loading !== 'premium' ? 0.5 : 1,
             }}
           >
-            {loading === 'premium' ? 'Redirection…' : 'Choisir le Premium — 99€'}
+            {loading === 'premium' ? 'Redirection…' : 'Choisir le Luxe — 99€'}
           </button>
         </div>
       </div>

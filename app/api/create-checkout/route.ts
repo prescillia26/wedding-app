@@ -6,8 +6,8 @@ function getStripe() {
 
 
 const PACKS: Record<string, { amount: number; amountUSD: number; name: string; nameEN: string }> = {
-  essentiel: { amount: 6900, amountUSD: 7900, name: "Lov'it — Pack Essentiel", nameEN: "Lov'it — Essentials Pack" },
-  premium:   { amount: 9900, amountUSD: 10900, name: "Lov'it — Pack Premium", nameEN: "Lov'it — Premium Pack" },
+  essentiel: { amount: 6900, amountUSD: 7900, name: "Lov'it — Pack Premium", nameEN: "Lov'it — Premium Pack" },
+  premium:   { amount: 9900, amountUSD: 10900, name: "Lov'it — Pack Luxe Aquarelle", nameEN: "Lov'it — Luxe Watercolor Pack" },
 }
 
 export async function POST(request: Request) {

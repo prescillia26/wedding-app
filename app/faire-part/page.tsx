@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { showToast } from '../components/Toast'
 import { useT } from '@/lib/i18n'
 import CeremonyWatercolorPanel from '../components/CeremonyWatercolorPanel'
-import { themeToWatercolorPalette } from '@/lib/watercolorPrompt'
+import type { Palette } from '@/lib/watercolorPrompt'
 
 
 type Theme = 'rose-fleuri' | 'ivoire-or' | 'bleu-floral' | 'champetre' | 'blanc-gris' | 'noir-blanc' | 'chocolat' | 'bordeaux' | 'bordeaux-nuit' | 'fuchsia' | 'marine-or' | 'menthe'
@@ -100,6 +100,26 @@ const ILLUSTRATIONS_COUPLES = [
   { id: 'couple-05', label: '💕 Couple brun + brune', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878835/87_hejtki.png' },
   { id: 'couple-06', label: '🌸 Arche florale rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878838/94_l7zjbv.png' },
 ] as const
+
+// ── Couleurs Luxe Aquarelle ──
+const LUXE_COLORS: { id: string; label: string; hex: string; palette: Palette }[] = [
+  { id: 'mauve',    label: 'Mauve',      hex: '#9b72aa', palette: 'lavande' },
+  { id: 'rose',     label: 'Rose',       hex: '#d4829a', palette: 'rose' },
+  { id: 'bleu',     label: 'Bleu nuit',  hex: '#2c4a7c', palette: 'bleu_nuit' },
+  { id: 'sauge',    label: 'Vert sauge', hex: '#7a9e6e', palette: 'sauge' },
+  { id: 'dore',     label: 'Doré',       hex: '#C9A84C', palette: 'rose' },
+  { id: 'bordeaux', label: 'Bordeaux',   hex: '#8b1a2a', palette: 'rose' },
+]
+
+// ── Illustrations décoratives (Pack Luxe) ──
+const DECO_ILLUSTRATIONS: { id: string; label: string; url: string }[] = [
+  { id: 'deco-colombes', label: 'Colombes', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765484/1_ruabdh.png' },
+  { id: 'deco-bagues', label: 'Bagues', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765486/2_xh3erh.png' },
+  { id: 'deco-champagne', label: 'Champagne', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765487/3_zdnq1l.png' },
+  { id: 'deco-bouquet', label: 'Bouquet', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765490/4_szuz80.png' },
+  { id: 'deco-arche', label: 'Arche florale', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765509/5_v3kcqb.png' },
+  { id: 'deco-coeurs', label: 'Coeurs', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765511/7_h5mjjm.png' },
+]
 
 // Vidéos animées pour page d'accueil et cadres
 const VIDEO_BACKGROUNDS: { id: string; label: string; url: string; textPosition: 'top' | 'center' | 'center-top'; needsOverlay: boolean; dark?: boolean }[] = [
@@ -289,6 +309,8 @@ interface FormData {
   illustrationUrl?: string // aquarelle IA v1 (rétrocompat)
   illustrations?: IllustrationElement[] // v2 : tableau d'illustrations (scènes + motifs)
   rsvpDeadline?: string // date limite de confirmation (YYYY-MM-DD)
+  luxeColor?: string // couleur choisie pour le pack Luxe Aquarelle
+  luxeDecoIds?: string[] // IDs des illustrations décoratives sélectionnées (pack Luxe)
 }
 
 type IllustrationKind = 'scene' | 'motif'
@@ -1809,12 +1831,15 @@ function AccordionSection({ title, defaultOpen = false, children }: { title: str
 
 function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChange: (d: Partial<FormData>) => void; pack?: 'essentiel' | 'premium' }) {
   const { t, locale } = useT()
-  const isPremium = pack === 'premium' || (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('premium') === 'true')
+  const isLuxe = pack === 'premium' || (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('premium') === 'true')
+  const selectedLuxeColor = LUXE_COLORS.find(c => c.id === data.luxeColor) || LUXE_COLORS[0]
   return (
     <div>
       <h2 style={{ textAlign: 'center', fontFamily: 'var(--font-playfair-display)', fontSize: 20, fontWeight: 600, color: '#3a3330', marginBottom: 6 }}>{t.fairepart.step4Title}</h2>
       <p style={{ textAlign: 'center', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9a928a', marginBottom: 24 }}>
-        {locale === 'en' ? 'Customize the look and feel of your invitation' : 'Personnalisez le style de votre invitation'}
+        {isLuxe
+          ? (locale === 'en' ? 'Choose your color palette and generate unique watercolors' : 'Choisissez votre palette de couleurs et générez vos aquarelles uniques')
+          : (locale === 'en' ? 'Customize the look and feel of your invitation' : 'Personnalisez le style de votre invitation')}
       </p>
 
       <AccordionSection title={locale === 'en' ? '📐 Layout' : '📐 Mise en page'} defaultOpen>
@@ -1878,41 +1903,48 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
         </div>
       </AccordionSection>
 
-      <AccordionSection title={locale === 'en' ? '🎨 Theme & colors' : '🎨 Thème & couleurs'} defaultOpen>
-        <Label>{locale === 'en' ? 'Visual style' : 'Style visuel'}</Label>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 16 }}>
-        {(Object.entries(THEMES) as [Theme, ThemeObj][]).map(([key, t]) => {
-          const sel = data.style === key
-          return (
-            <button key={key} type="button" onClick={() => onChange({ style: key })} style={{
-              ...BTN, padding: 0, borderRadius: 8, overflow: 'hidden',
-              border: `2px solid ${sel ? t.accent : '#e8e0d8'}`,
-              background: 'transparent', textAlign: 'center',
-              boxShadow: sel ? `0 0 0 1px ${t.accent}` : 'none',
-            }}>
-              <div style={{ background: t.fond, width: '100%', height: 55, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: t.accent, letterSpacing: 0.5 }}>A &amp; B</span>
-              </div>
-              <div style={{ padding: '4px 2px 5px', background: sel ? t.accent : '#faf8f6', fontSize: 8, fontWeight: sel ? 700 : 400, color: sel ? 'white' : '#3a3330', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {t.nom}
-              </div>
-            </button>
-          )
-        })}
-      </div>
+      {/* ── Pack Luxe : Couleur + Aquarelles + Illustrations décoratives ── */}
+      {isLuxe ? (<>
+        <AccordionSection title={locale === 'en' ? '🎨 Color palette' : '🎨 Palette de couleurs'} defaultOpen>
+          <Label>{locale === 'en' ? 'Choose the main color for your invitation' : 'Choisissez la couleur principale de votre faire-part'}</Label>
+          <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 14, lineHeight: 1.5 }}>
+            {locale === 'en'
+              ? 'This color will set the tone for your watercolors and decorative elements.'
+              : 'Cette couleur donnera le ton à vos aquarelles et éléments décoratifs.'}
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+            {LUXE_COLORS.map(c => {
+              const sel = (data.luxeColor || 'mauve') === c.id
+              return (
+                <button key={c.id} type="button" onClick={() => onChange({ luxeColor: c.id })} style={{
+                  ...BTN, padding: '16px 8px', borderRadius: 12,
+                  border: `2.5px solid ${sel ? c.hex : '#e8e0d8'}`,
+                  background: sel ? `${c.hex}12` : '#fffdf9',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+                  boxShadow: sel ? `0 0 0 1px ${c.hex}, 0 4px 12px ${c.hex}22` : 'none',
+                }}>
+                  <div style={{
+                    width: 44, height: 44, borderRadius: '50%',
+                    background: `linear-gradient(135deg, ${c.hex}, ${c.hex}bb)`,
+                    boxShadow: sel ? `0 4px 16px ${c.hex}44` : `0 2px 8px ${c.hex}22`,
+                    border: sel ? '3px solid white' : '2px solid white',
+                  }} />
+                  <span style={{ fontSize: 11, fontWeight: sel ? 700 : 500, color: sel ? c.hex : '#3a3330' }}>{c.label}</span>
+                </button>
+              )
+            })}
+          </div>
+        </AccordionSection>
 
-      </AccordionSection>
-
-      {isPremium && (
-        <AccordionSection title={locale === 'en' ? '🎨 AI Watercolor' : '🎨 Aquarelle IA'} defaultOpen>
+        <AccordionSection title={locale === 'en' ? '🎨 AI Watercolors' : '🎨 Aquarelles IA'} defaultOpen>
           <p style={{ fontSize: 12, color: '#6a5040', marginBottom: 12, lineHeight: 1.6 }}>
             {locale === 'en'
-              ? 'Generate a unique watercolor for each of your events, based on the venue you entered in step 3.'
-              : 'Générez une aquarelle unique pour chacun de vos événements, basée sur le lieu renseigné à l\u2019étape 3.'}
+              ? 'Generate a unique watercolor for each of your events, based on the venue, event type, and your chosen color.'
+              : 'Générez une aquarelle unique pour chacun de vos événements, basée sur le lieu, le type d\u2019événement et la couleur choisie.'}
           </p>
           <CeremonyWatercolorPanel
             ceremonies={data.ceremonies}
-            palette={themeToWatercolorPalette(data.style)}
+            palette={selectedLuxeColor.palette}
             onUpdateCeremony={(i, updates) => {
               const newCeremonies = [...data.ceremonies]
               newCeremonies[i] = { ...newCeremonies[i], ...updates }
@@ -1920,71 +1952,163 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
             }}
           />
         </AccordionSection>
-      )}
 
-      <AccordionSection title={locale === 'en' ? '🖼️ Decorative frame' : '🖼️ Cadre décoratif'}>
-        {/* Cadres statiques (images) */}
-        <div style={{ fontSize: 12, fontWeight: 700, color: '#3a3028', marginBottom: 8 }}>
-          {locale === 'en' ? '🌸 Floral frames' : '🌸 Cadres floraux'}
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
-          {FRAMES.filter(fr => !fr.video).map(fr => {
-            const accent = THEMES[data.style].accent
-            const sel = (data.frameId ?? 'frame-09') === fr.id
-            return (
-              <button key={fr.id} type="button" onClick={() => onChange({ frameId: fr.id })} style={{
-                ...BTN, padding: 8, borderRadius: 10,
-                border: `2px solid ${sel ? accent : '#f0e0d0'}`,
-                background: sel ? `${accent}10` : 'white',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-                boxShadow: sel ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.08)',
-              }}>
-                {fr.url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={fr.url} alt={fr.label} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
-                ) : (
-                  <div style={{ width: 80, height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, opacity: 0.4, background: '#f5f5f5', borderRadius: 6 }}>✕</div>
-                )}
-                <span style={{ fontSize: 9, fontWeight: sel ? 700 : 400, color: sel ? accent : '#3a3330', textAlign: 'center', lineHeight: 1.3 }}>{fr.label}</span>
-              </button>
-            )
-          })}
-        </div>
+        <AccordionSection title={locale === 'en' ? '💎 Decorative illustrations' : '💎 Illustrations décoratives'}>
+          <p style={{ fontSize: 12, color: '#6a5040', marginBottom: 14, lineHeight: 1.6 }}>
+            {locale === 'en'
+              ? 'Select decorative elements to embellish your luxury invitation: rings, doves, champagne…'
+              : 'Sélectionnez des éléments décoratifs pour embellir votre faire-part luxe : bagues, colombes, champagne…'}
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+            {DECO_ILLUSTRATIONS.map(deco => {
+              const ids = data.luxeDecoIds || []
+              const sel = ids.includes(deco.id)
+              const accent = selectedLuxeColor.hex
+              return (
+                <button key={deco.id} type="button" onClick={() => {
+                  const current = data.luxeDecoIds || []
+                  onChange({ luxeDecoIds: sel ? current.filter(id => id !== deco.id) : [...current, deco.id] })
+                }} style={{
+                  ...BTN, padding: 8, borderRadius: 12,
+                  border: `2.5px solid ${sel ? accent : '#e8e0d8'}`,
+                  background: sel ? `${accent}10` : 'white',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                  boxShadow: sel ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.06)',
+                  position: 'relative',
+                }}>
+                  {sel && (
+                    <div style={{
+                      position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: '50%',
+                      background: accent, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                        <path d="M4 8.5L6.5 11L12 5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                  )}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={deco.url} alt={deco.label} style={{ width: 70, height: 70, objectFit: 'contain', borderRadius: 6 }} />
+                  <span style={{ fontSize: 10, fontWeight: sel ? 700 : 500, color: sel ? accent : '#3a3330' }}>{deco.label}</span>
+                </button>
+              )
+            })}
+          </div>
+        </AccordionSection>
 
-        {/* Séparateur */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-          <div style={{ flex: 1, height: 1, background: '#efe5d8' }} />
-          <span style={{ fontSize: 10, color: '#b0a898', fontStyle: 'italic' }}>ou</span>
-          <div style={{ flex: 1, height: 1, background: '#efe5d8' }} />
-        </div>
+        {/* Thème pour les couleurs de texte (simplifié pour Luxe) */}
+        <AccordionSection title={locale === 'en' ? '🎨 Theme & colors' : '🎨 Thème & couleurs'}>
+          <Label>{locale === 'en' ? 'Visual style' : 'Style visuel'}</Label>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 16 }}>
+            {(Object.entries(THEMES) as [Theme, ThemeObj][]).map(([key, t]) => {
+              const sel = data.style === key
+              return (
+                <button key={key} type="button" onClick={() => onChange({ style: key })} style={{
+                  ...BTN, padding: 0, borderRadius: 8, overflow: 'hidden',
+                  border: `2px solid ${sel ? t.accent : '#e8e0d8'}`,
+                  background: 'transparent', textAlign: 'center',
+                  boxShadow: sel ? `0 0 0 1px ${t.accent}` : 'none',
+                }}>
+                  <div style={{ background: t.fond, width: '100%', height: 55, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: t.accent, letterSpacing: 0.5 }}>A &amp; B</span>
+                  </div>
+                  <div style={{ padding: '4px 2px 5px', background: sel ? t.accent : '#faf8f6', fontSize: 8, fontWeight: sel ? 700 : 400, color: sel ? 'white' : '#3a3330', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {t.nom}
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </AccordionSection>
+      </>) : (<>
+        {/* ── Pack Premium : Thème + Cadres décoratifs ── */}
+        <AccordionSection title={locale === 'en' ? '🎨 Theme & colors' : '🎨 Thème & couleurs'} defaultOpen>
+          <Label>{locale === 'en' ? 'Visual style' : 'Style visuel'}</Label>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 16 }}>
+            {(Object.entries(THEMES) as [Theme, ThemeObj][]).map(([key, t]) => {
+              const sel = data.style === key
+              return (
+                <button key={key} type="button" onClick={() => onChange({ style: key })} style={{
+                  ...BTN, padding: 0, borderRadius: 8, overflow: 'hidden',
+                  border: `2px solid ${sel ? t.accent : '#e8e0d8'}`,
+                  background: 'transparent', textAlign: 'center',
+                  boxShadow: sel ? `0 0 0 1px ${t.accent}` : 'none',
+                }}>
+                  <div style={{ background: t.fond, width: '100%', height: 55, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: t.accent, letterSpacing: 0.5 }}>A &amp; B</span>
+                  </div>
+                  <div style={{ padding: '4px 2px 5px', background: sel ? t.accent : '#faf8f6', fontSize: 8, fontWeight: sel ? 700 : 400, color: sel ? 'white' : '#3a3330', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {t.nom}
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </AccordionSection>
 
-        {/* Cadres vidéo animés */}
-        <div style={{ fontSize: 12, fontWeight: 700, color: '#3a3028', marginBottom: 8 }}>
-          {locale === 'en' ? '🎬 Animated video frames' : '🎬 Cadres vidéo animés'}
-        </div>
-        <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 10 }}>
-          {locale === 'en' ? 'Moving backgrounds that bring your invitation to life.' : 'Des fonds animés qui donnent vie à votre invitation.'}
-        </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-          {FRAMES.filter(fr => fr.video).map(fr => {
-            const accent = THEMES[data.style].accent
-            const sel = (data.frameId ?? 'frame-09') === fr.id
-            return (
-              <button key={fr.id} type="button" onClick={() => onChange({ frameId: fr.id })} style={{
-                ...BTN, padding: 8, borderRadius: 10,
-                border: `2px solid ${sel ? accent : '#f0e0d0'}`,
-                background: sel ? `${accent}10` : 'white',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-                boxShadow: sel ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.08)',
-              }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={fr.url!.replace('/video/upload/', '/video/upload/so_2,w_160,h_200,c_fill,f_jpg/').replace('.mp4', '.jpg')} alt={fr.label} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
-                <span style={{ fontSize: 9, fontWeight: sel ? 700 : 400, color: sel ? accent : '#3a3330', textAlign: 'center', lineHeight: 1.3 }}>{fr.label}</span>
-              </button>
-            )
-          })}
-        </div>
-      </AccordionSection>
+        <AccordionSection title={locale === 'en' ? '🖼️ Decorative frame' : '🖼️ Cadre décoratif'}>
+          {/* Cadres statiques (images) */}
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#3a3028', marginBottom: 8 }}>
+            {locale === 'en' ? '🌸 Floral frames' : '🌸 Cadres floraux'}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
+            {FRAMES.filter(fr => !fr.video).map(fr => {
+              const accent = THEMES[data.style].accent
+              const sel = (data.frameId ?? 'frame-09') === fr.id
+              return (
+                <button key={fr.id} type="button" onClick={() => onChange({ frameId: fr.id })} style={{
+                  ...BTN, padding: 8, borderRadius: 10,
+                  border: `2px solid ${sel ? accent : '#f0e0d0'}`,
+                  background: sel ? `${accent}10` : 'white',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                  boxShadow: sel ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.08)',
+                }}>
+                  {fr.url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={fr.url} alt={fr.label} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
+                  ) : (
+                    <div style={{ width: 80, height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, opacity: 0.4, background: '#f5f5f5', borderRadius: 6 }}>✕</div>
+                  )}
+                  <span style={{ fontSize: 9, fontWeight: sel ? 700 : 400, color: sel ? accent : '#3a3330', textAlign: 'center', lineHeight: 1.3 }}>{fr.label}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Séparateur */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+            <div style={{ flex: 1, height: 1, background: '#efe5d8' }} />
+            <span style={{ fontSize: 10, color: '#b0a898', fontStyle: 'italic' }}>ou</span>
+            <div style={{ flex: 1, height: 1, background: '#efe5d8' }} />
+          </div>
+
+          {/* Cadres vidéo animés */}
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#3a3028', marginBottom: 8 }}>
+            {locale === 'en' ? '🎬 Animated video frames' : '🎬 Cadres vidéo animés'}
+          </div>
+          <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 10 }}>
+            {locale === 'en' ? 'Moving backgrounds that bring your invitation to life.' : 'Des fonds animés qui donnent vie à votre invitation.'}
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+            {FRAMES.filter(fr => fr.video).map(fr => {
+              const accent = THEMES[data.style].accent
+              const sel = (data.frameId ?? 'frame-09') === fr.id
+              return (
+                <button key={fr.id} type="button" onClick={() => onChange({ frameId: fr.id })} style={{
+                  ...BTN, padding: 8, borderRadius: 10,
+                  border: `2px solid ${sel ? accent : '#f0e0d0'}`,
+                  background: sel ? `${accent}10` : 'white',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                  boxShadow: sel ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.08)',
+                }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={fr.url!.replace('/video/upload/', '/video/upload/so_2,w_160,h_200,c_fill,f_jpg/').replace('.mp4', '.jpg')} alt={fr.label} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
+                  <span style={{ fontSize: 9, fontWeight: sel ? 700 : 400, color: sel ? accent : '#3a3330', textAlign: 'center', lineHeight: 1.3 }}>{fr.label}</span>
+                </button>
+              )
+            })}
+          </div>
+        </AccordionSection>
+      </>)}
 
       <AccordionSection title={locale === 'en' ? '↕️ Text position' : '↕️ Position du texte'}>
         <Label>{locale === 'en' ? 'Vertical offset' : 'Décalage vertical'}</Label>

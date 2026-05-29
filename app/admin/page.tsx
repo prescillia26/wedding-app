@@ -26,7 +26,7 @@ function randomCode() {
   return c
 }
 
-const PACK_LABELS: Record<string, string> = { essentiel: 'Essentiel', premium: 'Premium', luxe: 'Luxe' }
+const PACK_LABELS: Record<string, string> = { essentiel: 'Premium', premium: 'Luxe Aquarelle', luxe: 'Luxe' }
 const PACK_COLORS: Record<string, string> = { essentiel: '#6b7280', premium: GOLD, luxe: '#7c3aed' }
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -133,8 +133,8 @@ function CreatePromoSection({ adminPassword }: { adminPassword: string }) {
         <div>
           <label style={{ display: 'block', fontSize: 11, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>Pack</label>
           <select value={pack} onChange={e => setPack(e.target.value)} style={{ ...inputStyle }}>
-            <option value="essentiel">Essentiel — 79€</option>
-            <option value="premium">Premium — 129€</option>
+            <option value="essentiel">Premium — 69€</option>
+            <option value="premium">Luxe Aquarelle — 99€</option>
             <option value="luxe">Luxe — 199€</option>
           </select>
         </div>
