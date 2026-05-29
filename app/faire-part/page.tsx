@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { showToast } from '../components/Toast'
 import { useT } from '@/lib/i18n'
 import CeremonyWatercolorPanel from '../components/CeremonyWatercolorPanel'
+import DecoIllustrationPanel from '../components/DecoIllustrationPanel'
 import type { Palette } from '@/lib/watercolorPrompt'
 
 
@@ -103,23 +104,20 @@ const ILLUSTRATIONS_COUPLES = [
 
 // ── Couleurs Luxe Aquarelle ──
 const LUXE_COLORS: { id: string; label: string; hex: string; palette: Palette }[] = [
-  { id: 'mauve',    label: 'Mauve',      hex: '#9b72aa', palette: 'lavande' },
-  { id: 'rose',     label: 'Rose',       hex: '#d4829a', palette: 'rose' },
-  { id: 'bleu',     label: 'Bleu nuit',  hex: '#2c4a7c', palette: 'bleu_nuit' },
-  { id: 'sauge',    label: 'Vert sauge', hex: '#7a9e6e', palette: 'sauge' },
-  { id: 'dore',     label: 'Doré',       hex: '#C9A84C', palette: 'rose' },
-  { id: 'bordeaux', label: 'Bordeaux',   hex: '#8b1a2a', palette: 'rose' },
+  { id: 'mauve',      label: 'Mauve',        hex: '#9b72aa', palette: 'mauve' },
+  { id: 'rose_clair', label: 'Rose clair',   hex: '#e8a0b4', palette: 'rose_clair' },
+  { id: 'rose',       label: 'Rose',         hex: '#d4829a', palette: 'rose' },
+  { id: 'bleu_ciel',  label: 'Bleu ciel',    hex: '#7aaed4', palette: 'bleu_ciel' },
+  { id: 'bleu',       label: 'Bleu nuit',    hex: '#2c4a7c', palette: 'bleu_nuit' },
+  { id: 'sauge',      label: 'Vert sauge',   hex: '#7a9e6e', palette: 'sauge' },
+  { id: 'menthe',     label: 'Menthe',       hex: '#2a9a6a', palette: 'menthe' },
+  { id: 'lavande',    label: 'Lavande',      hex: '#8a7cb8', palette: 'lavande' },
+  { id: 'peche',      label: 'Pêche',        hex: '#e8a870', palette: 'peche' },
+  { id: 'dore',       label: 'Doré',         hex: '#C9A84C', palette: 'dore' },
+  { id: 'bordeaux',   label: 'Bordeaux',     hex: '#8b1a2a', palette: 'bordeaux' },
+  { id: 'terracotta', label: 'Terracotta',   hex: '#c4704a', palette: 'terracotta' },
 ]
 
-// ── Illustrations décoratives (Pack Luxe) ──
-const DECO_ILLUSTRATIONS: { id: string; label: string; url: string }[] = [
-  { id: 'deco-colombes', label: 'Colombes', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765484/1_ruabdh.png' },
-  { id: 'deco-bagues', label: 'Bagues', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765486/2_xh3erh.png' },
-  { id: 'deco-champagne', label: 'Champagne', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765487/3_zdnq1l.png' },
-  { id: 'deco-bouquet', label: 'Bouquet', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765490/4_szuz80.png' },
-  { id: 'deco-arche', label: 'Arche florale', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765509/5_v3kcqb.png' },
-  { id: 'deco-coeurs', label: 'Coeurs', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765511/7_h5mjjm.png' },
-]
 
 // Vidéos animées pour page d'accueil et cadres
 const VIDEO_BACKGROUNDS: { id: string; label: string; url: string; textPosition: 'top' | 'center' | 'center-top'; needsOverlay: boolean; dark?: boolean }[] = [
@@ -310,7 +308,7 @@ interface FormData {
   illustrations?: IllustrationElement[] // v2 : tableau d'illustrations (scènes + motifs)
   rsvpDeadline?: string // date limite de confirmation (YYYY-MM-DD)
   luxeColor?: string // couleur choisie pour le pack Luxe Aquarelle
-  luxeDecoIds?: string[] // IDs des illustrations décoratives sélectionnées (pack Luxe)
+  luxeDecoUrls?: Record<string, string> // decoId → saved URL des illustrations décoratives générées par IA
 }
 
 type IllustrationKind = 'scene' | 'motif'
@@ -1956,43 +1954,24 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
         <AccordionSection title={locale === 'en' ? '💎 Decorative illustrations' : '💎 Illustrations décoratives'}>
           <p style={{ fontSize: 12, color: '#6a5040', marginBottom: 14, lineHeight: 1.6 }}>
             {locale === 'en'
-              ? 'Select decorative elements to embellish your luxury invitation: rings, doves, champagne…'
-              : 'Sélectionnez des éléments décoratifs pour embellir votre faire-part luxe : bagues, colombes, champagne…'}
+              ? 'Generate unique watercolor illustrations to embellish your invitation: rings, doves, champagne… Each one is painted by AI in your chosen color palette.'
+              : 'Générez des illustrations aquarelle uniques pour embellir votre faire-part : bagues, colombes, champagne… Chaque illustration est peinte par l\u2019IA dans votre palette de couleurs.'}
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-            {DECO_ILLUSTRATIONS.map(deco => {
-              const ids = data.luxeDecoIds || []
-              const sel = ids.includes(deco.id)
-              const accent = selectedLuxeColor.hex
-              return (
-                <button key={deco.id} type="button" onClick={() => {
-                  const current = data.luxeDecoIds || []
-                  onChange({ luxeDecoIds: sel ? current.filter(id => id !== deco.id) : [...current, deco.id] })
-                }} style={{
-                  ...BTN, padding: 8, borderRadius: 12,
-                  border: `2.5px solid ${sel ? accent : '#e8e0d8'}`,
-                  background: sel ? `${accent}10` : 'white',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-                  boxShadow: sel ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.06)',
-                  position: 'relative',
-                }}>
-                  {sel && (
-                    <div style={{
-                      position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: '50%',
-                      background: accent, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-                        <path d="M4 8.5L6.5 11L12 5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </div>
-                  )}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={deco.url} alt={deco.label} style={{ width: 70, height: 70, objectFit: 'contain', borderRadius: 6 }} />
-                  <span style={{ fontSize: 10, fontWeight: sel ? 700 : 500, color: sel ? accent : '#3a3330' }}>{deco.label}</span>
-                </button>
-              )
-            })}
-          </div>
+          <DecoIllustrationPanel
+            palette={selectedLuxeColor.palette}
+            accentColor={selectedLuxeColor.hex}
+            locale={locale}
+            selectedIllustrations={data.luxeDecoUrls || {}}
+            onSelectIllustration={(decoId, url) => {
+              const current = { ...(data.luxeDecoUrls || {}) }
+              if (url) {
+                current[decoId] = url
+              } else {
+                delete current[decoId]
+              }
+              onChange({ luxeDecoUrls: current })
+            }}
+          />
         </AccordionSection>
 
         {/* Thème pour les couleurs de texte (simplifié pour Luxe) */}
