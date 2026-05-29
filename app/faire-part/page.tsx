@@ -4709,11 +4709,11 @@ function AnimEnveloppe({ data, theme, onDone }: { data: FormData; theme: ThemeOb
     setTimeout(() => onDone(), 800)      // terminé
   }
 
-  const textColor = theme.dark ? '#e8ddd0' : `color-mix(in srgb, ${a} 60%, #2a2018)`
+  const textColor = theme.dark ? '#e8ddd0' : a
 
   // Couleur texte premium
-  const txtMain = theme.dark ? '#f0e8dc' : `color-mix(in srgb, ${a} 55%, #1a1008)`
-  const txtSoft = theme.dark ? '#c8b8a4' : `color-mix(in srgb, ${a} 35%, #3a3028)`
+  const txtMain = theme.dark ? '#f0e8dc' : a
+  const txtSoft = theme.dark ? '#c8b8a4' : `${a}99`
 
   return (
     <div onClick={phase === 0 ? handleOpen : undefined} style={{
@@ -5307,7 +5307,7 @@ const firstDate = sorted[0]?.date
         .lovit-btn:active{transform:translateY(0);filter:brightness(0.98)}
       `}</style>
 {/* SECTION 1 : Écran d'accueil */}
-      <div style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center',
+      <div style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center',
         justifyContent: data.styleAccueil === 'video' ? 'flex-start' : 'center',
         paddingTop: data.styleAccueil === 'video' ? (() => { const v = VIDEO_BACKGROUNDS.find(x => x.id === data.videoAccueilId); return v?.textPosition === 'top' ? '6%' : v?.textPosition === 'center-top' ? '12%' : '18%' })() : undefined,
         maxWidth: 480, margin: '0 auto', boxShadow: '0 8px 60px rgba(0,0,0,0.15)' }}>
