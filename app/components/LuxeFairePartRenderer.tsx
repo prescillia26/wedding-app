@@ -180,13 +180,15 @@ function CeremonySection({ ceremony, data, sceneUrl, palette }: { ceremony: Cere
           {invitePhrase}
         </div>
 
-        {/* Prénoms calligraphiés */}
-        <div style={{ fontFamily: GV, fontSize: 'clamp(28px, 8vw, 42px)', color: palette.primary, lineHeight: 1.2, marginBottom: 6 }}>
-          {p1}
-        </div>
-        <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 16, color: palette.accent, marginBottom: 6 }}>&</div>
-        <div style={{ fontFamily: GV, fontSize: 'clamp(28px, 8vw, 42px)', color: palette.primary, lineHeight: 1.2, marginBottom: 24 }}>
-          {p2}
+        {/* Prénoms calligraphiés — toujours les deux ensemble */}
+        <div style={{ marginBottom: 24 }}>
+          <span style={{ fontFamily: GV, fontSize: 'clamp(28px, 8vw, 42px)', color: palette.primary, lineHeight: 1.2 }}>
+            {p1}
+          </span>
+          <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 16, color: palette.accent, margin: '0 8px' }}>&</span>
+          <span style={{ fontFamily: GV, fontSize: 'clamp(28px, 8vw, 42px)', color: palette.primary, lineHeight: 1.2 }}>
+            {p2}
+          </span>
         </div>
 
         {/* Prénoms hébreux (Houppa) */}
