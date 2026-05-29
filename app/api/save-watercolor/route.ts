@@ -11,10 +11,6 @@ const CLOUD_NAME = 'dau96mui2'
 const UPLOAD_PRESET = 'lovit_watercolor'
 
 export async function POST(req: Request) {
-  if (process.env.ENABLE_AI_WATERCOLOR !== 'true') {
-    return new Response('Not found', { status: 404 })
-  }
-
   try {
     const { imageUrl } = await req.json()
 

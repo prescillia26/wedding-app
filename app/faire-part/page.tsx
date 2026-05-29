@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { showToast } from '../components/Toast'
 import { useT } from '@/lib/i18n'
-import WatercolorGenerator from '../components/WatercolorGenerator'
+import CeremonyWatercolorPanel from '../components/CeremonyWatercolorPanel'
+import { themeToWatercolorPalette } from '@/lib/watercolorPrompt'
 
 
 type Theme = 'rose-fleuri' | 'ivoire-or' | 'bleu-floral' | 'champetre' | 'blanc-gris' | 'noir-blanc' | 'chocolat' | 'bordeaux' | 'bordeaux-nuit' | 'fuchsia' | 'marine-or' | 'menthe'
@@ -210,6 +211,8 @@ interface Ceremony {
   penseesDefuntsIntro: string
   penseesDefuntsNoms: string[]
   penseesDefuntsFin: string
+  // ── Aquarelle IA v2 (par événement) ──
+  illustrationUrl?: string
 }
 interface FormData {
   marie1Prenom: string
@@ -1900,20 +1903,20 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       </AccordionSection>
 
       <AccordionSection title={locale === 'en' ? '🎨 AI Watercolor' : '🎨 Aquarelle IA'}>
-          <p style={{ fontSize: 12, color: '#6a5040', marginBottom: 16, lineHeight: 1.6 }}>
-            Générez une aquarelle unique inspirée de votre lieu de mariage. L&apos;illustration sera utilisée comme fond décoratif de votre faire-part.
+          <p style={{ fontSize: 12, color: '#6a5040', marginBottom: 12, lineHeight: 1.6 }}>
+            {locale === 'en'
+              ? 'Generate a unique watercolor for each of your events, based on the venue you entered in step 3.'
+              : 'Générez une aquarelle unique pour chacun de vos événements, basée sur le lieu renseigné à l\u2019étape 3.'}
           </p>
-          {data.illustrationUrl && (
-            <div style={{ marginBottom: 16, textAlign: 'center' }}>
-              <p style={{ fontSize: 11, color: '#7a9e6e', fontWeight: 600, marginBottom: 8 }}>✓ Aquarelle sélectionnée</p>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={data.illustrationUrl} alt="Aquarelle choisie" style={{ width: '60%', borderRadius: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }} />
-              <button type="button" onClick={() => onChange({ illustrationUrl: undefined })} style={{ ...BTN, display: 'block', margin: '8px auto 0', fontSize: 11, color: '#9ca3af', background: 'none', border: 'none', textDecoration: 'underline' }}>
-                Supprimer l&apos;aquarelle
-              </button>
-            </div>
-          )}
-          <WatercolorGenerator onSelect={(url) => onChange({ illustrationUrl: url })} />
+          <CeremonyWatercolorPanel
+            ceremonies={data.ceremonies}
+            palette={themeToWatercolorPalette(data.style)}
+            onUpdateCeremony={(i, updates) => {
+              const newCeremonies = [...data.ceremonies]
+              newCeremonies[i] = { ...newCeremonies[i], ...updates }
+              onChange({ ceremonies: newCeremonies })
+            }}
+          />
         </AccordionSection>
 
       <AccordionSection title={locale === 'en' ? '🖼️ Decorative frame' : '🖼️ Cadre décoratif'}>
@@ -2795,7 +2798,9 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
 function renderCard(ceremony: Ceremony, data: FormData, theme: ThemeObj, photoIdx = 0, isShared = false) {
   const photos = data.photosFond ?? []
   const photoFond = photos[photoIdx] ?? photos[photos.length - 1] ?? data.photoFond ?? ''
-  const props = { ceremony, data: { ...data, photoFond }, theme, isShared, cardIdx: photoIdx }
+  // Aquarelle par cérémonie (v2) ou globale (v1 rétrocompat)
+  const illustrationUrl = ceremony.illustrationUrl || data.illustrationUrl
+  const props = { ceremony, data: { ...data, photoFond, illustrationUrl }, theme, isShared, cardIdx: photoIdx }
   if (ceremony.type === 'Mairie') return <CardMairie {...props} />
   if (ceremony.type === 'Cérémonie religieuse / Houppa') return <CardHouppa {...props} />
   if (ceremony.type === 'Shabbat Hatan') return <CarteShabbatHatan {...props} />
@@ -5459,11 +5464,13 @@ const firstDate = sorted[0]?.date
                   {hasFrame && FRAMES_STRONG_BG.has(data.frameId ?? '') && (
                     <div style={{ position: 'absolute', inset: '12% 18%', background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: 0 }} />
                   )}
-                  {/* Aquarelle IA en fond décoratif */}
-                  {data.illustrationUrl && (
+                  {/* Aquarelle IA en fond décoratif (cover = 1ère cérémonie ou global) */}
+                  {(() => {
+                    const coverIllustration = data.ceremonies?.find(c => c.illustrationUrl)?.illustrationUrl || data.illustrationUrl
+                    if (!coverIllustration) return null
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={data.illustrationUrl} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.25, pointerEvents: 'none', zIndex: 0 }} />
-                  )}
+                    return <img src={coverIllustration} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.25, pointerEvents: 'none', zIndex: 0 }} />
+                  })()}
                   {(() => {
                     const canEdit = role !== 'guest' && !!onUpdate
                     const layout = data.accueilLayout ?? {}

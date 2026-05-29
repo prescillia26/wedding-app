@@ -32,4 +32,55 @@ export function buildWatercolorPrompt(ambiance: Ambiance, palette: Palette, free
   ].join(" ");
 }
 
+// ── V2 : prompt basé sur le lieu réel ──
+
+const CEREMONY_CONTEXT: Record<string, string> = {
+  'Mairie': 'a civil wedding ceremony at a city hall',
+  'Cérémonie religieuse / Houppa': 'a Jewish wedding ceremony under a chuppah',
+  'Shabbat Hatan': 'a festive Shabbat celebration before a wedding',
+  'Henné': 'a traditional henna celebration',
+  'Cocktail': 'an elegant cocktail reception',
+  'Soirée': 'an elegant evening wedding reception',
+  'Boat Party': 'a festive boat party celebration',
+};
+
+export function buildVenueWatercolorPrompt(opts: {
+  lieu: string
+  adresse?: string
+  ceremonyType: string
+  palette: Palette
+}): string {
+  const { lieu, adresse, ceremonyType, palette } = opts;
+  const colors = PALETTES[palette] ?? PALETTES.rose;
+  const context = CEREMONY_CONTEXT[ceremonyType] || 'a wedding celebration';
+  const location = adresse ? `${lieu}, ${adresse}` : lieu;
+
+  return [
+    "A full-page hand-painted WATERCOLOR illustration filling the entire frame, fine art wedding style.",
+    "NOT a poster, NOT a template, NO text, NO words, NO logo, NO icons, no solid color blocks.",
+    `Scene: a beautiful watercolor painting of "${location}", showing the real architecture and atmosphere of this venue, prepared for ${context}.`,
+    `Color palette: ${colors}.`,
+    "Delicate watercolor with fine black ink linework, visible brush strokes, transparencies,",
+    "soft romantic light, the painting fades softly toward the edges. Timeless elegance.",
+  ].join(" ");
+}
+
+export function themeToWatercolorPalette(style: string): Palette {
+  const map: Record<string, Palette> = {
+    'rose-fleuri': 'rose',
+    'ivoire-or': 'rose',
+    'bleu-floral': 'bleu_nuit',
+    'champetre': 'sauge',
+    'blanc-gris': 'lavande',
+    'noir-blanc': 'bleu_nuit',
+    'chocolat': 'sauge',
+    'bordeaux': 'rose',
+    'bordeaux-nuit': 'bleu_nuit',
+    'fuchsia': 'rose',
+    'marine-or': 'bleu_nuit',
+    'menthe': 'sauge',
+  };
+  return map[style] ?? 'rose';
+}
+
 export const WATERCOLOR_NEGATIVE = "text, words, letters, logo, watermark, poster, template, frame, border, UI, flat vector, photo, 3d render";
