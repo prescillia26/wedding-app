@@ -5,11 +5,6 @@ const VALID_AMBIANCES: Ambiance[] = ["plage", "chateau", "jardin", "salle", "syn
 const VALID_PALETTES: Palette[] = ["lavande", "rose", "sauge", "bleu_nuit"];
 
 export async function POST(req: Request) {
-  // Feature flag
-  if (process.env.ENABLE_AI_WATERCOLOR !== "true") {
-    return new Response("Not found", { status: 404 });
-  }
-
   // Token check
   if (!process.env.REPLICATE_API_TOKEN) {
     return Response.json({ error: "Configuration serveur manquante" }, { status: 500 });

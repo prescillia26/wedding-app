@@ -1899,8 +1899,7 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
 
       </AccordionSection>
 
-      {process.env.NEXT_PUBLIC_ENABLE_AI_WATERCOLOR === 'true' && (
-        <AccordionSection title={locale === 'en' ? '🎨 AI Watercolor' : '🎨 Aquarelle IA'}>
+      <AccordionSection title={locale === 'en' ? '🎨 AI Watercolor' : '🎨 Aquarelle IA'}>
           <p style={{ fontSize: 12, color: '#6a5040', marginBottom: 16, lineHeight: 1.6 }}>
             Générez une aquarelle unique inspirée de votre lieu de mariage. L&apos;illustration sera utilisée comme fond décoratif de votre faire-part.
           </p>
@@ -1916,7 +1915,6 @@ function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           )}
           <WatercolorGenerator onSelect={(url) => onChange({ illustrationUrl: url })} />
         </AccordionSection>
-      )}
 
       <AccordionSection title={locale === 'en' ? '🖼️ Decorative frame' : '🖼️ Cadre décoratif'}>
         {/* Cadres statiques (images) */}
