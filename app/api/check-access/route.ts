@@ -26,10 +26,10 @@ export async function GET(request: Request) {
     if (!code) return Response.json({ valid: false, reason: 'Code manquant' })
 
     const normalized = code.toUpperCase().trim()
-    const data = await redis.get(`access:${normalized}`)
+    const data = await redis.get<{ pack?: string }>(`access:${normalized}`)
 
     if (!data) return Response.json({ valid: false, reason: 'Code invalide' })
-    return Response.json({ valid: true })
+    return Response.json({ valid: true, pack: data.pack || 'essentiel' })
   } catch (err) {
     return Response.json({ valid: false, reason: 'Erreur serveur' }, { status: 500 })
   }
@@ -44,10 +44,10 @@ export async function POST(request: Request) {
     const normalized = code?.toUpperCase().trim()
     if (!normalized) return Response.json({ valid: false, reason: 'Code manquant' })
 
-    const data = await redis.get(`access:${normalized}`)
+    const data = await redis.get<{ pack?: string }>(`access:${normalized}`)
     if (!data) return Response.json({ valid: false, reason: 'Code invalide' })
 
-    return Response.json({ valid: true })
+    return Response.json({ valid: true, pack: data.pack || 'essentiel' })
   } catch (err) {
     return Response.json({ valid: false, reason: 'Erreur serveur' }, { status: 500 })
   }

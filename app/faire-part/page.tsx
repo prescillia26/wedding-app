@@ -1807,9 +1807,9 @@ function AccordionSection({ title, defaultOpen = false, children }: { title: str
   )
 }
 
-function Step4({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
+function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChange: (d: Partial<FormData>) => void; pack?: 'essentiel' | 'premium' }) {
   const { t, locale } = useT()
-  const [isPremium] = useState(() => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('premium') === 'true')
+  const isPremium = pack === 'premium' || (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('premium') === 'true')
   return (
     <div>
       <h2 style={{ textAlign: 'center', fontFamily: 'var(--font-playfair-display)', fontSize: 20, fontWeight: 600, color: '#3a3330', marginBottom: 6 }}>{t.fairepart.step4Title}</h2>
@@ -6300,6 +6300,9 @@ export default function FairePartPage() {
   const [accessGranted, setAccessGranted] = useState(true) // Freemium : accès ouvert à tous
   const [checkingAccess, setCheckingAccess] = useState(false) // Plus de gate
   const [isPaid, setIsPaid] = useState(false)
+  const [userPack, setUserPack] = useState<'essentiel' | 'premium'>(() => {
+    try { return (localStorage.getItem('lovit_pack') === 'premium' ? 'premium' : 'essentiel') } catch { return 'essentiel' }
+  })
   // Auth & sauvegarde serveur
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [userFaireparts, setUserFaireparts] = useState<string[]>([])
@@ -6361,7 +6364,8 @@ export default function FairePartPage() {
         if (d.valid) {
           setAccessGranted(true)
           setIsPaid(true)
-          try { localStorage.setItem('lovit_access_code', code) } catch { /* ignore */ }
+          if (d.pack === 'premium') setUserPack('premium')
+          try { localStorage.setItem('lovit_access_code', code); if (d.pack) localStorage.setItem('lovit_pack', d.pack) } catch { /* ignore */ }
 
           // 1) D'abord essayer le brouillon localStorage
           let hasLocalDraft = false
@@ -6636,7 +6640,7 @@ export default function FairePartPage() {
         {step === 1 && <Step1 data={formData} onChange={update} />}
         {step === 2 && <Step2 data={formData} onChange={update} />}
         {step === 3 && <Step3 data={formData} onChange={update} />}
-        {step === 4 && <Step4 data={formData} onChange={update} />}
+        {step === 4 && <Step4 data={formData} onChange={update} pack={userPack} />}
         <div style={{ display: 'flex', gap: 12, marginTop: 32, position: 'relative', zIndex: 1 }}>
           {step > 1 && (
             <button

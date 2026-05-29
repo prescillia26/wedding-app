@@ -373,10 +373,10 @@ export default function Home() {
               </p>
             </div>
 
-            {/* ── Pack Premium — 99€ (Coming Soon) ── */}
-            <div style={{ background: 'white', borderRadius: 24, padding: '40px 32px', boxShadow: `0 16px 64px ${GOLD}22`, border: `2px solid ${GOLD}`, textAlign: 'center', position: 'relative', opacity: 0.92 }}>
-              <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`, color: 'white', fontSize: 9, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', padding: '5px 16px', borderRadius: 9999, whiteSpace: 'nowrap' }}>
-                Coming soon
+            {/* ── Pack Premium — 99€ ── */}
+            <div style={{ background: 'white', borderRadius: 24, padding: '40px 32px', boxShadow: `0 24px 72px ${GOLD}33`, border: `2.5px solid ${GOLD}`, textAlign: 'center', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`, color: 'white', fontSize: 9, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', padding: '5px 16px', borderRadius: 9999, whiteSpace: 'nowrap', boxShadow: `0 4px 16px ${GOLD}55` }}>
+                Recommandé
               </div>
               <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: GOLD, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>Premium</div>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 4, marginBottom: 4 }}>
@@ -395,9 +395,9 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-              <div style={{ display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', padding: '16px 40px', borderRadius: 9999, background: '#e8e0d8', color: '#9a928a', fontSize: 14, fontWeight: 700, letterSpacing: '0.05em', fontFamily: 'var(--font-playfair-display)' }}>
-                Bientôt disponible
-              </div>
+              <a href="/paiement" style={{ ...S.btnPrimary, display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontSize: 14, textDecoration: 'none' }}>
+                Choisir le Premium — 99&euro;
+              </a>
             </div>
 
           </div>

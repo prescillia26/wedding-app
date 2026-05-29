@@ -5,10 +5,9 @@ function getStripe() {
 }
 
 
-const PACKS: Record<string, { amount: number; name: string }> = {
-  essentiel: { amount: 6900, name: "Lov'it — Offre de lancement" },  // 69€
-  premium:   { amount: 6900, name: "Lov'it — Offre de lancement" },  // 69€
-  luxe:      { amount: 6900, name: "Lov'it — Offre de lancement" },  // 69€
+const PACKS: Record<string, { amount: number; amountUSD: number; name: string; nameEN: string }> = {
+  essentiel: { amount: 6900, amountUSD: 7900, name: "Lov'it — Pack Essentiel", nameEN: "Lov'it — Essentials Pack" },
+  premium:   { amount: 9900, amountUSD: 10900, name: "Lov'it — Pack Premium", nameEN: "Lov'it — Premium Pack" },
 }
 
 export async function POST(request: Request) {
@@ -27,8 +26,8 @@ export async function POST(request: Request) {
       line_items: [{
         price_data: {
           currency: isEN ? 'usd' : 'eur',
-          product_data: { name: isEN ? "Lov'it — Launch offer" : selected.name },
-          unit_amount: isEN ? 7900 : selected.amount,  // $79 USD ou 69€ EUR
+          product_data: { name: isEN ? selected.nameEN : selected.name },
+          unit_amount: isEN ? selected.amountUSD : selected.amount,
         },
         quantity: 1,
       }],
