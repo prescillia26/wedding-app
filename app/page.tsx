@@ -174,7 +174,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 }
 
 export default function Home() {
-  const { t } = useT()
+  const { t, locale } = useT()
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   useEffect(() => {
     fetch('/api/auth/me').then(r => { if (r.ok) setIsLoggedIn(true) }).catch(() => {})
@@ -232,7 +232,7 @@ export default function Home() {
 
         <div style={{ margin: '32px auto 40px', maxWidth: 400 }}>
           <div style={{ marginBottom: 16 }}>
-            <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 16, color: '#9ca3af', textDecoration: 'line-through', marginRight: 8 }}>{h.priceBefore}</span>
+            <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: TEXT, marginRight: 6 }}>{locale === 'en' ? 'From' : 'À partir de'}</span>
             <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 36, color: DARK, fontWeight: 700 }}>{c.price}</span>
             <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: TEXT, marginLeft: 6 }}>{c.singlePayment}</span>
           </div>
@@ -318,7 +318,7 @@ export default function Home() {
           </div>
           <div style={{ textAlign: 'center', marginTop: 48 }}>
             <a href={ctaHref} style={S.btnPrimary}>
-              {isLoggedIn ? c.createYourFairepart : `${c.startNow} — ${c.price}`}
+              {isLoggedIn ? c.createYourFairepart : c.startNow}
             </a>
           </div>
         </div>
@@ -424,7 +424,7 @@ export default function Home() {
           {h.ctaSub}
         </p>
         <a href={ctaHref} style={S.btnPrimary}>
-          {isLoggedIn ? c.yourSpace : `${c.createYourFairepart} — ${c.price}`}
+          {isLoggedIn ? c.yourSpace : c.createYourFairepart}
         </a>
       </div>
 
