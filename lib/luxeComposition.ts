@@ -3,26 +3,28 @@
 export interface LuxePalette {
   id: string
   label: string
-  primary: string    // couleur principale (titres, prénoms)
-  cream: string      // fond crème
-  accent: string     // couleur accent
-  rsvp: string       // couleur du bloc RSVP
+  primary: string       // couleur principale (titres, prénoms)
+  cream: string         // fond crème
+  accent: string        // couleur accent
+  rsvpBg: string        // fond pastel RSVP
+  rsvpText: string      // texte RSVP
+  rsvpAccent: string    // filets/bouton RSVP
   textSecondary: string // texte secondaire
 }
 
 export const LUXE_PALETTES: Record<string, LuxePalette> = {
-  mauve:      { id: 'mauve',      label: 'Mauve',        primary: '#4A2576', cream: '#F8F5FD', accent: '#9B6FD0', rsvp: '#5A2D8C', textSecondary: '#6a5080' },
-  rose_clair: { id: 'rose_clair', label: 'Rosé poudré',  primary: '#993556', cream: '#FDF7F8', accent: '#D4537E', rsvp: '#993556', textSecondary: '#8a5060' },
-  rose:       { id: 'rose',       label: 'Rose',         primary: '#993556', cream: '#FDF7F8', accent: '#D4537E', rsvp: '#993556', textSecondary: '#8a5060' },
-  sauge:      { id: 'sauge',      label: 'Vert sauge',   primary: '#3B6D11', cream: '#F7FAF1', accent: '#97C459', rsvp: '#3B6D11', textSecondary: '#5a7050' },
-  bleu_ciel:  { id: 'bleu_ciel',  label: 'Bleu ciel',    primary: '#2970A0', cream: '#F5F9FD', accent: '#85C7EB', rsvp: '#185FA5', textSecondary: '#4a6a8a' },
-  bleu_nuit:  { id: 'bleu_nuit',  label: 'Bleu nuit',    primary: '#185FA5', cream: '#F5F9FD', accent: '#85B7EB', rsvp: '#042C53', textSecondary: '#4a6a8a' },
-  lavande:    { id: 'lavande',    label: 'Lavande',      primary: '#4A2576', cream: '#F8F5FD', accent: '#9B6FD0', rsvp: '#5A2D8C', textSecondary: '#6a5080' },
-  dore:       { id: 'dore',       label: 'Doré',         primary: '#8A6914', cream: '#FDF8F0', accent: '#C9A84C', rsvp: '#6A5010', textSecondary: '#6a5040' },
-  bordeaux:   { id: 'bordeaux',   label: 'Bordeaux',     primary: '#6B1020', cream: '#FDF7F8', accent: '#A83050', rsvp: '#4A0A18', textSecondary: '#7a3a3a' },
-  menthe:     { id: 'menthe',     label: 'Menthe',       primary: '#1A7A4A', cream: '#F0FAF5', accent: '#4AC88A', rsvp: '#0A5A30', textSecondary: '#4a7a5a' },
-  peche:      { id: 'peche',      label: 'Pêche',        primary: '#A06030', cream: '#FDF8F2', accent: '#E8A870', rsvp: '#8A5020', textSecondary: '#8a6050' },
-  terracotta: { id: 'terracotta', label: 'Terracotta',   primary: '#8A4A2A', cream: '#FDF6F2', accent: '#C4704A', rsvp: '#6A3A1A', textSecondary: '#8a5a40' },
+  mauve:      { id: 'mauve',      label: 'Mauve',        primary: '#4A2576', cream: '#F8F5FD', accent: '#9B6FD0', rsvpBg: '#EDE5F7', rsvpText: '#4A2576', rsvpAccent: '#7B4FB5', textSecondary: '#6a5080' },
+  rose_clair: { id: 'rose_clair', label: 'Rosé poudré',  primary: '#993556', cream: '#FDF7F8', accent: '#D4537E', rsvpBg: '#FDE8F0', rsvpText: '#993556', rsvpAccent: '#C44A6E', textSecondary: '#8a5060' },
+  rose:       { id: 'rose',       label: 'Rose',         primary: '#993556', cream: '#FDF7F8', accent: '#D4537E', rsvpBg: '#FDE8F0', rsvpText: '#993556', rsvpAccent: '#C44A6E', textSecondary: '#8a5060' },
+  sauge:      { id: 'sauge',      label: 'Vert sauge',   primary: '#3B6D11', cream: '#F7FAF1', accent: '#97C459', rsvpBg: '#E8F5D8', rsvpText: '#3B6D11', rsvpAccent: '#6A9A30', textSecondary: '#5a7050' },
+  bleu_ciel:  { id: 'bleu_ciel',  label: 'Bleu ciel',    primary: '#2970A0', cream: '#F5F9FD', accent: '#85C7EB', rsvpBg: '#E0F0FD', rsvpText: '#185FA5', rsvpAccent: '#5090C0', textSecondary: '#4a6a8a' },
+  bleu_nuit:  { id: 'bleu_nuit',  label: 'Bleu nuit',    primary: '#185FA5', cream: '#F5F9FD', accent: '#85B7EB', rsvpBg: '#E0EDFA', rsvpText: '#0A3A6A', rsvpAccent: '#4080B8', textSecondary: '#4a6a8a' },
+  lavande:    { id: 'lavande',    label: 'Lavande',      primary: '#4A2576', cream: '#F8F5FD', accent: '#9B6FD0', rsvpBg: '#EDE5F7', rsvpText: '#4A2576', rsvpAccent: '#7B4FB5', textSecondary: '#6a5080' },
+  dore:       { id: 'dore',       label: 'Doré',         primary: '#8A6914', cream: '#FDF8F0', accent: '#C9A84C', rsvpBg: '#F5EDDA', rsvpText: '#6A5010', rsvpAccent: '#B08A30', textSecondary: '#6a5040' },
+  bordeaux:   { id: 'bordeaux',   label: 'Bordeaux',     primary: '#6B1020', cream: '#FDF7F8', accent: '#A83050', rsvpBg: '#F5E0E5', rsvpText: '#6B1020', rsvpAccent: '#9A2840', textSecondary: '#7a3a3a' },
+  menthe:     { id: 'menthe',     label: 'Menthe',       primary: '#1A7A4A', cream: '#F0FAF5', accent: '#4AC88A', rsvpBg: '#D8F5E8', rsvpText: '#0A5A30', rsvpAccent: '#30A060', textSecondary: '#4a7a5a' },
+  peche:      { id: 'peche',      label: 'Pêche',        primary: '#A06030', cream: '#FDF8F2', accent: '#E8A870', rsvpBg: '#F8E8D8', rsvpText: '#8A5020', rsvpAccent: '#C08040', textSecondary: '#8a6050' },
+  terracotta: { id: 'terracotta', label: 'Terracotta',   primary: '#8A4A2A', cream: '#FDF6F2', accent: '#C4704A', rsvpBg: '#F5E5DA', rsvpText: '#6A3A1A', rsvpAccent: '#A06040', textSecondary: '#8a5a40' },
 }
 
 // ── Motifs par défaut entre cérémonies ──

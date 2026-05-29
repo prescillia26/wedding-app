@@ -6027,7 +6027,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
     <div id="faire-part-preview-target" style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte, position: 'relative' }}>
       {!isPaid && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 40, pointerEvents: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(60px,15vw,120px)', color: 'rgba(201,168,76,0.08)', fontWeight: 700, letterSpacing: 8, transform: 'rotate(-30deg)', whiteSpace: 'nowrap', userSelect: 'none' }}>
+          <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(60px,15vw,120px)', color: 'rgba(201,168,76,0.05)', fontWeight: 700, letterSpacing: 8, transform: 'rotate(-30deg)', whiteSpace: 'nowrap', userSelect: 'none' }}>
             LOV&apos;IT
           </div>
         </div>
@@ -6665,7 +6665,7 @@ export default function FairePartPage() {
         <div style={{ position: 'relative' }}>
           {!isPaid && (
             <div style={{ position: 'fixed', inset: 0, zIndex: 40, pointerEvents: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-              <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(60px,15vw,120px)', color: 'rgba(201,168,76,0.08)', fontWeight: 700, letterSpacing: 8, transform: 'rotate(-30deg)', whiteSpace: 'nowrap', userSelect: 'none' }}>LOV&apos;IT</div>
+              <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(60px,15vw,120px)', color: 'rgba(201,168,76,0.05)', fontWeight: 700, letterSpacing: 8, transform: 'rotate(-30deg)', whiteSpace: 'nowrap', userSelect: 'none' }}>LOV&apos;IT</div>
             </div>
           )}
           <LuxeFairePartRenderer data={formData} />

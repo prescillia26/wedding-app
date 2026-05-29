@@ -154,16 +154,21 @@ function CeremonySection({ ceremony, data, sceneUrl, palette }: { ceremony: Cere
       )}
 
       {/* Bloc texte */}
-      <div style={{ padding: '32px 24px 40px', textAlign: 'center', maxWidth: 500, margin: '0 auto' }}>
+      <div style={{ padding: '32px 24px 40px', textAlign: 'center', maxWidth: 500, margin: '0 auto', position: 'relative' }}>
+        {/* בס״ד en haut à droite (Houppa seulement) */}
+        {isHouppa && data.mariageJuif && (
+          <div style={{ position: 'absolute', top: 12, right: 8, fontFamily: 'serif', fontSize: 11, color: palette.accent, opacity: 0.7, direction: 'rtl' }}>בס״ד</div>
+        )}
+
         {/* Titre cérémonie */}
         <div style={{ fontFamily: PD, fontSize: 22, color: palette.primary, letterSpacing: 6, marginBottom: 24 }}>
           {title}
         </div>
 
-        {/* Kol Sasson (Houppa seulement) */}
+        {/* קול ששון וקול שמחה (Houppa seulement, une seule ligne) */}
         {isHouppa && data.mariageJuif && (
-          <div style={{ fontFamily: 'serif', fontSize: 14, color: palette.accent, direction: 'rtl', marginBottom: 20, lineHeight: 1.8 }}>
-            קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה, קוֹל חָתָן וְקוֹל כַּלָּה
+          <div style={{ fontFamily: 'var(--font-bellefair, serif)', fontSize: 22, color: palette.accent, direction: 'rtl', marginBottom: 20, whiteSpace: 'nowrap' }}>
+            קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה
           </div>
         )}
 
@@ -193,8 +198,8 @@ function CeremonySection({ ceremony, data, sceneUrl, palette }: { ceremony: Cere
 
         {/* Prénoms hébreux (Houppa) */}
         {isHouppa && data.marie1PrenomHebreu && data.marie2PrenomHebreu && (
-          <div style={{ fontFamily: 'serif', fontSize: 15, color: palette.accent, direction: 'rtl', marginBottom: 20 }}>
-            {data.marie1PrenomHebreu} & {data.marie2PrenomHebreu}
+          <div style={{ fontFamily: 'var(--font-bellefair, serif)', fontSize: 22, color: palette.primary, direction: 'rtl', marginBottom: 20, opacity: 0.7 }}>
+            {data.marie1PrenomHebreu} ・ {data.marie2PrenomHebreu}
           </div>
         )}
 
@@ -230,7 +235,9 @@ function CeremonySection({ ceremony, data, sceneUrl, palette }: { ceremony: Cere
               {ceremony.penseesDefuntsIntro}
             </div>
             {ceremony.penseesDefuntsNoms.map((nom, i) => (
-              <div key={i} style={{ fontFamily: PD, fontSize: 13, color: palette.primary, marginBottom: 4 }}>{nom}</div>
+              <div key={i} style={{ fontFamily: PD, fontSize: 13, color: palette.primary, marginBottom: 6 }}>
+                🕯 {nom} <span style={{ fontFamily: 'serif', direction: 'rtl', unicodeBidi: 'embed' }}>ז״ל</span>
+              </div>
             ))}
             {ceremony.penseesDefuntsFin && (
               <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 12, color: palette.textSecondary, marginTop: 10 }}>
@@ -247,23 +254,32 @@ function CeremonySection({ ceremony, data, sceneUrl, palette }: { ceremony: Cere
 // ══════════════════════════════════════════════════════════════════════
 // ── MOTIF SÉPARATEUR ──
 // ══════════════════════════════════════════════════════════════════════
+function DecorativeLine({ palette }: { palette: LuxePalette }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+      <div style={{ width: 60, height: 0.5, background: palette.accent, opacity: 0.4 }} />
+      <span style={{ color: palette.accent, fontSize: 10, opacity: 0.4 }}>✦</span>
+      <div style={{ width: 60, height: 0.5, background: palette.accent, opacity: 0.4 }} />
+    </div>
+  )
+}
+
 function MotifSeparator({ url, palette }: { url?: string; palette: LuxePalette }) {
   if (!url) {
-    // Fallback : simple séparateur élégant
     return (
-      <div style={{ padding: '24px 0', textAlign: 'center', background: palette.cream }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 40, height: 0.5, background: palette.accent, opacity: 0.3 }} />
-          <span style={{ color: palette.accent, fontSize: 10, opacity: 0.4 }}>◆</span>
-          <div style={{ width: 40, height: 0.5, background: palette.accent, opacity: 0.3 }} />
-        </div>
+      <div style={{ padding: '40px 0', textAlign: 'center', background: palette.cream }}>
+        <DecorativeLine palette={palette} />
       </div>
     )
   }
   return (
-    <div style={{ padding: '20px 0', textAlign: 'center', background: palette.cream }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={url} alt="" style={{ height: 70, maxWidth: '60%', objectFit: 'contain', display: 'inline-block', opacity: 0.9 }} />
+    <div style={{ padding: '48px 0', textAlign: 'center', background: palette.cream }}>
+      <DecorativeLine palette={palette} />
+      <div style={{ padding: '20px 0' }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={url} alt="" style={{ height: 120, maxWidth: '50%', objectFit: 'contain', display: 'inline-block' }} />
+      </div>
+      <DecorativeLine palette={palette} />
     </div>
   )
 }
@@ -307,25 +323,29 @@ function InfosSection({ data, palette }: { data: WeddingData; palette: LuxePalet
 // ══════════════════════════════════════════════════════════════════════
 function RsvpSection({ palette, onRsvpOpen }: { palette: LuxePalette; onRsvpOpen?: () => void }) {
   return (
-    <div style={{ background: palette.rsvp, padding: '48px 24px', textAlign: 'center' }}>
-      <div style={{ fontFamily: PD, fontSize: 16, color: 'rgba(255,255,255,0.8)', letterSpacing: 4, marginBottom: 16, textTransform: 'uppercase' }}>
-        À vous de nous dire
+    <div style={{ background: palette.rsvpBg, padding: '48px 24px', textAlign: 'center' }}>
+      <DecorativeLine palette={palette} />
+      <div style={{ padding: '28px 0' }}>
+        <div style={{ fontFamily: PD, fontSize: 14, color: palette.rsvpAccent, letterSpacing: 4, marginBottom: 16, textTransform: 'uppercase' }}>
+          À vous de nous dire
+        </div>
+        <div style={{ fontFamily: GV, fontSize: 'clamp(32px, 8vw, 48px)', color: palette.rsvpText, marginBottom: 28 }}>
+          Oui !
+        </div>
+        <button
+          type="button"
+          onClick={onRsvpOpen}
+          style={{
+            fontFamily: PD, fontSize: 13, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase',
+            padding: '14px 36px', borderRadius: 9999, border: 'none',
+            background: palette.rsvpText, color: palette.rsvpBg, cursor: 'pointer',
+            transition: 'background 0.2s',
+          }}
+        >
+          Confirmer ma présence
+        </button>
       </div>
-      <div style={{ fontFamily: GV, fontSize: 'clamp(32px, 8vw, 48px)', color: 'white', marginBottom: 28 }}>
-        Oui !
-      </div>
-      <button
-        type="button"
-        onClick={onRsvpOpen}
-        style={{
-          fontFamily: PD, fontSize: 13, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase',
-          padding: '14px 36px', borderRadius: 9999, border: '2px solid rgba(255,255,255,0.8)',
-          background: 'transparent', color: 'white', cursor: 'pointer',
-          transition: 'background 0.2s',
-        }}
-      >
-        Confirmer ma présence
-      </button>
+      <DecorativeLine palette={palette} />
     </div>
   )
 }
@@ -366,14 +386,9 @@ export default function LuxeFairePartRenderer({
             <InfosSection data={data} palette={palette} />
           )}
 
-          {/* Galerie d'illustrations décoratives avant le RSVP */}
+          {/* Motif final avant RSVP (un seul, le plus significatif) */}
           {section.kind === 'rsvp' && decoImages.length > 0 && (
-            <div style={{ background: palette.cream, padding: '20px 24px', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 16 }}>
-              {decoImages.map(({ id, url }) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img key={id} src={url} alt="" style={{ height: 70, maxWidth: 100, objectFit: 'contain' }} />
-              ))}
-            </div>
+            <MotifSeparator url={decoImages[decoImages.length - 1].url} palette={palette} />
           )}
 
           {section.kind === 'rsvp' && (
