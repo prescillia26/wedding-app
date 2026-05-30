@@ -108,9 +108,13 @@ export default function LuxeFairePartRenderer({
   const composition = buildLuxeComposition(data.ceremonies, paletteId, data.luxeDecoUrls)
   const decoUrls = (data.luxeDecoUrls || {}) as Record<string, string>
   const decoImages = Object.entries(decoUrls).filter(([, url]) => url).map(([id, url]) => ({ id, url }))
+  const monogramUrl = data.luxeMonogramUrl as string | undefined
+  const p1 = data.marie1Prenom || 'Prénom'
+  const p2 = data.marie2Prenom || 'Prénom'
+  const firstCeremony = data.ceremonies?.[0]
+  const lieu = firstCeremony?.lieu || ''
 
   // Crée un thème "override" qui utilise les couleurs de la palette Luxe
-  // pour que les composants Premium utilisent les bonnes couleurs
   const luxeTheme = {
     fond: palette.cream,
     accent: palette.primary,
@@ -123,10 +127,30 @@ export default function LuxeFairePartRenderer({
     <div style={{ background: palette.cream, minHeight: '100vh', maxWidth: 600, margin: '0 auto', boxShadow: '0 0 60px rgba(0,0,0,0.08)' }}>
       {composition.sections.map((section, i) => (
         <React.Fragment key={i}>
+          {/* ── COVER avec monogramme ── */}
           {section.kind === 'cover' && (
-            <div style={{ background: palette.cream }}>
-              {/* Cover utilise ElegantPage1 via renderCard — on la skip car
-                  les prénoms sont déjà dans chaque carte de cérémonie Premium */}
+            <div style={{ background: palette.cream, padding: '48px 24px 32px', textAlign: 'center' }}>
+              {/* Monogramme entrelacé */}
+              {monogramUrl && (
+                <div style={{ marginBottom: 24 }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={monogramUrl} alt={`${p1} & ${p2}`} style={{ width: 140, height: 140, objectFit: 'contain', mixBlendMode: 'multiply', display: 'inline-block' }} />
+                </div>
+              )}
+              {/* Prénoms calligraphiés */}
+              <div style={{ marginBottom: 12 }}>
+                <span style={{ fontFamily: GV, fontSize: 'clamp(32px, 9vw, 48px)', color: palette.primary }}>{p1}</span>
+                <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 18, color: palette.accent, margin: '0 8px' }}>&</span>
+                <span style={{ fontFamily: GV, fontSize: 'clamp(32px, 9vw, 48px)', color: palette.primary }}>{p2}</span>
+              </div>
+              {/* Séparateur */}
+              <DecorativeLine palette={palette} />
+              {/* Lieu */}
+              {lieu && (
+                <div style={{ fontFamily: PD, fontSize: 12, color: palette.textSecondary, letterSpacing: 2, textTransform: 'uppercase', marginTop: 16 }}>
+                  {lieu}
+                </div>
+              )}
             </div>
           )}
 
