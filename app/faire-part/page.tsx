@@ -6668,7 +6668,7 @@ export default function FairePartPage() {
               <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(60px,15vw,120px)', color: 'rgba(201,168,76,0.05)', fontWeight: 700, letterSpacing: 8, transform: 'rotate(-30deg)', whiteSpace: 'nowrap', userSelect: 'none' }}>LOV&apos;IT</div>
             </div>
           )}
-          <LuxeFairePartRenderer data={formData} />
+          <LuxeFairePartRenderer data={formData} renderCard={renderCard} />
           <div style={{ position: 'sticky', bottom: 0, zIndex: 50, background: 'white', borderTop: '1px solid #e8e0d8', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center' }}>
             <button onClick={onEdit} style={{ padding: '10px 20px', borderRadius: 9999, border: '1.5px solid #C9A84C', background: 'transparent', color: '#C9A84C', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Modifier</button>
             <button onClick={() => { if (!isPaid) { window.location.href = '/paiement'; return } }} style={{ padding: '10px 20px', borderRadius: 9999, background: isPaid ? '#C9A84C' : 'linear-gradient(135deg, #C9A84C, #e8c96a)', color: 'white', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>{!isPaid ? 'Débloquer le partage' : 'Partager'}</button>
