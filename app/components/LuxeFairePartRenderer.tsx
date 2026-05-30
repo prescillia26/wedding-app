@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { buildLuxeComposition, getLuxePalette, type LuxePalette } from '@/lib/luxeComposition'
 
 // ── Fonts ──
@@ -8,8 +8,117 @@ const GV = 'var(--font-great-vibes)'
 const PD = 'var(--font-playfair-display)'
 const CG = 'var(--font-cormorant-garamond)'
 
+// ── Spacing tokens (#9) ──
+const SP = { xs: 8, s: 16, m: 24, l: 40, xl: 64, xxl: 96 }
+
 // ══════════════════════════════════════════════════════════════════════
-// ── AQUARELLE BANNER (couche visuelle Luxe) ──
+// ── STICKY HEADER (#2 + #12) ──
+// ══════════════════════════════════════════════════════════════════════
+function LuxeStickyHeader({ monogramUrl, weddingDate, palette, p1, p2 }: {
+  monogramUrl?: string; weddingDate?: string; palette: LuxePalette; p1: string; p2: string
+}) {
+  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+
+  useEffect(() => {
+    if (!weddingDate) return
+    const target = new Date(weddingDate).getTime()
+    const tick = () => {
+      const diff = Math.max(0, target - Date.now())
+      setCountdown({
+        days: Math.floor(diff / 86400000),
+        hours: Math.floor((diff % 86400000) / 3600000),
+        minutes: Math.floor((diff % 3600000) / 60000),
+        seconds: Math.floor((diff % 60000) / 1000),
+      })
+    }
+    tick()
+    const id = setInterval(tick, 1000)
+    return () => clearInterval(id)
+  }, [weddingDate])
+
+  return (
+    <div style={{
+      position: 'sticky', top: 0, zIndex: 50, background: `${palette.cream}ee`,
+      backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+      borderBottom: `1px solid ${palette.accent}20`,
+      padding: '8px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    }}>
+      {/* Mini monogramme ou initiales */}
+      <div style={{ width: 32 }}>
+        {monogramUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={monogramUrl} alt="" style={{ width: 28, height: 28, objectFit: 'contain', mixBlendMode: 'multiply' }} />
+        ) : (
+          <span style={{ fontFamily: GV, fontSize: 16, color: palette.primary }}>{p1[0]}{p2[0]}</span>
+        )}
+      </div>
+
+      {/* Countdown */}
+      {weddingDate && (
+        <div style={{ fontFamily: PD, fontSize: 11, color: palette.primary, letterSpacing: 2, textTransform: 'uppercase' }}>
+          {countdown.days}<span style={{ fontSize: 8, opacity: 0.6, margin: '0 2px' }}>J</span>{' '}
+          {countdown.hours}<span style={{ fontSize: 8, opacity: 0.6, margin: '0 2px' }}>H</span>{' '}
+          {countdown.minutes}<span style={{ fontSize: 8, opacity: 0.6, margin: '0 2px' }}>M</span>{' '}
+          {countdown.seconds}<span style={{ fontSize: 8, opacity: 0.6, margin: '0 2px' }}>S</span>
+        </div>
+      )}
+
+      <div style={{ width: 32 }} />
+    </div>
+  )
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// ── COUNTDOWN BLOCK (#12) ──
+// ══════════════════════════════════════════════════════════════════════
+function CountdownBlock({ weddingDate, palette, p1, p2 }: { weddingDate?: string; palette: LuxePalette; p1: string; p2: string }) {
+  const [cd, setCd] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+
+  useEffect(() => {
+    if (!weddingDate) return
+    const target = new Date(weddingDate).getTime()
+    const tick = () => {
+      const diff = Math.max(0, target - Date.now())
+      setCd({
+        days: Math.floor(diff / 86400000),
+        hours: Math.floor((diff % 86400000) / 3600000),
+        minutes: Math.floor((diff % 3600000) / 60000),
+        seconds: Math.floor((diff % 60000) / 1000),
+      })
+    }
+    tick()
+    const id = setInterval(tick, 1000)
+    return () => clearInterval(id)
+  }, [weddingDate])
+
+  if (!weddingDate) return null
+
+  const items = [
+    { value: cd.days, label: 'JOURS' },
+    { value: cd.hours, label: 'H' },
+    { value: cd.minutes, label: 'M' },
+    { value: cd.seconds, label: 'S' },
+  ]
+
+  return (
+    <div style={{ background: palette.cream, padding: `${SP.l}px 24px`, textAlign: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
+        {items.map(({ value, label }) => (
+          <div key={label} style={{ minWidth: 52 }}>
+            <div style={{ fontFamily: PD, fontSize: 28, color: palette.primary, fontWeight: 700, lineHeight: 1 }}>{value}</div>
+            <div style={{ fontFamily: PD, fontSize: 8, color: palette.accent, letterSpacing: 2, marginTop: 4 }}>{label}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 12, color: palette.textSecondary, marginTop: SP.s }}>
+        avant que {p1} & {p2} se disent oui
+      </div>
+    </div>
+  )
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// ── AQUARELLE BANNER ──
 // ══════════════════════════════════════════════════════════════════════
 function AquarelleBanner({ sceneUrl }: { sceneUrl?: string }) {
   if (!sceneUrl) return null
@@ -35,20 +144,20 @@ function DecorativeLine({ palette }: { palette: LuxePalette }) {
 }
 
 // ══════════════════════════════════════════════════════════════════════
-// ── MOTIF SÉPARATEUR (couche visuelle Luxe) ──
+// ── MOTIF SÉPARATEUR ──
 // ══════════════════════════════════════════════════════════════════════
 function MotifSeparator({ url, palette }: { url?: string; palette: LuxePalette }) {
   if (!url) {
     return (
-      <div style={{ padding: '40px 0', textAlign: 'center', background: palette.cream }}>
+      <div style={{ padding: `${SP.l}px 0`, textAlign: 'center', background: palette.cream }}>
         <DecorativeLine palette={palette} />
       </div>
     )
   }
   return (
-    <div style={{ padding: '48px 0', textAlign: 'center', background: palette.cream }}>
+    <div style={{ padding: `${SP.xl}px 0`, textAlign: 'center', background: palette.cream }}>
       <DecorativeLine palette={palette} />
-      <div style={{ padding: '24px 0' }}>
+      <div style={{ padding: `${SP.m}px 0` }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={url} alt="" style={{ height: 160, maxWidth: '65%', objectFit: 'contain', display: 'inline-block', mixBlendMode: 'multiply' }} />
       </div>
@@ -58,17 +167,33 @@ function MotifSeparator({ url, palette }: { url?: string; palette: LuxePalette }
 }
 
 // ══════════════════════════════════════════════════════════════════════
-// ── BLOC RSVP (couche visuelle Luxe) ──
+// ── NARRATIVE COPY (#5) ──
+// ══════════════════════════════════════════════════════════════════════
+function StorySection({ story, palette }: { story?: string; palette: LuxePalette }) {
+  if (!story) return null
+  return (
+    <div style={{ background: palette.cream, padding: `${SP.xl}px 24px`, textAlign: 'center' }}>
+      <div style={{ maxWidth: 480, margin: '0 auto' }}>
+        <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 15, color: palette.textSecondary, lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
+          {story}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// ── BLOC RSVP ──
 // ══════════════════════════════════════════════════════════════════════
 function RsvpSection({ palette, onRsvpOpen }: { palette: LuxePalette; onRsvpOpen?: () => void }) {
   return (
-    <div style={{ background: palette.rsvpBg, padding: '48px 24px', textAlign: 'center' }}>
+    <div style={{ background: palette.rsvpBg, padding: `${SP.xl}px 24px`, textAlign: 'center' }}>
       <DecorativeLine palette={palette} />
-      <div style={{ padding: '28px 0' }}>
-        <div style={{ fontFamily: PD, fontSize: 14, color: palette.rsvpAccent, letterSpacing: 4, marginBottom: 16, textTransform: 'uppercase' }}>
+      <div style={{ padding: `${SP.m}px 0` }}>
+        <div style={{ fontFamily: PD, fontSize: 14, color: palette.rsvpAccent, letterSpacing: 4, marginBottom: SP.s, textTransform: 'uppercase' }}>
           À vous de nous dire
         </div>
-        <div style={{ fontFamily: GV, fontSize: 'clamp(32px, 8vw, 48px)', color: palette.rsvpText, marginBottom: 28 }}>
+        <div style={{ fontFamily: GV, fontSize: 'clamp(32px, 8vw, 48px)', color: palette.rsvpText, marginBottom: SP.m }}>
           Oui !
         </div>
         <button
@@ -89,9 +214,36 @@ function RsvpSection({ palette, onRsvpOpen }: { palette: LuxePalette; onRsvpOpen
 }
 
 // ══════════════════════════════════════════════════════════════════════
+// ── FOOTER PRO (#11) ──
+// ══════════════════════════════════════════════════════════════════════
+function LuxeFooter({ palette, p1, p2, monogramUrl, weddingDate }: {
+  palette: LuxePalette; p1: string; p2: string; monogramUrl?: string; weddingDate?: string
+}) {
+  return (
+    <div style={{ padding: `${SP.l}px 24px ${SP.m}px`, textAlign: 'center', background: palette.cream }}>
+      {monogramUrl && (
+        <div style={{ marginBottom: SP.s }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={monogramUrl} alt="" style={{ width: 36, height: 36, objectFit: 'contain', mixBlendMode: 'multiply', display: 'inline-block', opacity: 0.5 }} />
+        </div>
+      )}
+      <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 13, color: palette.textSecondary, marginBottom: 4 }}>
+        Avec amour, {p1} & {p2}
+      </div>
+      {weddingDate && (
+        <div style={{ fontFamily: PD, fontSize: 10, color: palette.accent, letterSpacing: 2, opacity: 0.6, marginBottom: SP.s }}>
+          {new Date(weddingDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+        </div>
+      )}
+      <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 10, color: `${palette.textSecondary}66` }}>
+        Faire-part créé avec Lov&apos;it · getlovit.fr
+      </div>
+    </div>
+  )
+}
+
+// ══════════════════════════════════════════════════════════════════════
 // ── RENDERER PRINCIPAL ──
-// Luxe = Premium + couches visuelles (aquarelle + motif + palette)
-// Le texte vient EXACTEMENT du même renderCard que Premium
 // ══════════════════════════════════════════════════════════════════════
 export default function LuxeFairePartRenderer({
   data,
@@ -113,8 +265,9 @@ export default function LuxeFairePartRenderer({
   const p2 = data.marie2Prenom || 'Prénom'
   const firstCeremony = data.ceremonies?.[0]
   const lieu = firstCeremony?.lieu || ''
+  const weddingDate = firstCeremony?.date || ''
+  const story = data.luxeStory as string | undefined
 
-  // Crée un thème "override" qui utilise les couleurs de la palette Luxe
   const luxeTheme = {
     fond: palette.cream,
     accent: palette.primary,
@@ -125,42 +278,58 @@ export default function LuxeFairePartRenderer({
 
   return (
     <div style={{ background: palette.cream, minHeight: '100vh', maxWidth: 600, margin: '0 auto', boxShadow: '0 0 60px rgba(0,0,0,0.08)' }}>
+      {/* Sticky Header */}
+      <LuxeStickyHeader monogramUrl={monogramUrl} weddingDate={weddingDate} palette={palette} p1={p1} p2={p2} />
+
       {composition.sections.map((section, i) => (
         <React.Fragment key={i}>
-          {/* ── COVER avec monogramme ── */}
+          {/* ── COVER ── */}
           {section.kind === 'cover' && (
-            <div style={{ background: palette.cream, padding: '48px 24px 32px', textAlign: 'center' }}>
-              {/* Monogramme entrelacé */}
+            <div style={{ background: palette.cream, padding: `${SP.xxl}px 24px ${SP.l}px`, textAlign: 'center' }}>
               {monogramUrl && (
-                <div style={{ marginBottom: 24 }}>
+                <div style={{ marginBottom: SP.m }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={monogramUrl} alt={`${p1} & ${p2}`} style={{ width: 140, height: 140, objectFit: 'contain', mixBlendMode: 'multiply', display: 'inline-block' }} />
                 </div>
               )}
-              {/* Prénoms calligraphiés */}
-              <div style={{ marginBottom: 12 }}>
+              <div style={{ marginBottom: SP.s }}>
                 <span style={{ fontFamily: GV, fontSize: 'clamp(32px, 9vw, 48px)', color: palette.primary }}>{p1}</span>
                 <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 18, color: palette.accent, margin: '0 8px' }}>&</span>
                 <span style={{ fontFamily: GV, fontSize: 'clamp(32px, 9vw, 48px)', color: palette.primary }}>{p2}</span>
               </div>
-              {/* Séparateur */}
               <DecorativeLine palette={palette} />
-              {/* Lieu */}
               {lieu && (
-                <div style={{ fontFamily: PD, fontSize: 12, color: palette.textSecondary, letterSpacing: 2, textTransform: 'uppercase', marginTop: 16 }}>
+                <div style={{ fontFamily: PD, fontSize: 12, color: palette.textSecondary, letterSpacing: 2, textTransform: 'uppercase', marginTop: SP.s }}>
                   {lieu}
+                </div>
+              )}
+              {weddingDate && (
+                <div style={{ fontFamily: PD, fontSize: 11, color: palette.accent, letterSpacing: 1.5, marginTop: SP.xs, opacity: 0.7 }}>
+                  {new Date(weddingDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </div>
               )}
             </div>
           )}
 
+          {/* ── COUNTDOWN après la cover ── */}
+          {section.kind === 'cover' && (
+            <CountdownBlock weddingDate={weddingDate} palette={palette} p1={p1} p2={p2} />
+          )}
+
+          {/* ── STORY (si renseigné) après countdown ── */}
+          {section.kind === 'cover' && story && (
+            <>
+              <DecorativeLine palette={palette} />
+              <StorySection story={story} palette={palette} />
+            </>
+          )}
+
+          {/* ── CÉRÉMONIE ── */}
           {section.kind === 'ceremony' && section.ceremonyIndex !== undefined && (() => {
             const ceremony = data.ceremonies[section.ceremonyIndex]
             return (
               <div>
-                {/* Couche visuelle Luxe : aquarelle banner */}
                 <AquarelleBanner sceneUrl={section.sceneUrl} />
-                {/* Texte : IDENTIQUE au Premium via renderCard */}
                 <div style={{ maxWidth: 600, margin: '0 auto', overflow: 'hidden' }}>
                   {renderCard(ceremony, data, luxeTheme, section.ceremonyIndex, false)}
                 </div>
@@ -168,9 +337,9 @@ export default function LuxeFairePartRenderer({
             )
           })()}
 
-          {section.kind === 'infos' && null /* Les infos pratiques sont déjà dans les cartes Premium */}
+          {section.kind === 'infos' && null}
 
-          {/* Motif final avant RSVP */}
+          {/* Motif avant RSVP */}
           {section.kind === 'rsvp' && decoImages.length > 0 && (
             <MotifSeparator url={decoImages[decoImages.length - 1].url} palette={palette} />
           )}
@@ -179,7 +348,7 @@ export default function LuxeFairePartRenderer({
             <RsvpSection palette={palette} onRsvpOpen={onRsvpOpen} />
           )}
 
-          {/* Motif séparateur entre les cérémonies */}
+          {/* Motif entre cérémonies */}
           {section.motifAfterUrl !== undefined && (
             <MotifSeparator url={section.motifAfterUrl} palette={palette} />
           )}
@@ -189,12 +358,8 @@ export default function LuxeFairePartRenderer({
         </React.Fragment>
       ))}
 
-      {/* Crédit */}
-      <div style={{ padding: '20px 0', textAlign: 'center', background: palette.cream }}>
-        <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 11, color: `${palette.textSecondary}88` }}>
-          Créé avec ❤️ par Lov&apos;it
-        </span>
-      </div>
+      {/* Footer pro */}
+      <LuxeFooter palette={palette} p1={p1} p2={p2} monogramUrl={monogramUrl} weddingDate={weddingDate} />
     </div>
   )
 }

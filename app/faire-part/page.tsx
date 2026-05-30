@@ -1926,6 +1926,23 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
           />
         </AccordionSection>
 
+        <AccordionSection title={locale === 'en' ? '💬 Our story' : '💬 Notre histoire'}>
+          <Label>{locale === 'en' ? 'A personal note for your guests (optional)' : 'Un mot personnel pour vos invités (optionnel)'}</Label>
+          <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 10, lineHeight: 1.5 }}>
+            {locale === 'en'
+              ? 'Share a few words about your love story. This will appear between the cover and the ceremonies.'
+              : 'Partagez quelques mots sur votre histoire. Ils apparaîtront entre la cover et les cérémonies.'}
+          </p>
+          <textarea
+            value={data.luxeStory || ''}
+            onChange={e => onChange({ luxeStory: e.target.value })}
+            placeholder={locale === 'en' ? 'After X years of love, we celebrate our wedding...' : 'Après X années d\'amour, nous célèbrerons notre mariage…'}
+            maxLength={500}
+            style={{ ...S.input, minHeight: 80, resize: 'vertical', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic' }}
+          />
+          <div style={{ fontSize: 10, color: '#b0a898', textAlign: 'right', marginTop: 4 }}>{(data.luxeStory || '').length}/500</div>
+        </AccordionSection>
+
         <AccordionSection title={locale === 'en' ? '🎨 Color palette' : '🎨 Palette de couleurs'} defaultOpen>
           <Label>{locale === 'en' ? 'Choose the main color for your invitation' : 'Choisissez la couleur principale de votre faire-part'}</Label>
           <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 14, lineHeight: 1.5 }}>
