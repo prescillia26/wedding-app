@@ -94,14 +94,13 @@ export function buildDecoIllustrationPrompt(decoId: string, palette: Palette): s
   const colors = PALETTES[palette] ?? PALETTES.rose;
 
   return [
-    "A single decorative element painted in delicate WATERCOLOR style on a pure WHITE background.",
-    "The element is centered, isolated, with NO background scene, NO frame, NO border.",
-    "NOT a poster, NO text, NO words, NO letters, NO logo. Just the element itself on white.",
+    "A single decorative watercolor element on a PURE FLAT WHITE (#FFFFFF) background.",
+    "The element is centered and isolated. The background is COMPLETELY empty white — no texture, no gradient, no shadow, no border, no frame.",
     `Subject: ${subject}.`,
     `Color palette: ${colors}.`,
-    "Style: fine art watercolor with soft brush strokes, gentle ink linework, beautiful transparencies and soft color bleeds.",
-    "The element should look like a hand-painted watercolor illustration suitable for a luxury wedding invitation.",
-    "Clean white background, the watercolor element floats elegantly on the page.",
+    "Style: delicate hand-painted watercolor, soft brush strokes, fine ink linework, gentle transparencies.",
+    "The illustration must look like it was painted on white paper — edges fade naturally into the white background with no hard edges or rectangular borders.",
+    "NOT a poster, NO text, NO words, NO letters, NO logo, NO rectangular frame around the element.",
   ].join(" ");
 }
 

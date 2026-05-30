@@ -275,9 +275,9 @@ function MotifSeparator({ url, palette }: { url?: string; palette: LuxePalette }
   return (
     <div style={{ padding: '48px 0', textAlign: 'center', background: palette.cream }}>
       <DecorativeLine palette={palette} />
-      <div style={{ padding: '20px 0' }}>
+      <div style={{ padding: '24px 0' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={url} alt="" style={{ height: 120, maxWidth: '50%', objectFit: 'contain', display: 'inline-block' }} />
+        <img src={url} alt="" style={{ height: 160, maxWidth: '65%', objectFit: 'contain', display: 'inline-block', mixBlendMode: 'multiply' }} />
       </div>
       <DecorativeLine palette={palette} />
     </div>
