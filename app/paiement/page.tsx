@@ -82,8 +82,8 @@ export default function PaiementPage() {
         </div>
       </div>
 
-      {/* ── 2 Packs ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24, maxWidth: 820, margin: '0 auto 40px' }}>
+      {/* ── Pack unique ── */}
+      <div style={{ maxWidth: 440, margin: '0 auto 40px' }}>
 
         {/* ── Premium — 69€ ── */}
         <div style={{
@@ -134,69 +134,6 @@ export default function PaiementPage() {
           </button>
         </div>
 
-        {/* ── Luxe Aquarelle — 99€ ── */}
-        <div style={{
-          background: `linear-gradient(160deg, #fff 0%, ${CREAM} 100%)`,
-          borderRadius: 28, padding: '40px 32px',
-          boxShadow: `0 24px 72px ${GOLD}33`,
-          border: `2.5px solid ${GOLD}`,
-          position: 'relative', textAlign: 'center',
-        }}>
-          {/* Badge */}
-          <div style={{
-            position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)',
-            background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`,
-            color: 'white', padding: '6px 20px', borderRadius: 9999,
-            fontFamily: 'var(--font-playfair-display)', fontSize: 11, fontWeight: 700,
-            letterSpacing: '0.12em', whiteSpace: 'nowrap',
-            boxShadow: `0 6px 20px ${GOLD}66`, textTransform: 'uppercase',
-          }}>
-            Recommandé
-          </div>
-
-          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: GOLD, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>
-            Luxe Aquarelle
-          </div>
-          <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
-            <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, color: '#aaa', textDecoration: 'line-through' }}>
-              169&euro;
-            </span>
-            <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 64, fontWeight: 700, color: GOLD, lineHeight: 1 }}>
-              99&euro;
-            </span>
-          </div>
-          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: TEXT, marginBottom: 28 }}>
-            {t.common.singlePayment} · {t.common.lifetimeAccess}
-          </div>
-
-          <div style={{ background: 'white', borderRadius: 16, padding: '24px 24px 20px', marginBottom: 28, border: `1px solid ${GOLD}22`, textAlign: 'left' }}>
-            {LUXE_FEATURES.map(f => (
-              <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 12, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 16, color: DARK, lineHeight: 1.4 }}>
-                <CheckIcon color={GOLD} big />
-                {f}
-              </div>
-            ))}
-          </div>
-
-          <button
-            onClick={() => startCheckout('premium')}
-            disabled={loading !== null}
-            style={{
-              width: '100%', padding: '16px 0', borderRadius: 9999,
-              cursor: loading ? 'not-allowed' : 'pointer', border: 'none',
-              background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`,
-              color: 'white',
-              fontFamily: 'var(--font-playfair-display)', fontSize: 15, fontWeight: 700, letterSpacing: '0.06em',
-              boxShadow: `0 10px 32px ${GOLD}55`,
-              opacity: loading && loading !== 'premium' ? 0.5 : 1,
-            }}
-          >
-            {loading === 'premium' ? 'Redirection…' : 'Choisir le Luxe — 99€'}
-          </button>
-          <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: `${TEXT}77`, marginTop: 10, marginBottom: 0 }}>
-            {t.common.satisfiedOrRefunded}
-          </p>
-        </div>
       </div>
 
       {error && (

@@ -230,9 +230,9 @@ export default function Home() {
           {h.heroSubtitle}
         </p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, maxWidth: 800, margin: '32px auto 40px' }}>
+        <div style={{ maxWidth: 420, margin: '32px auto 40px' }}>
 
-          {/* ── Pack Premium — 69€ ── */}
+          {/* ── Pack Premium — 69€ (seul pack visible) ── */}
           <div style={{ background: 'white', borderRadius: 24, padding: '36px 28px', boxShadow: `0 16px 64px ${GOLD}22`, border: `1.5px solid ${GOLD}66`, textAlign: 'center', position: 'relative' }}>
             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: GOLD, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>Premium</div>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 4, marginBottom: 4 }}>
@@ -249,40 +249,7 @@ export default function Home() {
               ))}
             </div>
             <a href="/faire-part?pack=premium" style={{ ...S.btnPrimary, display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontSize: 14, textDecoration: 'none' }}>
-              {locale === 'en' ? 'Create my Premium invitation' : 'Créer mon faire-part Premium'}
-            </a>
-            <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: `${TEXT}77`, marginTop: 10, marginBottom: 0 }}>
-              {c.satisfiedOrRefunded}
-            </p>
-          </div>
-
-          {/* ── Pack Luxe Aquarelle — 99€ ── */}
-          <div style={{ background: 'white', borderRadius: 24, padding: '36px 28px', boxShadow: `0 24px 72px ${GOLD}33`, border: `2.5px solid ${GOLD}`, textAlign: 'center', position: 'relative' }}>
-            <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`, color: 'white', fontSize: 9, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', padding: '5px 16px', borderRadius: 9999, whiteSpace: 'nowrap', boxShadow: `0 4px 16px ${GOLD}55` }}>
-              Recommandé
-            </div>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: GOLD, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>Luxe Aquarelle</div>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 4, marginBottom: 4 }}>
-              <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 18, color: '#9ca3af', textDecoration: 'line-through', marginTop: 8, marginRight: 4 }}>169&euro;</span>
-              <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 48, color: DARK, lineHeight: 1, fontWeight: 700 }}>99&euro;</span>
-            </div>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: TEXT, marginBottom: 20 }}>{c.singlePayment} — {c.lifetimeAccess}</div>
-            <div style={{ textAlign: 'left', marginBottom: 24 }}>
-              {[
-                locale === 'en' ? 'Everything in Premium' : 'Tout le pack Premium',
-                locale === 'en' ? 'AI watercolors per event (real venue)' : 'Aquarelles IA par événement (lieu réel)',
-                locale === 'en' ? 'Decorative illustrations (rings, doves…)' : 'Illustrations décoratives (bagues, colombes…)',
-                locale === 'en' ? 'Custom color palette' : 'Palette de couleurs personnalisée',
-                locale === 'en' ? 'AI-personalized Luxe design' : 'Design Luxe personnalisé par l\'IA',
-              ].map(item => (
-                <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                  <span style={{ color: GOLD, fontSize: 13 }}>✓</span>
-                  <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: TEXT }}>{item}</span>
-                </div>
-              ))}
-            </div>
-            <a href="/faire-part?pack=luxe" style={{ ...S.btnPrimary, display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontSize: 14, textDecoration: 'none' }}>
-              {locale === 'en' ? 'Create my Luxe invitation' : 'Créer mon faire-part Luxe'}
+              {locale === 'en' ? 'Create my invitation' : 'Créer mon faire-part'}
             </a>
             <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: `${TEXT}77`, marginTop: 10, marginBottom: 0 }}>
               {c.satisfiedOrRefunded}
