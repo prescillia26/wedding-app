@@ -185,10 +185,17 @@ function StorySection({ story, palette }: { story?: string; palette: LuxePalette
 // ══════════════════════════════════════════════════════════════════════
 // ── BLOC RSVP ──
 // ══════════════════════════════════════════════════════════════════════
-function RsvpSection({ palette, onRsvpOpen }: { palette: LuxePalette; onRsvpOpen?: () => void }) {
+function RsvpSection({ palette, onRsvpOpen, inlineMotifUrl }: { palette: LuxePalette; onRsvpOpen?: () => void; inlineMotifUrl?: string }) {
   return (
     <div style={{ background: palette.rsvpBg, padding: `${SP.xl}px 24px`, textAlign: 'center' }}>
       <DecorativeLine palette={palette} />
+      {/* Illustration inline (enveloppe / coeur) */}
+      {inlineMotifUrl && (
+        <div style={{ padding: `${SP.s}px 0` }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={inlineMotifUrl} alt="" style={{ height: 100, maxWidth: '40%', objectFit: 'contain', display: 'inline-block', mixBlendMode: 'multiply', opacity: 0.8 }} />
+        </div>
+      )}
       <div style={{ padding: `${SP.m}px 0` }}>
         <div style={{ fontFamily: PD, fontSize: 14, color: palette.rsvpAccent, letterSpacing: 4, marginBottom: SP.s, textTransform: 'uppercase' }}>
           À vous de nous dire
@@ -411,7 +418,7 @@ export default function LuxeFairePartRenderer({
           )}
 
           {section.kind === 'rsvp' && (
-            <RsvpSection palette={palette} onRsvpOpen={onRsvpOpen} />
+            <RsvpSection palette={palette} onRsvpOpen={onRsvpOpen} inlineMotifUrl={decoUrls['coeurs'] || decoUrls['bouquet']} />
           )}
 
           {/* Motif entre cérémonies */}

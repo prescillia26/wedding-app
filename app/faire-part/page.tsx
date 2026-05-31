@@ -3212,6 +3212,7 @@ interface RSVPEntry {
   nom: string
   email?: string
   message?: string
+  allergies?: string
   reponses: RSVPReponse[]
   sentAt: string
   shareId?: string
@@ -3245,6 +3246,7 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
     ceremonies.map((c, idx) => ({ ceremonie: getCeremonyName(c), ceremonieIdx: idx, date: c.date || '', present: null, nbPersonnes: 1 }))
   )
   const [message, setMessage] = useState('')
+  const [allergies, setAllergies] = useState('')
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
   const [accompagnants, setAccompagnants] = useState<Record<number, string[]>>({})
@@ -3264,6 +3266,7 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
         nom,
         email: email || undefined,
         message: message || undefined,
+        allergies: allergies || undefined,
         reponses: reponses.map((r, i) => ({
           ceremonie: r.ceremonie,
           ceremonieIdx: r.ceremonieIdx,
@@ -3449,6 +3452,15 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
                 style={{ ...S.input, resize: 'vertical', lineHeight: 1.6 } as React.CSSProperties}
               />
               <div style={{ fontSize: 11, color: '#9ca3af', textAlign: 'right', marginTop: 4 }}>{message.length}/300</div>
+            </div>
+            <div style={{ marginBottom: 24 }}>
+              <Label>Allergies / régimes alimentaires (optionnel)</Label>
+              <input
+                value={allergies}
+                onChange={e => setAllergies(e.target.value)}
+                placeholder="Végétarien, sans gluten, casher strict…"
+                style={S.input}
+              />
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setStep(2)} style={{ ...BTN, flex: 1, padding: '14px 0', borderRadius: 9999, border: `1.5px solid ${accent}44`, background: 'white', color: accent, fontSize: 14, fontWeight: 600 }}>← Retour</button>
