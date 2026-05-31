@@ -52,16 +52,24 @@ export default function CeremonyWatercolorPanel({
     setError('')
     setCandidates(prev => ({ ...prev, [idx]: [] }))
     try {
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 90000) // 90s max
       const res = await fetch('/api/generate-watercolor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mode: 'venue', lieu, adresse, ceremonyType: type, palette }),
+        signal: controller.signal,
       })
+      clearTimeout(timeout)
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Erreur')
       setCandidates(prev => ({ ...prev, [idx]: data.images }))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur lors de la génération')
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        setError('La génération a pris trop de temps. Réessayez.')
+      } else {
+        setError(err instanceof Error ? err.message : 'Erreur lors de la génération')
+      }
     } finally {
       setGeneratingIdx(null)
     }

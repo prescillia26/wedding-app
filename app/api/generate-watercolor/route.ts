@@ -1,6 +1,8 @@
 import Replicate from "replicate";
 import { buildWatercolorPrompt, buildVenueWatercolorPrompt, buildDecoIllustrationPrompt, DECO_TYPES, type Ambiance, type Palette } from "@/lib/watercolorPrompt";
 
+export const maxDuration = 120; // 2 minutes max pour la génération
+
 const VALID_AMBIANCES: Ambiance[] = ["plage", "chateau", "jardin", "salle", "synagogue", "israel", "universel"];
 const VALID_PALETTES: Palette[] = ["lavande", "rose", "sauge", "bleu_nuit", "bleu_ciel", "rose_clair", "mauve", "peche", "dore", "bordeaux", "menthe", "terracotta"];
 
@@ -33,7 +35,7 @@ export async function POST(req: Request) {
       const ceremonyType = String(body.ceremonyType || '').slice(0, 100);
       const palette: Palette = VALID_PALETTES.includes(body.palette) ? body.palette : 'rose';
       prompt = buildVenueWatercolorPrompt({ lieu, adresse, ceremonyType, palette });
-      numOutputs = 4;
+      numOutputs = 2;
       aspectRatio = "3:2";
     } else {
       const { ambiance, palette, freeText } = body;

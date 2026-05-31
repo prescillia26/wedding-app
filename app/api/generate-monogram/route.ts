@@ -1,5 +1,7 @@
 import Replicate from "replicate";
 
+export const maxDuration = 120;
+
 export async function POST(req: Request) {
   if (!process.env.REPLICATE_API_TOKEN) {
     return Response.json({ error: "Configuration serveur manquante" }, { status: 500 });
