@@ -267,6 +267,10 @@ export default function LuxeFairePartRenderer({
   const lieu = firstCeremony?.lieu || ''
   const weddingDate = firstCeremony?.date || ''
   const story = data.luxeStory as string | undefined
+  const coverAquarelleUrl = firstCeremony?.illustrationUrl || ''
+  const dressCode = data.luxeDressCode as string | undefined
+  const giftsUrl = data.luxeGiftsUrl as string | undefined
+  const giftsLabel = data.luxeGiftsLabel as string | undefined
 
   const luxeTheme = {
     fond: palette.cream,
@@ -283,45 +287,74 @@ export default function LuxeFairePartRenderer({
 
       {composition.sections.map((section, i) => (
         <React.Fragment key={i}>
-          {/* ── COVER ── */}
+          {/* ── COVER PLEIN ÉCRAN ── */}
           {section.kind === 'cover' && (
-            <div style={{ background: palette.cream, padding: `${SP.xxl}px 24px ${SP.l}px`, textAlign: 'center' }}>
-              {monogramUrl && (
+            <div id="luxe-cover" style={{ background: palette.cream, minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center', position: 'relative' }}>
+              <div style={{ padding: `${SP.xl}px 24px ${SP.m}px`, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                {/* Monogramme */}
+                {monogramUrl && (
+                  <div style={{ marginBottom: SP.m }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={monogramUrl} alt={`${p1} & ${p2}`} style={{ width: 120, height: 120, objectFit: 'contain', mixBlendMode: 'multiply', display: 'inline-block' }} />
+                  </div>
+                )}
+
+                {/* Prénoms calligraphiés */}
                 <div style={{ marginBottom: SP.m }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={monogramUrl} alt={`${p1} & ${p2}`} style={{ width: 140, height: 140, objectFit: 'contain', mixBlendMode: 'multiply', display: 'inline-block' }} />
+                  <span style={{ fontFamily: GV, fontSize: 'clamp(34px, 10vw, 52px)', color: palette.primary }}>{p1}</span>
+                  <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 20, color: palette.accent, margin: '0 10px' }}>&</span>
+                  <span style={{ fontFamily: GV, fontSize: 'clamp(34px, 10vw, 52px)', color: palette.primary }}>{p2}</span>
                 </div>
-              )}
-              <div style={{ marginBottom: SP.s }}>
-                <span style={{ fontFamily: GV, fontSize: 'clamp(32px, 9vw, 48px)', color: palette.primary }}>{p1}</span>
-                <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 18, color: palette.accent, margin: '0 8px' }}>&</span>
-                <span style={{ fontFamily: GV, fontSize: 'clamp(32px, 9vw, 48px)', color: palette.primary }}>{p2}</span>
+
+                {/* "OUVRIR L'INVITATION" */}
+                <button
+                  type="button"
+                  onClick={() => document.getElementById('luxe-content')?.scrollIntoView({ behavior: 'smooth' })}
+                  style={{
+                    fontFamily: PD, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase',
+                    color: palette.primary, background: 'none', border: 'none', cursor: 'pointer',
+                    marginBottom: SP.l, padding: '8px 0',
+                  }}
+                >
+                  Ouvrir l&apos;invitation
+                </button>
+
+                {/* Lieu en small caps espacées */}
+                {lieu && (
+                  <div style={{ fontFamily: PD, fontSize: 14, color: palette.primary, letterSpacing: 6, textTransform: 'uppercase', marginBottom: SP.xs }}>
+                    {lieu}
+                  </div>
+                )}
+
+                {/* Dates */}
+                {weddingDate && (
+                  <div style={{ fontFamily: PD, fontSize: 14, color: palette.accent, letterSpacing: 2 }}>
+                    {new Date(weddingDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase()}
+                  </div>
+                )}
               </div>
-              <DecorativeLine palette={palette} />
-              {lieu && (
-                <div style={{ fontFamily: PD, fontSize: 12, color: palette.textSecondary, letterSpacing: 2, textTransform: 'uppercase', marginTop: SP.s }}>
-                  {lieu}
-                </div>
-              )}
-              {weddingDate && (
-                <div style={{ fontFamily: PD, fontSize: 11, color: palette.accent, letterSpacing: 1.5, marginTop: SP.xs, opacity: 0.7 }}>
-                  {new Date(weddingDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+
+              {/* Aquarelle du portail / entrée en bas de la cover */}
+              {coverAquarelleUrl && (
+                <div style={{ width: '100%', overflow: 'hidden' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={coverAquarelleUrl} alt="" style={{ width: '100%', height: 'clamp(250px, 45vh, 400px)', objectFit: 'cover', display: 'block' }} />
                 </div>
               )}
             </div>
           )}
 
-          {/* ── COUNTDOWN après la cover ── */}
+          {/* ── COUNTDOWN + STORY après la cover ── */}
           {section.kind === 'cover' && (
-            <CountdownBlock weddingDate={weddingDate} palette={palette} p1={p1} p2={p2} />
-          )}
-
-          {/* ── STORY (si renseigné) après countdown ── */}
-          {section.kind === 'cover' && story && (
-            <>
-              <DecorativeLine palette={palette} />
-              <StorySection story={story} palette={palette} />
-            </>
+            <div id="luxe-content">
+              <CountdownBlock weddingDate={weddingDate} palette={palette} p1={p1} p2={p2} />
+              {story && (
+                <>
+                  <DecorativeLine palette={palette} />
+                  <StorySection story={story} palette={palette} />
+                </>
+              )}
+            </div>
           )}
 
           {/* ── CÉRÉMONIE ── */}
@@ -338,6 +371,39 @@ export default function LuxeFairePartRenderer({
           })()}
 
           {section.kind === 'infos' && null}
+
+          {/* ── DRESS CODE (avant RSVP) ── */}
+          {section.kind === 'rsvp' && dressCode && (
+            <div style={{ background: palette.cream, padding: `${SP.l}px 24px`, textAlign: 'center' }}>
+              <div style={{ fontFamily: PD, fontSize: 18, color: palette.primary, letterSpacing: 4, marginBottom: SP.s, textTransform: 'uppercase' }}>
+                Dress Code
+              </div>
+              <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 14, color: palette.textSecondary, lineHeight: 1.8, maxWidth: 420, margin: '0 auto', whiteSpace: 'pre-wrap' }}>
+                {dressCode}
+              </div>
+            </div>
+          )}
+
+          {/* ── LISTE DE MARIAGE (avant RSVP) ── */}
+          {section.kind === 'rsvp' && giftsUrl && (
+            <div style={{ background: palette.cream, padding: `${SP.l}px 24px`, textAlign: 'center' }}>
+              <div style={{ fontFamily: PD, fontSize: 18, color: palette.primary, letterSpacing: 4, marginBottom: SP.s, textTransform: 'uppercase' }}>
+                Liste de Mariage
+              </div>
+              <a
+                href={giftsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  fontFamily: PD, fontSize: 12, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase',
+                  padding: '12px 28px', borderRadius: 9999, border: `1.5px solid ${palette.primary}`,
+                  background: 'transparent', color: palette.primary, textDecoration: 'none', display: 'inline-block',
+                }}
+              >
+                {giftsLabel || 'Voir notre liste'}
+              </a>
+            </div>
+          )}
 
           {/* Motif avant RSVP */}
           {section.kind === 'rsvp' && decoImages.length > 0 && (

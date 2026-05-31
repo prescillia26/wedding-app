@@ -314,6 +314,9 @@ interface FormData {
   luxeDecoUrls?: Record<string, string> // decoId → saved URL des illustrations décoratives générées par IA
   luxeMonogramUrl?: string // URL du monogramme entrelacé IA (pack Luxe)
   luxeStory?: string // texte narratif optionnel (pack Luxe)
+  luxeDressCode?: string // dress code optionnel (pack Luxe)
+  luxeGiftsUrl?: string // lien liste de mariage (pack Luxe)
+  luxeGiftsLabel?: string // label du lien (ex: "Notre liste sur Zankyou")
 }
 
 type IllustrationKind = 'scene' | 'motif'
@@ -1941,6 +1944,23 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
             style={{ ...S.input, minHeight: 80, resize: 'vertical', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic' }}
           />
           <div style={{ fontSize: 10, color: '#b0a898', textAlign: 'right', marginTop: 4 }}>{(data.luxeStory || '').length}/500</div>
+        </AccordionSection>
+
+        <AccordionSection title={locale === 'en' ? '👗 Dress code' : '👗 Dress code'}>
+          <Label>{locale === 'en' ? 'Dress code indications (optional)' : 'Indications vestimentaires (optionnel)'}</Label>
+          <textarea
+            value={data.luxeDressCode || ''}
+            onChange={e => onChange({ luxeDressCode: e.target.value })}
+            placeholder={locale === 'en' ? 'White for the Shabbat, chic for the evening...' : 'Blanc pour le Shabbat, tenue de soirée pour la réception…'}
+            maxLength={300}
+            style={{ ...S.input, minHeight: 60, resize: 'vertical' }}
+          />
+        </AccordionSection>
+
+        <AccordionSection title={locale === 'en' ? '🎁 Gift registry' : '🎁 Liste de mariage'}>
+          <Label>{locale === 'en' ? 'Link to your gift registry (optional)' : 'Lien vers votre liste de mariage (optionnel)'}</Label>
+          <Field label={locale === 'en' ? 'URL' : 'URL'} value={data.luxeGiftsUrl || ''} onChange={v => onChange({ luxeGiftsUrl: v })} placeholder="https://www.zankyou.com/..." />
+          <Field label={locale === 'en' ? 'Button text' : 'Texte du bouton'} value={data.luxeGiftsLabel || ''} onChange={v => onChange({ luxeGiftsLabel: v })} placeholder={locale === 'en' ? 'Our registry on Zankyou' : 'Notre liste sur Zankyou'} />
         </AccordionSection>
 
         <AccordionSection title={locale === 'en' ? '🎨 Color palette' : '🎨 Palette de couleurs'} defaultOpen>
