@@ -18,7 +18,6 @@ export async function POST(req: Request) {
     let aspectRatio = "2:3";
 
     if (body.mode === 'deco') {
-      // ── V3 : mode illustration décorative ──
       const decoId = String(body.decoId || '');
       if (!DECO_TYPES.includes(decoId)) {
         return Response.json({ error: "Type d'illustration invalide" }, { status: 400 });
@@ -28,18 +27,15 @@ export async function POST(req: Request) {
       numOutputs = 2;
       aspectRatio = "1:1";
     } else if (body.mode === 'venue') {
-      // ── V2 : mode lieu réel ──
       const lieu = String(body.lieu || '').slice(0, 200);
       if (!lieu) return Response.json({ error: "Lieu requis" }, { status: 400 });
       const adresse = String(body.adresse || '').slice(0, 300);
       const ceremonyType = String(body.ceremonyType || '').slice(0, 100);
       const palette: Palette = VALID_PALETTES.includes(body.palette) ? body.palette : 'rose';
-
       prompt = buildVenueWatercolorPrompt({ lieu, adresse, ceremonyType, palette });
       numOutputs = 4;
       aspectRatio = "3:2";
     } else {
-      // ── V1 : mode ambiance (rétrocompat) ──
       const { ambiance, palette, freeText } = body;
       if (!ambiance || !VALID_AMBIANCES.includes(ambiance)) {
         return Response.json({ error: "Ambiance invalide" }, { status: 400 });
@@ -50,19 +46,23 @@ export async function POST(req: Request) {
       prompt = buildWatercolorPrompt(ambiance, palette, freeText ? String(freeText).slice(0, 200) : undefined);
     }
 
-    // flux-schnell : ~2-3s au lieu de ~15-20s avec flux-dev
-    const output = await replicate.run("black-forest-labs/flux-schnell", {
-      input: {
-        prompt,
-        num_outputs: numOutputs,
-        aspect_ratio: aspectRatio,
-        output_format: "png",
-        disable_safety_checker: false,
-      },
-    });
+    // flux-schnell : rapide (~2-3s), num_outputs=1 uniquement → paralléliser
+    const promises = Array.from({ length: numOutputs }, () =>
+      replicate.run("black-forest-labs/flux-schnell", {
+        input: {
+          prompt,
+          num_outputs: 1,
+          aspect_ratio: aspectRatio,
+          output_format: "png",
+        },
+      })
+    );
 
-    const urls = (output as unknown[]).map((o) =>
-      typeof o === "string" ? o : (typeof (o as { url?: () => string })?.url === "function" ? (o as { url: () => string }).url() : String(o))
+    const results = await Promise.all(promises);
+    const urls = results.flatMap((output) =>
+      (output as unknown[]).map((o) =>
+        typeof o === "string" ? o : (typeof (o as { url?: () => string })?.url === "function" ? (o as { url: () => string }).url() : String(o))
+      )
     );
 
     return Response.json({ images: urls });

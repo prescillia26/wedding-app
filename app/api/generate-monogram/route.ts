@@ -22,18 +22,23 @@ export async function POST(req: Request) {
       "The two letters should be artistically intertwined as one unified emblem.",
     ].join(" ");
 
-    const output = await replicate.run("black-forest-labs/flux-schnell", {
-      input: {
-        prompt,
-        num_outputs: 4,
-        aspect_ratio: "1:1",
-        output_format: "png",
-        disable_safety_checker: false,
-      },
-    });
+    // Générer 4 images en parallèle (flux-schnell ne supporte que num_outputs=1)
+    const promises = Array.from({ length: 4 }, () =>
+      replicate.run("black-forest-labs/flux-schnell", {
+        input: {
+          prompt,
+          num_outputs: 1,
+          aspect_ratio: "1:1",
+          output_format: "png",
+        },
+      })
+    );
 
-    const urls = (output as unknown[]).map((o) =>
-      typeof o === "string" ? o : (typeof (o as { url?: () => string })?.url === "function" ? (o as { url: () => string }).url() : String(o))
+    const results = await Promise.all(promises);
+    const urls = results.flatMap((output) =>
+      (output as unknown[]).map((o) =>
+        typeof o === "string" ? o : (typeof (o as { url?: () => string })?.url === "function" ? (o as { url: () => string }).url() : String(o))
+      )
     );
 
     return Response.json({ images: urls });
