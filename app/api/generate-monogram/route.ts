@@ -22,13 +22,12 @@ export async function POST(req: Request) {
       "The two letters should be artistically intertwined as one unified emblem.",
     ].join(" ");
 
-    const output = await replicate.run("black-forest-labs/flux-dev", {
+    const output = await replicate.run("black-forest-labs/flux-schnell", {
       input: {
         prompt,
         num_outputs: 4,
         aspect_ratio: "1:1",
         output_format: "png",
-        output_quality: 95,
         disable_safety_checker: false,
       },
     });

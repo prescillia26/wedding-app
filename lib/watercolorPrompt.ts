@@ -52,6 +52,44 @@ const CEREMONY_CONTEXT: Record<string, string> = {
   'Boat Party': 'a festive boat party celebration',
 };
 
+// Détecte le type d'architecture à partir du nom du lieu
+function guessArchitectureHints(lieu: string, adresse: string): string {
+  const text = `${lieu} ${adresse}`.toLowerCase()
+
+  // Plage / bord de mer
+  if (/plage|beach|bord de mer|littoral|côte|cote|marina|port/.test(text))
+    return 'beachfront venue, sea view, sandy shore, Mediterranean atmosphere'
+  // Hôtel / palace
+  if (/hilton|marriott|intercontinental|palace|hôtel|hotel|ritz|sofitel|hyatt|pullman|four seasons|david citadel|king david|carlton|sheraton/.test(text))
+    return 'grand luxury hotel building, impressive facade, elegant entrance with columns or arches, manicured gardens'
+  // Château / domaine
+  if (/château|chateau|domaine|manoir|castle|manor|villa/.test(text))
+    return 'French château or country estate, stone walls, ornate gates, romantic gardens, wisteria or climbing roses'
+  // Salle / réception
+  if (/salle|hall|espace|centre|convention|palais des|pavillon/.test(text))
+    return 'elegant reception hall, grand entrance, arched doorways, chandeliers visible through windows'
+  // Synagogue / lieu de culte
+  if (/synagogue|shul|temple|grande synagogue|beth|beit/.test(text))
+    return 'ornate synagogue facade, arched windows, Star of David motif, decorative stone work'
+  // Jardin / parc
+  if (/jardin|garden|parc|park|terrasse|terrace|orangerie/.test(text))
+    return 'beautiful formal garden with fountains, hedges, flowering trees, pergola or gazebo'
+  // Restaurant
+  if (/restaurant|traiteur|auberge|bistrot|brasserie/.test(text))
+    return 'charming restaurant facade, outdoor terrace, wrought iron details, flower boxes'
+  // Israël
+  if (/israel|israël|tel aviv|jerusalem|jérusalem|haifa|herzliya|eilat|netanya|ashdod|caesarea/.test(text))
+    return 'Mediterranean architecture, Jerusalem stone, palm trees, bright sunlight, blue sky'
+  // Paris
+  if (/paris|seine|montmartre|marais|bastille|opéra/.test(text))
+    return 'Haussmannian Parisian architecture, wrought iron balconies, zinc roofs, elegant stone facade'
+  // Corse / Murtoli
+  if (/corse|corsica|murtoli|bonifacio|ajaccio|porto[-\s]vecchio|calvi/.test(text))
+    return 'Corsican maquis landscape, stone walls, Mediterranean vegetation, wild beauty, granite rocks'
+
+  return 'elegant venue facade, beautiful architecture, romantic atmosphere'
+}
+
 export function buildVenueWatercolorPrompt(opts: {
   lieu: string
   adresse?: string
@@ -62,15 +100,17 @@ export function buildVenueWatercolorPrompt(opts: {
   const colors = PALETTES[palette] ?? PALETTES.rose;
   const context = CEREMONY_CONTEXT[ceremonyType] || 'a wedding celebration';
   const location = adresse ? `${lieu}, ${adresse}` : lieu;
+  const archHints = guessArchitectureHints(lieu, adresse || '');
 
   return [
-    `A beautiful hand-painted WATERCOLOR painting of the real place "${location}".`,
-    "The painting is a realistic and RECOGNIZABLE depiction of this specific real-world location.",
-    `Show the actual building, architecture, landscape and distinctive features of "${lieu}" exactly as it looks in real life — someone who has visited this place should immediately recognize it.`,
-    `The scene shows the venue set up for ${context}, with subtle elegant wedding decorations.`,
+    `A stunning hand-painted WATERCOLOR illustration of "${location}".`,
+    `Architecture: ${archHints}.`,
+    `The painting shows the exterior of this venue prepared for ${context}, with elegant floral decorations.`,
+    `Capture the essence and character of this place: its entrance, its main building, its surroundings.`,
     `Color palette: ${colors}.`,
-    "Style: fine art watercolor, delicate brush strokes, soft washes, ink linework details, romantic light.",
-    "NOT a poster, NO text, NO words, NO letters, NO logo. The painting fills the entire frame.",
+    "Style: fine art watercolor, loose brush strokes, soft wet-on-wet washes, fine ink linework for architectural details,",
+    "golden hour romantic lighting, the painting fills the entire frame edge to edge.",
+    "NO text, NO words, NO letters, NO logo, NO people.",
   ].join(" ");
 }
 

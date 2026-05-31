@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       const palette: Palette = VALID_PALETTES.includes(body.palette) ? body.palette : 'rose';
 
       prompt = buildVenueWatercolorPrompt({ lieu, adresse, ceremonyType, palette });
-      numOutputs = 2;
+      numOutputs = 4;
       aspectRatio = "3:2";
     } else {
       // ── V1 : mode ambiance (rétrocompat) ──
@@ -50,13 +50,13 @@ export async function POST(req: Request) {
       prompt = buildWatercolorPrompt(ambiance, palette, freeText ? String(freeText).slice(0, 200) : undefined);
     }
 
-    const output = await replicate.run("black-forest-labs/flux-dev", {
+    // flux-schnell : ~2-3s au lieu de ~15-20s avec flux-dev
+    const output = await replicate.run("black-forest-labs/flux-schnell", {
       input: {
         prompt,
         num_outputs: numOutputs,
         aspect_ratio: aspectRatio,
         output_format: "png",
-        output_quality: 90,
         disable_safety_checker: false,
       },
     });
