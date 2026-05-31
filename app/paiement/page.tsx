@@ -21,9 +21,11 @@ function CheckIcon({ color, big }: { color: string; big?: boolean }) {
 
 const PREMIUM_FEATURES = [
   'Design élégant et personnalisable',
-  '12 thèmes au choix',
-  'Cadres décoratifs & cadres vidéo animés',
-  'RSVP intégré + notifications email',
+  'Thèmes et cadres personnalisables',
+  'RSVP par événement + notifications email',
+  'Export Excel des réponses invités',
+  'Plan de table intégré',
+  'Partage illimité (WhatsApp, SMS, email…)',
   'Musique de fond, photos carrousel',
   'Clavier hébreu intégré',
   'Modifications illimitées — valable à vie',
