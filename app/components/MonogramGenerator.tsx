@@ -9,10 +9,31 @@ const STYLES = [
   { id: 'art-nouveau', label: 'Art Nouveau', icon: '✒️' },
   { id: 'laurel', label: 'Laurier', icon: '🌿' },
   { id: 'botanical', label: 'Botanique', icon: '🌸' },
-  { id: 'floral-circle', label: 'Couronne florale', icon: '💐' },
+  { id: 'floral-circle', label: 'Couronne', icon: '💐' },
   { id: 'minimal', label: 'Minimal', icon: '◆' },
   { id: 'oriental', label: 'Oriental', icon: '✦' },
 ]
+
+// Prévisualisation du monogramme : cadre IA + initiales CSS
+function MonogramPreview({ frameUrl, i1, i2, size, accentColor }: { frameUrl: string; i1: string; i2: string; size: number; accentColor: string }) {
+  return (
+    <div style={{ position: 'relative', width: size, height: size, display: 'inline-block' }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={frameUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+      {/* Initiales superposées au centre — toujours lisibles */}
+      <div style={{
+        position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <span style={{
+          fontFamily: 'var(--font-playfair-display)', fontSize: size * 0.28, fontWeight: 700,
+          color: accentColor, letterSpacing: -1, lineHeight: 1,
+        }}>
+          {i1}<span style={{ fontSize: size * 0.18, opacity: 0.4, margin: '0 1px' }}>&</span>{i2}
+        </span>
+      </div>
+    </div>
+  )
+}
 
 export default function MonogramGenerator({
   initial1,
@@ -31,7 +52,7 @@ export default function MonogramGenerator({
   const [candidates, setCandidates] = useState<string[]>([])
   const [saving, setSaving] = useState<string | null>(null)
   const [error, setError] = useState('')
-  const [selectedStyle, setSelectedStyle] = useState('art-nouveau')
+  const [selectedStyle, setSelectedStyle] = useState('laurel')
   const autoGenRef = useRef(false)
 
   const i1 = (initial1 || 'A').charAt(0).toUpperCase()
@@ -73,13 +94,14 @@ export default function MonogramGenerator({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const selectImage = async (imageUrl: string) => {
-    setSaving(imageUrl)
+  const selectFrame = async (frameUrl: string) => {
+    setSaving(frameUrl)
     try {
+      // On sauvegarde l'URL du cadre — les initiales seront superposées en CSS
       const res = await fetch('/api/save-watercolor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl }),
+        body: JSON.stringify({ imageUrl: frameUrl }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Erreur')
@@ -111,14 +133,13 @@ export default function MonogramGenerator({
         })}
       </div>
 
-      {/* Saved state */}
+      {/* Saved state — cadre + initiales */}
       {savedUrl && candidates.length === 0 && !generating && (
         <div style={{ textAlign: 'center' }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={savedUrl} alt={`${i1}&${i2}`} style={{ width: 100, height: 100, objectFit: 'contain', mixBlendMode: 'multiply', display: 'inline-block' }} />
+          <MonogramPreview frameUrl={savedUrl} i1={i1} i2={i2} size={110} accentColor={accentColor} />
           <div>
             <button type="button" onClick={() => generate()} style={{ ...BTN, background: 'none', border: 'none', color: '#9a928a', fontSize: 10, textDecoration: 'underline', marginTop: 6 }}>
-              Régénérer
+              Régénérer le cadre
             </button>
           </div>
         </div>
@@ -131,18 +152,18 @@ export default function MonogramGenerator({
         </div>
       )}
 
-      {/* Candidates */}
+      {/* Candidates — cadre + initiales superposées */}
       {candidates.length > 0 && !generating && (
         <div>
-          <p style={{ fontSize: 11, fontWeight: 600, color: '#3a3330', marginBottom: 8, textAlign: 'center' }}>Choisissez votre logo</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: '#3a3330', marginBottom: 8, textAlign: 'center' }}>Choisissez votre cadre</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
             {candidates.map((url, idx) => (
-              <button key={idx} type="button" onClick={() => selectImage(url)} disabled={saving !== null} style={{
-                ...BTN, padding: 4, borderRadius: 8, border: `2px solid ${saving === url ? accentColor : '#e8e0d8'}`,
+              <button key={idx} type="button" onClick={() => selectFrame(url)} disabled={saving !== null} style={{
+                ...BTN, padding: 8, borderRadius: 10, border: `2px solid ${saving === url ? accentColor : '#e8e0d8'}`,
                 background: 'white', opacity: saving && saving !== url ? 0.4 : 1,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={url} alt={`Option ${idx + 1}`} style={{ width: '100%', aspectRatio: '1/1', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+                <MonogramPreview frameUrl={url} i1={i1} i2={i2} size={120} accentColor={accentColor} />
               </button>
             ))}
           </div>
@@ -163,3 +184,6 @@ export default function MonogramGenerator({
     </div>
   )
 }
+
+// Export pour réutiliser dans InvitationCover et le rendu
+export { MonogramPreview }
