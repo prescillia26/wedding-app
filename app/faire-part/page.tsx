@@ -7,6 +7,7 @@ import CeremonyWatercolorPanel from '../components/CeremonyWatercolorPanel'
 import DecoIllustrationPanel from '../components/DecoIllustrationPanel'
 import LuxeFairePartRenderer from '../components/LuxeFairePartRenderer'
 import MonogramGenerator from '../components/MonogramGenerator'
+import InvitationCover from '../components/InvitationCover'
 import type { Palette } from '@/lib/watercolorPrompt'
 import { toTitleCase } from '@/lib/titleCase'
 
@@ -5840,7 +5841,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
   const [coupleUrl, setCoupleUrl] = useState<string | null>(null)
   const [sharing, setSharing] = useState(false)
   const [sharingStatus, setSharingStatus] = useState('')
-  const [enveloppeFinie, setEnveloppeFinie] = useState(data.introAnimation === 'none')
+  const [coverOpen, setCoverOpen] = useState(!isShared) // en mode édition, pas de cover
 
   // Ouvrir directement le modal RSVP si ?rsvp=1 dans l'URL
   useEffect(() => {
@@ -5848,7 +5849,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
     if (params.get('rsvp') === '1') {
       const id = params.get('share')
       if (id) setLastShareId(id)
-      setEnveloppeFinie(true)
+      setCoverOpen(true)
       setRsvpListOpen(true)
     }
   }, [])
@@ -5936,11 +5937,21 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
   }
 
   if (isShared) {
-    if (!enveloppeFinie) {
-      return <EnveloppeAnimation data={data} theme={theme} onDone={() => setEnveloppeFinie(true)} />
-    }
     return (
       <div style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
+        {/* Cover page pour les invités */}
+        {!coverOpen && (
+          <InvitationCover
+            prenom1={data.marie1Prenom}
+            prenom2={data.marie2Prenom}
+            lieu={data.ceremonies?.[0]?.lieu}
+            date={data.ceremonies?.[0]?.date}
+            accent={theme.accent}
+            fond={theme.fond}
+            logoUrl={data.luxeMonogramUrl || data.customLogoUrl}
+            onOpen={() => setCoverOpen(true)}
+          />
+        )}
         {data.petalsEnabled && <FloatingPetals accent={theme.accent} />}
         <SharedPageContent
           data={{ ...data, zoneStyles: data.zoneStyles ?? {} }}
@@ -5990,12 +6001,21 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
     )
   }
 
-  if (!enveloppeFinie) {
-    return <EnveloppeAnimation data={data} theme={theme} onDone={() => setEnveloppeFinie(true)} />
-  }
-
   return (
     <div id="faire-part-preview-target" style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte, position: 'relative' }}>
+      {/* Cover page universelle — "Découvrir votre invitation" */}
+      {!coverOpen && (
+        <InvitationCover
+          prenom1={data.marie1Prenom}
+          prenom2={data.marie2Prenom}
+          lieu={data.ceremonies?.[0]?.lieu}
+          date={data.ceremonies?.[0]?.date}
+          accent={theme.accent}
+          fond={theme.fond}
+          logoUrl={data.luxeMonogramUrl || data.customLogoUrl}
+          onOpen={() => setCoverOpen(true)}
+        />
+      )}
       {!isPaid && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 40, pointerEvents: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
           <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(60px,15vw,120px)', color: 'rgba(201,168,76,0.05)', fontWeight: 700, letterSpacing: 8, transform: 'rotate(-30deg)', whiteSpace: 'nowrap', userSelect: 'none' }}>
