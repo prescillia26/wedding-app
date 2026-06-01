@@ -35,8 +35,6 @@ export async function POST(req: Request) {
     const styleKey = MONOGRAM_STYLES[style] ? style : 'art-nouveau';
     const styleDesc = MONOGRAM_STYLES[styleKey];
 
-    const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
-
     const prompt = [
       `An elegant interlaced wedding monogram combining the capital letters "${i1}" and "${i2}",`,
       styleDesc,
@@ -46,23 +44,37 @@ export async function POST(req: Request) {
       `The two letters should be artistically intertwined as one unified emblem.`,
     ].join(" ");
 
-    const promises = Array.from({ length: 4 }, () =>
-      replicate.run("black-forest-labs/flux-schnell", {
-        input: {
-          prompt,
-          num_outputs: 1,
-          aspect_ratio: "1:1",
-          output_format: "png",
-        },
-      })
-    );
+    // Appel direct à l'API Replicate avec Prefer: wait (synchrone, pas de polling)
+    const token = process.env.REPLICATE_API_TOKEN;
+    const urls: string[] = [];
 
-    const results = await Promise.all(promises);
-    const urls = results.flatMap((output) =>
-      (output as unknown[]).map((o) =>
-        typeof o === "string" ? o : (typeof (o as { url?: () => string })?.url === "function" ? (o as { url: () => string }).url() : String(o))
-      )
-    );
+    for (let i = 0; i < 4; i++) {
+      const res = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'wait',
+        },
+        body: JSON.stringify({
+          input: {
+            prompt,
+            num_outputs: 1,
+            aspect_ratio: '1:1',
+            output_format: 'png',
+          },
+        }),
+      });
+
+      const data = await res.json();
+      if (data.output?.[0]) {
+        urls.push(data.output[0]);
+      }
+    }
+
+    if (urls.length === 0) {
+      return Response.json({ error: "Aucune image générée" }, { status: 500 });
+    }
 
     return Response.json({ images: urls });
   } catch (err) {
