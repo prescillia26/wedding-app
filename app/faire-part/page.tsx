@@ -1012,53 +1012,80 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
   return (
     <div>
       <h2 style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: '#3a3330', marginBottom: 24 }}>{t.fairepart.step1Title}</h2>
+
+      {/* Mariage juif + Email — EN PREMIER */}
+      <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
+        <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10, padding: 14, border: '1px solid #e0d5c8', borderRadius: 10, cursor: 'pointer', fontSize: 14, color: '#3a3330', background: data.mariageJuif ? '#fdf8f0' : 'white' }}>
+          <input type="checkbox" checked={data.mariageJuif} onChange={e => onChange({ mariageJuif: e.target.checked })} />
+          {t.fairepart.jewishWedding}
+        </label>
+      </div>
+      <div style={{ marginBottom: 20 }}>
+        <Label>{t.fairepart.emailSectionTitle}</Label>
+        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 6 }}>{t.fairepart.emailSectionHelp}</p>
+        <input type="email" value={data.emailMaries ?? ''} onChange={e => onChange({ emailMaries: e.target.value })} placeholder="marie@exemple.com" style={S.input} />
+      </div>
+
+      {/* Marié·e 1 */}
       <div style={{ background: '#fdf8f0', borderRadius: 12, padding: 20, marginBottom: 16 }}>
         <div style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>{t.fairepart.person1}</div>
         <div style={{ display: 'flex', gap: 12 }}>
           <Field label={t.fairepart.firstName} value={data.marie1Prenom} onChange={v => onChange({ marie1Prenom: v })} placeholder={t.fairepart.placeholderFirstName1} autoCapitalize />
           <Field label={t.fairepart.lastName} value={data.marie1Nom} onChange={v => onChange({ marie1Nom: v })} placeholder={t.fairepart.placeholderLastName1} autoCapitalize />
         </div>
-        {!data.mariageJuif && <Field label={t.fairepart.secondName} value={data.marie1Prenom2} onChange={v => onChange({ marie1Prenom2: v })} placeholder="" />}
-        <div style={{ marginTop: 8 }}>
-          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 4 }}>Prénom hébraïque (optionnel)</label>
-          <input dir="rtl" lang="he" value={data.marie1PrenomHebreu ?? ''} onChange={e => onChange({ marie1PrenomHebreu: e.target.value })} placeholder="שרה"
-            style={{ ...S.input, fontFamily: 'var(--font-bellefair), serif', fontSize: 18, textAlign: 'right' }} />
-          <HebrewKeyboard value={data.marie1PrenomHebreu ?? ''} onChange={v => onChange({ marie1PrenomHebreu: v })} />
-        </div>
+        {data.mariageJuif ? (
+          <div style={{ marginTop: 8 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 4 }}>{t.fairepart.hebrewFirstName}</label>
+            <input dir="rtl" lang="he" value={data.marie1PrenomHebreu ?? ''} onChange={e => onChange({ marie1PrenomHebreu: e.target.value })} placeholder="שרה"
+              style={{ ...S.input, fontFamily: 'var(--font-bellefair), serif', fontSize: 18, textAlign: 'right' }} />
+            <HebrewKeyboard value={data.marie1PrenomHebreu ?? ''} onChange={v => onChange({ marie1PrenomHebreu: v })} />
+          </div>
+        ) : (
+          <Field label={t.fairepart.secondName} value={data.marie1Prenom2} onChange={v => onChange({ marie1Prenom2: v })} placeholder="" />
+        )}
       </div>
+
+      {/* & separator */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '16px 0' }}>
         <div style={{ flex: 1, height: 1, background: '#e0d5c8' }} />
         <span style={{ color: '#C9A84C', fontSize: 20 }}>&</span>
         <div style={{ flex: 1, height: 1, background: '#e0d5c8' }} />
       </div>
+
+      {/* Marié·e 2 */}
       <div style={{ background: '#fdf8f0', borderRadius: 12, padding: 20 }}>
         <div style={{ fontSize: 11, color: '#C9A84C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>{t.fairepart.person2}</div>
         <div style={{ display: 'flex', gap: 12 }}>
           <Field label={t.fairepart.firstName} value={data.marie2Prenom} onChange={v => onChange({ marie2Prenom: v })} placeholder={t.fairepart.placeholderFirstName2} autoCapitalize />
           <Field label={t.fairepart.lastName} value={data.marie2Nom} onChange={v => onChange({ marie2Nom: v })} placeholder={t.fairepart.placeholderLastName2} autoCapitalize />
         </div>
-        {!data.mariageJuif && <Field label={t.fairepart.secondName} value={data.marie2Prenom2} onChange={v => onChange({ marie2Prenom2: v })} placeholder="" />}
-        <div style={{ marginTop: 8 }}>
-          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 4 }}>Prénom hébraïque (optionnel)</label>
-          <input dir="rtl" lang="he" value={data.marie2PrenomHebreu ?? ''} onChange={e => onChange({ marie2PrenomHebreu: e.target.value })} placeholder="דוד"
-            style={{ ...S.input, fontFamily: 'var(--font-bellefair), serif', fontSize: 18, textAlign: 'right' }} />
-          <HebrewKeyboard value={data.marie2PrenomHebreu ?? ''} onChange={v => onChange({ marie2PrenomHebreu: v })} />
+        {data.mariageJuif ? (
+          <div style={{ marginTop: 8 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 4 }}>{t.fairepart.hebrewFirstName}</label>
+            <input dir="rtl" lang="he" value={data.marie2PrenomHebreu ?? ''} onChange={e => onChange({ marie2PrenomHebreu: e.target.value })} placeholder="דוד"
+              style={{ ...S.input, fontFamily: 'var(--font-bellefair), serif', fontSize: 18, textAlign: 'right' }} />
+            <HebrewKeyboard value={data.marie2PrenomHebreu ?? ''} onChange={v => onChange({ marie2PrenomHebreu: v })} />
+          </div>
+        ) : (
+          <Field label={t.fairepart.secondName} value={data.marie2Prenom2} onChange={v => onChange({ marie2Prenom2: v })} placeholder="" />
+        )}
+      </div>
+
+      {/* Custom link */}
+      <div style={{ marginTop: 20, padding: 16, background: '#fdf8f0', borderRadius: 12 }}>
+        <Label>{t.fairepart.customLink} (optionnel)</Label>
+        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Ex: sarah-et-david → lovit.fr/sarah-et-david</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 12, color: '#9ca3af', whiteSpace: 'nowrap' }}>lovit.fr/</span>
+          <input
+            type="text"
+            value={data.slug ?? ''}
+            onChange={e => onChange({ slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 40) })}
+            placeholder="prenom1-et-prenom2"
+            style={S.input}
+          />
         </div>
       </div>
-      <div style={{ marginTop: 20, padding: 16, background: '#fdf8f0', borderRadius: 12 }}>
-  <Label>{t.fairepart.customLink} (optionnel)</Label>
-  <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Ex: sarah-et-david → lovit.fr/sarah-et-david</p>
-  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-    <span style={{ fontSize: 12, color: '#9ca3af', whiteSpace: 'nowrap' }}>lovit.fr/</span>
-    <input
-      type="text"
-      value={data.slug ?? ''}
-      onChange={e => onChange({ slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 40) })}
-      placeholder="prenom1-et-prenom2"
-      style={S.input}
-    />
-  </div>
-</div>
     </div>
   )
 }
@@ -1851,67 +1878,6 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
           : (locale === 'en' ? 'Customize the look and feel of your invitation' : 'Personnalisez le style de votre invitation')}
       </p>
 
-      <AccordionSection title={locale === 'en' ? '📐 Layout' : '📐 Mise en page'} defaultOpen>
-        <Label>{t.fairepart.presentationLabel}</Label>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-          {([
-            {
-              key: 'page-unique' as PresentationStyle,
-              label: t.fairepart.presentationOptions['page-unique'],
-              desc: t.fairepart.presentationDescriptions['page-unique'],
-              icon: (
-                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                  <rect x="6" y="4" width="24" height="28" rx="2" stroke="currentColor" strokeWidth="1.5"/>
-                  <line x1="10" y1="11" x2="26" y2="11" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-                  <line x1="10" y1="15" x2="22" y2="15" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-                  <line x1="10" y1="19" x2="24" y2="19" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-                  <line x1="10" y1="23" x2="20" y2="23" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-                </svg>
-              ),
-            },
-            {
-              key: 'cartes-scrollables' as PresentationStyle,
-              label: t.fairepart.presentationOptions['cartes-scrollables'],
-              desc: t.fairepart.presentationDescriptions['cartes-scrollables'],
-              icon: (
-                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                  <rect x="5" y="3" width="22" height="12" rx="2" stroke="currentColor" strokeWidth="1.5"/>
-                  <rect x="5" y="18" width="22" height="12" rx="2" stroke="currentColor" strokeWidth="1.5"/>
-                  <line x1="30" y1="14" x2="30" y2="22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                  <polyline points="27,19 30,23 33,19" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              ),
-            },
-            {
-              key: 'cartes-separees' as PresentationStyle,
-              label: t.fairepart.presentationOptions['cartes-separees'],
-              desc: t.fairepart.presentationDescriptions['cartes-separees'],
-              icon: (
-                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                  <rect x="4" y="6" width="20" height="24" rx="2" stroke="currentColor" strokeWidth="1.5"/>
-                  <rect x="12" y="4" width="20" height="24" rx="2" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 2"/>
-                </svg>
-              ),
-            },
-          ]).map(opt => {
-            const sel = (data.presentationStyle ?? 'page-unique') === opt.key
-            return (
-              <button key={opt.key} type="button" onClick={() => onChange({ presentationStyle: opt.key })} style={{
-                ...BTN, padding: '14px 8px 12px', borderRadius: 12, position: 'relative',
-                border: `2px solid ${sel ? '#C9A84C' : '#e0d5c8'}`,
-                background: sel ? '#faf5ea' : '#fffdf9',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-              }}>
-                {opt.key === 'page-unique' && <span style={{ position: 'absolute', top: -8, right: -4, background: '#C9A84C', color: 'white', fontSize: 8, fontWeight: 700, padding: '2px 6px', borderRadius: 9999, letterSpacing: '0.05em' }}>★</span>}
-                <div style={{ color: sel ? '#C9A84C' : '#b0a898' }}>{opt.icon}</div>
-                <div style={{ fontSize: 11, fontWeight: sel ? 700 : 600, color: sel ? '#C9A84C' : '#3a3330', textAlign: 'center', lineHeight: 1.3 }}>{opt.label}</div>
-                <div style={{ fontSize: 9, color: '#9a928a', textAlign: 'center', lineHeight: 1.4 }}>{opt.desc}</div>
-              </button>
-            )
-          })}
-        </div>
-      </AccordionSection>
-
       {/* ── Pack Luxe : Monogramme + Couleur + Aquarelles + Illustrations décoratives ── */}
       {isLuxe ? (<>
         <AccordionSection title={locale === 'en' ? '✒️ AI Monogram' : '✒️ Monogramme IA'} defaultOpen>
@@ -2037,7 +2003,7 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
         {/* ── Pack Premium : Thème + Cadres décoratifs ── */}
         <AccordionSection title={locale === 'en' ? '🎨 Theme & colors' : '🎨 Thème & couleurs'} defaultOpen>
           <Label>{locale === 'en' ? 'Visual style' : 'Style visuel'}</Label>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 6, marginBottom: 16 }}>
             {(Object.entries(THEMES) as [Theme, ThemeObj][]).map(([key, t]) => {
               const sel = data.style === key
               return (
@@ -2047,10 +2013,10 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
                   background: 'transparent', textAlign: 'center',
                   boxShadow: sel ? `0 0 0 1px ${t.accent}` : 'none',
                 }}>
-                  <div style={{ background: t.fond, width: '100%', height: 55, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: t.accent, letterSpacing: 0.5 }}>A &amp; B</span>
+                  <div style={{ background: t.fond, width: '100%', height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: t.accent, letterSpacing: 0.5 }}>A &amp; B</span>
                   </div>
-                  <div style={{ padding: '4px 2px 5px', background: sel ? t.accent : '#faf8f6', fontSize: 8, fontWeight: sel ? 700 : 400, color: sel ? 'white' : '#3a3330', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <div style={{ padding: '3px 2px 4px', background: sel ? t.accent : '#faf8f6', fontSize: 7, fontWeight: sel ? 700 : 400, color: sel ? 'white' : '#3a3330', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {t.nom}
                   </div>
                 </button>
@@ -2145,31 +2111,6 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
       </AccordionSection>
 
 
-      <AccordionSection title={locale === 'en' ? '🎬 Opening animation' : '🎬 Animation d\'ouverture'}>
-        <Label>{locale === 'en' ? 'Choose the opening animation' : 'Choisissez l\'animation d\'ouverture'}</Label>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 8 }}>
-          {([
-            { key: 'enveloppe', label: locale === 'en' ? '💌 Envelope' : '💌 Enveloppe', desc: locale === 'en' ? 'Elegant envelope that opens' : 'Enveloppe élégante qui s\'ouvre' },
-            { key: 'petales', label: locale === 'en' ? '🌹 Falling petals' : '🌹 Pétales', desc: locale === 'en' ? 'Rose petals falling softly' : 'Pétales de roses qui tombent' },
-
-            { key: 'parchemin', label: locale === 'en' ? '📜 Scroll' : '📜 Parchemin', desc: locale === 'en' ? 'Elegant opening scroll' : 'Parchemin qui se déroule' },
-            { key: 'none', label: locale === 'en' ? '⏭️ None' : '⏭️ Aucune', desc: locale === 'en' ? 'Skip intro animation' : 'Pas d\'animation d\'intro' },
-          ]).map(opt => {
-            const sel = (data.introAnimation || 'petales') === opt.key
-            return (
-              <button key={opt.key} type="button" onClick={() => onChange({ introAnimation: opt.key })} style={{
-                ...BTN, padding: '14px 10px', borderRadius: 12, textAlign: 'center',
-                border: `2px solid ${sel ? THEMES[data.style].accent : '#e0d5c8'}`,
-                background: sel ? `${THEMES[data.style].accent}12` : 'white',
-              }}>
-                <div style={{ fontSize: 14, marginBottom: 4 }}>{opt.label}</div>
-                <div style={{ fontSize: 9, color: sel ? THEMES[data.style].accent : '#9a928a', lineHeight: 1.3 }}>{opt.desc}</div>
-              </button>
-            )
-          })}
-        </div>
-      </AccordionSection>
-
       <AccordionSection title={locale === 'en' ? '✨ Text animations' : '✨ Animations de texte'}>
         <Label>{t.fairepart.animationTextLabel}</Label>
         <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 12 }}>
@@ -2220,7 +2161,7 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
         </div>
       </AccordionSection>
 
-      <AccordionSection title={locale === 'en' ? '✒️ Monogram' : '✒️ Monogramme'}>
+      <AccordionSection title={locale === 'en' ? '✒️ Logo' : '✒️ Logo'}>
         <Label>{t.fairepart.monogramStyleLabel}</Label>
         <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>{t.fairepart.monogramPreviewHint}</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 14 }}>
@@ -2314,16 +2255,7 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
       </AccordionSection>
 
       <AccordionSection title={locale === 'en' ? '⚙️ Options' : '⚙️ Options'}>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 14, border: '1px solid #e0d5c8', borderRadius: 10, cursor: 'pointer', marginBottom: 16, fontSize: 14, color: '#3a3330' }}>
-          <input type="checkbox" checked={data.mariageJuif} onChange={e => onChange({ mariageJuif: e.target.checked })} />
-          {t.fairepart.jewishWedding}
-        </label>
         <div>
-          <Label>{t.fairepart.emailSectionTitle}</Label>
-          <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>{t.fairepart.emailSectionHelp}</p>
-          <input type="email" value={data.emailMaries ?? ''} onChange={e => onChange({ emailMaries: e.target.value })} placeholder="marie@exemple.com" style={S.input} />
-        </div>
-        <div style={{ marginTop: 16 }}>
           <Label>Date limite de confirmation</Label>
           <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Les invités verront cette date sur la section de confirmation de présence</p>
           <input type="date" value={data.rsvpDeadline ?? ''} onChange={e => onChange({ rsvpDeadline: e.target.value })} style={S.input} />
