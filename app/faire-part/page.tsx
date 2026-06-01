@@ -2143,71 +2143,23 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
         </div>
       </AccordionSection>
 
-      <AccordionSection title={locale === 'en' ? '✒️ Logo' : '✒️ Logo'}>
-        <Label>{t.fairepart.monogramStyleLabel}</Label>
-        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>{t.fairepart.monogramPreviewHint}</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 14 }}>
-          {([
-            { key: 'cercle',      label: t.fairepart.monogramStyles.cercle },
-            { key: 'losange',     label: t.fairepart.monogramStyles.losange },
-          ] as { key: string; label: string }[]).map(opt => {
-            const sel = (data.monogrammeStyle || 'cercle') === opt.key
-            const previewColor = data.monogrammeColor || '#C9A84C'
-            const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
-            const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
-            return (
-              <div key={opt.key} role="button" tabIndex={0} onClick={() => onChange({ monogrammeStyle: opt.key })} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onChange({ monogrammeStyle: opt.key }) }} style={{
-                cursor: 'pointer',
-                padding: '12px 6px 8px',
-                borderRadius: 10,
-                border: `2px solid ${sel ? '#C9A84C' : '#e0d5c8'}`,
-                background: sel ? '#faf5ea' : 'white',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6,
-                minHeight: 130, overflow: 'visible',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, minHeight: 90, overflow: 'visible' }}>
-                  <MonogramByStyle initial1={i1} initial2={i2} color={previewColor} size={80} style={opt.key} />
-                </div>
-                <span style={{ fontSize: 9, color: sel ? '#C9A84C' : '#6a5040', fontWeight: sel ? 700 : 400, textAlign: 'center', lineHeight: 1.3 }}>{opt.label}</span>
-              </div>
-            )
-          })}
-        </div>
-        <Label>{t.fairepart.monogramColorLabel}</Label>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
-          {([
-            { value: '',        label: t.fairepart.colorOptions[''] || 'Theme',       swatch: '#C9A84C' },
-            { value: '#C9A84C', label: t.fairepart.colorOptions['#C9A84C'] || 'Gold', swatch: '#C9A84C' },
-            { value: '#9e9e9e', label: t.fairepart.colorOptions['#9e9e9e'] || 'Silver', swatch: '#9e9e9e' },
-            { value: '#d4829a', label: t.fairepart.colorOptions['#d4829a'] || 'Pink',   swatch: '#d4829a' },
-            { value: '#8b0000', label: t.fairepart.colorOptions['#8b0000'] || 'Burgundy', swatch: '#8b0000' },
-            { value: '#1a1a1a', label: t.fairepart.colorOptions['#1a1a1a'] || 'Black',  swatch: '#1a1a1a' },
-            { value: '#2c4a7c', label: t.fairepart.colorOptions['#2c4a7c'] || 'Navy',   swatch: '#2c4a7c' },
-            { value: '#7a9e6e', label: t.fairepart.colorOptions['#7a9e6e'] || 'Green',  swatch: '#7a9e6e' },
-            { value: '#4a3728', label: t.fairepart.colorOptions['#4a3728'] || 'Brown',  swatch: '#4a3728' },
-            { value: '#d4a574', label: t.fairepart.colorOptions['#d4a574'] || 'Copper', swatch: '#d4a574' },
-            { value: '#2a9a6a', label: t.fairepart.colorOptions['#2a9a6a'] || 'Mint',   swatch: '#2a9a6a' },
-            { value: '#ffffff', label: t.fairepart.colorOptions['#ffffff'] || 'White',  swatch: '#ffffff' },
-          ] as { value: string; label: string; swatch: string }[]).map(opt => {
-            const sel = (data.monogrammeColor ?? '') === opt.value
-            return (
-              <button key={opt.label} type="button" onClick={() => onChange({ monogrammeColor: opt.value })} style={{
-                ...BTN,
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-                padding: '6px 10px', borderRadius: 8,
-                border: `2px solid ${sel ? opt.swatch : 'transparent'}`,
-                background: sel ? `${opt.swatch}18` : 'transparent',
-              }}>
-                <div style={{ width: 22, height: 22, borderRadius: '50%', background: opt.swatch, border: `1px solid ${opt.swatch}66`, boxShadow: sel ? `0 0 0 2px white, 0 0 0 3px ${opt.swatch}` : 'none' }} />
-                <span style={{ fontSize: 10, color: '#3a3330' }}>{opt.label}</span>
-              </button>
-            )
-          })}
-        </div>
-        {/* ── Logo personnalisé ── */}
+      <AccordionSection title={locale === 'en' ? '✒️ Logo' : '✒️ Logo'} defaultOpen>
+        <p style={{ fontSize: 12, color: '#6a5040', marginBottom: 12, lineHeight: 1.6 }}>
+          {locale === 'en'
+            ? 'Generate a unique logo with AI or upload your own.'
+            : 'Générez un logo unique par l\'IA ou importez le vôtre.'}
+        </p>
+        <MonogramGenerator
+          initial1={data.marie1Prenom}
+          initial2={data.marie2Prenom}
+          accentColor={THEMES[data.style].accent}
+          savedUrl={data.luxeMonogramUrl}
+          onSelect={url => onChange({ luxeMonogramUrl: url })}
+        />
+        {/* ── Ou importer son propre logo ── */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '18px 0 10px' }}>
           <div style={{ flex: 1, height: 1, background: '#e5d5c5' }} />
-          <span style={{ fontSize: 12, color: '#9ca3af', fontStyle: 'italic' }}>ou</span>
+          <span style={{ fontSize: 12, color: '#9ca3af', fontStyle: 'italic' }}>ou importez le vôtre</span>
           <div style={{ flex: 1, height: 1, background: '#e5d5c5' }} />
         </div>
         <CustomLogoUpload logoUrl={data.customLogoUrl} logoSize={data.customLogoSize} logoColor={data.customLogoColor} onChange={onChange} accent={THEMES[data.style].accent} />
