@@ -2090,25 +2090,6 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
         </AccordionSection>
       </>)}
 
-      <AccordionSection title={locale === 'en' ? '↕️ Text position' : '↕️ Position du texte'}>
-        <Label>{locale === 'en' ? 'Vertical offset' : 'Décalage vertical'}</Label>
-        <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 12 }}>
-          {locale === 'en' ? 'Move all the text up or down on the invitation cards.' : 'Déplacez tout le texte vers le haut ou le bas sur les cartes d\'invitation.'}
-        </p>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ fontSize: 11, color: '#9a928a', whiteSpace: 'nowrap' }}>{locale === 'en' ? 'Up' : 'Haut'}</span>
-          <input type="range" min={-80} max={80} step={2} value={data.textOffsetY ?? 0} onChange={e => onChange({ textOffsetY: Number(e.target.value) })} style={{ flex: 1, accentColor: THEMES[data.style].accent }} />
-          <span style={{ fontSize: 11, color: '#9a928a', whiteSpace: 'nowrap' }}>{locale === 'en' ? 'Down' : 'Bas'}</span>
-        </div>
-        <div style={{ textAlign: 'center', marginTop: 8 }}>
-          <span style={{ fontSize: 11, color: '#b0a898' }}>{data.textOffsetY ?? 0}px</span>
-          {(data.textOffsetY ?? 0) !== 0 && (
-            <button type="button" onClick={() => onChange({ textOffsetY: 0 })} style={{ ...BTN, marginLeft: 12, fontSize: 11, color: THEMES[data.style].accent, background: 'none', border: 'none', textDecoration: 'underline' }}>
-              {locale === 'en' ? 'Reset' : 'Réinitialiser'}
-            </button>
-          )}
-        </div>
-      </AccordionSection>
 
 
       <AccordionSection title={locale === 'en' ? '✨ Text animations' : '✨ Animations de texte'}>
