@@ -3453,15 +3453,6 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
               />
               <div style={{ fontSize: 11, color: '#9ca3af', textAlign: 'right', marginTop: 4 }}>{message.length}/300</div>
             </div>
-            <div style={{ marginBottom: 24 }}>
-              <Label>Allergies / régimes alimentaires (optionnel)</Label>
-              <input
-                value={allergies}
-                onChange={e => setAllergies(e.target.value)}
-                placeholder="Végétarien, sans gluten, casher strict…"
-                style={S.input}
-              />
-            </div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setStep(2)} style={{ ...BTN, flex: 1, padding: '14px 0', borderRadius: 9999, border: `1.5px solid ${accent}44`, background: 'white', color: accent, fontSize: 14, fontWeight: 600 }}>← Retour</button>
               <button onClick={send} disabled={loading} style={{
