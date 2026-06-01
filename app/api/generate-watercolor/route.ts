@@ -6,24 +6,24 @@ const VALID_AMBIANCES: Ambiance[] = ["plage", "chateau", "jardin", "salle", "syn
 const VALID_PALETTES: Palette[] = ["lavande", "rose", "sauge", "bleu_nuit", "bleu_ciel", "rose_clair", "mauve", "peche", "dore", "bordeaux", "menthe", "terracotta"];
 
 async function generateImage(token: string, prompt: string, aspectRatio: string): Promise<string | null> {
-  const res = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'wait',
-    },
-    body: JSON.stringify({
-      input: {
-        prompt,
-        num_outputs: 1,
-        aspect_ratio: aspectRatio,
-        output_format: 'png',
+  try {
+    const res = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'wait',
       },
-    }),
-  });
-  const data = await res.json();
-  return data.output?.[0] || null;
+      body: JSON.stringify({
+        input: { prompt, num_outputs: 1, aspect_ratio: aspectRatio, output_format: 'png' },
+      }),
+      signal: AbortSignal.timeout(45000),
+    });
+    const data = await res.json();
+    return data.output?.[0] || null;
+  } catch {
+    return null;
+  }
 }
 
 async function generateImageImg2Img(token: string, prompt: string, imageUrl: string, aspectRatio: string): Promise<string | null> {
@@ -92,25 +92,29 @@ export async function POST(req: Request) {
       numOutputs = 4;
     }
 
-    const urls: string[] = [];
+    let urls: string[] = [];
 
     if (referenceImage && body.mode === 'venue') {
-      // img2img avec flux-dev
       const img2imgPrompt = prompt + " Transform this photograph into a delicate hand-painted watercolor illustration, keeping the exact same composition, architecture and perspective.";
-      for (let i = 0; i < numOutputs; i++) {
-        const url = await generateImageImg2Img(token, img2imgPrompt, referenceImage, aspectRatio);
-        if (url) urls.push(url);
-      }
+      const results = await Promise.allSettled(
+        Array.from({ length: numOutputs }, () => generateImageImg2Img(token, img2imgPrompt, referenceImage, aspectRatio))
+      );
+      urls = results.filter((r): r is PromiseFulfilledResult<string | null> => r.status === 'fulfilled').map(r => r.value).filter((u): u is string => !!u);
     } else {
-      // text2img avec flux-schnell
-      for (let i = 0; i < numOutputs; i++) {
-        const url = await generateImage(token, prompt, aspectRatio);
-        if (url) urls.push(url);
-      }
+      const results = await Promise.allSettled(
+        Array.from({ length: numOutputs }, () => generateImage(token, prompt, aspectRatio))
+      );
+      urls = results.filter((r): r is PromiseFulfilledResult<string | null> => r.status === 'fulfilled').map(r => r.value).filter((u): u is string => !!u);
+    }
+
+    // Retry si aucune image
+    if (urls.length === 0) {
+      const retry = await generateImage(token, prompt, aspectRatio);
+      if (retry) urls.push(retry);
     }
 
     if (urls.length === 0) {
-      return Response.json({ error: "Aucune image générée" }, { status: 500 });
+      return Response.json({ error: "La génération a échoué. Réessayez." }, { status: 500 });
     }
 
     return Response.json({ images: urls });

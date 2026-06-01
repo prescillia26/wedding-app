@@ -9,6 +9,27 @@ const FRAME_STYLES: Record<string, string> = {
   'oriental': `An ornamental arch-shaped frame with geometric patterns inspired by Moroccan zellige tiles, empty center space, intricate but refined line work, monochrome black ink on pure white background`,
 }
 
+async function callReplicate(token: string, prompt: string): Promise<string | null> {
+  try {
+    const res = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'wait',
+      },
+      body: JSON.stringify({
+        input: { prompt, num_outputs: 1, aspect_ratio: '1:1', output_format: 'png' },
+      }),
+      signal: AbortSignal.timeout(45000), // 45s max par appel
+    });
+    const data = await res.json();
+    return data.output?.[0] || null;
+  } catch {
+    return null;
+  }
+}
+
 export async function POST(req: Request) {
   const token = process.env.REPLICATE_API_TOKEN;
   if (!token) {
@@ -17,37 +38,28 @@ export async function POST(req: Request) {
 
   try {
     const { style } = await req.json();
-    const styleKey = FRAME_STYLES[style] ? style : 'art-nouveau';
+    const styleKey = FRAME_STYLES[style] ? style : 'laurel';
     const prompt = FRAME_STYLES[styleKey] + ". NO letters, NO text, NO initials inside the frame. The center must be completely EMPTY white space.";
 
-    const urls: string[] = [];
+    // 2 images en parallèle (rapide + fiable)
+    const results = await Promise.allSettled([
+      callReplicate(token, prompt),
+      callReplicate(token, prompt),
+    ]);
 
-    for (let i = 0; i < 4; i++) {
-      const res = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'wait',
-        },
-        body: JSON.stringify({
-          input: {
-            prompt,
-            num_outputs: 1,
-            aspect_ratio: '1:1',
-            output_format: 'png',
-          },
-        }),
-      });
+    const urls = results
+      .filter((r): r is PromiseFulfilledResult<string | null> => r.status === 'fulfilled')
+      .map(r => r.value)
+      .filter((url): url is string => !!url);
 
-      const data = await res.json();
-      if (data.output?.[0]) {
-        urls.push(data.output[0]);
-      }
+    // Si aucune image, retry une fois
+    if (urls.length === 0) {
+      const retry = await callReplicate(token, prompt);
+      if (retry) urls.push(retry);
     }
 
     if (urls.length === 0) {
-      return Response.json({ error: "Aucune image générée" }, { status: 500 });
+      return Response.json({ error: "La génération a échoué. Réessayez." }, { status: 500 });
     }
 
     return Response.json({ images: urls });

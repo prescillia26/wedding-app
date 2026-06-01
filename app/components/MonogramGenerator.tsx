@@ -180,7 +180,14 @@ export default function MonogramGenerator({
         </div>
       )}
 
-      {error && <p style={{ color: '#dc2626', fontSize: 11, textAlign: 'center', marginTop: 6 }}>{error}</p>}
+      {error && (
+        <div style={{ textAlign: 'center', marginTop: 8 }}>
+          <p style={{ color: '#dc2626', fontSize: 11, marginBottom: 6 }}>{error}</p>
+          <button type="button" onClick={() => generate()} style={{ ...BTN, padding: '6px 16px', borderRadius: 9999, border: '1px solid #C9A84C', background: 'white', color: '#C9A84C', fontSize: 11, fontWeight: 600 }}>
+            Réessayer
+          </button>
+        </div>
+      )}
     </div>
   )
 }
