@@ -84,22 +84,17 @@ export default function InvitationCover({
           <div style={{ width: 40, height: 0.5, background: accent, opacity: 0.3 }} />
         </div>
 
-        {/* Logo / Monogramme — cadre IA + initiales CSS */}
+        {/* Logo importé ou Monogramme CSS */}
         {logoUrl ? (
-          <div style={{ marginBottom: 28, position: 'relative', width: 140, height: 140, display: 'inline-block' }}>
+          <div style={{ marginBottom: 28 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={logoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontFamily: PD, fontSize: 38, fontWeight: 700, color: accent, letterSpacing: -1 }}>
-                {p1[0]}<span style={{ fontSize: 24, opacity: 0.4, margin: '0 1px' }}>&</span>{p2[0]}
-              </span>
-            </div>
+            <img src={logoUrl} alt="" style={{ width: 120, height: 120, objectFit: 'contain', display: 'inline-block' }} />
           </div>
         ) : (
           <div style={{ marginBottom: 28 }}>
-            <span style={{ fontFamily: PD, fontSize: 56, fontWeight: 700, color: accent }}>{p1[0]}</span>
-            <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 24, color: accent, margin: '0 4px', opacity: 0.5 }}>&</span>
-            <span style={{ fontFamily: PD, fontSize: 56, fontWeight: 700, color: accent }}>{p2[0]}</span>
+            <span style={{ fontFamily: GV, fontSize: 56, color: accent }}>{p1[0]}</span>
+            <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 24, color: accent, margin: '0 6px', opacity: 0.5 }}>&</span>
+            <span style={{ fontFamily: GV, fontSize: 56, color: accent }}>{p2[0]}</span>
           </div>
         )}
 

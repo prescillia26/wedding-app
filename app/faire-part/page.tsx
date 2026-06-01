@@ -2144,22 +2144,64 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
       </AccordionSection>
 
       <AccordionSection title={locale === 'en' ? '✒️ Logo' : '✒️ Logo'} defaultOpen>
-        <p style={{ fontSize: 12, color: '#6a5040', marginBottom: 12, lineHeight: 1.6 }}>
-          {locale === 'en'
-            ? 'Generate a unique logo with AI or upload your own.'
-            : 'Générez un logo unique par l\'IA ou importez le vôtre.'}
-        </p>
-        <MonogramGenerator
-          initial1={data.marie1Prenom}
-          initial2={data.marie2Prenom}
-          accentColor={THEMES[data.style].accent}
-          savedUrl={data.luxeMonogramUrl}
-          onSelect={url => onChange({ luxeMonogramUrl: url })}
-        />
+        <Label>{locale === 'en' ? 'Monogram style' : 'Style du monogramme'}</Label>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 14 }}>
+          {([
+            { key: 'cercle', label: locale === 'en' ? 'Intertwined' : 'Entrelacé' },
+            { key: 'enlace', label: locale === 'en' ? 'Calligraphy' : 'Calligraphie' },
+            { key: 'couronne', label: locale === 'en' ? 'Circle' : 'Cercle' },
+            { key: 'branches', label: locale === 'en' ? 'Vertical' : 'Vertical' },
+            { key: 'losange', label: locale === 'en' ? 'Minimalist' : 'Minimaliste' },
+            { key: 'minimaliste', label: locale === 'en' ? 'Baroque' : 'Baroque' },
+          ] as { key: string; label: string }[]).map(opt => {
+            const sel = (data.monogrammeStyle || 'cercle') === opt.key
+            const previewColor = data.monogrammeColor || THEMES[data.style].accent
+            const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
+            const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
+            return (
+              <div key={opt.key} role="button" tabIndex={0} onClick={() => onChange({ monogrammeStyle: opt.key })} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onChange({ monogrammeStyle: opt.key }) }} style={{
+                cursor: 'pointer', padding: '10px 4px 6px', borderRadius: 10,
+                border: `2px solid ${sel ? THEMES[data.style].accent : '#e0d5c8'}`,
+                background: sel ? `${THEMES[data.style].accent}10` : 'white',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 60, overflow: 'visible' }}>
+                  <MonogramByStyle initial1={i1} initial2={i2} color={previewColor} size={55} style={opt.key} />
+                </div>
+                <span style={{ fontSize: 8, color: sel ? THEMES[data.style].accent : '#6a5040', fontWeight: sel ? 700 : 400 }}>{opt.label}</span>
+              </div>
+            )
+          })}
+        </div>
+        <Label>{locale === 'en' ? 'Monogram color' : 'Couleur du monogramme'}</Label>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6, marginBottom: 16 }}>
+          {[
+            { value: '', swatch: THEMES[data.style].accent, label: 'Thème' },
+            { value: '#C9A84C', swatch: '#C9A84C', label: 'Or' },
+            { value: '#9e9e9e', swatch: '#9e9e9e', label: 'Argent' },
+            { value: '#d4829a', swatch: '#d4829a', label: 'Rose' },
+            { value: '#1a1a1a', swatch: '#1a1a1a', label: 'Noir' },
+            { value: '#2c4a7c', swatch: '#2c4a7c', label: 'Marine' },
+            { value: '#ffffff', swatch: '#ffffff', label: 'Blanc' },
+          ].map(opt => {
+            const sel = (data.monogrammeColor ?? '') === opt.value
+            return (
+              <button key={opt.label} type="button" onClick={() => onChange({ monogrammeColor: opt.value })} style={{
+                ...BTN, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+                padding: '4px 8px', borderRadius: 8,
+                border: `2px solid ${sel ? opt.swatch : 'transparent'}`,
+                background: sel ? `${opt.swatch}15` : 'transparent',
+              }}>
+                <div style={{ width: 20, height: 20, borderRadius: '50%', background: opt.swatch, border: '1px solid #ddd' }} />
+                <span style={{ fontSize: 8, color: '#3a3330' }}>{opt.label}</span>
+              </button>
+            )
+          })}
+        </div>
         {/* ── Ou importer son propre logo ── */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '18px 0 10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '4px 0 10px' }}>
           <div style={{ flex: 1, height: 1, background: '#e5d5c5' }} />
-          <span style={{ fontSize: 12, color: '#9ca3af', fontStyle: 'italic' }}>ou importez le vôtre</span>
+          <span style={{ fontSize: 11, color: '#9ca3af', fontStyle: 'italic' }}>ou importez votre logo</span>
           <div style={{ flex: 1, height: 1, background: '#e5d5c5' }} />
         </div>
         <CustomLogoUpload logoUrl={data.customLogoUrl} logoSize={data.customLogoSize} logoColor={data.customLogoColor} onChange={onChange} accent={THEMES[data.style].accent} />
