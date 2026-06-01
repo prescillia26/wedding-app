@@ -6710,6 +6710,10 @@ export default function FairePartPage() {
       </div>
       <div style={{ width: '100%', maxWidth: 600, background: 'white', borderRadius: 20, padding: '32px 24px', boxShadow: '0 12px 48px rgba(0,0,0,0.07)', border: '1px solid #efe5d8', boxSizing: 'border-box' }}>
         <ProgressBar step={step} />
+        {step === 1 && <p style={{ textAlign: 'center', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#C9A84C', marginBottom: 16 }}>Commençons par les prénoms des mariés</p>}
+        {step === 2 && <p style={{ textAlign: 'center', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#C9A84C', marginBottom: 16 }}>Superbe ! Ajoutons les familles</p>}
+        {step === 3 && <p style={{ textAlign: 'center', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#C9A84C', marginBottom: 16 }}>Parfait ! Plus que les cérémonies et le style</p>}
+        {step === 4 && <p style={{ textAlign: 'center', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#C9A84C', marginBottom: 16 }}>Dernière étape — personnalisez le style ✨</p>}
         {step === 1 && <Step1 data={formData} onChange={update} />}
         {step === 2 && <Step2 data={formData} onChange={update} />}
         {step === 3 && <Step3 data={formData} onChange={update} />}
@@ -6729,7 +6733,7 @@ export default function FairePartPage() {
             onTouchEnd={onTouchNext}
             style={{ ...BTN, flex: 1, padding: '18px 0', borderRadius: 9999, border: 'none', background: step === 4 ? 'linear-gradient(135deg, #C9A84C, #e8c96a)' : 'linear-gradient(135deg, #d45050, #f43f5e)', color: 'white', fontSize: 14, fontWeight: 700, boxShadow: '0 6px 20px rgba(251,113,133,0.35)' }}
           >
-            {step === 4 ? t.fairepart.generateBtn : 'Suivant →'}
+            {step === 4 ? 'Voir mon faire-part ✨' : 'Suivant →'}
           </button>
         </div>
       </div>
