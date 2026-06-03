@@ -6586,6 +6586,8 @@ export default function FairePartPage() {
     }
 
     if (id) {
+      // Debug: loguer le shareId utilisé pour charger
+      console.log('[guest-load] shareId depuis URL:', id)
       // Vue partagée — pas de protection
       setIsShared(true)
       setRole(r)
