@@ -6524,7 +6524,10 @@ export default function FairePartPage() {
   const [savedAt, setSavedAt] = useState<Date | null>(null)
   const [accessGranted, setAccessGranted] = useState(true) // Freemium : accès ouvert à tous
   const [checkingAccess, setCheckingAccess] = useState(false) // Plus de gate
-  const [isPaid, setIsPaid] = useState(false)
+  const [isPaid, setIsPaid] = useState(() => {
+    // Si on a un code d'accès en localStorage, on est déjà payé
+    try { return !!localStorage.getItem('lovit_access_code') } catch { return false }
+  })
   const [userPack, setUserPack] = useState<'essentiel' | 'premium'>(() => {
     try {
       // URL ?pack=luxe → interne 'premium', ?pack=premium → interne 'essentiel'
@@ -6578,6 +6581,8 @@ export default function FairePartPage() {
             setRole(null)
             setShowCards(false)
             setStep(1)
+            // L'utilisateur vient de Mon espace = il a payé
+            setIsPaid(true)
           } else {
             setShowCards(true)
           }
@@ -6652,7 +6657,8 @@ export default function FairePartPage() {
     // ⚠️ En mode partagé (?share=XXX), ne JAMAIS charger le brouillon de l'utilisateur connecté
     // pour ne pas écraser le faire-part partagé avec les données de l'utilisateur B
     const params = new URLSearchParams(window.location.search)
-    if (params.get('share')) return // Vue partagée → skip auth loading
+    // En mode partagé guest, skip. Mais en mode edit (depuis Mon espace), vérifier l'auth
+    if (params.get('share') && params.get('role') !== 'edit') return
 
     let cancelled = false
     async function checkAuth() {
