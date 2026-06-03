@@ -1785,15 +1785,15 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
     const previewSize = Math.min(220, 140 * (logoSize / 100))
     const imgSrc = logoUrl?.includes('cloudinary.com')
       ? logoColor
-        ? logoUrl!.replace('/upload/', `/upload/e_background_removal/e_grayscale/e_tint:100:${logoColor.replace('#', '')}:0p/`)
-        : logoUrl!.replace('/upload/', '/upload/e_background_removal/')
+        ? logoUrl!.replace('/upload/', `/upload/e_background_removal/e_trim/e_grayscale/e_tint:100:${logoColor.replace('#', '')}:0p/`)
+        : logoUrl!.replace('/upload/', '/upload/e_background_removal/e_trim/')
       : logoUrl!
     return (
       <div style={{ textAlign: 'center' }}>
         {/* Preview — pas de cadre, fond propre */}
         <div style={{ marginBottom: 16 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imgSrc} alt="Logo" style={{ width: previewSize, height: previewSize, objectFit: 'contain', display: 'inline-block', background: 'transparent' }} />
+          <img src={imgSrc} alt="Logo" style={{ maxWidth: previewSize, maxHeight: previewSize, objectFit: 'contain', display: 'inline-block' }} />
         </div>
 
         {/* Couleurs — directement visibles, changement en direct */}
@@ -2856,15 +2856,13 @@ function CustomLogo({ url, size, scale = 100, color }: { url: string; size: numb
   if (url.includes('cloudinary.com')) {
     if (color) {
       const hex = color.replace('#', '')
-      // Cloudinary : supprimer le fond + niveaux de gris + coloriser
-      src = url.replace('/upload/', `/upload/e_background_removal/e_grayscale/e_tint:100:${hex}:0p/`)
+      src = url.replace('/upload/', `/upload/e_background_removal/e_trim/e_grayscale/e_tint:100:${hex}:0p/`)
     } else {
-      // Supprimer le fond uniquement
-      src = url.replace('/upload/', '/upload/e_background_removal/')
+      src = url.replace('/upload/', '/upload/e_background_removal/e_trim/')
     }
   }
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={src} alt="Logo" style={{ width: s, height: s, objectFit: 'contain' }} />
+  return <img src={src} alt="Logo" style={{ maxWidth: s, maxHeight: s, objectFit: 'contain' }} />
 }
 
 function LogoOrMonogram({ data, theme }: { data: FormData; theme: ThemeObj }) {
