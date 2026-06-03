@@ -37,8 +37,9 @@ export async function POST(request: Request) {
     deduped.push(data)
     await redis.set(key, deduped)
 
-    // Envoyer email de notification aux mariés
+    // Envoyer email de notification aux mariés (email 1 + email 2)
     const emailMaries = await redis.get<string>(`email:${shareId}`)
+    const emailMaries2 = await redis.get<string>(`email2:${shareId}`)
 
     let locale = 'fr'
     if (emailMaries) {
@@ -106,9 +107,10 @@ export async function POST(request: Request) {
 
       const html = emailLayout(et.rsvp.headerSub, body, locale)
 
+      const recipients = [emailMaries, emailMaries2].filter(Boolean) as string[]
       await resend.emails.send({
         from: 'Lov\'it <noreply@getlovit.fr>',
-        to: emailMaries,
+        to: recipients,
         subject: et.rsvp.subject(nom),
         html,
       })

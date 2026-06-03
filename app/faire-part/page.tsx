@@ -276,6 +276,7 @@ interface FormData {
   photoFond: string
   photosFond: string[]
   emailMaries: string
+  emailMaries2?: string
   textOverrides?: Record<string, string>
   monogrammeStyle?: string
   monogrammeColor?: string
@@ -1024,7 +1025,8 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       <div style={{ marginBottom: 20 }}>
         <Label>{t.fairepart.emailSectionTitle}</Label>
         <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 6 }}>{t.fairepart.emailSectionHelp}</p>
-        <input type="email" value={data.emailMaries ?? ''} onChange={e => onChange({ emailMaries: e.target.value })} placeholder="marie@exemple.com" style={S.input} />
+        <input type="email" value={data.emailMaries ?? ''} onChange={e => onChange({ emailMaries: e.target.value })} placeholder="email-marie1@exemple.com" style={{ ...S.input, marginBottom: 8 }} />
+        <input type="email" value={data.emailMaries2 ?? ''} onChange={e => onChange({ emailMaries2: e.target.value })} placeholder="email-marie2@exemple.com (optionnel)" style={S.input} />
       </div>
 
       {/* Marié·e 1 */}

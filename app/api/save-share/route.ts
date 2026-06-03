@@ -50,6 +50,9 @@ export async function POST(request: Request) {
     if (shareData.emailMaries) {
       await redis.set(`email:${id}`, shareData.emailMaries, { ex: 31536000 })
     }
+    if (shareData.emailMaries2) {
+      await redis.set(`email2:${id}`, shareData.emailMaries2, { ex: 31536000 })
+    }
 
     if (shareData.slug) {
       const slug = shareData.slug.toLowerCase().replace(/[^a-z0-9-]/g, '')
