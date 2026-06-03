@@ -14,6 +14,7 @@ export default function InvitationCover({
   accent,
   fond,
   logoUrl,
+  logoColor,
   onOpen,
 }: {
   prenom1: string
@@ -23,6 +24,7 @@ export default function InvitationCover({
   accent: string
   fond: string
   logoUrl?: string
+  logoColor?: string
   onOpen: () => void
 }) {
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
@@ -85,12 +87,18 @@ export default function InvitationCover({
         </div>
 
         {/* Logo importé ou Monogramme CSS */}
-        {logoUrl ? (
-          <div style={{ marginBottom: 28 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={logoUrl} alt="" style={{ width: 120, height: 120, objectFit: 'contain', display: 'inline-block' }} />
-          </div>
-        ) : (
+        {logoUrl ? (() => {
+          const colorToUse = logoColor || accent.replace('#', '')
+          const colorizedUrl = logoUrl.includes('cloudinary.com') && colorToUse
+            ? logoUrl.replace('/upload/', `/upload/e_grayscale/e_tint:100:${colorToUse.replace('#', '')}:0p/`)
+            : logoUrl
+          return (
+            <div style={{ marginBottom: 28 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={colorizedUrl} alt="" style={{ width: 120, height: 120, objectFit: 'contain', display: 'inline-block' }} />
+            </div>
+          )
+        })() : (
           <div style={{ marginBottom: 28 }}>
             <span style={{ fontFamily: GV, fontSize: 56, color: accent }}>{p1[0]}</span>
             <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 24, color: accent, margin: '0 6px', opacity: 0.5 }}>&</span>

@@ -6113,6 +6113,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
             accent={theme.accent}
             fond={theme.fond}
             logoUrl={data.luxeMonogramUrl || data.customLogoUrl}
+            logoColor={data.customLogoColor}
             onOpen={() => setCoverOpen(true)}
           />
         )}
@@ -6177,6 +6178,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
           accent={theme.accent}
           fond={theme.fond}
           logoUrl={data.luxeMonogramUrl || data.customLogoUrl}
+          logoColor={data.customLogoColor}
           onOpen={() => setCoverOpen(true)}
         />
       )}
