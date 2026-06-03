@@ -70,16 +70,23 @@ export async function POST(request: Request) {
     if (shareData.slug) {
       const slug = shareData.slug.toLowerCase().replace(/[^a-z0-9-]/g, '')
       if (slug) {
-        // Vérifier que le slug n'est pas déjà pris par un autre faire-part
         const existingSlugOwner = await redis.get<string>(`slug:${slug}`)
         if (existingSlugOwner && existingSlugOwner !== id) {
-          // Slug déjà pris par un autre → ajouter un suffixe aléatoire
-          const chars = 'abcdefghijkmnpqrstuvwxyz23456789'
-          let suffix = ''
-          for (let i = 0; i < 4; i++) suffix += chars[Math.floor(Math.random() * chars.length)]
-          const newSlug = `${slug}-${suffix}`
-          shareData.slug = newSlug
-          await redis.set(`slug:${newSlug}`, id, { ex: 31536000 })
+          // Slug pris par un autre ID — vérifier si c'est le MÊME propriétaire
+          const otherData = await redis.get<Record<string, unknown>>(existingSlugOwner)
+          if (otherData?.ownerEmail && otherData.ownerEmail === shareData.ownerEmail) {
+            // Même propriétaire (ancien ID du même faire-part) → mettre à jour le slug vers le nouvel ID
+            console.log('[save-share] Slug réattribué:', slug, existingSlugOwner, '→', id)
+            await redis.set(`slug:${slug}`, id, { ex: 31536000 })
+          } else {
+            // Propriétaire différent → ajouter un suffixe aléatoire
+            const chars = 'abcdefghijkmnpqrstuvwxyz23456789'
+            let suffix = ''
+            for (let i = 0; i < 4; i++) suffix += chars[Math.floor(Math.random() * chars.length)]
+            const newSlug = `${slug}-${suffix}`
+            shareData.slug = newSlug
+            await redis.set(`slug:${newSlug}`, id, { ex: 31536000 })
+          }
         } else {
           await redis.set(`slug:${slug}`, id, { ex: 31536000 })
         }
