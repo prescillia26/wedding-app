@@ -6079,6 +6079,9 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
       if (!existingId) {
         showToast('Nouveau lien créé', 'success')
       }
+      // Debug: vérifier que le logo est bien dans le payload
+      console.log('[handleShare] customLogoUrl envoyé:', dataToSend.customLogoUrl || '(vide)')
+      console.log('[handleShare] fixedId:', existingId || '(nouveau)')
       const res = await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...dataToSend, fixedId: existingId }) })
       const json = await res.json()
       if (!res.ok || !json.id) {
@@ -6581,6 +6584,9 @@ export default function FairePartPage() {
       fetch(`/api/get-share?id=${id}`)
         .then(res => res.json())
         .then((d: FormData) => {
+          // Debug: vérifier ce que l'invité reçoit
+          console.log('[guest-load] customLogoUrl reçu:', d.customLogoUrl || '(vide)')
+          console.log('[guest-load] luxeMonogramUrl reçu:', d.luxeMonogramUrl || '(vide)')
           // Reconstruire photosData.url depuis photosFond (supprimé avant envoi pour économiser de l'espace)
           if (d.photosFond?.length && d.photosData?.length) {
             d.photosData = d.photosData.map((c, i) => ({ ...c, url: d.photosFond![i] ?? '' }))

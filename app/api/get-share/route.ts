@@ -17,6 +17,8 @@ export async function GET(request: Request) {
     if (!data) {
       return Response.json({ error: 'Faire-part introuvable' }, { status: 404 })
     }
+    // Debug: loguer les champs logo pour diagnostiquer
+    console.log('[get-share] id:', id, 'customLogoUrl:', data.customLogoUrl || '(vide)', 'luxeMonogramUrl:', data.luxeMonogramUrl || '(vide)')
     // Retourner ownerEmail SEULEMENT si le requester est le propriétaire
     const session = await getSession()
     if (session?.email && data.ownerEmail === session.email) {

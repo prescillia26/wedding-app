@@ -30,6 +30,11 @@ export async function POST(request: Request) {
       }
     }
 
+    // Debug: loguer les champs logo pour diagnostiquer le problème
+    console.log('[save-share] customLogoUrl:', shareData.customLogoUrl || '(vide)')
+    console.log('[save-share] luxeMonogramUrl:', shareData.luxeMonogramUrl || '(vide)')
+    console.log('[save-share] fixedId:', fixedId || '(nouveau)')
+
     const size = new TextEncoder().encode(JSON.stringify(shareData)).length
     if (size > MAX_BYTES) {
       return Response.json({ error: 'Données trop volumineuses.' }, { status: 413 })
