@@ -6076,11 +6076,18 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
       }
 
       const existingId = (() => { try { return localStorage.getItem('lovit_share_id') } catch { return null } })()
+      if (!existingId) {
+        showToast('Nouveau lien créé', 'success')
+      }
       const res = await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...dataToSend, fixedId: existingId }) })
       const json = await res.json()
       if (!res.ok || !json.id) {
         showToast('Erreur lors de la sauvegarde : ' + (json.error || 'Réessayez'), 'error')
         throw new Error(json.error || 'save-share failed')
+      }
+      // Forcer le MÊME ID pour le lien — ne jamais créer un 2ème lien
+      if (existingId && json.id !== existingId) {
+        console.warn('[handleShare] ID changé :', existingId, '→', json.id)
       }
       const id = json.id
       setLastShareId(id)
