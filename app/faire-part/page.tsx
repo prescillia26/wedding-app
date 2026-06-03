@@ -5308,7 +5308,185 @@ function EnveloppeAnimation({ data, theme, onDone }: { data: FormData; theme: Th
   return <AnimEnveloppe data={data} theme={theme} onDone={onDone} />
 }
 
-// ── ItineraireButtons : Google Maps + Waze avec design luxe ───────────────────
+// ── Carton-réponse intégré (inline, pas de popup) ─────────────────────────────
+function InlineRSVP({ ceremonies, accent, textColor, shareId, mariee1, mariee2, rsvpText, rsvpDeadline, locale }: {
+  ceremonies: Ceremony[]; accent: string; textColor: string; shareId: string | null; mariee1: string; mariee2: string; rsvpText?: string; rsvpDeadline?: string; locale: string
+}) {
+  const FP = 'var(--font-playfair-display)'
+  const FC = 'var(--font-cormorant-garamond)'
+  const GV = 'var(--font-great-vibes)'
+
+  const getCeremonyName = (c: Ceremony) => {
+    if (c.type === 'Autre') return c.customName || 'Événement'
+    const names: Record<string, string> = { 'Cérémonie religieuse / Houppa': 'La Houppa', 'Mairie': 'La Mairie', 'Shabbat Hatan': 'Le Shabbat', 'Henné': 'Le Henné', 'Cocktail': 'Le Cocktail', 'Soirée': 'La Soirée', 'Boat Party': 'Boat Party' }
+    return names[c.type] || c.type
+  }
+
+  const [nom, setNom] = useState('')
+  const [reponses, setReponses] = useState<Record<number, boolean | null>>({})
+  const [nbPersonnes, setNbPersonnes] = useState<Record<number, number>>({})
+  const [accompagnants, setAccompagnants] = useState<Record<number, string[]>>({})
+  const [message, setMessage] = useState('')
+  const [sending, setSending] = useState(false)
+  const [sent, setSent] = useState(false)
+  const [error, setError] = useState('')
+
+  const togglePresent = (idx: number, present: boolean) => {
+    setReponses(prev => ({ ...prev, [idx]: prev[idx] === present ? null : present }))
+    if (present && !nbPersonnes[idx]) setNbPersonnes(prev => ({ ...prev, [idx]: 1 }))
+  }
+
+  const send = async () => {
+    if (!nom.trim()) { setError(locale === 'en' ? 'Please enter your name' : 'Veuillez entrer votre nom'); return }
+    setSending(true)
+    setError('')
+    try {
+      const entry = {
+        nom,
+        reponses: ceremonies.map((c, i) => ({
+          ceremonie: getCeremonyName(c),
+          ceremonieIdx: i,
+          date: c.date || '',
+          present: reponses[i] ?? false,
+          nbPersonnes: reponses[i] ? (nbPersonnes[i] || 1) : 0,
+          accompagnants: reponses[i] ? (accompagnants[i] || []).filter(Boolean) : [],
+        })),
+        message: message || undefined,
+        sentAt: new Date().toISOString(),
+        shareId: shareId ?? undefined,
+        mariee1,
+        mariee2,
+      }
+      await fetch('/api/rsvp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry) })
+      if (shareId) try { localStorage.setItem(`lovit_rsvp_sent_${shareId}`, new Date().toISOString()) } catch { /* */ }
+      setSent(true)
+    } catch { setError(locale === 'en' ? 'Error sending' : 'Erreur lors de l\'envoi') }
+    finally { setSending(false) }
+  }
+
+  if (sent) {
+    return (
+      <div style={{ textAlign: 'center', padding: '48px 24px' }}>
+        <div style={{ fontSize: 48, marginBottom: 16 }}>💕</div>
+        <div style={{ fontFamily: GV, fontSize: 32, color: accent, marginBottom: 12 }}>Merci {nom.split(' ')[0]} !</div>
+        <p style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: textColor, opacity: 0.7 }}>
+          {locale === 'en' ? 'Your response has been sent to the couple.' : 'Votre réponse a bien été transmise aux mariés.'}
+        </p>
+      </div>
+    )
+  }
+
+  const deadlineText = rsvpDeadline ? (() => {
+    const dl = new Date(rsvpDeadline + 'T12:00:00')
+    const fmt = new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(dl)
+    return locale === 'en' ? `Please respond before ${fmt}.` : `Merci de répondre avant le ${fmt}.`
+  })() : ''
+
+  return (
+    <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 16px' }}>
+      {/* Titre */}
+      <div style={{ textAlign: 'center', marginBottom: 24 }}>
+        <div style={{ fontFamily: FP, fontSize: 11, letterSpacing: 5, textTransform: 'uppercase', color: accent, marginBottom: 12 }}>
+          {locale === 'en' ? 'RSVP' : 'CARTON-RÉPONSE'}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 16 }}>
+          <div style={{ width: 40, height: 0.5, background: accent, opacity: 0.3 }} />
+          <span style={{ color: accent, fontSize: 10, opacity: 0.4 }}>✦</span>
+          <div style={{ width: 40, height: 0.5, background: accent, opacity: 0.3 }} />
+        </div>
+        <p style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: textColor, lineHeight: 1.7, opacity: 0.8, margin: 0 }}>
+          {rsvpText || (locale === 'en' ? 'Your presence would mean the world to us.' : 'Votre présence à nos côtés serait un immense bonheur.')}
+        </p>
+        {deadlineText && <p style={{ fontFamily: FC, fontSize: 12, color: accent, marginTop: 8 }}>{deadlineText}</p>}
+      </div>
+
+      {/* Nom */}
+      <div style={{ marginBottom: 24 }}>
+        <label style={{ fontFamily: FP, fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: accent, display: 'block', marginBottom: 6 }}>
+          {locale === 'en' ? 'Your name' : 'Votre nom'}
+        </label>
+        <input value={nom} onChange={e => setNom(e.target.value)} placeholder={locale === 'en' ? 'First and last name' : 'Prénom et nom'}
+          style={{ width: '100%', padding: '12px 16px', borderRadius: 8, border: `1.5px solid ${accent}33`, background: 'white', fontFamily: FC, fontSize: 15, color: textColor, outline: 'none', boxSizing: 'border-box' }} />
+      </div>
+
+      {/* Cérémonies */}
+      {ceremonies.map((c, idx) => {
+        const present = reponses[idx]
+        const nb = nbPersonnes[idx] || 1
+        const accs = accompagnants[idx] || []
+        return (
+          <div key={idx} style={{ marginBottom: 24, paddingBottom: 24, borderBottom: idx < ceremonies.length - 1 ? `1px solid ${accent}15` : 'none' }}>
+            <div style={{ fontFamily: FP, fontSize: 16, color: textColor, fontWeight: 600, marginBottom: 12 }}>{getCeremonyName(c)}</div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button type="button" onClick={() => togglePresent(idx, true)} style={{
+                flex: 1, padding: '11px 0', borderRadius: 8, fontFamily: FC, fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                border: `1.5px solid ${present === true ? accent : `${accent}33`}`,
+                background: present === true ? accent : 'white',
+                color: present === true ? 'white' : accent,
+                transition: 'all 0.2s',
+              }}>
+                ✓ {locale === 'en' ? 'Will attend' : 'Présent'}
+              </button>
+              <button type="button" onClick={() => togglePresent(idx, false)} style={{
+                flex: 1, padding: '11px 0', borderRadius: 8, fontFamily: FC, fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                border: `1.5px solid ${present === false ? '#d45050' : `${accent}33`}`,
+                background: present === false ? '#d45050' : 'white',
+                color: present === false ? 'white' : '#d45050',
+                transition: 'all 0.2s',
+              }}>
+                ✗ {locale === 'en' ? 'Absent' : 'Absent'}
+              </button>
+            </div>
+
+            {/* Nombre de personnes + accompagnants (si présent) */}
+            {present === true && (
+              <div style={{ marginTop: 14, padding: '14px 16px', background: `${accent}08`, borderRadius: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: accs.length > 0 || nb > 1 ? 12 : 0 }}>
+                  <span style={{ fontFamily: FC, fontSize: 13, color: textColor }}>{locale === 'en' ? 'Guests:' : 'Personnes :'}</span>
+                  <button type="button" onClick={() => setNbPersonnes(p => ({ ...p, [idx]: Math.max(1, nb - 1) }))} style={{ width: 28, height: 28, borderRadius: 9999, border: `1px solid ${accent}44`, background: 'white', color: accent, fontSize: 16, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
+                  <span style={{ fontFamily: FP, fontSize: 16, fontWeight: 700, color: accent, minWidth: 20, textAlign: 'center' }}>{nb}</span>
+                  <button type="button" onClick={() => setNbPersonnes(p => ({ ...p, [idx]: nb + 1 }))} style={{ width: 28, height: 28, borderRadius: 9999, border: `1px solid ${accent}44`, background: 'white', color: accent, fontSize: 16, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
+                </div>
+                {nb > 1 && Array.from({ length: nb - 1 }).map((_, j) => (
+                  <input key={j} value={accs[j] || ''} onChange={e => {
+                    const u = [...accs]; u[j] = e.target.value; setAccompagnants(p => ({ ...p, [idx]: u }))
+                  }} placeholder={`${locale === 'en' ? 'Guest' : 'Accompagnant'} ${j + 2}`}
+                  style={{ width: '100%', padding: '8px 12px', borderRadius: 6, border: `1px solid ${accent}22`, fontFamily: FC, fontSize: 13, color: textColor, marginBottom: 6, boxSizing: 'border-box', outline: 'none' }} />
+                ))}
+              </div>
+            )}
+          </div>
+        )
+      })}
+
+      {/* Message */}
+      <div style={{ marginBottom: 24 }}>
+        <label style={{ fontFamily: FP, fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: accent, display: 'block', marginBottom: 6 }}>
+          {locale === 'en' ? 'A word for the couple' : 'Un mot pour les mariés'} <span style={{ opacity: 0.5 }}>(optionnel)</span>
+        </label>
+        <textarea value={message} onChange={e => e.target.value.length <= 300 && setMessage(e.target.value)} placeholder={locale === 'en' ? 'With all our love...' : 'Avec toute notre affection…'} rows={3}
+          style={{ width: '100%', padding: '12px 16px', borderRadius: 8, border: `1.5px solid ${accent}33`, background: 'white', fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: textColor, resize: 'vertical', outline: 'none', boxSizing: 'border-box' }} />
+      </div>
+
+      {/* Erreur */}
+      {error && <p style={{ color: '#d45050', fontSize: 13, textAlign: 'center', marginBottom: 12 }}>{error}</p>}
+
+      {/* Bouton envoyer */}
+      <div style={{ textAlign: 'center' }}>
+        <button type="button" onClick={send} disabled={sending} style={{
+          fontFamily: FP, fontSize: 12, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase',
+          padding: '16px 48px', borderRadius: 2, border: 'none', cursor: sending ? 'not-allowed' : 'pointer',
+          background: `linear-gradient(135deg, ${accent}, ${accent}cc)`, color: 'white',
+          boxShadow: `0 4px 20px ${accent}44`, opacity: sending ? 0.7 : 1,
+        }}>
+          {sending ? '...' : (locale === 'en' ? 'SEND MY RESPONSE' : 'ENVOYER MA RÉPONSE')}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ── SharedPageContent ─────────────────────────────────────────────────────────
 function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute, onUpdate }: SharedPageContentProps) {
   const { t, locale } = useT()
   const contentRef = useRef<HTMLDivElement>(null)
@@ -5753,54 +5931,10 @@ const firstDate = sorted[0]?.date
           </div>
         )}
 
-        {/* SECTION 5 : Carton-réponse intégré */}
+        {/* SECTION 5 : Carton-réponse intégré complet */}
         {role === 'guest' && (
-          <section id="rsvp-section" style={{ paddingTop: 60, paddingBottom: 52, borderBottom: `1px solid ${G}1a`, scrollMarginTop: 60 }}>
-            <AnimSection animStyle={anim}>
-              <div style={{ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>
-                {locale === 'en' ? 'RSVP' : 'CARTON-RÉPONSE'}
-              </div>
-              <OrnSep />
-              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, marginBottom: 24, lineHeight: 1.8, opacity: 0.85, textAlign: 'center' }}>
-                {data.textOverrides?.['global_rsvpText'] || (locale === 'en'
-                  ? 'Your presence would mean the world to us.'
-                  : 'Votre présence à nos côtés serait un immense bonheur.')}
-              </div>
-              {/* Liste des cérémonies avec checkboxes */}
-              <div style={{ maxWidth: 440, margin: '0 auto' }}>
-                {sorted.map((ceremony, idx) => {
-                  const cName = ceremony.type === 'Autre' ? (ceremony.customName || 'Événement') : (
-                    ceremony.type === 'Cérémonie religieuse / Houppa' ? 'La Houppa / Soirée' :
-                    ceremony.type === 'Mairie' ? 'La Mairie' :
-                    ceremony.type === 'Shabbat Hatan' ? 'Le Shabbat' :
-                    ceremony.type === 'Henné' ? 'Le Henné' :
-                    ceremony.type === 'Cocktail' ? 'Le Cocktail' :
-                    ceremony.type === 'Soirée' ? 'La Soirée' :
-                    ceremony.type
-                  )
-                  return (
-                    <div key={idx} style={{ paddingBottom: 20, marginBottom: 20, borderBottom: idx < sorted.length - 1 ? `1px solid ${G}22` : 'none' }}>
-                      <div style={{ fontFamily: FP, fontSize: 18, color: TEXT, fontWeight: 700, marginBottom: 12 }}>{cName}</div>
-                      <div style={{ display: 'flex', gap: 16 }}>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                          <input type="checkbox" style={{ width: 18, height: 18, accentColor: G }} />
-                          <span style={{ fontFamily: FC, fontSize: 14, color: G }}>{locale === 'en' ? 'Will attend' : 'Seront présents'}</span>
-                        </label>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                          <input type="checkbox" style={{ width: 18, height: 18, accentColor: G }} />
-                          <span style={{ fontFamily: FC, fontSize: 14, color: G }}>{locale === 'en' ? 'Will not attend' : 'Ne seront pas présents'}</span>
-                        </label>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-              <div style={{ textAlign: 'center', marginTop: 8 }}>
-                <button onClick={onRsvpOpen} style={{ ...BTN, background: `${G}cc`, color: 'white', border: 'none', borderRadius: 8, padding: '14px 40px', fontFamily: FP, fontSize: 13, fontWeight: 700, letterSpacing: 2 }}>
-                  {locale === 'en' ? 'Next' : 'Suivant'}
-                </button>
-              </div>
-            </AnimSection>
+          <section id="rsvp-section" style={{ paddingTop: 60, paddingBottom: 52, scrollMarginTop: 60 }}>
+            <InlineRSVP ceremonies={sorted} accent={G} textColor={TEXT} shareId={_lastShareId} mariee1={data.marie1Prenom} mariee2={data.marie2Prenom} rsvpText={data.textOverrides?.['global_rsvpText']} rsvpDeadline={data.rsvpDeadline} locale={locale} />
           </section>
         )}
 
