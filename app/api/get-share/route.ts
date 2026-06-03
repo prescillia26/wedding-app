@@ -13,12 +13,17 @@ export async function GET(request: Request) {
     if (!id || !/^[0-9a-f-]+$/i.test(id)) {
       return Response.json({ error: 'ID invalide' }, { status: 400 })
     }
-    const data = await redis.get<Record<string, unknown>>(id)
+    let data = await redis.get<Record<string, unknown>>(id)
     if (!data) {
       return Response.json({ error: 'Faire-part introuvable' }, { status: 404 })
     }
-    // Debug: loguer les champs logo pour diagnostiquer
-    console.log('[get-share] id:', id, 'customLogoUrl:', data.customLogoUrl || '(vide)', 'luxeMonogramUrl:', data.luxeMonogramUrl || '(vide)')
+    // Si cet ID est un ancien doublon, charger les données du nouvel ID canonique
+    if (data.canonicalId && typeof data.canonicalId === 'string') {
+      const canonical = await redis.get<Record<string, unknown>>(data.canonicalId)
+      if (canonical) {
+        data = canonical
+      }
+    }
     // Retourner ownerEmail SEULEMENT si le requester est le propriétaire
     const session = await getSession()
     if (session?.email && data.ownerEmail === session.email) {
