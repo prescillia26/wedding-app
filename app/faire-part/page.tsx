@@ -2187,10 +2187,40 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
         </div>
       </AccordionSection>
 
-      <AccordionSection title={locale === 'en' ? '✒️ Custom logo' : '✒️ Logo personnalisé'}>
-        <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 10, lineHeight: 1.5 }}>
-          {locale === 'en' ? 'Upload your own logo if you have one (optional).' : 'Importez votre propre logo si vous en avez un (optionnel).'}
-        </p>
+      <AccordionSection title={locale === 'en' ? '✒️ Initials' : '✒️ Initiales'} defaultOpen>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 14 }}>
+          {([
+            { key: 'cercle', label: locale === 'en' ? 'Intertwined' : 'Entrelacé' },
+            { key: 'enlace', label: locale === 'en' ? 'Calligraphy' : 'Calligraphie' },
+            { key: 'couronne', label: locale === 'en' ? 'Circle' : 'Cercle' },
+            { key: 'branches', label: locale === 'en' ? 'Vertical' : 'Vertical' },
+            { key: 'losange', label: locale === 'en' ? 'Chic' : 'Chic' },
+            { key: 'minimaliste', label: locale === 'en' ? 'Baroque' : 'Baroque' },
+          ] as { key: string; label: string }[]).map(opt => {
+            const sel = (data.monogrammeStyle || 'cercle') === opt.key
+            const previewColor = data.monogrammeColor || THEMES[data.style].accent
+            const mi1 = (data.marie1Prenom || 'S')[0].toUpperCase()
+            const mi2 = (data.marie2Prenom || 'D')[0].toUpperCase()
+            return (
+              <button key={opt.key} type="button" onClick={() => onChange({ monogrammeStyle: opt.key })} style={{
+                ...BTN, padding: '10px 4px 6px', borderRadius: 10,
+                border: `2px solid ${sel ? THEMES[data.style].accent : '#e0d5c8'}`,
+                background: sel ? `${THEMES[data.style].accent}10` : 'white',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 55, overflow: 'visible' }}>
+                  <MonogramByStyle initial1={mi1} initial2={mi2} color={previewColor} size={50} style={opt.key} />
+                </div>
+                <span style={{ fontSize: 8, color: sel ? THEMES[data.style].accent : '#6a5040', fontWeight: sel ? 700 : 400 }}>{opt.label}</span>
+              </button>
+            )
+          })}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0 10px' }}>
+          <div style={{ flex: 1, height: 1, background: '#e5d5c5' }} />
+          <span style={{ fontSize: 11, color: '#9ca3af', fontStyle: 'italic' }}>{locale === 'en' ? 'or upload your logo' : 'ou importez votre logo'}</span>
+          <div style={{ flex: 1, height: 1, background: '#e5d5c5' }} />
+        </div>
         <CustomLogoUpload logoUrl={data.customLogoUrl} logoSize={data.customLogoSize} logoColor={data.customLogoColor} onChange={onChange} accent={THEMES[data.style].accent} />
       </AccordionSection>
 
