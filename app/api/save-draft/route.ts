@@ -25,18 +25,6 @@ export async function POST(request: Request) {
     // Sauvegarder le brouillon (expiration 1 an)
     await redis.set(`draft:${shareId}`, { formData }, { ex: 60 * 60 * 24 * 365 })
 
-    // ✅ Aussi mettre à jour la version publiée (visible par les invités)
-    if (published) {
-      const updated = {
-        ...published,
-        ...formData,
-        ownerEmail: published.ownerEmail,
-        slug: published.slug,
-        ogVersion: Date.now(),
-      }
-      await redis.set(shareId, updated, { ex: 60 * 60 * 24 * 365 })
-    }
-
     return Response.json({ ok: true })
   } catch (err) {
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })

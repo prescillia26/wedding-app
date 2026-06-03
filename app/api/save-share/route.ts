@@ -49,6 +49,11 @@ export async function POST(request: Request) {
     shareData.ogVersion = Date.now()
     await redis.set(id, shareData, { ex: 31536000 })
 
+    // ✅ Vérification : relire immédiatement ce qui a été sauvé pour confirmer
+    const verification = await redis.get<Record<string, unknown>>(id)
+    console.log('[save-share] VERIFICATION après écriture — customLogoUrl:', verification?.customLogoUrl || '(ABSENT!)')
+    console.log('[save-share] VERIFICATION — nombre de clés:', verification ? Object.keys(verification).length : 0)
+
     // Sauvegarder un snapshot initial (uniquement à la première génération)
     const initialExists = await redis.exists(`${id}:initial`)
     if (!initialExists) {

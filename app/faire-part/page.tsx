@@ -6093,6 +6093,17 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
         console.warn('[handleShare] ID changé :', existingId, '→', json.id)
       }
       const id = json.id
+      // ✅ Vérification : relire ce qui a été sauvé pour confirmer que le logo est bien là
+      try {
+        const verif = await fetch(`/api/get-share?id=${id}`).then(r => r.json())
+        console.log('[handleShare] VÉRIFICATION après sauvegarde — customLogoUrl:', verif.customLogoUrl || '(ABSENT!)')
+        if (dataToSend.customLogoUrl && !verif.customLogoUrl) {
+          console.error('[handleShare] ⚠️ LOGO PERDU ! Envoyé:', dataToSend.customLogoUrl, 'Reçu: (vide)')
+          // Tentative de re-sauvegarde forcée
+          await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...dataToSend, fixedId: id }) })
+          console.log('[handleShare] Re-sauvegarde forcée effectuée')
+        }
+      } catch { /* ignore verification errors */ }
       setLastShareId(id)
       try { localStorage.setItem('lovit_share_id', id) } catch { /* ignore */ }
       const base = window.location.origin + '/faire-part?share=' + id
