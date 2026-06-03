@@ -89,13 +89,17 @@ export default function InvitationCover({
         {/* Logo importé ou Monogramme CSS */}
         {logoUrl ? (() => {
           const colorToUse = logoColor || accent.replace('#', '')
-          const colorizedUrl = logoUrl.includes('cloudinary.com') && colorToUse
-            ? logoUrl.replace('/upload/', `/upload/e_grayscale/e_tint:100:${colorToUse.replace('#', '')}:0p/`)
-            : logoUrl
+          let displayUrl = logoUrl
+          if (logoUrl.includes('cloudinary.com')) {
+            const hex = colorToUse.replace('#', '')
+            displayUrl = hex
+              ? logoUrl.replace('/upload/', `/upload/e_background_removal/e_grayscale/e_tint:100:${hex}:0p/`)
+              : logoUrl.replace('/upload/', '/upload/e_background_removal/')
+          }
           return (
             <div style={{ marginBottom: 28 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={colorizedUrl} alt="" style={{ width: 120, height: 120, objectFit: 'contain', display: 'inline-block' }} />
+              <img src={displayUrl} alt="" style={{ width: 120, height: 120, objectFit: 'contain', display: 'inline-block' }} />
             </div>
           )
         })() : (

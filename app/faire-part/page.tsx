@@ -1750,22 +1750,14 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
     if (file.size > 5 * 1024 * 1024) { showToast(t.fairepart.errorFileTooLarge, 'error'); return }
     setUploading(true)
     try {
-      // Si le fichier est déjà un PNG, vérifier s'il a de la transparence
-      // Si oui, ne pas toucher au fond — l'utilisateur l'a déjà préparé
-      let blobToUpload: Blob = file
-      const isPng = file.type === 'image/png'
-      if (!isPng) {
-        // Seulement supprimer le fond pour les images non-PNG (JPG, etc.)
-        blobToUpload = await removeBackground(file)
-      }
-
+      // Upload le fichier tel quel sur Cloudinary (la suppression de fond se fait via l'URL de transformation)
       const fd = new (globalThis.FormData)()
-      fd.append('file', blobToUpload)
+      fd.append('file', file)
       fd.append('upload_preset', 'wedding_music')
       const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
       const json = await res.json()
       if (json.secure_url) {
-        // Forcer le format PNG dans l'URL pour préserver la transparence
+        // Forcer le format PNG pour la transparence
         const pngUrl = json.secure_url.replace(/\.\w+$/, '.png')
         onChange({ customLogoUrl: pngUrl })
       }
@@ -1791,8 +1783,10 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
       { value: '#000000', label: 'Noir', swatch: '#000000' },
     ]
     const previewSize = Math.min(220, 140 * (logoSize / 100))
-    const imgSrc = logoColor && logoUrl?.includes('cloudinary.com')
-      ? logoUrl.replace('/upload/', `/upload/e_grayscale/e_tint:100:${logoColor.replace('#', '')}:0p/`)
+    const imgSrc = logoUrl?.includes('cloudinary.com')
+      ? logoColor
+        ? logoUrl!.replace('/upload/', `/upload/e_background_removal/e_grayscale/e_tint:100:${logoColor.replace('#', '')}:0p/`)
+        : logoUrl!.replace('/upload/', '/upload/e_background_removal/')
       : logoUrl!
     return (
       <div style={{ textAlign: 'center' }}>
@@ -2859,13 +2853,18 @@ function renderCard(ceremony: Ceremony, data: FormData, theme: ThemeObj, photoId
 function CustomLogo({ url, size, scale = 100, color }: { url: string; size: number; scale?: number; color?: string }) {
   const s = size * (scale / 100)
   let src = url
-  if (color && url.includes('cloudinary.com')) {
-    const hex = color.replace('#', '')
-    // Cloudinary : d'abord rendre le logo en niveaux de gris, puis coloriser
-    src = url.replace('/upload/', `/upload/e_grayscale/e_tint:100:${hex}:0p/`)
+  if (url.includes('cloudinary.com')) {
+    if (color) {
+      const hex = color.replace('#', '')
+      // Cloudinary : supprimer le fond + niveaux de gris + coloriser
+      src = url.replace('/upload/', `/upload/e_background_removal/e_grayscale/e_tint:100:${hex}:0p/`)
+    } else {
+      // Supprimer le fond uniquement
+      src = url.replace('/upload/', '/upload/e_background_removal/')
+    }
   }
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={src} alt="Logo" style={{ width: s, height: s, objectFit: 'contain', background: 'transparent' }} />
+  return <img src={src} alt="Logo" style={{ width: s, height: s, objectFit: 'contain' }} />
 }
 
 function LogoOrMonogram({ data, theme }: { data: FormData; theme: ThemeObj }) {
