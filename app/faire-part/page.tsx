@@ -1784,59 +1784,49 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
       { value: '#2a9a6a', label: 'Menthe', swatch: '#2a9a6a' },
       { value: '#000000', label: 'Noir', swatch: '#000000' },
     ]
-    const previewSize = 120 * (logoSize / 100)
+    const previewSize = Math.min(220, 140 * (logoSize / 100))
+    const imgSrc = logoColor && logoUrl?.includes('cloudinary.com')
+      ? logoUrl.replace('/upload/', `/upload/e_grayscale/e_tint:100:${logoColor.replace('#', '')}:0p/`)
+      : logoUrl!
     return (
       <div style={{ textAlign: 'center' }}>
-        <p style={{ fontSize: 12, fontWeight: 600, color: '#3a3330', marginBottom: 8 }}>Votre logo</p>
-        <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 160, height: 160, borderRadius: 8, border: '1px solid #e5d5c5', background: 'repeating-conic-gradient(#f0f0f0 0% 25%, white 0% 50%) 0 0 / 16px 16px' }}>
+        {/* Preview — pas de cadre, fond propre */}
+        <div style={{ marginBottom: 16 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={logoColor && logoUrl?.includes('cloudinary.com') ? logoUrl.replace('/upload/', `/upload/e_grayscale/e_tint:100:${logoColor.replace('#', '')}:0p/`) : logoUrl!} alt="Logo" style={{ width: previewSize, height: previewSize, objectFit: 'contain' }} />
+          <img src={imgSrc} alt="Logo" style={{ width: previewSize, height: previewSize, objectFit: 'contain', display: 'inline-block' }} />
         </div>
 
-        {/* Réglages avancés */}
-        <div style={{ marginTop: 16, padding: '14px 16px', border: '1px solid #e5d5c5', borderRadius: 12, background: '#fefcf8', textAlign: 'left' }}>
-          <p style={{ fontSize: 11, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>{t.fairepart.logoAdvanced}</p>
-
-          {/* Taille */}
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-              <span style={{ fontSize: 12, color: '#3a3330' }}>{t.fairepart.logoSize}</span>
-              <span style={{ fontSize: 11, color: '#9ca3af' }}>{logoSize}%</span>
-            </div>
-            <input type="range" min={50} max={150} step={5} value={logoSize} onChange={e => onChange({ customLogoSize: Number(e.target.value) })} style={{ width: '100%', accentColor: accent }} />
-          </div>
-
-          {/* Couleur */}
-          <div>
-            <span style={{ fontSize: 12, color: '#3a3330', display: 'block', marginBottom: 8 }}>{t.fairepart.logoColor}</span>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              {LOGO_COLORS.map(opt => {
-                const sel = logoColor === opt.value
-                return (
-                  <button key={opt.label} type="button" onClick={() => onChange({ customLogoColor: opt.value })} style={{
-                    cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
-                    padding: '4px 6px', borderRadius: 8,
-                    border: `2px solid ${sel ? accent : 'transparent'}`,
-                    background: sel ? `${accent}12` : 'transparent',
-                  }}>
-                    {opt.swatch ? (
-                      <div style={{ width: 22, height: 22, borderRadius: '50%', background: opt.swatch, border: `1px solid ${opt.swatch === '#FFFFFF' ? '#d1d5db' : opt.swatch}`, boxShadow: sel ? `0 0 0 2px white, 0 0 0 3px ${accent}` : 'none' }} />
-                    ) : (
-                      <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'conic-gradient(#f87171, #facc15, #34d399, #60a5fa, #a78bfa, #f87171)', border: '1px solid #d1d5db', boxShadow: sel ? `0 0 0 2px white, 0 0 0 3px ${accent}` : 'none' }} />
-                    )}
-                    <span style={{ fontSize: 9, color: '#3a3330' }}>{opt.label}</span>
-                  </button>
-                )
-              })}
-            </div>
+        {/* Couleurs — directement visibles, changement en direct */}
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', justifyContent: 'center' }}>
+            {LOGO_COLORS.map(opt => {
+              const sel = logoColor === opt.value
+              return (
+                <button key={opt.label} type="button" onClick={() => onChange({ customLogoColor: opt.value })} style={{
+                  cursor: 'pointer', padding: 0, borderRadius: 9999, border: 'none', background: 'none',
+                }}>
+                  {opt.swatch ? (
+                    <div style={{ width: 26, height: 26, borderRadius: '50%', background: opt.swatch, border: sel ? `3px solid ${accent}` : '2px solid #e0d5c8', boxShadow: sel ? `0 0 0 2px white, 0 0 0 4px ${accent}` : 'none', transition: 'all 0.15s' }} />
+                  ) : (
+                    <div style={{ width: 26, height: 26, borderRadius: '50%', background: 'conic-gradient(#f87171, #facc15, #34d399, #60a5fa, #a78bfa, #f87171)', border: sel ? `3px solid ${accent}` : '2px solid #e0d5c8', boxShadow: sel ? `0 0 0 2px white, 0 0 0 4px ${accent}` : 'none', transition: 'all 0.15s' }} />
+                  )}
+                </button>
+              )
+            })}
           </div>
         </div>
 
-        <div style={{ marginTop: 10 }}>
-          <button type="button" onClick={() => onChange({ customLogoUrl: '', customLogoSize: 100, customLogoColor: '' })} style={{ cursor: 'pointer', background: 'transparent', border: `1px solid #e0d5c8`, borderRadius: 9999, padding: '6px 16px', fontSize: 11, color: '#d45050', fontWeight: 600 }}>
-            {t.fairepart.logoDelete}
-          </button>
+        {/* Taille */}
+        <div style={{ marginBottom: 14, padding: '0 20px' }}>
+          <input type="range" min={50} max={250} step={5} value={logoSize} onChange={e => onChange({ customLogoSize: Number(e.target.value) })} style={{ width: '100%', accentColor: accent }} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#9ca3af', marginTop: 2 }}>
+            <span>Petit</span><span>{logoSize}%</span><span>Grand</span>
+          </div>
         </div>
+
+        <button type="button" onClick={() => onChange({ customLogoUrl: '', customLogoSize: 100, customLogoColor: '' })} style={{ cursor: 'pointer', background: 'transparent', border: `1px solid #e0d5c8`, borderRadius: 9999, padding: '6px 16px', fontSize: 11, color: '#d45050', fontWeight: 600 }}>
+          {t.fairepart.logoDelete}
+        </button>
       </div>
     )
   }
