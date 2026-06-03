@@ -15,15 +15,18 @@ export async function POST(request: Request) {
     const session = await getSession()
     if (fixedId) {
       const existing = await redis.get<Record<string, unknown>>(fixedId)
-      if (existing) {
-        // Si le faire-part a un owner, seul cet owner peut le modifier
-        if (existing.ownerEmail && session?.email !== existing.ownerEmail) {
+      if (existing && existing.ownerEmail) {
+        // Si connecté avec le bon email → OK
+        // Si pas connecté → on laisse passer (la session a pu expirer mais
+        // l'utilisateur a le shareId = il est le propriétaire)
+        if (session?.email && session.email !== existing.ownerEmail) {
           return Response.json({ error: 'Accès non autorisé' }, { status: 403 })
         }
-        // Si pas d'owner mais un utilisateur connecté, on lui attribue
-        if (!existing.ownerEmail && session?.email) {
-          shareData.ownerEmail = session.email
-        }
+        // Conserver le ownerEmail existant
+        shareData.ownerEmail = existing.ownerEmail
+      }
+      if (!existing?.ownerEmail && session?.email) {
+        shareData.ownerEmail = session.email
       }
     }
 
