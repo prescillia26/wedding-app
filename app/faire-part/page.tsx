@@ -6727,12 +6727,11 @@ export default function FairePartPage() {
     return () => { cancelled = true }
   }, [])
 
-  // ✅ Sauvegarde serveur debounced
+  // ✅ Sauvegarde serveur debounced — publie aussi pour que les invités voient les modifs
   const saveToServer = useCallback((data: FormData) => {
-    if (!userEmail) return
-    // Trouver le shareId actif
+    // Trouver le shareId actif (pas besoin d'attendre userEmail — le serveur vérifie l'auth)
     const shareId = (() => { try { return localStorage.getItem('lovit_share_id') } catch { return null } })()
-    if (!shareId || !userFaireparts.includes(shareId)) return
+    if (!shareId) return
 
     if (serverSaveTimer.current) clearTimeout(serverSaveTimer.current)
     serverSaveTimer.current = setTimeout(async () => {
@@ -6746,12 +6745,12 @@ export default function FairePartPage() {
         if (res.ok) {
           setServerSavedAt(new Date())
         } else if (res.status === 401) {
-          showToast(t.fairepart.sessionExpired, 'error')
+          // Pas connecté — ignorer silencieusement (le localStorage sauvegarde quand même)
         }
       } catch { /* ignore */ }
       setServerSaving(false)
     }, 1000) // debounce 1 seconde
-  }, [userEmail, userFaireparts])
+  }, [])
 
   const update = useCallback((u: Partial<FormData>) => {
     setFormData(p => {

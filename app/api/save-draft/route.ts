@@ -13,9 +13,12 @@ export async function POST(request: Request) {
       return Response.json({ error: 'shareId et formData requis' }, { status: 400 })
     }
 
-    // Vérifier la propriété : le shareId doit appartenir à l'utilisateur
+    // Vérifier la propriété : via user.faireparts OU via ownerEmail du faire-part publié
     const user = await redis.get<User>(`user:${session.email}`)
-    if (!user || !user.faireparts.includes(shareId)) {
+    const published = await redis.get<Record<string, unknown>>(shareId)
+    const ownsViaUser = user?.faireparts?.includes(shareId)
+    const ownsViaPublished = published?.ownerEmail === session.email
+    if (!ownsViaUser && !ownsViaPublished) {
       return Response.json({ error: 'Accès non autorisé' }, { status: 403 })
     }
 
@@ -23,11 +26,7 @@ export async function POST(request: Request) {
     await redis.set(`draft:${shareId}`, { formData }, { ex: 60 * 60 * 24 * 365 })
 
     // ✅ Aussi mettre à jour la version publiée (visible par les invités)
-    // pour que les modifications soient immédiatement visibles
-    const published = await redis.get<Record<string, unknown>>(shareId)
     if (published) {
-      // Fusionner les données du formulaire dans la version publiée
-      // en conservant les métadonnées existantes (ownerEmail, slug, etc.)
       const updated = {
         ...published,
         ...formData,
