@@ -22,11 +22,11 @@ export async function POST(req: Request) {
       return Response.json({ error: 'Initiales invalides (une lettre A-Z chacune)' }, { status: 400 });
     }
 
-    // Rate limit : max 3 générations par couple d'initiales par heure
+    // Rate limit : max 20 générations par couple d'initiales par heure
     const rateLimitKey = `monogram-ratelimit:${i1}${i2}`;
     const attempts = await redis.incr(rateLimitKey);
     if (attempts === 1) await redis.expire(rateLimitKey, 3600);
-    if (attempts > 3) {
+    if (attempts > 20) {
       return Response.json({ error: 'Limite de régénération atteinte. Réessayez dans 1 heure.' }, { status: 429 });
     }
 
