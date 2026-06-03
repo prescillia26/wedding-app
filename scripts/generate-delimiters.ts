@@ -12,6 +12,7 @@ import { config } from 'dotenv';
 config({ path: '.env.local' });
 
 const TOKEN = process.env.REPLICATE_API_TOKEN;
+console.log('Token:', TOKEN ? TOKEN.slice(0, 8) + '...' : 'MISSING');
 if (!TOKEN) { console.error('REPLICATE_API_TOKEN manquant dans .env.local'); process.exit(1); }
 
 const PROMPTS: { id: string; name: string; category: string; prompt: string }[] = [
@@ -34,30 +35,35 @@ const PROMPTS: { id: string; name: string; category: string; prompt: string }[] 
 
 async function generateOne(prompt: string): Promise<string | null> {
   try {
-    console.log('  Generating...');
-    const res = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-dev/predictions', {
+    console.log('  Generating (flux-schnell)...');
+    const res = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${TOKEN}`,
         'Content-Type': 'application/json',
-        'Prefer': 'wait=120',
+        'Prefer': 'wait',
       },
       body: JSON.stringify({
         input: {
           prompt,
           num_outputs: 1,
-          aspect_ratio: '3:1',
+          aspect_ratio: '21:9',
           output_format: 'png',
-          output_quality: 95,
-          num_inference_steps: 28,
-          guidance: 3.5,
         },
       }),
     });
     const data = await res.json();
-    return data.output?.[0] || null;
+    if (data.error) {
+      console.error('  API error:', data.error);
+      return null;
+    }
+    if (!data.output?.[0]) {
+      console.error('  No output. Status:', data.status, 'Full response:', JSON.stringify(data).slice(0, 200));
+      return null;
+    }
+    return data.output[0];
   } catch (err) {
-    console.error('  Generation failed:', err);
+    console.error('  Fetch failed:', (err as Error).message);
     return null;
   }
 }
