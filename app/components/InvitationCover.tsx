@@ -99,7 +99,7 @@ export default function InvitationCover({
           return (
             <div style={{ marginBottom: 28 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={displayUrl} alt="" style={{ maxWidth: 120, maxHeight: 120, objectFit: 'contain', display: 'inline-block' }} />
+              <img src={displayUrl} alt="" style={{ width: 120, height: 120, objectFit: 'contain', display: 'inline-block' }} />
             </div>
           )
         })() : (

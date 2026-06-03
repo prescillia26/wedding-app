@@ -1793,7 +1793,7 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
         {/* Preview — pas de cadre, fond propre */}
         <div style={{ marginBottom: 16 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imgSrc} alt="Logo" style={{ maxWidth: previewSize, maxHeight: previewSize, objectFit: 'contain', display: 'inline-block' }} />
+          <img src={imgSrc} alt="Logo" style={{ width: previewSize, height: previewSize, objectFit: 'contain', display: 'inline-block' }} />
         </div>
 
         {/* Couleurs — directement visibles, changement en direct */}
@@ -2862,7 +2862,7 @@ function CustomLogo({ url, size, scale = 100, color }: { url: string; size: numb
     }
   }
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={src} alt="Logo" style={{ maxWidth: s, maxHeight: s, objectFit: 'contain' }} />
+  return <img src={src} alt="Logo" style={{ width: s, height: s, objectFit: 'contain' }} />
 }
 
 function LogoOrMonogram({ data, theme }: { data: FormData; theme: ThemeObj }) {
