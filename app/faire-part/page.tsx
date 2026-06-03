@@ -6011,6 +6011,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
   const [coupleUrl, setCoupleUrl] = useState<string | null>(null)
   const [sharing, setSharing] = useState(false)
   const [sharingStatus, setSharingStatus] = useState('')
+  const [saving, setSaving] = useState(false)
   const [coverOpen, setCoverOpen] = useState(!isShared) // en mode édition, pas de cover
 
   // Ouvrir directement le modal RSVP si ?rsvp=1 dans l'URL
@@ -6057,7 +6058,38 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
     }
   }, [isShared])
 
- const handleShare = async () => {
+ // ✅ Enregistrer les modifications et mettre à jour la version publiée (visible par les invités)
+  const handleSave = async () => {
+    const existingId = (() => { try { return localStorage.getItem('lovit_share_id') } catch { return null } })()
+    if (!existingId) {
+      showToast('Aucun faire-part à enregistrer — partagez d\'abord', 'error')
+      return
+    }
+    if (saving) return
+    setSaving(true)
+    try {
+      const mergedData = { ...data, textOverrides: { ...data.textOverrides, ...textOverrides }, zoneStyles }
+      const photosDataToSend = (data.photosData ?? []).map(({ cropX, cropY, cropScale }) => ({ cropX, cropY, cropScale }))
+      const dataToSend = { ...mergedData, photosFond: data.photosFond ?? [], photoFond: (data.photosFond ?? [])[0] ?? '', photosData: photosDataToSend }
+      if (!dataToSend.slug || !dataToSend.slug.trim()) {
+        dataToSend.slug = generateAutoSlug(dataToSend.marie1Prenom, dataToSend.marie2Prenom)
+      }
+      const res = await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...dataToSend, fixedId: existingId }) })
+      const json = await res.json()
+      if (res.ok && json.id) {
+        setLastShareId(json.id)
+        showToast('Modifications enregistrées ! Les invités verront les changements.', 'success')
+      } else {
+        showToast('Erreur lors de l\'enregistrement : ' + (json.error || 'Réessayez'), 'error')
+      }
+    } catch {
+      showToast('Erreur réseau — vérifiez votre connexion', 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleShare = async () => {
     if (!isPaid) {
       window.location.href = '/paiement'
       return
@@ -6165,6 +6197,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
           <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
             <button onClick={onEdit} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>{t.fairepart.editBtn}</button>
             <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>{t.fairepart.textBtn}</button>
+            <button onClick={handleSave} disabled={saving} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: '#2a7d4f', color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: '0 4px 16px rgba(42,125,79,0.25)', opacity: saving ? 0.7 : 1 }}>{saving ? 'Enregistrement...' : 'Enregistrer'}</button>
             <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{sharing ? (sharingStatus || 'Chargement...') : t.common.share}</button>
             {lastShareId && (
               <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>📋 Réponses</button>
@@ -6241,6 +6274,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
         </div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
         <button onClick={onEdit} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>{t.fairepart.editBtn}</button>
+        <button onClick={handleSave} disabled={saving} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: '#2a7d4f', color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: '0 4px 16px rgba(42,125,79,0.25)', opacity: saving ? 0.7 : 1 }}>{saving ? 'Enregistrement...' : 'Enregistrer'}</button>
         <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: isPaid ? theme.accent : 'linear-gradient(135deg, #C9A84C, #e8c96a)', color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{!isPaid ? 'Débloquer le partage' : sharing ? (sharingStatus || 'Chargement...') : t.common.share}</button>
         {lastShareId && (
           <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>📋 Réponses</button>
