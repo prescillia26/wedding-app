@@ -1771,12 +1771,18 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
   if (logoUrl) {
     const LOGO_COLORS = [
       { value: '', label: 'Original', swatch: '' },
+      { value: '#c4829a', label: 'Rose Fleuri', swatch: '#c4829a' },
+      { value: '#C9A84C', label: 'Ivoire & Or', swatch: '#C9A84C' },
+      { value: '#2c4a7c', label: 'Bleu', swatch: '#2c4a7c' },
+      { value: '#7a9e6e', label: 'Champêtre', swatch: '#7a9e6e' },
+      { value: '#888888', label: 'Gris', swatch: '#888888' },
+      { value: '#e0e0e0', label: 'Blanc', swatch: '#e0e0e0' },
+      { value: '#d4a574', label: 'Chocolat', swatch: '#d4a574' },
+      { value: '#8b1a2a', label: 'Bordeaux', swatch: '#8b1a2a' },
+      { value: '#d4829a', label: 'Bordeaux Nuit', swatch: '#d4829a' },
+      { value: '#d4006a', label: 'Fuchsia', swatch: '#d4006a' },
+      { value: '#2a9a6a', label: 'Menthe', swatch: '#2a9a6a' },
       { value: '#000000', label: 'Noir', swatch: '#000000' },
-      { value: '#C9A84C', label: 'Doré', swatch: '#C9A84C' },
-      { value: '#FFFFFF', label: 'Blanc', swatch: '#FFFFFF' },
-      { value: '#D4A5A5', label: 'Rose', swatch: '#D4A5A5' },
-      { value: '#1B2845', label: 'Marine', swatch: '#1B2845' },
-      { value: '#7A9E6E', label: 'Sauge', swatch: '#7A9E6E' },
     ]
     const previewSize = 120 * (logoSize / 100)
     return (
