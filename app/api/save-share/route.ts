@@ -75,9 +75,11 @@ export async function POST(request: Request) {
           // Slug pris par un autre ID — vérifier si c'est le MÊME propriétaire
           const otherData = await redis.get<Record<string, unknown>>(existingSlugOwner)
           if (otherData?.ownerEmail && otherData.ownerEmail === shareData.ownerEmail) {
-            // Même propriétaire (ancien ID du même faire-part) → mettre à jour le slug vers le nouvel ID
+            // Même propriétaire (ancien ID du même faire-part) → mettre à jour le slug + syncer l'ancien ID
             console.log('[save-share] Slug réattribué:', slug, existingSlugOwner, '→', id)
             await redis.set(`slug:${slug}`, id, { ex: 31536000 })
+            // ✅ Aussi mettre à jour l'ancien ID pour que les liens déjà envoyés affichent les nouvelles données
+            await redis.set(existingSlugOwner, shareData, { ex: 31536000 })
           } else {
             // Propriétaire différent → ajouter un suffixe aléatoire
             const chars = 'abcdefghijkmnpqrstuvwxyz23456789'
