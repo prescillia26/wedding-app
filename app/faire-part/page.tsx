@@ -1750,11 +1750,17 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
     if (file.size > 5 * 1024 * 1024) { showToast(t.fairepart.errorFileTooLarge, 'error'); return }
     setUploading(true)
     try {
-      // Supprimer le fond côté client avant upload
-      const transparentBlob = await removeBackground(file)
+      // Si le fichier est déjà un PNG, vérifier s'il a de la transparence
+      // Si oui, ne pas toucher au fond — l'utilisateur l'a déjà préparé
+      let blobToUpload: Blob = file
+      const isPng = file.type === 'image/png'
+      if (!isPng) {
+        // Seulement supprimer le fond pour les images non-PNG (JPG, etc.)
+        blobToUpload = await removeBackground(file)
+      }
 
       const fd = new (globalThis.FormData)()
-      fd.append('file', transparentBlob)
+      fd.append('file', blobToUpload)
       fd.append('upload_preset', 'wedding_music')
       const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
       const json = await res.json()
@@ -1793,7 +1799,7 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
         {/* Preview — pas de cadre, fond propre */}
         <div style={{ marginBottom: 16 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imgSrc} alt="Logo" style={{ width: previewSize, height: previewSize, objectFit: 'contain', display: 'inline-block' }} />
+          <img src={imgSrc} alt="Logo" style={{ width: previewSize, height: previewSize, objectFit: 'contain', display: 'inline-block', background: 'transparent' }} />
         </div>
 
         {/* Couleurs — directement visibles, changement en direct */}
@@ -2859,7 +2865,7 @@ function CustomLogo({ url, size, scale = 100, color }: { url: string; size: numb
     src = url.replace('/upload/', `/upload/e_grayscale/e_tint:100:${hex}:0p/`)
   }
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={src} alt="Logo" style={{ width: s, height: s, objectFit: 'contain' }} />
+  return <img src={src} alt="Logo" style={{ width: s, height: s, objectFit: 'contain', background: 'transparent' }} />
 }
 
 function LogoOrMonogram({ data, theme }: { data: FormData; theme: ThemeObj }) {
