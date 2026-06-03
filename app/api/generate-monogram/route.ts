@@ -1,70 +1,110 @@
+import { redis } from '@/lib/redis'
+
 export const maxDuration = 120;
 
-const FRAME_STYLES: Record<string, string> = {
-  'art-nouveau': `An ornamental Art Nouveau decorative frame, symmetrical design with elegant swirls and flourishes, thin vector-like lines, empty center space for text, monochrome black ink on pure white background, vintage wedding crest border style`,
-  'laurel': `A circular laurel wreath made of delicate olive branches and leaves, empty center, classical Roman style, thin botanical vine details, monochrome black ink on pure white background, elegant and timeless`,
-  'botanical': `A lush circular botanical wreath frame with roses, peonies, olive branches and small flowers, empty center space, hand-drawn botanical illustration style, monochrome black ink on pure white background`,
-  'floral-circle': `A delicate circular ring of hand-drawn flowers (roses, peonies, cherry blossoms) and leaves, empty center space for text, romantic feminine style, monochrome black ink on pure white background`,
-  'minimal': `A very thin elegant circular line border with tiny ornamental details at top and bottom, ultra-minimal, almost invisible, sophisticated, monochrome black ink on pure white background, lots of empty space`,
-  'oriental': `An ornamental arch-shaped frame with geometric patterns inspired by Moroccan zellige tiles, empty center space, intricate but refined line work, monochrome black ink on pure white background`,
-}
-
-async function callReplicate(token: string, prompt: string): Promise<string | null> {
-  try {
-    const res = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'wait',
-      },
-      body: JSON.stringify({
-        input: { prompt, num_outputs: 1, aspect_ratio: '1:1', output_format: 'png' },
-      }),
-      signal: AbortSignal.timeout(45000), // 45s max par appel
-    });
-    const data = await res.json();
-    return data.output?.[0] || null;
-  } catch {
-    return null;
-  }
-}
-
 export async function POST(req: Request) {
+  // Feature flag
+  if (process.env.ENABLE_LUXE_PRO !== 'true') {
+    return Response.json({ error: 'Feature not enabled' }, { status: 404 });
+  }
+
   const token = process.env.REPLICATE_API_TOKEN;
   if (!token) {
-    return Response.json({ error: "Configuration serveur manquante" }, { status: 500 });
+    return Response.json({ error: 'Configuration serveur manquante' }, { status: 500 });
   }
 
   try {
-    const { style } = await req.json();
-    const styleKey = FRAME_STYLES[style] ? style : 'laurel';
-    const prompt = FRAME_STYLES[styleKey] + ". NO letters, NO text, NO initials inside the frame. The center must be completely EMPTY white space.";
+    const { initial1, initial2 } = await req.json();
+    const i1 = String(initial1 || '').charAt(0).toUpperCase();
+    const i2 = String(initial2 || '').charAt(0).toUpperCase();
 
-    // 2 images en parallèle (rapide + fiable)
-    const results = await Promise.allSettled([
-      callReplicate(token, prompt),
-      callReplicate(token, prompt),
-    ]);
+    if (!/^[A-Z]$/.test(i1) || !/^[A-Z]$/.test(i2)) {
+      return Response.json({ error: 'Initiales invalides (une lettre A-Z chacune)' }, { status: 400 });
+    }
 
-    const urls = results
-      .filter((r): r is PromiseFulfilledResult<string | null> => r.status === 'fulfilled')
-      .map(r => r.value)
-      .filter((url): url is string => !!url);
+    // Rate limit : max 3 générations par couple d'initiales par heure
+    const rateLimitKey = `monogram-ratelimit:${i1}${i2}`;
+    const attempts = await redis.incr(rateLimitKey);
+    if (attempts === 1) await redis.expire(rateLimitKey, 3600);
+    if (attempts > 3) {
+      return Response.json({ error: 'Limite de régénération atteinte. Réessayez dans 1 heure.' }, { status: 429 });
+    }
 
-    // Si aucune image, retry une fois
-    if (urls.length === 0) {
-      const retry = await callReplicate(token, prompt);
-      if (retry) urls.push(retry);
+    const prompt = [
+      `An elegant interlaced wedding monogram of the capital letters ${i1} and ${i2},`,
+      'letters intertwined and overlapping elegantly with ornamental curves and flourishes,',
+      'single elegant continuous line drawing,',
+      'Art Nouveau wedding crest style,',
+      'deep purple color on plain pure white background,',
+      'centered with lots of empty white space around,',
+      'vector-like clean precise lines, monochrome,',
+      'no text labels, no other elements, no shadow, no color variation',
+    ].join(' ');
+
+    // Générer 4 images avec Flux Dev (meilleure qualité que Schnell pour les lettres)
+    const urls: string[] = [];
+
+    const genPromises = Array.from({ length: 4 }, () =>
+      fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-dev/predictions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'wait=90',
+        },
+        body: JSON.stringify({
+          input: {
+            prompt,
+            num_outputs: 1,
+            aspect_ratio: '1:1',
+            output_format: 'png',
+            output_quality: 95,
+            num_inference_steps: 28,
+            guidance: 3.5,
+          },
+        }),
+        signal: AbortSignal.timeout(90000),
+      }).then(r => r.json()).then(d => d.output?.[0] || null).catch(() => null)
+    );
+
+    const results = await Promise.allSettled(genPromises);
+    for (const r of results) {
+      if (r.status === 'fulfilled' && r.value) urls.push(r.value);
     }
 
     if (urls.length === 0) {
-      return Response.json({ error: "La génération a échoué. Réessayez." }, { status: 500 });
+      return Response.json({ error: 'La génération a échoué. Réessayez.' }, { status: 500 });
     }
 
-    return Response.json({ images: urls });
+    // Détourage via background-remover pour chaque image
+    const transparentUrls: string[] = [];
+    for (const imgUrl of urls) {
+      try {
+        const bgRes = await fetch('https://api.replicate.com/v1/models/851-labs/background-remover/predictions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'wait=60',
+          },
+          body: JSON.stringify({ input: { image: imgUrl } }),
+          signal: AbortSignal.timeout(60000),
+        });
+        const bgData = await bgRes.json();
+        const transparentUrl = bgData.output;
+        if (transparentUrl) {
+          transparentUrls.push(typeof transparentUrl === 'string' ? transparentUrl : String(transparentUrl));
+        } else {
+          transparentUrls.push(imgUrl); // Fallback : image originale
+        }
+      } catch {
+        transparentUrls.push(imgUrl); // Fallback
+      }
+    }
+
+    return Response.json({ monograms: transparentUrls });
   } catch (err) {
-    console.error("Erreur génération cadre monogramme:", err);
-    return Response.json({ error: "Erreur lors de la génération" }, { status: 500 });
+    console.error('Erreur génération monogramme:', err);
+    return Response.json({ error: 'Erreur lors de la génération' }, { status: 500 });
   }
 }

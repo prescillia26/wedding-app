@@ -10,6 +10,7 @@ import MonogramGenerator from '../components/MonogramGenerator'
 import InvitationCover from '../components/InvitationCover'
 import type { Palette } from '@/lib/watercolorPrompt'
 import { toTitleCase } from '@/lib/titleCase'
+import { DELIMITERS } from '@/lib/delimiters'
 
 
 type Theme = 'rose-fleuri' | 'ivoire-or' | 'bleu-floral' | 'champetre' | 'blanc-gris' | 'noir-blanc' | 'chocolat' | 'bordeaux' | 'bordeaux-nuit' | 'fuchsia' | 'marine-or' | 'menthe'
@@ -319,6 +320,8 @@ interface FormData {
   luxeDressCode?: string // dress code optionnel (pack Luxe)
   luxeGiftsUrl?: string // lien liste de mariage (pack Luxe)
   luxeGiftsLabel?: string // label du lien (ex: "Notre liste sur Zankyou")
+  luxeDelimiterId?: string // id du délimiteur signature (pack Luxe Pro)
+  luxePalette?: string // palette Luxe Pro (lavande/rose/sauge/bleunuit)
 }
 
 type IllustrationKind = 'scene' | 'motif'
@@ -1897,6 +1900,45 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
             onSelect={url => onChange({ luxeMonogramUrl: url })}
           />
         </AccordionSection>
+
+        {process.env.NEXT_PUBLIC_ENABLE_LUXE_PRO === 'true' && (
+          <AccordionSection title={locale === 'en' ? '🌸 Signature delimiter' : '🌸 Délimiteur signature'}>
+            <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 12, lineHeight: 1.5 }}>
+              {locale === 'en'
+                ? 'Choose the decorative element between sections of your invitation.'
+                : 'Choisissez l\'élément décoratif entre les sections de votre faire-part.'}
+            </p>
+            {(['floral', 'geo', 'jewish'] as const).map(cat => {
+              const catLabel = cat === 'floral' ? (locale === 'en' ? 'Floral' : 'Floral') : cat === 'geo' ? (locale === 'en' ? 'Geometric' : 'Géométrique') : (locale === 'en' ? 'Jewish wedding' : 'Mariage juif')
+              const items = DELIMITERS.filter(d => d.category === cat)
+              return items.length > 0 ? (
+                <div key={cat} style={{ marginBottom: 14 }}>
+                  <div style={{ fontSize: 10, color: selectedLuxeColor.hex, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>{catLabel}</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+                    {items.map(d => {
+                      const sel = data.luxeDelimiterId === d.id
+                      return (
+                        <button key={d.id} type="button" onClick={() => onChange({ luxeDelimiterId: d.id })} style={{
+                          ...BTN, padding: 8, borderRadius: 8,
+                          border: `2px solid ${sel ? selectedLuxeColor.hex : '#e8e0d8'}`,
+                          background: sel ? `${selectedLuxeColor.hex}10` : 'white',
+                          textAlign: 'center',
+                        }}>
+                          {d.url ? (
+                            <img src={d.url} alt={d.name} style={{ width: '100%', height: 40, objectFit: 'contain', mixBlendMode: 'multiply' }} />
+                          ) : (
+                            <div style={{ height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, color: '#9a928a' }}>Bientôt</div>
+                          )}
+                          <div style={{ fontSize: 8, color: sel ? selectedLuxeColor.hex : '#6a5040', marginTop: 4 }}>{d.name}</div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ) : null
+            })}
+          </AccordionSection>
+        )}
 
         <AccordionSection title={locale === 'en' ? '💬 Our story' : '💬 Notre histoire'}>
           <Label>{locale === 'en' ? 'A personal note for your guests (optional)' : 'Un mot personnel pour vos invités (optionnel)'}</Label>
