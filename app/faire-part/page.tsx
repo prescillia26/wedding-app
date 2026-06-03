@@ -5753,31 +5753,51 @@ const firstDate = sorted[0]?.date
           </div>
         )}
 
-        {/* SECTION 5 : Confirmer sa présence (invités) */}
+        {/* SECTION 5 : Carton-réponse intégré */}
         {role === 'guest' && (
           <section id="rsvp-section" style={{ paddingTop: 60, paddingBottom: 52, borderBottom: `1px solid ${G}1a`, scrollMarginTop: 60 }}>
             <AnimSection animStyle={anim}>
               <div style={{ fontFamily: FP, fontSize: 12, letterSpacing: 4, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 14 }}>
-                {locale === 'en' ? 'Confirm your attendance' : 'Confirmez votre présence'}
+                {locale === 'en' ? 'RSVP' : 'CARTON-RÉPONSE'}
               </div>
               <OrnSep />
-              <div style={{ border: `1px solid ${G}33`, borderRadius: 4, padding: '32px 24px', textAlign: 'center' }}>
-                <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, marginBottom: 28, lineHeight: 1.8, opacity: 0.85 }}>
-                  {data.textOverrides?.['global_rsvpText'] || (() => {
-                    if (data.rsvpDeadline) {
-                      const dl = new Date(data.rsvpDeadline + 'T12:00:00')
-                      const fmt = new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(dl)
-                      return locale === 'en'
-                        ? `Your presence would mean the world to us. Please confirm your attendance before ${fmt} by clicking the button below.`
-                        : `Votre présence à nos côtés serait un immense bonheur. Merci de nous confirmer votre venue avant le ${fmt} en cliquant sur le bouton ci-dessous.`
-                    }
-                    return locale === 'en'
-                      ? 'Your presence would mean the world to us. Please confirm your attendance as soon as possible by clicking the button below.'
-                      : 'Votre présence à nos côtés serait un immense bonheur. Merci de nous confirmer votre venue dès que possible en cliquant sur le bouton ci-dessous.'
-                  })()}
-                </div>
-                <button onClick={onRsvpOpen} style={{ ...BTN, background: `linear-gradient(135deg,${G},${G}cc)`, color: 'white', border: 'none', borderRadius: 2, padding: '14px 48px', fontFamily: FP, fontSize: 12, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase' as const, boxShadow: `0 4px 20px ${G}44` }}>
-                  {locale === 'en' ? 'CONFIRM MY ATTENDANCE' : 'CONFIRMER MA PRÉSENCE'}
+              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, marginBottom: 24, lineHeight: 1.8, opacity: 0.85, textAlign: 'center' }}>
+                {data.textOverrides?.['global_rsvpText'] || (locale === 'en'
+                  ? 'Your presence would mean the world to us.'
+                  : 'Votre présence à nos côtés serait un immense bonheur.')}
+              </div>
+              {/* Liste des cérémonies avec checkboxes */}
+              <div style={{ maxWidth: 440, margin: '0 auto' }}>
+                {sorted.map((ceremony, idx) => {
+                  const cName = ceremony.type === 'Autre' ? (ceremony.customName || 'Événement') : (
+                    ceremony.type === 'Cérémonie religieuse / Houppa' ? 'La Houppa / Soirée' :
+                    ceremony.type === 'Mairie' ? 'La Mairie' :
+                    ceremony.type === 'Shabbat Hatan' ? 'Le Shabbat' :
+                    ceremony.type === 'Henné' ? 'Le Henné' :
+                    ceremony.type === 'Cocktail' ? 'Le Cocktail' :
+                    ceremony.type === 'Soirée' ? 'La Soirée' :
+                    ceremony.type
+                  )
+                  return (
+                    <div key={idx} style={{ paddingBottom: 20, marginBottom: 20, borderBottom: idx < sorted.length - 1 ? `1px solid ${G}22` : 'none' }}>
+                      <div style={{ fontFamily: FP, fontSize: 18, color: TEXT, fontWeight: 700, marginBottom: 12 }}>{cName}</div>
+                      <div style={{ display: 'flex', gap: 16 }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                          <input type="checkbox" style={{ width: 18, height: 18, accentColor: G }} />
+                          <span style={{ fontFamily: FC, fontSize: 14, color: G }}>{locale === 'en' ? 'Will attend' : 'Seront présents'}</span>
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                          <input type="checkbox" style={{ width: 18, height: 18, accentColor: G }} />
+                          <span style={{ fontFamily: FC, fontSize: 14, color: G }}>{locale === 'en' ? 'Will not attend' : 'Ne seront pas présents'}</span>
+                        </label>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+              <div style={{ textAlign: 'center', marginTop: 8 }}>
+                <button onClick={onRsvpOpen} style={{ ...BTN, background: `${G}cc`, color: 'white', border: 'none', borderRadius: 8, padding: '14px 40px', fontFamily: FP, fontSize: 13, fontWeight: 700, letterSpacing: 2 }}>
+                  {locale === 'en' ? 'Next' : 'Suivant'}
                 </button>
               </div>
             </AnimSection>
