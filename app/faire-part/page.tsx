@@ -6576,13 +6576,14 @@ export default function FairePartPage() {
           }
           setFormData(d)
           if (r === 'edit') {
-            // Mode édition : revenir au formulaire local (pas en mode partagé)
+            // Mode édition depuis Mon espace
             setIsShared(false)
             setRole(null)
             setShowCards(false)
             setStep(1)
-            // L'utilisateur vient de Mon espace = il a payé
             setIsPaid(true)
+            // Sauver le shareId pour les futures sauvegardes auto
+            try { localStorage.setItem('lovit_share_id', id) } catch { /* */ }
           } else {
             setShowCards(true)
           }
@@ -6657,8 +6658,10 @@ export default function FairePartPage() {
     // ⚠️ En mode partagé (?share=XXX), ne JAMAIS charger le brouillon de l'utilisateur connecté
     // pour ne pas écraser le faire-part partagé avec les données de l'utilisateur B
     const params = new URLSearchParams(window.location.search)
-    // En mode partagé guest, skip. Mais en mode edit (depuis Mon espace), vérifier l'auth
-    if (params.get('share') && params.get('role') !== 'edit') return
+    // En mode share (guest ou edit), skip le chargement de brouillon
+    // Le faire-part est déjà chargé via get-share dans le 1er useEffect
+    // On vérifie juste l'auth pour setIsPaid
+    const isShareMode = !!params.get('share')
 
     let cancelled = false
     async function checkAuth() {
@@ -6688,22 +6691,24 @@ export default function FairePartPage() {
         } catch { /* ignore */ }
 
         // Si connecté et qu'on a des faire-parts, tenter de charger le brouillon serveur
-        const faireparts: string[] = data.faireparts ?? []
-        if (faireparts.length > 0) {
-          // Charger le dernier faire-part
-          const shareId = faireparts[faireparts.length - 1]
-          try {
-            const draftRes = await fetch(`/api/get-draft?shareId=${shareId}`)
-            if (draftRes.ok) {
-              const draftData = await draftRes.json()
-              if (!cancelled && draftData.formData) {
-                setFormData(draftData.formData as FormData)
-                setHasDraft(true)
-                setAccessGranted(true)
-                setCheckingAccess(false)
+        // SAUF en mode share/edit (le faire-part est déjà chargé via get-share)
+        if (!isShareMode) {
+          const faireparts: string[] = data.faireparts ?? []
+          if (faireparts.length > 0) {
+            const shareId = faireparts[faireparts.length - 1]
+            try {
+              const draftRes = await fetch(`/api/get-draft?shareId=${shareId}`)
+              if (draftRes.ok) {
+                const draftData = await draftRes.json()
+                if (!cancelled && draftData.formData) {
+                  setFormData(draftData.formData as FormData)
+                  setHasDraft(true)
+                  setAccessGranted(true)
+                  setCheckingAccess(false)
+                }
               }
-            }
-          } catch { /* ignore */ }
+            } catch { /* ignore */ }
+          }
         }
       } catch { /* pas connecté, ignore */ }
     }
