@@ -6825,26 +6825,7 @@ export default function FairePartPage() {
     const onEdit = () => { try { localStorage.setItem('wedding-draft', JSON.stringify(formData)) } catch { /* ignore */ } setShowCards(false); setStep(4) }
     const onReset = () => { setFormData(defaultFormData); setShowCards(false); setStep(1); try { localStorage.removeItem('wedding-draft') } catch { /* ignore */ } }
 
-    if (isLuxePack && !isShared) {
-      // ── Pack Luxe : rendu multi-sections ──
-      return (
-        <div style={{ position: 'relative' }}>
-          {/* Bannière preview discrète (pas de watermark diagonal) */}
-          {!isPaid && (
-            <div style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(255,248,237,0.95)', backdropFilter: 'blur(8px)', borderBottom: '1px solid #e8e0d8', padding: '8px 16px', textAlign: 'center' }}>
-              <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: '#8a7860' }}>Aperçu de votre faire-part</span>
-              <button onClick={() => { window.location.href = '/paiement' }} style={{ marginLeft: 12, padding: '4px 14px', borderRadius: 9999, background: 'linear-gradient(135deg, #C9A84C, #e8c96a)', color: 'white', border: 'none', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Débloquer</button>
-            </div>
-          )}
-          <LuxeFairePartRenderer data={formData} renderCard={renderCard} />
-          <div style={{ position: 'sticky', bottom: 0, zIndex: 50, background: 'white', borderTop: '1px solid #e8e0d8', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center' }}>
-            <button onClick={onEdit} style={{ padding: '10px 20px', borderRadius: 9999, border: '1.5px solid #C9A84C', background: 'transparent', color: '#C9A84C', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Modifier</button>
-            <button onClick={() => { if (!isPaid) { window.location.href = '/paiement'; return } }} style={{ padding: '10px 20px', borderRadius: 9999, background: isPaid ? '#C9A84C' : 'linear-gradient(135deg, #C9A84C, #e8c96a)', color: 'white', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>{!isPaid ? 'Débloquer le partage' : 'Partager'}</button>
-          </div>
-        </div>
-      )
-    }
-
+    // Le rendu Premium ET Luxe passe par CardsView qui gère handleShare correctement
     return <CardsView data={formData} onEdit={onEdit} onReset={onReset} isShared={isShared} role={role} onUpdate={update} isPaid={isPaid} />
   }
 
