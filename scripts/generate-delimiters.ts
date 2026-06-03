@@ -15,19 +15,12 @@ const TOKEN = process.env.REPLICATE_API_TOKEN;
 console.log('Token:', TOKEN ? TOKEN.slice(0, 8) + '...' : 'MISSING');
 if (!TOKEN) { console.error('REPLICATE_API_TOKEN manquant dans .env.local'); process.exit(1); }
 
+// Seulement les 7 manquants (les 8 premiers sont déjà sur Cloudinary)
 const PROMPTS: { id: string; name: string; category: string; prompt: string }[] = [
-  { id: 'd01-violets', name: 'Bouquet de violettes', category: 'floral', prompt: 'horizontal ornamental divider, two violet flowers with curly leaves and elegant flourishes on each side, single thin elegant line drawing, deep purple ink on plain white background, vector-like clean lines, no text' },
-  { id: 'd02-olive', name: "Branche d'olivier", category: 'floral', prompt: 'horizontal olive branch divider, elegant, with leaves and small olives, deep purple ink on plain white background, vector clean lines, no text' },
-  { id: 'd03-rose-stem', name: 'Rose unique', category: 'floral', prompt: 'single long-stem rose lying horizontally, elegant fine ink line drawing, deep purple on plain white background, vector clean lines, no text' },
-  { id: 'd04-wisteria', name: 'Glycine cascadante', category: 'floral', prompt: 'small cascading wisteria garland horizontal, deep purple ink on plain white background, fine line illustration, no text' },
-  { id: 'd05-laurel', name: 'Couronne de laurier', category: 'floral', prompt: 'horizontal small laurel wreath divider, two branches forming a horizontal flourish, deep purple ink on white, fine line, no text' },
-  { id: 'd06-diamond', name: 'Diamant Art Nouveau', category: 'geo', prompt: 'elegant horizontal divider with central small diamond shape flanked by two thin lines with tiny curls at the ends, deep purple ink on white, Art Nouveau, no text' },
   { id: 'd07-magen', name: 'Étoile à 6 branches', category: 'geo', prompt: 'elegant six-pointed star centered with thin flanking lines, deep purple ink on white background, fine line illustration, no text' },
-  { id: 'd08-heart', name: 'Coeur fleuri', category: 'geo', prompt: 'small floral heart-shaped wreath horizontal divider, deep purple ink on white, fine flowers and leaves, no text' },
   { id: 'd09-crown', name: 'Couronne ornementale', category: 'geo', prompt: 'small ornamental crown silhouette centered horizontally with thin flanking lines, deep purple ink on white, fine lines, no text' },
   { id: 'd10-circle', name: 'Cercle de feuilles', category: 'geo', prompt: 'small circular wreath of olive leaves centered horizontally with two thin lines on each side, deep purple ink on white, fine illustration, no text' },
   { id: 'd11-doves', name: 'Deux colombes', category: 'jewish', prompt: 'two doves facing each other holding small wisteria flowers in their beaks, watercolor with fine purple ink linework, on plain white background, no text' },
-  { id: 'd12-rings', name: 'Bagues entrelacées', category: 'jewish', prompt: 'two elegant wedding rings interlocked horizontally with a tiny flower flourish on each side, deep purple ink line drawing on white, no text' },
   { id: 'd13-kiddush', name: 'Coupe de Kiddoush', category: 'jewish', prompt: 'ornamental kiddush cup centered with curls on each side, deep purple ink fine line drawing on white, no text' },
   { id: 'd14-candles', name: 'Bougies de Shabbat', category: 'jewish', prompt: 'two Shabbat candles in candlesticks side by side with subtle flame, deep purple ink fine illustration on white, no text' },
   { id: 'd15-hamsa', name: 'Hamsa stylisée', category: 'jewish', prompt: 'elegant Hamsa hand silhouette centered, deep purple ink fine ornamental line drawing on white, no text' },
