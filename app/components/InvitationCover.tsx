@@ -9,7 +9,6 @@ const CG = 'var(--font-cormorant-garamond)'
 export default function InvitationCover({
   prenom1,
   prenom2,
-  lieu,
   date,
   accent,
   fond,
@@ -64,7 +63,7 @@ export default function InvitationCover({
       transition: 'opacity 0.8s ease, transform 0.8s ease',
       pointerEvents: opened ? 'none' : 'auto',
     }}>
-      {/* Particules décoratives animées */}
+      {/* Animations */}
       <style>{`
         @keyframes coverFloat1 { 0%,100% { transform: translateY(0) rotate(0deg); opacity: 0.15; } 50% { transform: translateY(-20px) rotate(5deg); opacity: 0.3; } }
         @keyframes coverFloat2 { 0%,100% { transform: translateY(0) rotate(0deg); opacity: 0.1; } 50% { transform: translateY(-15px) rotate(-3deg); opacity: 0.2; } }
@@ -79,14 +78,8 @@ export default function InvitationCover({
       <div style={{ position: 'absolute', bottom: 40, right: 40, width: 60, height: 60, borderBottom: `1px solid ${accent}30`, borderRight: `1px solid ${accent}30`, animation: 'coverFloat1 7s ease infinite' }} />
 
       <div style={{ textAlign: 'center', padding: '0 32px', animation: 'coverFadeIn 1.2s ease both' }}>
-        {/* Petit séparateur haut */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 32 }}>
-          <div style={{ width: 40, height: 0.5, background: accent, opacity: 0.3 }} />
-          <span style={{ color: accent, fontSize: 10, opacity: 0.4 }}>✦</span>
-          <div style={{ width: 40, height: 0.5, background: accent, opacity: 0.3 }} />
-        </div>
 
-        {/* Logo importé ou Monogramme CSS */}
+        {/* Logo en gros */}
         {logoUrl ? (() => {
           const colorToUse = logoColor || accent.replace('#', '')
           let displayUrl = logoUrl
@@ -97,50 +90,41 @@ export default function InvitationCover({
               : logoUrl.replace('/upload/', '/upload/e_background_removal/e_trim/')
           }
           return (
-            <div style={{ marginBottom: 28 }}>
+            <div style={{ marginBottom: 32 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={displayUrl} alt="" style={{ width: 120, height: 120, objectFit: 'contain', display: 'inline-block' }} />
+              <img src={displayUrl} alt="" style={{ width: 180, height: 180, objectFit: 'contain', display: 'inline-block' }} />
             </div>
           )
         })() : (
-          <div style={{ marginBottom: 28 }}>
-            <span style={{ fontFamily: GV, fontSize: 56, color: accent }}>{p1[0]}</span>
-            <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 24, color: accent, margin: '0 6px', opacity: 0.5 }}>&</span>
-            <span style={{ fontFamily: GV, fontSize: 56, color: accent }}>{p2[0]}</span>
+          <div style={{ marginBottom: 32 }}>
+            <span style={{ fontFamily: GV, fontSize: 72, color: accent }}>{p1[0]}</span>
+            <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 28, color: accent, margin: '0 8px', opacity: 0.5 }}>&</span>
+            <span style={{ fontFamily: GV, fontSize: 72, color: accent }}>{p2[0]}</span>
           </div>
         )}
 
-        {/* Prénoms */}
-        <div style={{ marginBottom: 24 }}>
-          <span style={{ fontFamily: GV, fontSize: 'clamp(32px, 10vw, 52px)', color: accent }}>{p1}</span>
-          <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 20, color: accent, margin: '0 10px', opacity: 0.5 }}>&</span>
-          <span style={{ fontFamily: GV, fontSize: 'clamp(32px, 10vw, 52px)', color: accent }}>{p2}</span>
-        </div>
-
         {/* Séparateur */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 28 }}>
           <div style={{ width: 50, height: 0.5, background: accent, opacity: 0.3 }} />
           <span style={{ color: accent, fontSize: 8, opacity: 0.4 }}>✦</span>
           <div style={{ width: 50, height: 0.5, background: accent, opacity: 0.3 }} />
         </div>
 
-        {/* Lieu */}
-        {lieu && (
-          <div style={{ fontFamily: PD, fontSize: 13, color: accent, letterSpacing: 5, textTransform: 'uppercase', marginBottom: 8, opacity: 0.8 }}>
-            {lieu}
+        {/* Phrase — mariage de Prénom & Prénom */}
+        <div style={{ marginBottom: 32 }}>
+          <div style={{ fontFamily: PD, fontSize: 11, color: accent, letterSpacing: 4, textTransform: 'uppercase', marginBottom: 12, opacity: 0.6 }}>
+            Vous êtes conviés au mariage de
           </div>
-        )}
-
-        {/* Date */}
-        {date && (
-          <div style={{ fontFamily: PD, fontStyle: 'italic', fontSize: 13, color: accent, marginBottom: 32, opacity: 0.6 }}>
-            {new Date(date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+          <div>
+            <span style={{ fontFamily: GV, fontSize: 'clamp(32px, 10vw, 52px)', color: accent }}>{p1}</span>
+            <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 20, color: accent, margin: '0 10px', opacity: 0.5 }}>&</span>
+            <span style={{ fontFamily: GV, fontSize: 'clamp(32px, 10vw, 52px)', color: accent }}>{p2}</span>
           </div>
-        )}
+        </div>
 
         {/* Countdown */}
         {date && (
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 36 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 40 }}>
             {[
               { v: countdown.days, l: 'JOURS' },
               { v: countdown.hours, l: 'H' },
@@ -155,7 +139,7 @@ export default function InvitationCover({
           </div>
         )}
 
-        {/* Bouton "Découvrir votre invitation" */}
+        {/* Bouton Découvrir */}
         <button
           type="button"
           onClick={handleOpen}
