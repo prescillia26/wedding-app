@@ -138,7 +138,9 @@ const VIDEO_BACKGROUNDS: { id: string; label: string; url: string; textPosition:
   { id: 'vid-194', label: '🕯️ Nuit & chandeliers', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511813/194_kvvbyk.mp4', textPosition: 'center', needsOverlay: true, dark: true },
 ]
 
-const FRAMES_STRONG_BG = new Set(['frame-80', 'frame-107', 'frame-108', 'frame-vid-180', 'frame-vid-188', 'frame-vid-193', 'frame-vid-194'])
+const FRAMES_STRONG_BG = new Set(['frame-80', 'frame-84', 'frame-85', 'frame-107', 'frame-108', 'frame-vid-180', 'frame-vid-188', 'frame-vid-193', 'frame-vid-194'])
+// Frames qui doivent être affichés en contain (cadres décoratifs qui ne doivent pas être coupés)
+const FRAMES_CONTAIN = new Set(['frame-84', 'frame-85'])
 const FRAMES: { id: string; label: string; url: string | null; video?: boolean }[] = [
   { id: 'frame-02', label: '🤍 Roses Crème Haut/Bas', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/51_m9vx96.png' },
   { id: 'frame-03', label: '🌺 Cadre Floral Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/53_ho1gq8.png' },
@@ -2308,7 +2310,7 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
     <div style={{ position: 'relative', width: '100%', margin: 0, padding: 0, background: hasFrame ? '#ffffff' : themeCardBg, overflow: 'hidden' }}>
       {hasFrame && !isVideo && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: frameOpacity, transform: `scale(${frameSize / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
+        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: FRAMES_CONTAIN.has(frameId) ? 'contain' : 'cover', mixBlendMode: 'multiply', opacity: frameOpacity, transform: `scale(${frameSize / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
       )}
       {hasFrame && isVideo && (
         <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: frameOpacity, pointerEvents: 'none', zIndex: 1 }} />
@@ -5694,7 +5696,7 @@ const firstDate = sorted[0]?.date
                     <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
                   ) : hasFrame ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: data.frameOpacity ?? 1, transform: `scale(${(data.frameSize ?? 100) / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+                    <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: FRAMES_CONTAIN.has(data.frameId ?? '') ? 'contain' : 'cover', mixBlendMode: 'multiply', opacity: data.frameOpacity ?? 1, transform: `scale(${(data.frameSize ?? 100) / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
                   ) : usePhotoBg ? (
                     <>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
