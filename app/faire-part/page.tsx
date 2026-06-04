@@ -138,9 +138,14 @@ const VIDEO_BACKGROUNDS: { id: string; label: string; url: string; textPosition:
   { id: 'vid-194', label: '🕯️ Nuit & chandeliers', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511813/194_kvvbyk.mp4', textPosition: 'center', needsOverlay: true, dark: true },
 ]
 
-const FRAMES_STRONG_BG = new Set(['frame-80', 'frame-84', 'frame-85', 'frame-107', 'frame-108', 'frame-vid-180', 'frame-vid-188', 'frame-vid-193', 'frame-vid-194'])
+const FRAMES_STRONG_BG = new Set(['frame-80', 'frame-107', 'frame-108', 'frame-vid-180', 'frame-vid-188', 'frame-vid-193', 'frame-vid-194'])
 // Frames qui doivent être affichés en contain (cadres décoratifs qui ne doivent pas être coupés)
 const FRAMES_CONTAIN = new Set(['frame-84', 'frame-85'])
+// Padding personnalisé pour les cadres à bordure (texte bien intégré à l'intérieur)
+const FRAMES_CUSTOM_PADDING: Record<string, { v: number; h: number }> = {
+  'frame-84': { v: 12, h: 10 },
+  'frame-85': { v: 12, h: 10 },
+}
 const FRAMES: { id: string; label: string; url: string | null; video?: boolean }[] = [
   { id: 'frame-02', label: '🤍 Roses Crème Haut/Bas', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/51_m9vx96.png' },
   { id: 'frame-03', label: '🌺 Cadre Floral Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/53_ho1gq8.png' },
@@ -2318,7 +2323,7 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
       <OrnementCorner url={ornUrl} corner="top-right" size={130} />
       <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
       {/* Zone texte avec voile blanc semi-transparent derrière pour garantir la lisibilité sur cadres chargés */}
-      <div style={{ position: 'relative', zIndex: 10, paddingTop: `${framePaddingV}%`, paddingBottom: `${framePaddingV}%`, paddingLeft: `${framePaddingH}%`, paddingRight: `${framePaddingH}%`, textAlign: 'center', opacity: textOpacity, transform: textOffsetY ? `translateY(${textOffsetY}px)` : undefined }}>
+      <div style={{ position: 'relative', zIndex: 10, paddingTop: `${FRAMES_CUSTOM_PADDING[frameId]?.v ?? framePaddingV}%`, paddingBottom: `${FRAMES_CUSTOM_PADDING[frameId]?.v ?? framePaddingV}%`, paddingLeft: `${FRAMES_CUSTOM_PADDING[frameId]?.h ?? framePaddingH}%`, paddingRight: `${FRAMES_CUSTOM_PADDING[frameId]?.h ?? framePaddingH}%`, textAlign: 'center', opacity: textOpacity, transform: textOffsetY ? `translateY(${textOffsetY}px)` : undefined }}>
         {hasFrame && FRAMES_STRONG_BG.has(frameId) && (
           <div style={{ position: 'absolute', inset: '12% 18%', background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: -1 }} />
         )}
