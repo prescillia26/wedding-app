@@ -5400,6 +5400,9 @@ function InlineRSVP({ ceremonies, accent, textColor, shareId, mariee1, mariee2, 
           <span style={{ color: accent, fontSize: 10, opacity: 0.4 }}>✦</span>
           <div style={{ width: 40, height: 0.5, background: accent, opacity: 0.3 }} />
         </div>
+        <div style={{ fontFamily: GV, fontSize: 'clamp(26px, 7vw, 36px)', color: accent, marginBottom: 16, lineHeight: 1.3 }}>
+          {locale === 'en' ? "It's your turn to say yes!" : 'À votre tour de nous dire Oui\u00A0!'}
+        </div>
         <p style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: textColor, lineHeight: 1.7, opacity: 0.8, margin: 0 }}>
           {rsvpText || (locale === 'en' ? 'Your presence would mean the world to us.' : 'Votre présence à nos côtés serait un immense bonheur.')}
         </p>
@@ -5655,11 +5658,7 @@ const firstDate = sorted[0]?.date
             </div>
             </DraggableElement>
           )}
-          <DraggableElement id="button" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <button className="lovit-btn" onClick={canEdit ? undefined : handleDiscover} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '14px 40px', fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', boxShadow: `0 4px 20px ${G}44`, animation: 'sharedFadeIn 1s 0.8s ease forwards', opacity: 0 } as React.CSSProperties}>
-            {t.fairepart.discoverInvitation}
-          </button>
-          </DraggableElement>
+          {/* Bouton "Découvrir" supprimé — la cover InvitationCover fait déjà ce rôle */}
           </>)
           })()}
         </div>
