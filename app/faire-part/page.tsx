@@ -150,7 +150,6 @@ const FRAMES: { id: string; label: string; url: string | null; video?: boolean }
   { id: 'frame-02', label: '🤍 Roses Crème Haut/Bas', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/51_m9vx96.png' },
   { id: 'frame-03', label: '🌺 Cadre Floral Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/53_ho1gq8.png' },
   { id: 'frame-07', label: '🌷 Fleurs Rose Aquarelle', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785416/49_ewrr8v.png' },
-  { id: 'frame-30', label: '🌹 Floral 18', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778825/18_ushe4t.png' },
   { id: 'frame-34', label: '🌻 Floral 14', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778816/14_bzmmdm.png' },
   { id: 'frame-55', label: '🌸 Floral 55', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857011/55_l7xahl.png' },
   { id: 'frame-61', label: '🌸 Floral 61', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857014/61_nnkips.png' },
@@ -178,7 +177,6 @@ const FRAMES: { id: string; label: string; url: string | null; video?: boolean }
   { id: 'frame-149', label: '🌿 Feuillage 149', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896746/149_jwshu6.png' },
   { id: 'frame-150', label: '🌿 Feuillage 150', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896741/150_rzlu80.png' },
   { id: 'frame-151', label: '🌿 Feuillage 151', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896742/151_mllw5q.png' },
-  { id: 'frame-152', label: '🌿 Feuillage 152', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896745/152_vlbdi9.png' },
   { id: 'frame-154', label: '🌿 Feuillage 154', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896718/154_pxirys.png' },
   // Cadres vidéo animés
   ...VIDEO_BACKGROUNDS.map(v => ({ id: `frame-${v.id}`, label: `🎬 ${v.label.replace(/^.+?\s/, '')}`, url: v.url, video: true })),
