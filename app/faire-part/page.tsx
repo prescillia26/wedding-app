@@ -59,6 +59,21 @@ const COLOR_OPTIONS = [
   { value: '#4a3728', label: 'Chocolat', swatch: '#4a3728' },
   { value: '#ffffff', label: 'Blanc',    swatch: '#ffffff' },
   { value: '#2a9a6a', label: 'Menthe',   swatch: '#2a9a6a' },
+  { value: '#E8D4A2', label: 'Sable doré',     swatch: '#E8D4A2' },
+  { value: '#C97F4C', label: 'Terracotta',      swatch: '#C97F4C' },
+  { value: '#EDE3D2', label: 'Lin écru',        swatch: '#EDE3D2' },
+  { value: '#9DBBA1', label: 'Vert sauge',      swatch: '#9DBBA1' },
+  { value: '#D63384', label: 'Fuchsia',         swatch: '#D63384' },
+  { value: '#5DBDC8', label: 'Turquoise lagune', swatch: '#5DBDC8' },
+  { value: '#7A8B5C', label: 'Vert olivier',    swatch: '#7A8B5C' },
+  { value: '#F5C6B0', label: 'Rose pêche',      swatch: '#F5C6B0' },
+  { value: '#E07856', label: 'Orange terracotta', swatch: '#E07856' },
+  { value: '#1B3A5C', label: 'Bleu nuit',       swatch: '#1B3A5C' },
+  { value: '#FAF5EB', label: 'Crème',           swatch: '#FAF5EB' },
+  { value: '#1E5BA8', label: 'Bleu méditerranée', swatch: '#1E5BA8' },
+  { value: '#FBF9F4', label: 'Blanc immaculé',  swatch: '#FBF9F4' },
+  { value: '#E5B847', label: 'Jaune ocre',      swatch: '#E5B847' },
+  { value: '#8FB8A8', label: 'Vert céladon',    swatch: '#8FB8A8' },
 ]
 
 interface ZoneStyle {
