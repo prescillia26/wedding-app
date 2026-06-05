@@ -108,6 +108,7 @@ const ILLUSTRATIONS_COUPLES = [
   { id: 'couple-04', label: '💕 Robe pailletée', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878834/88_e6oobi.png' },
   { id: 'couple-05', label: '💕 Couple brun + brune', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878835/87_hejtki.png' },
   { id: 'couple-06', label: '🌸 Arche florale rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878838/94_l7zjbv.png' },
+  { id: 'couple-07', label: '💕 Couple aquarelle', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498222/1_dpwtiu.png' },
 ] as const
 
 // ── Couleurs Luxe Aquarelle ──
