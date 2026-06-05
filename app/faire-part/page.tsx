@@ -233,6 +233,8 @@ interface Ceremony {
   penseesDefuntsFin: string
   // ── Aquarelle IA v2 (par événement) ──
   illustrationUrl?: string
+  illustrationSize?: number // % de largeur (50-150, défaut 100)
+  illustrationOffsetY?: number // décalage vertical en px
 }
 interface FormData {
   marie1Prenom: string
@@ -5299,6 +5301,94 @@ function InlineRSVP({ ceremonies, accent, textColor, shareId, mariee1, mariee2, 
   )
 }
 
+// ── Illustration éditable (redimensionner, déplacer, changer, retirer) ───────
+function EditableIllustration({ url, size, offsetY, editable, accent, ceremonyType, onChangeSize, onChangeOffsetY, onChangeUrl, onRemove }: {
+  url: string; size: number; offsetY: number; editable: boolean; accent: string; ceremonyType: string
+  onChangeSize: (s: number) => void; onChangeOffsetY: (y: number) => void; onChangeUrl: (url: string) => void; onRemove: () => void
+}) {
+  const [showControls, setShowControls] = useState(false)
+  const [showPicker, setShowPicker] = useState(false)
+  const typeToCategory: Record<string, VisualCategory> = {
+    'Mairie': 'mairie', 'Cérémonie religieuse / Houppa': 'houppa', 'Shabbat Hatan': 'shabbat',
+    'Henné': 'couples', 'Cocktail': 'couples', 'Soirée': 'couples', 'Boat Party': 'couples', 'Autre': 'couples',
+  }
+  const category = typeToCategory[ceremonyType] || 'couples'
+  const widthPct = Math.max(30, Math.min(150, size))
+
+  return (
+    <div style={{ maxWidth: 520, margin: '0 auto 8px', padding: '0 16px', textAlign: 'center', position: 'relative' }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={url} alt=""
+        onClick={editable ? () => setShowControls(c => !c) : undefined}
+        style={{
+          width: `${widthPct}%`, maxHeight: 420, display: 'block', objectFit: 'contain',
+          margin: '0 auto', mixBlendMode: 'multiply',
+          transform: offsetY ? `translateY(${offsetY}px)` : undefined,
+          cursor: editable ? 'pointer' : 'default',
+          transition: 'width 0.2s, transform 0.2s',
+        }}
+      />
+
+      {/* Contrôles — apparaissent au clic */}
+      {editable && showControls && !showPicker && (
+        <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e8e0d8', padding: '14px 16px', marginTop: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}>
+          {/* Taille */}
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+              <span style={{ fontSize: 11, fontWeight: 600, color: '#3a3330' }}>Taille</span>
+              <span style={{ fontSize: 10, color: '#9a928a' }}>{widthPct}%</span>
+            </div>
+            <input type="range" min={30} max={150} step={5} value={widthPct}
+              onChange={e => onChangeSize(Number(e.target.value))}
+              style={{ width: '100%', accentColor: accent }} />
+          </div>
+          {/* Position verticale */}
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+              <span style={{ fontSize: 11, fontWeight: 600, color: '#3a3330' }}>Position</span>
+              <span style={{ fontSize: 10, color: '#9a928a' }}>{offsetY > 0 ? `+${offsetY}` : offsetY}px</span>
+            </div>
+            <input type="range" min={-80} max={80} step={2} value={offsetY}
+              onChange={e => onChangeOffsetY(Number(e.target.value))}
+              style={{ width: '100%', accentColor: accent }} />
+          </div>
+          {/* Boutons */}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button type="button" onClick={() => setShowPicker(true)} style={{
+              ...BTN, flex: 1, padding: '8px 0', borderRadius: 8, border: `1.5px solid ${accent}`,
+              background: 'transparent', color: accent, fontSize: 11, fontWeight: 600,
+            }}>Changer</button>
+            <button type="button" onClick={onRemove} style={{
+              ...BTN, flex: 1, padding: '8px 0', borderRadius: 8, border: '1.5px solid #d45050',
+              background: 'transparent', color: '#d45050', fontSize: 11, fontWeight: 600,
+            }}>Retirer</button>
+          </div>
+        </div>
+      )}
+
+      {/* Picker de remplacement */}
+      {editable && showPicker && (
+        <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e8e0d8', padding: '16px', marginTop: 8, boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <span style={{ fontSize: 12, fontWeight: 600, color: '#3a3330' }}>Choisir une autre illustration</span>
+            <button type="button" onClick={() => setShowPicker(false)} style={{ ...BTN, background: '#f5f3f0', border: 'none', borderRadius: 9999, width: 28, height: 28, fontSize: 14, color: '#9a928a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
+          </div>
+          <VisualPicker category={category} onSelect={(id) => {
+            const visual = visualById(id)
+            if (visual) { onChangeUrl(visual.url); setShowPicker(false); setShowControls(false) }
+          }} accent={accent} />
+        </div>
+      )}
+
+      {/* Indicateur discret pour le marié */}
+      {editable && !showControls && (
+        <div style={{ fontSize: 10, color: '#b0a898', marginTop: 4, fontStyle: 'italic' }}>Cliquez sur l&apos;image pour la modifier</div>
+      )}
+    </div>
+  )
+}
+
 // ── Zone d'ajout d'illustration entre les cérémonies ─────────────────────────
 function IllustrationAdder({ ceremonyType, accent, onSelect }: { ceremonyType: string; accent: string; onSelect: (url: string) => void }) {
   const [open, setOpen] = useState(false)
@@ -5545,19 +5635,34 @@ const firstDate = sorted[0]?.date
               {/* Illustration aquarelle — image décorative entre les sections */}
               {/* Illustration — visible uniquement en mode "Design libre" (sans cadre) */}
               {ceremony.illustrationUrl ? (
-                <div style={{ maxWidth: 520, margin: '0 auto 8px', padding: '0 16px', textAlign: 'center', position: 'relative' }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={ceremony.illustrationUrl} alt="" style={{ width: '100%', maxHeight: 360, display: 'block', objectFit: 'contain', margin: '0 auto', mixBlendMode: 'multiply' }} />
-                  {role !== 'guest' && onUpdate && (
-                    <button type="button" onClick={() => {
-                      const updated = [...(data.ceremonies ?? [])]
-                      updated[realIdx] = { ...updated[realIdx], illustrationUrl: '' }
-                      onUpdate?.({ ceremonies: updated })
-                    }} style={{ ...BTN, position: 'absolute', top: 8, right: 24, background: 'rgba(255,255,255,0.9)', border: '1px solid #e0d5c8', borderRadius: 9999, padding: '4px 12px', fontSize: 10, color: '#d45050', fontWeight: 600, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                      Retirer
-                    </button>
-                  )}
-                </div>
+                <EditableIllustration
+                  url={ceremony.illustrationUrl}
+                  size={ceremony.illustrationSize ?? 100}
+                  offsetY={ceremony.illustrationOffsetY ?? 0}
+                  editable={role !== 'guest' && !!onUpdate}
+                  accent={G}
+                  ceremonyType={ceremony.type}
+                  onChangeSize={(size) => {
+                    const updated = [...(data.ceremonies ?? [])]
+                    updated[realIdx] = { ...updated[realIdx], illustrationSize: size }
+                    onUpdate?.({ ceremonies: updated })
+                  }}
+                  onChangeOffsetY={(y) => {
+                    const updated = [...(data.ceremonies ?? [])]
+                    updated[realIdx] = { ...updated[realIdx], illustrationOffsetY: y }
+                    onUpdate?.({ ceremonies: updated })
+                  }}
+                  onChangeUrl={(url) => {
+                    const updated = [...(data.ceremonies ?? [])]
+                    updated[realIdx] = { ...updated[realIdx], illustrationUrl: url }
+                    onUpdate?.({ ceremonies: updated })
+                  }}
+                  onRemove={() => {
+                    const updated = [...(data.ceremonies ?? [])]
+                    updated[realIdx] = { ...updated[realIdx], illustrationUrl: '', illustrationSize: 100, illustrationOffsetY: 0 }
+                    onUpdate?.({ ceremonies: updated })
+                  }}
+                />
               ) : (!hasFrame && role !== 'guest' && onUpdate) ? (
                 <IllustrationAdder
                   ceremonyType={ceremony.type}
