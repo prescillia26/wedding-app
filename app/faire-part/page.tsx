@@ -176,7 +176,6 @@ const FRAMES: { id: string; label: string; url: string | null; video?: boolean }
   { id: 'frame-148', label: '🌿 Feuillage 148', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896737/148_hdqw48.png' },
   { id: 'frame-149', label: '🌿 Feuillage 149', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896746/149_jwshu6.png' },
   { id: 'frame-150', label: '🌿 Feuillage 150', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896741/150_rzlu80.png' },
-  { id: 'frame-151', label: '🌿 Feuillage 151', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896742/151_mllw5q.png' },
   { id: 'frame-154', label: '🌿 Feuillage 154', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896718/154_pxirys.png' },
   // Vidéos retirées des cadres — réservées pour la cover page invités
   { id: 'none', label: '⬜ Sans cadre', url: null },
