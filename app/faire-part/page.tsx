@@ -233,7 +233,8 @@ interface Ceremony {
   penseesDefuntsFin: string
   // ── Aquarelle IA v2 (par événement) ──
   illustrationUrl?: string
-  illustrationSize?: number // % de largeur (50-150, défaut 100)
+  illustrationSize?: number // % de largeur (30-150, défaut 80)
+  illustrationOffsetX?: number // décalage horizontal en px
   illustrationOffsetY?: number // décalage vertical en px
 }
 interface FormData {
@@ -5302,93 +5303,87 @@ function InlineRSVP({ ceremonies, accent, textColor, shareId, mariee1, mariee2, 
 }
 
 // ── Illustration éditable (redimensionner, déplacer, changer, retirer) ───────
-function EditableIllustration({ url, size, offsetY, editable, accent, ceremonyType, onChangeSize, onChangeOffsetY, onChangeUrl, onRemove }: {
-  url: string; size: number; offsetY: number; editable: boolean; accent: string; ceremonyType: string
-  onChangeSize: (s: number) => void; onChangeOffsetY: (y: number) => void; onChangeUrl: (url: string) => void; onRemove: () => void
+function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, ceremonyType, onChangeSize, onChangeOffsetX, onChangeOffsetY, onChangeUrl, onRemove }: {
+  url: string; size: number; offsetX: number; offsetY: number; editable: boolean; accent: string; ceremonyType: string
+  onChangeSize: (s: number) => void; onChangeOffsetX: (x: number) => void; onChangeOffsetY: (y: number) => void; onChangeUrl: (url: string) => void; onRemove: () => void
 }) {
   const [showPicker, setShowPicker] = useState(false)
   const [dragging, setDragging] = useState(false)
-  const dragStartY = useRef(0)
-  const dragStartOffset = useRef(0)
+  const dragStart = useRef({ x: 0, y: 0 })
+  const dragOffset = useRef({ x: 0, y: 0 })
   const typeToCategory: Record<string, VisualCategory> = {
     'Mairie': 'mairie', 'Cérémonie religieuse / Houppa': 'houppa', 'Shabbat Hatan': 'shabbat',
     'Henné': 'couples', 'Cocktail': 'couples', 'Soirée': 'couples', 'Boat Party': 'couples', 'Autre': 'couples',
   }
   const category = typeToCategory[ceremonyType] || 'couples'
-  const widthPct = Math.max(30, Math.min(150, size))
+  const w = Math.max(30, Math.min(150, size))
 
-  // Drag libre à la souris/touch
-  const handleDragStart = (clientY: number) => {
+  const startDrag = (cx: number, cy: number) => {
     if (!editable) return
     setDragging(true)
-    dragStartY.current = clientY
-    dragStartOffset.current = offsetY
+    dragStart.current = { x: cx, y: cy }
+    dragOffset.current = { x: offsetX, y: offsetY }
   }
-  const handleDragMove = useCallback((clientY: number) => {
+  const moveDrag = useCallback((cx: number, cy: number) => {
     if (!dragging) return
-    const delta = clientY - dragStartY.current
-    onChangeOffsetY(Math.max(-200, Math.min(200, dragStartOffset.current + delta)))
-  }, [dragging, onChangeOffsetY])
-  const handleDragEnd = useCallback(() => { setDragging(false) }, [])
+    onChangeOffsetX(Math.max(-150, Math.min(150, dragOffset.current.x + cx - dragStart.current.x)))
+    onChangeOffsetY(Math.max(-200, Math.min(200, dragOffset.current.y + cy - dragStart.current.y)))
+  }, [dragging, onChangeOffsetX, onChangeOffsetY])
+  const endDrag = useCallback(() => setDragging(false), [])
 
   useEffect(() => {
     if (!dragging) return
-    const onMove = (e: MouseEvent) => { e.preventDefault(); handleDragMove(e.clientY) }
-    const onTouchMove = (e: TouchEvent) => handleDragMove(e.touches[0].clientY)
-    const onUp = () => handleDragEnd()
-    window.addEventListener('mousemove', onMove)
-    window.addEventListener('mouseup', onUp)
-    window.addEventListener('touchmove', onTouchMove, { passive: true })
-    window.addEventListener('touchend', onUp)
-    return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); window.removeEventListener('touchmove', onTouchMove); window.removeEventListener('touchend', onUp) }
-  }, [dragging, handleDragMove, handleDragEnd])
+    const mm = (e: MouseEvent) => { e.preventDefault(); moveDrag(e.clientX, e.clientY) }
+    const tm = (e: TouchEvent) => moveDrag(e.touches[0].clientX, e.touches[0].clientY)
+    const up = () => endDrag()
+    window.addEventListener('mousemove', mm)
+    window.addEventListener('mouseup', up)
+    window.addEventListener('touchmove', tm, { passive: true })
+    window.addEventListener('touchend', up)
+    return () => { window.removeEventListener('mousemove', mm); window.removeEventListener('mouseup', up); window.removeEventListener('touchmove', tm); window.removeEventListener('touchend', up) }
+  }, [dragging, moveDrag, endDrag])
 
   return (
-    <div style={{ textAlign: 'center', position: 'relative', margin: '4px 0' }}>
-      {/* Image — drag pour déplacer */}
+    <div style={{ textAlign: 'center', position: 'relative', margin: '0', lineHeight: 0 }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={url} alt="" draggable={false}
-        onMouseDown={editable ? (e) => { e.preventDefault(); handleDragStart(e.clientY) } : undefined}
-        onTouchStart={editable ? (e) => handleDragStart(e.touches[0].clientY) : undefined}
+        onMouseDown={editable ? (e) => { e.preventDefault(); startDrag(e.clientX, e.clientY) } : undefined}
+        onTouchStart={editable ? (e) => startDrag(e.touches[0].clientX, e.touches[0].clientY) : undefined}
         style={{
-          width: `${widthPct}%`, maxHeight: 400, display: 'block', objectFit: 'contain',
-          margin: '0 auto', mixBlendMode: 'multiply',
-          transform: offsetY ? `translateY(${offsetY}px)` : undefined,
+          width: `${w}%`, maxHeight: 350, objectFit: 'contain', display: 'inline-block',
+          mixBlendMode: 'multiply',
+          transform: `translate(${offsetX}px, ${offsetY}px)`,
           cursor: editable ? (dragging ? 'grabbing' : 'grab') : 'default',
-          transition: dragging ? 'none' : 'width 0.3s, transform 0.3s',
+          transition: dragging ? 'none' : 'width 0.2s, transform 0.2s',
           userSelect: 'none',
         }}
       />
-
-      {/* Barre de contrôle flottante — toujours visible en mode éditeur */}
       {editable && !showPicker && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 6 }}>
-          <button type="button" onClick={() => onChangeSize(Math.max(30, widthPct - 10))} style={{
-            ...BTN, width: 28, height: 28, borderRadius: '50%', border: `1.5px solid ${accent}40`,
-            background: 'white', color: accent, fontSize: 16, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
-          }}>-</button>
-          <button type="button" onClick={() => onChangeSize(Math.min(150, widthPct + 10))} style={{
-            ...BTN, width: 28, height: 28, borderRadius: '50%', border: `1.5px solid ${accent}40`,
-            background: 'white', color: accent, fontSize: 16, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
+          <button type="button" onPointerDown={e => { e.stopPropagation(); onChangeSize(Math.max(30, w - 10)) }} style={{
+            ...BTN, width: 26, height: 26, borderRadius: '50%', border: `1px solid ${accent}30`,
+            background: 'white', color: accent, fontSize: 18, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, cursor: 'pointer',
+          }}>−</button>
+          <button type="button" onPointerDown={e => { e.stopPropagation(); onChangeSize(Math.min(150, w + 10)) }} style={{
+            ...BTN, width: 26, height: 26, borderRadius: '50%', border: `1px solid ${accent}30`,
+            background: 'white', color: accent, fontSize: 18, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, cursor: 'pointer',
           }}>+</button>
-          <button type="button" onClick={() => setShowPicker(true)} style={{
-            ...BTN, padding: '4px 10px', borderRadius: 9999, border: `1.5px solid ${accent}40`,
-            background: 'white', color: accent, fontSize: 10, fontWeight: 600,
+          <button type="button" onPointerDown={e => { e.stopPropagation(); setShowPicker(true) }} style={{
+            ...BTN, padding: '3px 8px', borderRadius: 9999, border: `1px solid ${accent}30`,
+            background: 'white', color: accent, fontSize: 9, fontWeight: 600, cursor: 'pointer',
           }}>Changer</button>
-          <button type="button" onClick={onRemove} style={{
-            ...BTN, padding: '4px 10px', borderRadius: 9999, border: '1.5px solid #d4505040',
-            background: 'white', color: '#d45050', fontSize: 10, fontWeight: 600,
+          <button type="button" onPointerDown={e => { e.stopPropagation(); onRemove() }} style={{
+            ...BTN, padding: '3px 8px', borderRadius: 9999, border: '1px solid #d4505030',
+            background: 'white', color: '#d45050', fontSize: 9, fontWeight: 600, cursor: 'pointer',
           }}>Retirer</button>
         </div>
       )}
-
-      {/* Picker de remplacement */}
       {editable && showPicker && (
-        <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e8e0d8', padding: '14px', marginTop: 6, boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: '#3a3330' }}>Choisir une illustration</span>
-            <button type="button" onClick={() => setShowPicker(false)} style={{ ...BTN, background: '#f5f3f0', border: 'none', borderRadius: 9999, width: 26, height: 26, fontSize: 13, color: '#9a928a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
+        <div style={{ background: 'white', borderRadius: 12, border: '1px solid #e8e0d8', padding: '12px', marginTop: 4, boxShadow: '0 4px 16px rgba(0,0,0,0.06)', textAlign: 'left' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: '#3a3330' }}>Choisir une illustration</span>
+            <button type="button" onClick={() => setShowPicker(false)} style={{ ...BTN, background: '#f5f3f0', border: 'none', borderRadius: 9999, width: 24, height: 24, fontSize: 12, color: '#9a928a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
           </div>
           <VisualPicker category={category} onSelect={(id) => {
             const visual = visualById(id)
@@ -5686,15 +5681,17 @@ const firstDate = sorted[0]?.date
                     {ceremony.illustrationUrl ? (
                       <EditableIllustration
                         url={ceremony.illustrationUrl}
-                        size={ceremony.illustrationSize ?? 100}
+                        size={ceremony.illustrationSize ?? 80}
+                        offsetX={ceremony.illustrationOffsetX ?? 0}
                         offsetY={ceremony.illustrationOffsetY ?? 0}
                         editable={canEdit}
                         accent={G}
                         ceremonyType={ceremony.type}
                         onChangeSize={(sz) => { const u = [...(data.ceremonies ?? [])]; u[displayIdx] = { ...u[displayIdx], illustrationSize: sz }; onUpdate?.({ ceremonies: u }) }}
+                        onChangeOffsetX={(x) => { const u = [...(data.ceremonies ?? [])]; u[displayIdx] = { ...u[displayIdx], illustrationOffsetX: x }; onUpdate?.({ ceremonies: u }) }}
                         onChangeOffsetY={(y) => { const u = [...(data.ceremonies ?? [])]; u[displayIdx] = { ...u[displayIdx], illustrationOffsetY: y }; onUpdate?.({ ceremonies: u }) }}
                         onChangeUrl={(url) => { const u = [...(data.ceremonies ?? [])]; u[displayIdx] = { ...u[displayIdx], illustrationUrl: url }; onUpdate?.({ ceremonies: u }) }}
-                        onRemove={() => { const u = [...(data.ceremonies ?? [])]; u[displayIdx] = { ...u[displayIdx], illustrationUrl: '', illustrationSize: 100, illustrationOffsetY: 0 }; onUpdate?.({ ceremonies: u }) }}
+                        onRemove={() => { const u = [...(data.ceremonies ?? [])]; u[displayIdx] = { ...u[displayIdx], illustrationUrl: '', illustrationSize: 80, illustrationOffsetX: 0, illustrationOffsetY: 0 }; onUpdate?.({ ceremonies: u }) }}
                       />
                     ) : (!hasFrame && canEdit) ? (
                       <IllustrationAdder ceremonyType={ceremony.type} accent={G} onSelect={(url) => { const u = [...(data.ceremonies ?? [])]; u[displayIdx] = { ...u[displayIdx], illustrationUrl: url }; onUpdate?.({ ceremonies: u }) }} />
