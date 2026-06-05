@@ -6184,10 +6184,12 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
       const id = json.id
       setLastShareId(id)
       try { localStorage.setItem('lovit_share_id', id) } catch { /* ignore */ }
+      // Ajouter ?v=timestamp pour forcer WhatsApp à recharger la preview
+      const cacheBust = `?v=${Math.floor(Date.now() / 1000)}`
       const base = window.location.origin + '/faire-part?share=' + id
       setGuestUrl(base + '&role=guest')
       if (data.slug) {
-      const slugUrl = window.location.origin + '/' + data.slug
+      const slugUrl = window.location.origin + '/' + data.slug + cacheBust
       setGuestUrl(slugUrl)
       }
       setCoupleUrl(base + '&role=couple')
