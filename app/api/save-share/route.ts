@@ -30,11 +30,6 @@ export async function POST(request: Request) {
       }
     }
 
-    // Debug: loguer les champs logo pour diagnostiquer le problème
-    console.log('[save-share] customLogoUrl:', shareData.customLogoUrl || '(vide)')
-    console.log('[save-share] luxeMonogramUrl:', shareData.luxeMonogramUrl || '(vide)')
-    console.log('[save-share] fixedId:', fixedId || '(nouveau)')
-
     const size = new TextEncoder().encode(JSON.stringify(shareData)).length
     if (size > MAX_BYTES) {
       return Response.json({ error: 'Données trop volumineuses.' }, { status: 413 })
@@ -48,11 +43,6 @@ export async function POST(request: Request) {
     // Timestamp pour invalider le cache des previews WhatsApp/Facebook quand les photos changent
     shareData.ogVersion = Date.now()
     await redis.set(id, shareData, { ex: 31536000 })
-
-    // ✅ Vérification : relire immédiatement ce qui a été sauvé pour confirmer
-    const verification = await redis.get<Record<string, unknown>>(id)
-    console.log('[save-share] VERIFICATION après écriture — customLogoUrl:', verification?.customLogoUrl || '(ABSENT!)')
-    console.log('[save-share] VERIFICATION — nombre de clés:', verification ? Object.keys(verification).length : 0)
 
     // Sauvegarder un snapshot initial (uniquement à la première génération)
     const initialExists = await redis.exists(`${id}:initial`)
@@ -76,7 +66,6 @@ export async function POST(request: Request) {
           const otherData = await redis.get<Record<string, unknown>>(existingSlugOwner)
           if (otherData?.ownerEmail && otherData.ownerEmail === shareData.ownerEmail) {
             // Même propriétaire (ancien ID du même faire-part) → mettre à jour le slug + rediriger l'ancien ID
-            console.log('[save-share] Slug réattribué:', slug, existingSlugOwner, '→', id)
             await redis.set(`slug:${slug}`, id, { ex: 31536000 })
             // ✅ Poser un pointeur canonique sur l'ancien ID → get-share suivra le lien
             await redis.set(existingSlugOwner, { ...otherData, canonicalId: id }, { ex: 31536000 })

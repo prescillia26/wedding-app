@@ -2671,13 +2671,13 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
         <div style={{ textAlign: 'center', fontSize: 24, letterSpacing: '0.5em', color: theme.accent, marginBottom: 24 }}>❋ ✿ ❀</div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte, lineHeight: 1.7, marginBottom: 28 }}>
           {t.fairepart.cardHenneInvite}<br />
-          <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 36, color: theme.accent }}>{data.marie1Prenom} & {data.marie2Prenom}</span>
+          <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(28px, 7vw, 52px)', color: theme.accent }}>{data.marie1Prenom} & {data.marie2Prenom}</span>
         </div>
-        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, color: theme.accent, textAlign: 'center', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 12 }}>{formatDateFr(ceremony.date)}</div>
-        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 24, color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{formatHeure(ceremony.heure)}</div>
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(14px, 3.5vw, 22px)', color: theme.accent, textAlign: 'center', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 12 }}>{formatDateFr(ceremony.date)}</div>
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(16px, 4vw, 22px)', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{formatHeure(ceremony.heure)}</div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte }}>
-          {lieuDisplay && <div>{formatLieu(lieuDisplay)}</div>}
-          {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
+          {lieuDisplay && <div style={{ maxWidth: '90%', margin: '0 auto', textWrap: 'balance' } as React.CSSProperties}>{formatLieu(lieuDisplay)}</div>}
+          {ceremony.adresse && <div style={{ fontSize: 'clamp(11px, 2.5vw, 14px)', marginTop: 8, color: theme.textSecondaire, textWrap: 'balance' } as React.CSSProperties}>{ceremony.adresse}</div>}
         </div>
         {isShared && ceremony.adresse && (
           <div style={{ marginTop: 20, paddingBottom: 8 }}>
@@ -2686,7 +2686,7 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
         )}
         {ceremony.note && (
           <div style={{ marginTop: 20, paddingTop: 14, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, textAlign: 'center', color: theme.texte }}>{ceremony.note}</div>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, textAlign: 'center', color: theme.texte, maxWidth: '90%', margin: '0 auto' }}>{ceremony.note}</div>
           </div>
         )}
         {isShared && (
@@ -2716,13 +2716,13 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{titreDisplay}</div>
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte, lineHeight: 1.7, marginBottom: 28 }}>
-          {t.fairepart.cardAutreJoin} <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 32, color: theme.accent }}>{data.marie1Prenom} & {data.marie2Prenom}</span> {t.fairepart.cardAutreFor} {titreDisplay.toLowerCase()}
+          {t.fairepart.cardAutreJoin} <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(28px, 7vw, 52px)', color: theme.accent }}>{data.marie1Prenom} & {data.marie2Prenom}</span> {t.fairepart.cardAutreFor} {titreDisplay.toLowerCase()}
         </div>
-        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, color: theme.accent, textAlign: 'center', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 12 }}>{formatDateFr(ceremony.date)}</div>
-        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 24, color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{formatHeure(ceremony.heure)}</div>
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(14px, 3.5vw, 22px)', color: theme.accent, textAlign: 'center', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 12 }}>{formatDateFr(ceremony.date)}</div>
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(16px, 4vw, 22px)', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{formatHeure(ceremony.heure)}</div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte }}>
-          {lieuDisplay && <div>{formatLieu(lieuDisplay)}</div>}
-          {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
+          {lieuDisplay && <div style={{ maxWidth: '90%', margin: '0 auto', textWrap: 'balance' } as React.CSSProperties}>{formatLieu(lieuDisplay)}</div>}
+          {ceremony.adresse && <div style={{ fontSize: 'clamp(11px, 2.5vw, 14px)', marginTop: 8, color: theme.textSecondaire, textWrap: 'balance' } as React.CSSProperties}>{ceremony.adresse}</div>}
         </div>
         {isShared && ceremony.adresse && (
           <div style={{ marginTop: 20, paddingBottom: 8 }}>
@@ -2731,7 +2731,7 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
         )}
         {ceremony.note && (
           <div style={{ marginTop: 20, paddingTop: 14, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, textAlign: 'center', color: theme.texte }}>{ceremony.note}</div>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, textAlign: 'center', color: theme.texte, maxWidth: '90%', margin: '0 auto' }}>{ceremony.note}</div>
           </div>
         )}
         {isShared && (
@@ -2814,11 +2814,11 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
             </div>
           )}
         </div>
-        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, color: theme.accent, textAlign: 'center', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 12 }}>{formatDateFr(ceremony.date)}</div>
-        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 24, color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{formatHeure(ceremony.heure)}</div>
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(14px, 3.5vw, 22px)', color: theme.accent, textAlign: 'center', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 12 }}>{formatDateFr(ceremony.date)}</div>
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(16px, 4vw, 22px)', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{formatHeure(ceremony.heure)}</div>
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte }}>
-          {lieuDisplay && <div>{formatLieu(lieuDisplay)}</div>}
-          {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
+          {lieuDisplay && <div style={{ maxWidth: '90%', margin: '0 auto', textWrap: 'balance' } as React.CSSProperties}>{formatLieu(lieuDisplay)}</div>}
+          {ceremony.adresse && <div style={{ fontSize: 'clamp(11px, 2.5vw, 14px)', marginTop: 8, color: theme.textSecondaire, textWrap: 'balance' } as React.CSSProperties}>{ceremony.adresse}</div>}
         </div>
         {isShared && ceremony.adresse && (
           <div style={{ marginTop: 20, paddingBottom: 8 }}>
@@ -2827,7 +2827,7 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
         )}
         {ceremony.note && (
           <div style={{ marginTop: 20, paddingTop: 14, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, textAlign: 'center', color: theme.texte }}>{ceremony.note}</div>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, textAlign: 'center', color: theme.texte, maxWidth: '90%', margin: '0 auto' }}>{ceremony.note}</div>
           </div>
         )}
         {isShared && (
@@ -6118,9 +6118,6 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
       if (!existingId) {
         showToast('Nouveau lien créé', 'success')
       }
-      // Debug: vérifier que le logo est bien dans le payload
-      console.log('[handleShare] customLogoUrl envoyé:', dataToSend.customLogoUrl || '(vide)')
-      console.log('[handleShare] fixedId:', existingId || '(nouveau)')
       const res = await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...dataToSend, fixedId: existingId }) })
       const json = await res.json()
       if (!res.ok || !json.id) {
@@ -6132,17 +6129,6 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
         console.warn('[handleShare] ID changé :', existingId, '→', json.id)
       }
       const id = json.id
-      // ✅ Vérification : relire ce qui a été sauvé pour confirmer que le logo est bien là
-      try {
-        const verif = await fetch(`/api/get-share?id=${id}`).then(r => r.json())
-        console.log('[handleShare] VÉRIFICATION après sauvegarde — customLogoUrl:', verif.customLogoUrl || '(ABSENT!)')
-        if (dataToSend.customLogoUrl && !verif.customLogoUrl) {
-          console.error('[handleShare] ⚠️ LOGO PERDU ! Envoyé:', dataToSend.customLogoUrl, 'Reçu: (vide)')
-          // Tentative de re-sauvegarde forcée
-          await fetch('/api/save-share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...dataToSend, fixedId: id }) })
-          console.log('[handleShare] Re-sauvegarde forcée effectuée')
-        }
-      } catch { /* ignore verification errors */ }
       setLastShareId(id)
       try { localStorage.setItem('lovit_share_id', id) } catch { /* ignore */ }
       const base = window.location.origin + '/faire-part?share=' + id
@@ -6612,8 +6598,6 @@ export default function FairePartPage() {
     }
 
     if (id) {
-      // Debug: loguer le shareId utilisé pour charger
-      console.log('[guest-load] shareId depuis URL:', id)
       // Vue partagée — pas de protection
       setIsShared(true)
       setRole(r)
@@ -6623,9 +6607,6 @@ export default function FairePartPage() {
       fetch(`/api/get-share?id=${id}`)
         .then(res => res.json())
         .then((d: FormData) => {
-          // Debug: vérifier ce que l'invité reçoit
-          console.log('[guest-load] customLogoUrl reçu:', d.customLogoUrl || '(vide)')
-          console.log('[guest-load] luxeMonogramUrl reçu:', d.luxeMonogramUrl || '(vide)')
           // Reconstruire photosData.url depuis photosFond (supprimé avant envoi pour économiser de l'espace)
           if (d.photosFond?.length && d.photosData?.length) {
             d.photosData = d.photosData.map((c, i) => ({ ...c, url: d.photosFond![i] ?? '' }))
