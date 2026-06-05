@@ -9,16 +9,13 @@ const redis = new Redis({
 })
 
 // ✅ Transforme une URL Cloudinary au format OG (1200x630)
-// Photos → c_fill (recadrage), illustrations → c_pad avec fond (pas de crop)
-function toCloudinaryOgUrl(raw: string | undefined | null, version?: number, bgColor?: string): string {
+function toCloudinaryOgUrl(raw: string | undefined | null, version?: number, bgColor?: string, isPhoto?: boolean): string {
   if (!raw) return ''
   if (raw.includes('/upload/')) {
-    // Détecter si c'est une illustration (pas une photo uploadée par l'utilisateur)
-    const isIllustration = raw.includes('/watercolors/') || raw.includes('_pzfb2j') || raw.includes('_gbqs4r') || raw.includes('_iw0wq9') || raw.includes('_e6oobi') || raw.includes('_hejtki') || raw.includes('_l7zjbv') || raw.includes('_dpwtiu')
     const bg = bgColor ? bgColor.replace('#', '') : 'fdf8f0'
-    const transform = isIllustration
-      ? `w_1200,h_630,c_pad,b_rgb:${bg},q_auto,f_auto`
-      : 'w_1200,h_630,c_fill,g_face:center,q_auto,f_auto'
+    const transform = isPhoto
+      ? 'w_1200,h_630,c_fill,g_face:center,q_auto,f_auto'
+      : `w_1200,h_630,c_pad,b_rgb:${bg},q_auto,f_auto`
     const url = raw.replace('/upload/', `/upload/${transform}/`)
     return version ? `${url}?v=${version}` : url
   }
@@ -111,14 +108,15 @@ export async function generateMetadata(
   const bgColor = THEME_BG[result.data.style || ''] || '#fdf8f0'
 
   // Priorité OG image : photo > illustration couple > illustration cérémonie > logo > monogramme > fallback
-  const rawPhoto = result.data.photosFond?.[0]
-    || result.data.photoFond
-    || coupleIlluUrl
+  const userPhoto = result.data.photosFond?.[0] || result.data.photoFond || ''
+  const fallbackImage = coupleIlluUrl
     || result.data.ceremonies?.find(c => c.illustrationUrl)?.illustrationUrl
     || result.data.customLogoUrl
     || result.data.luxeMonogramUrl
     || ''
-  const ogImage = rawPhoto ? toCloudinaryOgUrl(rawPhoto, result.data.ogVersion, bgColor) : ''
+  const rawOg = userPhoto || fallbackImage
+  const isPhoto = !!userPhoto
+  const ogImage = rawOg ? toCloudinaryOgUrl(rawOg, result.data.ogVersion, bgColor, isPhoto) : ''
 
   return {
     title,
@@ -154,15 +152,15 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
   const result = await getData(slug)
 
   const coupleIllu2 = result?.data?.illustrationCoupleId ? ILLU_COUPLES[result.data.illustrationCoupleId] : ''
-  const rawPhoto = result?.data?.photosFond?.[0]
-    || result?.data?.photoFond
-    || coupleIllu2
+  const userPhoto2 = result?.data?.photosFond?.[0] || result?.data?.photoFond || ''
+  const fallback2 = coupleIllu2
     || result?.data?.ceremonies?.find(c => c.illustrationUrl)?.illustrationUrl
     || result?.data?.customLogoUrl
     || result?.data?.luxeMonogramUrl
     || ''
+  const rawOg2 = userPhoto2 || fallback2
   const bgC = result?.data?.style ? (({ 'rose-fleuri': '#fff9f6', 'ivoire-or': '#fffdf5', 'bleu-floral': '#f6f9ff', 'champetre': '#f6faf4', 'blanc-gris': '#fafafa', 'noir-blanc': '#1a1a1a', 'chocolat': '#2c1a0e', 'bordeaux': '#fdf5f5', 'bordeaux-nuit': '#1a0810', 'fuchsia': '#fff5fc', 'marine-or': '#0a1628', 'menthe': '#f2fbf7' }) as Record<string, string>)[result.data.style] || '#fdf8f0' : '#fdf8f0'
-  const photo = rawPhoto ? toCloudinaryOgUrl(rawPhoto, result?.data?.ogVersion, bgC) : ''
+  const photo = rawOg2 ? toCloudinaryOgUrl(rawOg2, result?.data?.ogVersion, bgC, !!userPhoto2) : ''
   const accent = '#C9A84C'
   const targetUrl = result?.shareId
     ? `/faire-part?share=${result.shareId}&role=guest`
