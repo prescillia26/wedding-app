@@ -5869,12 +5869,6 @@ const firstDate = sorted[0]?.date
                             <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(14px,3.5vw,22px)', letterSpacing: '0.04em', color: G, opacity: 0.75, lineHeight: 1.3 }}>{data.marie2Prenom2 || ''}</div>
                           </div>
                         )}
-                        {/* Séparateur */}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, margin: '4px 0 12px' }}>
-                          <div style={{ width: 28, height: '0.5px', background: G, opacity: 0.3 }} />
-                          <span style={{ color: G, fontSize: 7, opacity: 0.4 }}>&#9670;</span>
-                          <div style={{ width: 28, height: '0.5px', background: G, opacity: 0.3 }} />
-                        </div>
                       </AnimSection></DraggableElement>
                     )}
                     <DraggableElement id={pre+"narratif"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={280} skipAnim={canEdit}>
