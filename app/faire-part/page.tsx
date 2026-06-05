@@ -361,7 +361,7 @@ const defaultFormData: FormData = {
   photosData: [],
   marie1PrenomHebreu: '',
   marie2PrenomHebreu: '',
-  frameId: 'frame-09',
+  frameId: 'none',
   frameOpacity: 1,
   frameSize: 100,
   framePaddingV: 35,
@@ -1866,167 +1866,124 @@ function AccordionSection({ title, defaultOpen = false, children }: { title: str
 
 function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChange: (d: Partial<FormData>) => void; pack?: 'essentiel' | 'premium' }) {
   const { t, locale } = useT()
-  const isLuxe = pack === 'premium' || (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('premium') === 'true')
   const selectedLuxeColor = LUXE_COLORS.find(c => c.id === data.luxeColor) || LUXE_COLORS[0]
+  const accent = THEMES[data.style].accent
   return (
     <div>
       <h2 style={{ textAlign: 'center', fontFamily: 'var(--font-playfair-display)', fontSize: 20, fontWeight: 600, color: '#3a3330', marginBottom: 6 }}>{t.fairepart.step4Title}</h2>
       <p style={{ textAlign: 'center', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9a928a', marginBottom: 24 }}>
-        {isLuxe
-          ? (locale === 'en' ? 'Choose your color palette and generate unique watercolors' : 'Choisissez votre palette de couleurs et générez vos aquarelles uniques')
-          : (locale === 'en' ? 'Customize the look and feel of your invitation' : 'Personnalisez le style de votre invitation')}
+        {locale === 'en' ? 'Design your invitation' : 'Définissez le design de votre invitation'}
       </p>
 
-      {/* ── Pack Luxe : Monogramme + Couleur + Aquarelles + Illustrations décoratives ── */}
-      {isLuxe ? (<>
-        {/* ── Palette de couleurs (compact) ── */}
-        <AccordionSection title={locale === 'en' ? '🎨 Color' : '🎨 Couleur'} defaultOpen>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center' }}>
-            {LUXE_COLORS.map(c => {
-              const sel = (data.luxeColor || 'dore') === c.id
-              return (
-                <button key={c.id} type="button" onClick={() => onChange({ luxeColor: c.id })} title={c.label} style={{
-                  ...BTN, padding: 0, borderRadius: '50%', border: sel ? `3px solid ${c.hex}` : '2px solid #e8e0d8',
-                  width: 36, height: 36, background: c.hex,
-                  boxShadow: sel ? `0 0 0 2px white, 0 0 0 4px ${c.hex}` : 'none',
-                  transition: 'all 0.15s',
-                }} />
-              )
-            })}
-          </div>
-          <div style={{ textAlign: 'center', marginTop: 8, fontSize: 12, color: selectedLuxeColor.hex, fontWeight: 600 }}>{selectedLuxeColor.label}</div>
-        </AccordionSection>
-
-        {/* ── Visuels des cérémonies ── */}
-        <AccordionSection title={locale === 'en' ? '🎨 Ceremony visuals' : '🎨 Visuels des cérémonies'} defaultOpen>
-          <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 14, lineHeight: 1.5 }}>
-            {locale === 'en'
-              ? 'Choose a watercolor illustration for each ceremony. It will appear as a beautiful decorative element.'
-              : 'Choisissez une illustration aquarelle pour chaque cérémonie. Elle apparaîtra comme un bel élément décoratif.'}
-          </p>
-          {(data.ceremonies ?? []).map((ceremony, idx) => {
-            const typeToCategory: Record<string, VisualCategory> = {
-              'Mairie': 'mairie',
-              'Cérémonie religieuse / Houppa': 'houppa',
-              'Shabbat Hatan': 'shabbat',
-              'Henné': 'couples',
-              'Cocktail': 'couples',
-              'Soirée': 'couples',
-              'Boat Party': 'couples',
-              'Autre': 'couples',
-            }
-            const category = typeToCategory[ceremony.type] || 'couples'
-            const ceremonyName = ceremony.type === 'Autre' ? (ceremony.customName || 'Événement') : ceremony.type
+      {/* ── 1. Thème & couleurs ── */}
+      <AccordionSection title={locale === 'en' ? '🎨 Theme & colors' : '🎨 Thème & couleurs'} defaultOpen>
+        <Label>{locale === 'en' ? 'Visual style' : 'Style visuel'}</Label>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 6, marginBottom: 16 }}>
+          {(Object.entries(THEMES) as [Theme, ThemeObj][]).map(([key, t]) => {
+            const sel = data.style === key
             return (
-              <div key={idx} style={{ marginBottom: 20 }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: selectedLuxeColor.hex, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                  {ceremonyName}
+              <button key={key} type="button" onClick={() => onChange({ style: key })} style={{
+                ...BTN, padding: 0, borderRadius: 8, overflow: 'hidden',
+                border: `2px solid ${sel ? t.accent : '#e8e0d8'}`,
+                background: 'transparent', textAlign: 'center',
+                boxShadow: sel ? `0 0 0 1px ${t.accent}` : 'none',
+              }}>
+                <div style={{ background: t.fond, width: '100%', height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: t.accent, letterSpacing: 0.5 }}>A &amp; B</span>
                 </div>
-                {ceremony.illustrationUrl && (
-                  <div style={{ textAlign: 'center', marginBottom: 8 }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={ceremony.illustrationUrl.replace('/upload/', '/upload/w_300,c_fit/')} alt="" style={{ maxHeight: 80, borderRadius: 8, opacity: 0.8 }} />
-                    <button type="button" onClick={() => {
-                      const updated = [...(data.ceremonies ?? [])]
-                      updated[idx] = { ...updated[idx], illustrationUrl: '' }
-                      onChange({ ceremonies: updated })
-                    }} style={{ ...BTN, display: 'block', margin: '4px auto 0', fontSize: 10, color: '#d45050', background: 'none', border: 'none' }}>
-                      {locale === 'en' ? 'Remove' : 'Retirer'}
-                    </button>
-                  </div>
-                )}
-                <VisualPicker
-                  category={category}
-                  selectedId={ceremony.illustrationUrl ? VISUALS.find(v => v.url === ceremony.illustrationUrl)?.id : undefined}
-                  onSelect={(id) => {
-                    const visual = visualById(id)
-                    if (visual) {
-                      const updated = [...(data.ceremonies ?? [])]
-                      updated[idx] = { ...updated[idx], illustrationUrl: visual.url }
-                      onChange({ ceremonies: updated })
-                    }
-                  }}
-                  accent={selectedLuxeColor.hex}
-                />
-              </div>
+                <div style={{ padding: '3px 2px 4px', background: sel ? t.accent : '#faf8f6', fontSize: 7, fontWeight: sel ? 700 : 400, color: sel ? 'white' : '#3a3330', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {t.nom}
+                </div>
+              </button>
             )
           })}
-        </AccordionSection>
+        </div>
+      </AccordionSection>
 
-        <AccordionSection title={locale === 'en' ? '🎨 AI Watercolors' : '🎨 Aquarelles IA'}>
-          <p style={{ fontSize: 12, color: '#6a5040', marginBottom: 12, lineHeight: 1.6 }}>
-            {locale === 'en'
-              ? 'Generate a unique watercolor for each of your events, based on the venue, event type, and your chosen color.'
-              : 'Générez une aquarelle unique pour chacun de vos événements, basée sur le lieu, le type d\u2019événement et la couleur choisie.'}
-          </p>
-          <CeremonyWatercolorPanel
-            ceremonies={data.ceremonies}
-            palette={selectedLuxeColor.palette}
-            onUpdateCeremony={(i, updates) => {
-              const newCeremonies = [...data.ceremonies]
-              newCeremonies[i] = { ...newCeremonies[i], ...updates }
-              onChange({ ceremonies: newCeremonies })
-            }}
-          />
-        </AccordionSection>
+      {/* ── 2. Cadre décoratif (optionnel) ── */}
+      <AccordionSection title={locale === 'en' ? '🖼️ Decorative frame (optional)' : '🖼️ Cadre décoratif (optionnel)'}>
+        <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 10, lineHeight: 1.5 }}>
+          {locale === 'en' ? 'Choose a frame or leave "No frame" for a clean look.' : 'Choisissez un cadre ou laissez "Sans cadre" pour un rendu épuré.'}
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+          {FRAMES.filter(fr => !fr.video).map(fr => {
+            const sel = (data.frameId ?? 'none') === fr.id
+            return (
+              <button key={fr.id} type="button" onClick={() => onChange({ frameId: fr.id })} style={{
+                ...BTN, padding: 8, borderRadius: 10,
+                border: `2px solid ${sel ? accent : '#f0e0d0'}`,
+                background: sel ? `${accent}10` : 'white',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                boxShadow: sel ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.08)',
+              }}>
+                {fr.url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={fr.url} alt={fr.label} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
+                ) : (
+                  <div style={{ width: 80, height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: '#9a928a', background: '#f9f7f5', borderRadius: 6 }}>Sans cadre</div>
+                )}
+                <span style={{ fontSize: 9, fontWeight: sel ? 700 : 400, color: sel ? accent : '#3a3330', textAlign: 'center', lineHeight: 1.3 }}>{fr.label}</span>
+              </button>
+            )
+          })}
+        </div>
+      </AccordionSection>
 
-      </>) : (<>
-        {/* ── Pack Premium : Thème + Cadres décoratifs ── */}
-        <AccordionSection title={locale === 'en' ? '🎨 Theme & colors' : '🎨 Thème & couleurs'} defaultOpen>
-          <Label>{locale === 'en' ? 'Visual style' : 'Style visuel'}</Label>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 6, marginBottom: 16 }}>
-            {(Object.entries(THEMES) as [Theme, ThemeObj][]).map(([key, t]) => {
-              const sel = data.style === key
-              return (
-                <button key={key} type="button" onClick={() => onChange({ style: key })} style={{
-                  ...BTN, padding: 0, borderRadius: 8, overflow: 'hidden',
-                  border: `2px solid ${sel ? t.accent : '#e8e0d8'}`,
-                  background: 'transparent', textAlign: 'center',
-                  boxShadow: sel ? `0 0 0 1px ${t.accent}` : 'none',
-                }}>
-                  <div style={{ background: t.fond, width: '100%', height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: t.accent, letterSpacing: 0.5 }}>A &amp; B</span>
-                  </div>
-                  <div style={{ padding: '3px 2px 4px', background: sel ? t.accent : '#faf8f6', fontSize: 7, fontWeight: sel ? 700 : 400, color: sel ? 'white' : '#3a3330', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {t.nom}
-                  </div>
-                </button>
-              )
-            })}
-          </div>
-        </AccordionSection>
-
-        <AccordionSection title={locale === 'en' ? '🖼️ Decorative frame' : '🖼️ Cadre décoratif'}>
-          {/* Cadres statiques (images) */}
-          <div style={{ fontSize: 12, fontWeight: 700, color: '#3a3028', marginBottom: 8 }}>
-            {locale === 'en' ? '🌸 Floral frames' : '🌸 Cadres floraux'}
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
-            {FRAMES.filter(fr => !fr.video).map(fr => {
-              const accent = THEMES[data.style].accent
-              const sel = (data.frameId ?? 'frame-09') === fr.id
-              return (
-                <button key={fr.id} type="button" onClick={() => onChange({ frameId: fr.id })} style={{
-                  ...BTN, padding: 8, borderRadius: 10,
-                  border: `2px solid ${sel ? accent : '#f0e0d0'}`,
-                  background: sel ? `${accent}10` : 'white',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-                  boxShadow: sel ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.08)',
-                }}>
-                  {fr.url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={fr.url} alt={fr.label} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
-                  ) : (
-                    <div style={{ width: 80, height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, opacity: 0.4, background: '#f5f5f5', borderRadius: 6 }}>✕</div>
-                  )}
-                  <span style={{ fontSize: 9, fontWeight: sel ? 700 : 400, color: sel ? accent : '#3a3330', textAlign: 'center', lineHeight: 1.3 }}>{fr.label}</span>
-                </button>
-              )
-            })}
-          </div>
-
-        </AccordionSection>
-      </>)}
+      {/* ── 3. Illustrations aquarelles par cérémonie ── */}
+      <AccordionSection title={locale === 'en' ? '🎨 Ceremony illustrations' : '🎨 Illustrations par cérémonie'}>
+        <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 14, lineHeight: 1.5 }}>
+          {locale === 'en'
+            ? 'Add a watercolor illustration for each ceremony. It will appear between your events.'
+            : 'Ajoutez une illustration aquarelle pour chaque cérémonie. Elle apparaîtra entre vos événements.'}
+        </p>
+        {(data.ceremonies ?? []).map((ceremony, idx) => {
+          const typeToCategory: Record<string, VisualCategory> = {
+            'Mairie': 'mairie',
+            'Cérémonie religieuse / Houppa': 'houppa',
+            'Shabbat Hatan': 'shabbat',
+            'Henné': 'couples',
+            'Cocktail': 'couples',
+            'Soirée': 'couples',
+            'Boat Party': 'couples',
+            'Autre': 'couples',
+          }
+          const category = typeToCategory[ceremony.type] || 'couples'
+          const ceremonyName = ceremony.type === 'Autre' ? (ceremony.customName || 'Événement') : ceremony.type
+          return (
+            <div key={idx} style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: accent, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                {ceremonyName}
+              </div>
+              {ceremony.illustrationUrl && (
+                <div style={{ textAlign: 'center', marginBottom: 8 }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={ceremony.illustrationUrl.replace('/upload/', '/upload/w_300,c_fit/')} alt="" style={{ maxHeight: 80, borderRadius: 8, opacity: 0.8 }} />
+                  <button type="button" onClick={() => {
+                    const updated = [...(data.ceremonies ?? [])]
+                    updated[idx] = { ...updated[idx], illustrationUrl: '' }
+                    onChange({ ceremonies: updated })
+                  }} style={{ ...BTN, display: 'block', margin: '4px auto 0', fontSize: 10, color: '#d45050', background: 'none', border: 'none' }}>
+                    {locale === 'en' ? 'Remove' : 'Retirer'}
+                  </button>
+                </div>
+              )}
+              <VisualPicker
+                category={category}
+                selectedId={ceremony.illustrationUrl ? VISUALS.find(v => v.url === ceremony.illustrationUrl)?.id : undefined}
+                onSelect={(id) => {
+                  const visual = visualById(id)
+                  if (visual) {
+                    const updated = [...(data.ceremonies ?? [])]
+                    updated[idx] = { ...updated[idx], illustrationUrl: visual.url }
+                    onChange({ ceremonies: updated })
+                  }
+                }}
+                accent={accent}
+              />
+            </div>
+          )
+        })}
+      </AccordionSection>
 
 
 
@@ -2395,7 +2352,7 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const honore = ov[`ceremony_${ci}_honore`] || t.fairepart.cardHonore
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0}>
+    <CardFrameWrapper frameId={data.frameId ?? 'none'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{t.fairepart.cardLaHouppa}</div>
@@ -2495,7 +2452,7 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const ci = cardIdx ?? 0
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0}>
+    <CardFrameWrapper frameId={data.frameId ?? 'none'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{t.fairepart.cardLaMairie}</div>
@@ -2554,7 +2511,7 @@ function CardHenne({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const ci = cardIdx ?? 0
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0}>
+    <CardFrameWrapper frameId={data.frameId ?? 'none'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{t.fairepart.cardLeHenne}</div>
@@ -2601,7 +2558,7 @@ function CardAutre({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
   const titreDisplay = ov[`ceremony_${ci}_titre`] || name
   const lieuDisplay = ov[`ceremony_${ci}_lieu`] || ceremony.lieu
   return (
-    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0}>
+    <CardFrameWrapper frameId={data.frameId ?? 'none'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{titreDisplay}</div>
@@ -2652,7 +2609,7 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
   const parents2 = fmtParentsLines(data.famille2PerePrenom, data.famille2PereNom, data.famille2MerePrenom, data.famille2MereNom, titles)
   const joie = ov[`ceremony_${ci}_joie`] || (hasGp ? t.fairepart.joyMessageGp : t.fairepart.joyMessage)
   return (
-    <CardFrameWrapper frameId={data.frameId ?? 'frame-09'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0}>
+    <CardFrameWrapper frameId={data.frameId ?? 'none'} ornamentId={data.ornamentId ?? 'none'} themeCardBg={THEME_CARD_BG[data.style] ?? '#ffffff'} frameOpacity={data.frameOpacity ?? 1} frameSize={data.frameSize ?? 100} framePaddingV={data.framePaddingV ?? 22} framePaddingH={data.framePaddingH ?? 18} textOpacity={data.textOpacity ?? 1} textBg={data.textBg ?? 0.5} textOffsetY={data.textOffsetY ?? 0}>
       <div style={{ position: 'relative' }}>
         {data.mariageJuif && <div style={{ position: 'absolute', top: '22%', right: '18%', fontSize: 13, fontFamily: 'serif', color: theme.accent, direction: 'rtl', opacity: 0.85, zIndex: 20 }}>בס״ד</div>}
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{t.fairepart.cardShabbatHatan}</div>
@@ -5427,7 +5384,7 @@ const firstDate = sorted[0]?.date
   const firstPhoto = data.photosFond?.[0] ?? data.photoFond ?? ''
 
   const ornUrl = ORNEMENTS_LIBRARY.find(o => o.id === (data.ornamentId ?? 'none'))?.url ?? ''
-  const frame = FRAMES.find(f => f.id === (data.frameId ?? 'frame-09')) ?? FRAMES[FRAMES.length - 1]
+  const frame = FRAMES.find(f => f.id === (data.frameId ?? 'none')) ?? FRAMES[FRAMES.length - 1]
   const hasFrame = !!frame.url
   const OrnTR = () => <OrnementCorner url={ornUrl} corner="top-right" size={85} />
   const OrnBL = () => <OrnementCorner url={ornUrl} corner="bottom-left" size={85} />
@@ -6748,14 +6705,10 @@ export default function FairePartPage() {
   // Le partage est bloqué si pas payé (isPaid=false)
 
   if (showCards) {
-    const isLuxePack = userPack === 'premium'
     const onEdit = () => { try { localStorage.setItem('wedding-draft', JSON.stringify(formData)) } catch { /* ignore */ } setShowCards(false); setStep(4) }
     const onReset = () => { setFormData(defaultFormData); setShowCards(false); setStep(1); try { localStorage.removeItem('wedding-draft') } catch { /* ignore */ } }
 
-    // Le rendu Premium ET Luxe passe par CardsView qui gère handleShare correctement
-    // Pack Luxe : pas de cadre derrière le texte — fond uni avec aquarelles entre les événements
-    const displayData = isLuxePack ? { ...formData, frameId: 'none', ornamentId: 'none' } : formData
-    return <CardsView data={displayData} onEdit={onEdit} onReset={onReset} isShared={isShared} role={role} onUpdate={update} isPaid={isPaid} />
+    return <CardsView data={formData} onEdit={onEdit} onReset={onReset} isShared={isShared} role={role} onUpdate={update} isPaid={isPaid} />
   }
 
   if (loadingShare) return (
