@@ -141,10 +141,10 @@ const VIDEO_BACKGROUNDS: { id: string; label: string; url: string; textPosition:
 const FRAMES_STRONG_BG = new Set(['frame-80', 'frame-107', 'frame-108', 'frame-vid-180', 'frame-vid-188', 'frame-vid-193', 'frame-vid-194'])
 // Frames qui doivent être affichés en contain (cadres décoratifs qui ne doivent pas être coupés)
 const FRAMES_CONTAIN = new Set(['frame-84', 'frame-85'])
-// Padding personnalisé pour les cadres à bordure (texte bien intégré à l'intérieur)
-const FRAMES_CUSTOM_PADDING: Record<string, { v: number; h: number }> = {
-  'frame-84': { v: 12, h: 10 },
-  'frame-85': { v: 12, h: 10 },
+// Padding personnalisé pour les cadres à bordure — top/bottom/h adaptés à chaque cadre
+const FRAMES_CUSTOM_PADDING: Record<string, { top: number; bottom: number; h: number }> = {
+  'frame-84': { top: 22, bottom: 14, h: 14 },
+  'frame-85': { top: 26, bottom: 10, h: 15 },
 }
 const FRAMES: { id: string; label: string; url: string | null; video?: boolean }[] = [
   { id: 'frame-02', label: '🤍 Roses Crème Haut/Bas', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/51_m9vx96.png' },
@@ -163,11 +163,9 @@ const FRAMES: { id: string; label: string; url: string | null; video?: boolean }
   { id: 'frame-77', label: '🌸 Floral 77', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878824/77_rnfcni.png' },
   { id: 'frame-78', label: '🌸 Floral 78', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878816/78_umvdax.png' },
   { id: 'frame-79', label: '🌸 Floral 79', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878824/79_msrbl6.png' },
-  { id: 'frame-80', label: '🌸 Floral 80', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878829/80_vsytvo.png' },
   { id: 'frame-95', label: '🌸 Floral 95', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878845/95_w9natp.png' },
   { id: 'frame-96', label: '🌸 Floral 96', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878838/96_bauksw.png' },
   { id: 'frame-97', label: '🌸 Floral 97', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878845/97_dcccon.png' },
-  { id: 'frame-99', label: '🌸 Floral 99', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878852/99_webyut.png' },
   { id: 'frame-100', label: '🌸 Floral 100', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878852/100_kzuxzq.png' },
   { id: 'frame-101', label: '🌸 Floral 101', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878850/101_s1bjjf.png' },
   { id: 'frame-102', label: '🌸 Floral 102', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878855/102_atqmm6.png' },
@@ -175,8 +173,6 @@ const FRAMES: { id: string; label: string; url: string | null; video?: boolean }
   { id: 'frame-104', label: '🌸 Floral 104', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878854/104_mafsu8.png' },
   { id: 'frame-105', label: '🌸 Floral 105', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878857/105_cyugrg.png' },
   { id: 'frame-106', label: '🌸 Floral 106', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878859/106_lv0kwe.png' },
-  { id: 'frame-107', label: '🌸 Floral 107', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878857/107_jal3jp.png' },
-  { id: 'frame-108', label: '🌸 Floral 108', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878858/108_xvumew.png' },
   { id: 'frame-147', label: '🌿 Feuillage 147', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896737/147_vmtvha.png' },
   { id: 'frame-148', label: '🌿 Feuillage 148', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896737/148_hdqw48.png' },
   { id: 'frame-149', label: '🌿 Feuillage 149', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896746/149_jwshu6.png' },
@@ -2323,7 +2319,7 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
       <OrnementCorner url={ornUrl} corner="top-right" size={130} />
       <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
       {/* Zone texte avec voile blanc semi-transparent derrière pour garantir la lisibilité sur cadres chargés */}
-      <div style={{ position: 'relative', zIndex: 10, paddingTop: `${FRAMES_CUSTOM_PADDING[frameId]?.v ?? framePaddingV}%`, paddingBottom: `${FRAMES_CUSTOM_PADDING[frameId]?.v ?? framePaddingV}%`, paddingLeft: `${FRAMES_CUSTOM_PADDING[frameId]?.h ?? framePaddingH}%`, paddingRight: `${FRAMES_CUSTOM_PADDING[frameId]?.h ?? framePaddingH}%`, textAlign: 'center', opacity: textOpacity, transform: textOffsetY ? `translateY(${textOffsetY}px)` : undefined }}>
+      <div style={{ position: 'relative', zIndex: 10, paddingTop: `${FRAMES_CUSTOM_PADDING[frameId]?.top ?? framePaddingV}%`, paddingBottom: `${FRAMES_CUSTOM_PADDING[frameId]?.bottom ?? framePaddingV}%`, paddingLeft: `${FRAMES_CUSTOM_PADDING[frameId]?.h ?? framePaddingH}%`, paddingRight: `${FRAMES_CUSTOM_PADDING[frameId]?.h ?? framePaddingH}%`, textAlign: 'center', opacity: textOpacity, transform: textOffsetY ? `translateY(${textOffsetY}px)` : undefined }}>
         {hasFrame && FRAMES_STRONG_BG.has(frameId) && (
           <div style={{ position: 'absolute', inset: '12% 18%', background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: -1 }} />
         )}
