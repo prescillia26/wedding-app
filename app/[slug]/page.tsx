@@ -33,6 +33,10 @@ const getData = cache(async (slug: string) => {
     ville?: string
     lieu?: string
     ogVersion?: number
+    customLogoUrl?: string
+    luxeMonogramUrl?: string
+    ceremonies?: { illustrationUrl?: string }[]
+    style?: string
   }>(shareId)
   if (!data) return null
   return { shareId, data }
@@ -76,8 +80,14 @@ export async function generateMetadata(
   ].filter(Boolean)
   const description = descParts.join(' ') + '. Découvrez les informations et confirmez votre présence.'
 
-  const rawPhoto = result.data.photosFond?.[0] || result.data.photoFond
-  const ogImage = toCloudinaryOgUrl(rawPhoto, result.data.ogVersion)
+  // Priorité OG image : photo uploadée > illustration cérémonie > logo custom > monogramme
+  const rawPhoto = result.data.photosFond?.[0]
+    || result.data.photoFond
+    || result.data.ceremonies?.find(c => c.illustrationUrl)?.illustrationUrl
+    || result.data.customLogoUrl
+    || result.data.luxeMonogramUrl
+    || ''
+  const ogImage = rawPhoto ? toCloudinaryOgUrl(rawPhoto, result.data.ogVersion) : ''
 
   return {
     title,
@@ -89,19 +99,19 @@ export async function generateMetadata(
       locale: 'fr_FR',
       url: `/${slug}`,
       siteName: "Lov'it — Invitations de mariage",
-      images: ogImage ? [{
-        url: ogImage,
+      images: [{
+        url: ogImage || 'https://res.cloudinary.com/dau96mui2/image/upload/w_1200,h_630,c_fill,q_auto/v1780178453/watercolors/st6oedinlfobqf1tqgkk.png',
         width: 1200,
         height: 630,
         alt: `Invitation de mariage de ${marie1Prenom} & ${marie2Prenom}`,
-        type: 'image/jpeg',
-      }] : [],
+        type: 'image/png',
+      }],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: ogImage ? [ogImage] : [],
+      images: [ogImage || 'https://res.cloudinary.com/dau96mui2/image/upload/w_1200,h_630,c_fill,q_auto/v1780178453/watercolors/st6oedinlfobqf1tqgkk.png'],
     },
     robots: { index: false, follow: false },
   }
@@ -112,8 +122,13 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const result = await getData(slug)
 
-  const rawPhoto = result?.data?.photosFond?.[0] || result?.data?.photoFond || ''
-  const photo = toCloudinaryOgUrl(rawPhoto, result?.data?.ogVersion)
+  const rawPhoto = result?.data?.photosFond?.[0]
+    || result?.data?.photoFond
+    || result?.data?.ceremonies?.find(c => c.illustrationUrl)?.illustrationUrl
+    || result?.data?.customLogoUrl
+    || result?.data?.luxeMonogramUrl
+    || ''
+  const photo = rawPhoto ? toCloudinaryOgUrl(rawPhoto, result?.data?.ogVersion) : ''
   const accent = '#C9A84C'
   const targetUrl = result?.shareId
     ? `/faire-part?share=${result.shareId}&role=guest`
