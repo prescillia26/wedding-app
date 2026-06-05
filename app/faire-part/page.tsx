@@ -1900,90 +1900,6 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
         </div>
       </AccordionSection>
 
-      {/* ── 2. Cadre décoratif (optionnel) ── */}
-      <AccordionSection title={locale === 'en' ? '🖼️ Decorative frame (optional)' : '🖼️ Cadre décoratif (optionnel)'}>
-        <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 10, lineHeight: 1.5 }}>
-          {locale === 'en' ? 'Choose a frame or leave "No frame" for a clean look.' : 'Choisissez un cadre ou laissez "Sans cadre" pour un rendu épuré.'}
-        </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-          {FRAMES.filter(fr => !fr.video).map(fr => {
-            const sel = (data.frameId ?? 'none') === fr.id
-            return (
-              <button key={fr.id} type="button" onClick={() => onChange({ frameId: fr.id })} style={{
-                ...BTN, padding: 8, borderRadius: 10,
-                border: `2px solid ${sel ? accent : '#f0e0d0'}`,
-                background: sel ? `${accent}10` : 'white',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-                boxShadow: sel ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.08)',
-              }}>
-                {fr.url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={fr.url} alt={fr.label} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
-                ) : (
-                  <div style={{ width: 80, height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: '#9a928a', background: '#f9f7f5', borderRadius: 6 }}>Sans cadre</div>
-                )}
-                <span style={{ fontSize: 9, fontWeight: sel ? 700 : 400, color: sel ? accent : '#3a3330', textAlign: 'center', lineHeight: 1.3 }}>{fr.label}</span>
-              </button>
-            )
-          })}
-        </div>
-      </AccordionSection>
-
-      {/* ── 3. Illustrations aquarelles par cérémonie ── */}
-      <AccordionSection title={locale === 'en' ? '🎨 Ceremony illustrations' : '🎨 Illustrations par cérémonie'}>
-        <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 14, lineHeight: 1.5 }}>
-          {locale === 'en'
-            ? 'Add a watercolor illustration for each ceremony. It will appear between your events.'
-            : 'Ajoutez une illustration aquarelle pour chaque cérémonie. Elle apparaîtra entre vos événements.'}
-        </p>
-        {(data.ceremonies ?? []).map((ceremony, idx) => {
-          const typeToCategory: Record<string, VisualCategory> = {
-            'Mairie': 'mairie',
-            'Cérémonie religieuse / Houppa': 'houppa',
-            'Shabbat Hatan': 'shabbat',
-            'Henné': 'couples',
-            'Cocktail': 'couples',
-            'Soirée': 'couples',
-            'Boat Party': 'couples',
-            'Autre': 'couples',
-          }
-          const category = typeToCategory[ceremony.type] || 'couples'
-          const ceremonyName = ceremony.type === 'Autre' ? (ceremony.customName || 'Événement') : ceremony.type
-          return (
-            <div key={idx} style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: accent, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                {ceremonyName}
-              </div>
-              {ceremony.illustrationUrl && (
-                <div style={{ textAlign: 'center', marginBottom: 8 }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={ceremony.illustrationUrl.replace('/upload/', '/upload/w_300,c_fit/')} alt="" style={{ maxHeight: 80, borderRadius: 8, opacity: 0.8 }} />
-                  <button type="button" onClick={() => {
-                    const updated = [...(data.ceremonies ?? [])]
-                    updated[idx] = { ...updated[idx], illustrationUrl: '' }
-                    onChange({ ceremonies: updated })
-                  }} style={{ ...BTN, display: 'block', margin: '4px auto 0', fontSize: 10, color: '#d45050', background: 'none', border: 'none' }}>
-                    {locale === 'en' ? 'Remove' : 'Retirer'}
-                  </button>
-                </div>
-              )}
-              <VisualPicker
-                category={category}
-                selectedId={ceremony.illustrationUrl ? VISUALS.find(v => v.url === ceremony.illustrationUrl)?.id : undefined}
-                onSelect={(id) => {
-                  const visual = visualById(id)
-                  if (visual) {
-                    const updated = [...(data.ceremonies ?? [])]
-                    updated[idx] = { ...updated[idx], illustrationUrl: visual.url }
-                    onChange({ ceremonies: updated })
-                  }
-                }}
-                accent={accent}
-              />
-            </div>
-          )
-        })}
-      </AccordionSection>
 
 
 
@@ -5344,6 +5260,50 @@ function InlineRSVP({ ceremonies, accent, textColor, shareId, mariee1, mariee2, 
   )
 }
 
+// ── Bouton "Ajouter une illustration" entre les cérémonies ───────────────────
+function IllustrationAdder({ ceremonyType, accent, onSelect }: { ceremonyType: string; accent: string; onSelect: (url: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const typeToCategory: Record<string, VisualCategory> = {
+    'Mairie': 'mairie', 'Cérémonie religieuse / Houppa': 'houppa', 'Shabbat Hatan': 'shabbat',
+    'Henné': 'couples', 'Cocktail': 'couples', 'Soirée': 'couples', 'Boat Party': 'couples', 'Autre': 'couples',
+  }
+  const category = typeToCategory[ceremonyType] || 'couples'
+
+  if (!open) {
+    return (
+      <div style={{ textAlign: 'center', padding: '12px 0' }}>
+        <button type="button" onClick={() => setOpen(true)} style={{
+          ...BTN, padding: '8px 20px', borderRadius: 9999, border: `1.5px dashed ${accent}55`,
+          background: 'transparent', color: accent, fontSize: 12, fontWeight: 600,
+          fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic',
+        }}>
+          + Ajouter une illustration
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ maxWidth: 520, margin: '0 auto', padding: '16px', background: '#faf8f5', borderRadius: 12, border: '1px solid #e8e0d8' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <span style={{ fontSize: 12, fontWeight: 600, color: accent, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Choisir une illustration</span>
+        <button type="button" onClick={() => setOpen(false)} style={{ ...BTN, background: 'none', border: 'none', fontSize: 16, color: '#9a928a', padding: 0 }}>✕</button>
+      </div>
+      <VisualPicker
+        category={category}
+        onSelect={(id) => {
+          const visual = visualById(id)
+          if (visual) {
+            onSelect(visual.url)
+            setOpen(false)
+          }
+        }}
+        accent={accent}
+      />
+    </div>
+  )
+}
+
 // ── SharedPageContent ─────────────────────────────────────────────────────────
 function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute, onUpdate }: SharedPageContentProps) {
   const { t, locale } = useT()
@@ -5531,13 +5491,32 @@ const firstDate = sorted[0]?.date
           const isCard = (data.presentationStyle ?? 'page-unique') !== 'page-unique'
           return (
             <React.Fragment key={realIdx}>
-              {/* Aquarelle IA du lieu — image décorative entre les sections */}
-              {ceremony.illustrationUrl && (
-                <div style={{ maxWidth: 520, margin: '0 auto 8px', padding: '0 16px', textAlign: 'center' }}>
+              {/* Illustration aquarelle — image décorative entre les sections */}
+              {ceremony.illustrationUrl ? (
+                <div style={{ maxWidth: 520, margin: '0 auto 8px', padding: '0 16px', textAlign: 'center', position: 'relative' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={ceremony.illustrationUrl} alt="" style={{ width: '100%', maxHeight: 360, display: 'block', objectFit: 'contain', margin: '0 auto', mixBlendMode: 'multiply' }} />
+                  {role !== 'guest' && onUpdate && (
+                    <button type="button" onClick={() => {
+                      const updated = [...(data.ceremonies ?? [])]
+                      updated[realIdx] = { ...updated[realIdx], illustrationUrl: '' }
+                      onUpdate?.({ ceremonies: updated })
+                    }} style={{ ...BTN, position: 'absolute', top: 8, right: 24, background: 'rgba(255,255,255,0.9)', border: '1px solid #e0d5c8', borderRadius: 9999, padding: '4px 12px', fontSize: 10, color: '#d45050', fontWeight: 600, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+                      Retirer
+                    </button>
+                  )}
                 </div>
-              )}
+              ) : (role !== 'guest' && onUpdate) ? (
+                <IllustrationAdder
+                  ceremonyType={ceremony.type}
+                  accent={G}
+                  onSelect={(url) => {
+                    const updated = [...(data.ceremonies ?? [])]
+                    updated[realIdx] = { ...updated[realIdx], illustrationUrl: url }
+                    onUpdate?.({ ceremonies: updated })
+                  }}
+                />
+              ) : null}
               <CeremonyCard isCard={isCard} accent={G}>
                 <section id={`ceremony-${realIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : 96, paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : 96, paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: (role !== 'guest' && !!onUpdate) ? 'visible' : 'hidden', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
                   {hasFrame && frame.video ? (
