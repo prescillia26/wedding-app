@@ -16,7 +16,7 @@ import { byId as visualById, VISUALS } from '@/lib/visuals'
 import type { VisualCategory } from '@/lib/visuals'
 
 
-type Theme = 'rose-fleuri' | 'ivoire-or' | 'bleu-floral' | 'champetre' | 'blanc-gris' | 'noir-blanc' | 'chocolat' | 'bordeaux' | 'bordeaux-nuit' | 'fuchsia' | 'marine-or' | 'menthe'
+type Theme = 'rose-fleuri' | 'ivoire-or' | 'bleu-floral' | 'champetre' | 'blanc-gris' | 'noir-blanc' | 'chocolat' | 'bordeaux' | 'bordeaux-nuit' | 'fuchsia' | 'marine-or' | 'menthe' | 'sable-dore' | 'terracotta' | 'lin-ecru' | 'vert-sauge' | 'rose-peche' | 'orange-terra' | 'bleu-nuit' | 'creme' | 'bleu-med' | 'blanc-imm' | 'jaune-ocre' | 'vert-celadon'
 type PresentationStyle = 'page-unique' | 'cartes-scrollables' | 'cartes-separees'
 // ⚙️ Nombre max de photos uploadables par couple (carrousel de la section d'accueil)
 const MAX_PHOTOS = 3
@@ -83,6 +83,18 @@ const THEMES: Record<Theme, ThemeObj> = {
   'fuchsia':       { fond: '#fff0f8', accent: '#d4006a', texte: '#2a0020', textSecondaire: '#8a0050', nom: 'Fuchsia' },
   'marine-or':     { fond: '#0a1628', accent: '#C9A84C', texte: '#e8e0d0', textSecondaire: '#b0a880', nom: 'Marine & Or', dark: true },
   'menthe':        { fond: '#f0faf5', accent: '#2a9a6a', texte: '#0a2a1a', textSecondaire: '#4a7a5a', nom: 'Menthe' },
+  'sable-dore':    { fond: '#faf6ee', accent: '#C9A84C', texte: '#3a3020', textSecondaire: '#8a7a5a', nom: 'Sable Doré' },
+  'terracotta':    { fond: '#faf0e8', accent: '#C97F4C', texte: '#3a2010', textSecondaire: '#8a5a3a', nom: 'Terracotta' },
+  'lin-ecru':      { fond: '#f8f4ee', accent: '#b0a080', texte: '#3a3528', textSecondaire: '#7a7060', nom: 'Lin Écru' },
+  'vert-sauge':    { fond: '#f2f7f3', accent: '#6a9a70', texte: '#1a3020', textSecondaire: '#4a7050', nom: 'Vert Sauge' },
+  'rose-peche':    { fond: '#fef5f0', accent: '#d4826a', texte: '#3a2018', textSecondaire: '#8a5a4a', nom: 'Rose Pêche' },
+  'orange-terra':  { fond: '#faf0e8', accent: '#E07856', texte: '#3a1810', textSecondaire: '#8a4a30', nom: 'Orange Terracotta' },
+  'bleu-nuit':     { fond: '#0e1e34', accent: '#7aaed4', texte: '#d8e4f0', textSecondaire: '#90a8c0', nom: 'Bleu Nuit', dark: true },
+  'creme':         { fond: '#faf5eb', accent: '#b0a070', texte: '#3a3520', textSecondaire: '#7a7050', nom: 'Crème' },
+  'bleu-med':      { fond: '#f0f6fc', accent: '#1E5BA8', texte: '#0a1a30', textSecondaire: '#3a5a80', nom: 'Bleu Méditerranée' },
+  'blanc-imm':     { fond: '#fbf9f4', accent: '#9a9080', texte: '#2a2820', textSecondaire: '#6a6558', nom: 'Blanc Immaculé' },
+  'jaune-ocre':    { fond: '#faf6e8', accent: '#C9A030', texte: '#3a3010', textSecondaire: '#8a7a30', nom: 'Jaune Ocre' },
+  'vert-celadon':  { fond: '#f0f6f3', accent: '#5a9a80', texte: '#1a3028', textSecondaire: '#4a7a68', nom: 'Vert Céladon' },
 }
 
 const ORNEMENTS_LIBRARY: { id: string; url: string; nom: string }[] = [
@@ -161,6 +173,16 @@ const LUXE_COLORS: { id: string; label: string; hex: string; palette: Palette }[
   { id: 'noir',       label: 'Noir',         hex: '#2a2a2a', palette: 'dore' },
   { id: 'blanc',      label: 'Blanc',        hex: '#c8c0b8', palette: 'dore' },
   { id: 'ivoire',     label: 'Ivoire',       hex: '#d4c5a0', palette: 'dore' },
+  { id: 'sable_dore', label: 'Sable doré',   hex: '#E8D4A2', palette: 'sable_dore' },
+  { id: 'rose_peche', label: 'Rose pêche',   hex: '#F5C6B0', palette: 'rose_peche' },
+  { id: 'bleu_med',   label: 'Bleu méditerranée', hex: '#1E5BA8', palette: 'bleu_med' },
+  { id: 'jaune_ocre', label: 'Jaune ocre',   hex: '#E5B847', palette: 'bleu_med' },
+  { id: 'vert_celadon', label: 'Vert céladon', hex: '#8FB8A8', palette: 'bleu_med' },
+  { id: 'turquoise_lagune', label: 'Turquoise lagune', hex: '#5DBDC8', palette: 'fuchsia' },
+  { id: 'vert_olivier', label: 'Vert olivier', hex: '#7A8B5C', palette: 'fuchsia' },
+  { id: 'lin_ecru',   label: 'Lin écru',     hex: '#EDE3D2', palette: 'sable_dore' },
+  { id: 'orange_terra', label: 'Orange terracotta', hex: '#E07856', palette: 'rose_peche' },
+  { id: 'blanc_imm',  label: 'Blanc immaculé', hex: '#FBF9F4', palette: 'bleu_med' },
 ]
 
 

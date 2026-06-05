@@ -1,5 +1,5 @@
 export type Ambiance = "plage" | "chateau" | "jardin" | "salle" | "synagogue" | "israel" | "universel";
-export type Palette = "lavande" | "rose" | "sauge" | "bleu_nuit" | "bleu_ciel" | "rose_clair" | "mauve" | "peche" | "dore" | "bordeaux" | "menthe" | "terracotta";
+export type Palette = "lavande" | "rose" | "sauge" | "bleu_nuit" | "bleu_ciel" | "rose_clair" | "mauve" | "peche" | "dore" | "bordeaux" | "menthe" | "terracotta" | "sable_dore" | "fuchsia" | "rose_peche" | "bleu_med";
 
 const SCENES: Record<Ambiance, string> = {
   plage: "a Mediterranean beach wedding setup, turquoise calm sea, soft sand, granite rocks",
@@ -24,6 +24,10 @@ const PALETTES: Record<Palette, string> = {
   bordeaux: "deep burgundy, wine red, dark rose, antique gold, cream",
   menthe: "fresh mint, seafoam green, soft teal, ivory, pale sage",
   terracotta: "warm terracotta, burnt sienna, dusty orange, olive, cream",
+  sable_dore: "sandy gold, warm terracotta, raw linen ecru, sage green, soft beige",
+  fuchsia: "vivid fuchsia bougainvillea, turquoise lagoon, olive green, pure white",
+  rose_peche: "soft peach pink, warm terracotta orange, deep navy blue, creamy ivory",
+  bleu_med: "Mediterranean blue, immaculate white, warm ochre yellow, celadon green",
 };
 
 export function buildWatercolorPrompt(ambiance: Ambiance, palette: Palette, freeText?: string): string {

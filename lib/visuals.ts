@@ -1,6 +1,6 @@
 // Bibliothèque de 58 visuels aquarelles curatés pour le Pack Luxe
 
-export type VisualCategory = 'couples' | 'mairie' | 'houppa' | 'shabbat' | 'beach' | 'rsvp' | 'delimiter'
+export type VisualCategory = 'couples' | 'mairie' | 'houppa' | 'shabbat' | 'beach' | 'rsvp' | 'delimiter' | 'itineraire'
 
 export interface Visual {
   id: string
@@ -47,6 +47,7 @@ export const VISUALS: Visual[] = [
   { id: 'M12', category: 'mairie', label: 'Mairie 12', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498299/57_trnqcw.png' },
   { id: 'M13', category: 'mairie', label: 'Mairie 13', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498301/58_u8a5ma.png' },
   { id: 'M14', category: 'mairie', label: 'Mairie 14', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498303/60_i5rwnj.png' },
+  { id: 'M15', category: 'mairie', label: 'Mairie 15', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780683058/101_vsahmu.png' },
 
   // ── Houppa (10) ───────────────────────────────────────────────────────
   { id: 'HU01', category: 'houppa', label: 'Houppa 1', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498306/65_t8zu3e.png' },
@@ -59,6 +60,7 @@ export const VISUALS: Visual[] = [
   { id: 'HU08', category: 'houppa', label: 'Houppa 8', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780213054/watercolors/zlfwhcqfmsmpcvkgaxs4.png' },
   { id: 'HU09', category: 'houppa', label: 'Houppa 9', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780178389/watercolors/pvgyg06aka8rnn6c2gok.png' },
   { id: 'HU10', category: 'houppa', label: 'Houppa 10', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780077676/watercolors/xmlalwrz5n43txcdxknw.png' },
+  { id: 'HU11', category: 'houppa', label: 'Houppa 11', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780683025/98_szms5i.png' },
 
   // ── Shabbat (12) ──────────────────────────────────────────────────────
   { id: 'S01', category: 'shabbat', label: 'Shabbat 1', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498308/69_okdgu1.png' },
@@ -78,7 +80,14 @@ export const VISUALS: Visual[] = [
   { id: 'D11', category: 'delimiter', label: 'Colombes', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780479346/delimiters/delimiters/d11-doves.png' },
   { id: 'D14', category: 'delimiter', label: 'Bougies', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780479348/delimiters/delimiters/d14-candles.png' },
 
-  // ── Beach Party (à compléter) ─────────────────────────────────────────
+  // ── Beach Party (3) ──────────────────────────────────────────────────
+  { id: 'B01', category: 'beach', label: 'Beach 1', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780683013/95_jtm2sc.png' },
+  { id: 'B02', category: 'beach', label: 'Beach 2', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780683015/96_y6mfxr.png' },
+  { id: 'B03', category: 'beach', label: 'Beach 3', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780683015/97_rwhyhk.png' },
+
+  // ── Itinéraire (1) ──────────────────────────────────────────────────
+  { id: 'IT01', category: 'itineraire', label: 'Itinéraire 1', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780683042/99_yvojqy.png' },
+
   // ── RSVP (à compléter) ────────────────────────────────────────────────
 ]
 

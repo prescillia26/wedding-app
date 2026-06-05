@@ -1,4 +1,4 @@
-export type LuxePalette = 'lavande' | 'rose' | 'sauge' | 'bleunuit'
+export type LuxePalette = 'lavande' | 'rose' | 'sauge' | 'bleunuit' | 'sable_dore' | 'fuchsia' | 'rose_peche' | 'bleu_med'
 
 export interface PaletteColors {
   primary: string
@@ -41,6 +41,38 @@ export const PALETTES: Record<LuxePalette, PaletteColors> = {
     text:       '#1a1a2e',
     textSoft:   '#6b7280',
     background: '#eff6ff',
+  },
+  sable_dore: {
+    primary:    '#C97F4C',
+    accent:     '#9DBBA1',
+    accentSoft: '#E8D4A2',
+    text:       '#3a2a1a',
+    textSoft:   '#8a7060',
+    background: '#EDE3D2',
+  },
+  fuchsia: {
+    primary:    '#D63384',
+    accent:     '#5DBDC8',
+    accentSoft: '#FCE4F0',
+    text:       '#2a1a2e',
+    textSoft:   '#7A8B5C',
+    background: '#FFFFFF',
+  },
+  rose_peche: {
+    primary:    '#1B3A5C',
+    accent:     '#E07856',
+    accentSoft: '#F5C6B0',
+    text:       '#1B3A5C',
+    textSoft:   '#6a5a50',
+    background: '#FAF5EB',
+  },
+  bleu_med: {
+    primary:    '#1E5BA8',
+    accent:     '#E5B847',
+    accentSoft: '#8FB8A8',
+    text:       '#1a2a3e',
+    textSoft:   '#4a6a8a',
+    background: '#FBF9F4',
   },
 }
 
