@@ -5356,7 +5356,7 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
   }
 
   return (
-    <div style={{ textAlign: 'center', position: 'relative', margin: '-8px 0 -4px', overflow: 'visible' }}>
+    <div style={{ textAlign: 'center', position: 'relative', margin: 0, padding: 0, overflow: 'visible', lineHeight: 0 }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={url} alt="" draggable={false}
@@ -5364,11 +5364,11 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
         onTouchStart={editable ? (e) => { e.preventDefault(); startDrag(e.touches[0].clientX, e.touches[0].clientY) } : undefined}
         style={{
           width: `${w}%`, maxHeight: 300, objectFit: 'contain', display: 'inline-block',
-          mixBlendMode: 'multiply',
+          mixBlendMode: 'multiply', verticalAlign: 'middle',
           transform: `translate(${cx}px, ${cy}px)`,
           cursor: editable ? (draggingRef.current ? 'grabbing' : 'grab') : 'default',
           transition: draggingRef.current ? 'none' : 'width 0.2s',
-          userSelect: 'none',
+          userSelect: 'none', margin: 0, padding: 0,
         }}
       />
       {editable && !showPicker && (
@@ -5686,8 +5686,12 @@ const firstDate = sorted[0]?.date
                       <DraggableElement id={pre+"bsd"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><div style={{ position: 'absolute', top: 18, right: 22, fontSize: 16, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, zIndex: 5, opacity: 0.85, letterSpacing: 1 }}>בס״ד</div></DraggableElement>
                     )}
                     <DraggableElement id={pre+"titre"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} skipAnim={canEdit}>
-                      <div style={applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 16, lineHeight: 1.4 }, 'titres', data.zoneStyles)}>{ov[`ceremony_${i}_titre`] || title}</div>
-                      <OrnSep />
+                      <div style={applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: ceremony.illustrationUrl ? 6 : 16, lineHeight: 1.4 }, 'titres', data.zoneStyles)}>{ov[`ceremony_${i}_titre`] || title}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center', margin: `0 auto ${ceremony.illustrationUrl ? '4px' : '24px'}`, maxWidth: 200 }}>
+                        <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to right, transparent, ${G}40)` }} />
+                        <span style={{ color: G, fontSize: 8, opacity: 0.5 }}>◆</span>
+                        <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to left, transparent, ${G}40)` }} />
+                      </div>
                     </AnimSection></DraggableElement>
                     {/* Illustration aquarelle — après le titre, déplaçable par les mariés */}
                     {ceremony.illustrationUrl ? (
