@@ -3,6 +3,10 @@ import type { Metadata } from 'next'
 import { cache } from 'react'
 import RedirectClient from './redirect-client'
 
+// Pas de cache sur cette page — les mariés modifient et la preview WhatsApp doit se mettre à jour
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 const redis = new Redis({
   url: process.env.KV_REST_API_URL!,
   token: process.env.KV_REST_API_TOKEN!,
