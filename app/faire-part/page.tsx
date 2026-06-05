@@ -268,9 +268,21 @@ const THEME_CARD_BG: Record<string, string> = {
   'fuchsia':       '#fff5fc',
   'marine-or':     '#0a1628',
   'menthe':        '#f2fbf7',
+  'sable-dore':    '#faf6ee',
+  'terracotta':    '#faf0e8',
+  'lin-ecru':      '#f8f4ee',
+  'vert-sauge':    '#f2f7f3',
+  'rose-peche':    '#fef5f0',
+  'orange-terra':  '#faf0e8',
+  'bleu-nuit':     '#0e1e34',
+  'creme':         '#faf5eb',
+  'bleu-med':      '#f0f6fc',
+  'blanc-imm':     '#fbf9f4',
+  'jaune-ocre':    '#faf6e8',
+  'vert-celadon':  '#f0f6f3',
 }
 
-const CEREMONY_TYPES = ['Mairie', 'Cérémonie religieuse / Houppa', 'Shabbat Hatan', 'Henné', 'Cocktail', 'Soirée', 'Boat Party', 'Autre']
+const CEREMONY_TYPES = ['Mairie', 'Cérémonie religieuse / Houppa', 'Shabbat Hatan', 'Henné', 'Cocktail', 'Soirée', 'Boat Party', 'Beach Party', 'Autre']
 
 interface Ceremony {
   type: string
@@ -732,6 +744,14 @@ function renderInvitationPhrase(
           <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteBoatPartyIntro ?? 'Embarquez avec'}</div>
           <div style={highlightStyle}>{p1} &amp; {p2}</div>
           <div style={introStyle}>{(dict?.inviteBoatPartySea ?? 'pour une soirée inoubliable,\nentre ciel et mer').split('\n').map((line, i) => <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>)}</div>
+        </>
+      )
+    case 'Beach Party':
+      return (
+        <>
+          <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteBeachPartyIntro ?? 'Retrouvez'}</div>
+          <div style={highlightStyle}>{p1} &amp; {p2}</div>
+          <div style={introStyle}>{(dict?.inviteBeachPartySea ?? 'les pieds dans le sable,\npour une fête inoubliable').split('\n').map((line, i) => <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>)}</div>
         </>
       )
     case 'Autre': {
@@ -3906,7 +3926,7 @@ function ShareModal({ accent, guestUrl, coupleUrl, onClose, data }: { accent: st
   const typeTitle: Record<string, string> = {
     'Mairie': t.fairepart.cardTitles['Mairie'], 'Cérémonie religieuse / Houppa': t.fairepart.cardTitles['Cérémonie religieuse / Houppa'],
     'Shabbat Hatan': t.fairepart.cardTitles['Shabbat Hatan'], 'Henné': t.fairepart.cardTitles['Henné'],
-    'Cocktail': t.fairepart.cardTitles['Cocktail'], 'Soirée': t.fairepart.cardTitles['Soirée'], 'Boat Party': t.fairepart.cardTitles['Boat Party'],
+    'Cocktail': t.fairepart.cardTitles['Cocktail'], 'Soirée': t.fairepart.cardTitles['Soirée'], 'Boat Party': t.fairepart.cardTitles['Boat Party'], 'Beach Party': t.fairepart.cardTitles['Beach Party'],
   }
   const getCName = (c: Ceremony) => typeTitle[c.type] || c.customName || c.type
 
@@ -4117,7 +4137,7 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
                       <textarea
                         value={localText[`ceremony_${i}_invitation`] ?? ''}
                         onChange={e => setText(`ceremony_${i}_invitation`, e.target.value)}
-                        placeholder={`ex: ${c.type === 'Shabbat Hatan' ? 'Les familles X et Y seront ravies de vous convier au Shabbat Hatan de...' : c.type === 'Henné' ? 'Vous convient à célébrer leur soirée de henné...' : c.type === 'Cocktail' ? 'Vous invitent à lever leur verre...' : c.type === 'Soirée' ? 'Vous invitent à danser et célébrer leur amour...' : c.type === 'Boat Party' ? 'Embarquez avec eux pour une soirée inoubliable...' : 'Rejoignez-les pour cet événement...'}`}
+                        placeholder={`ex: ${c.type === 'Shabbat Hatan' ? 'Les familles X et Y seront ravies de vous convier au Shabbat Hatan de...' : c.type === 'Henné' ? 'Vous convient à célébrer leur soirée de henné...' : c.type === 'Cocktail' ? 'Vous invitent à lever leur verre...' : c.type === 'Soirée' ? 'Vous invitent à danser et célébrer leur amour...' : c.type === 'Boat Party' ? 'Embarquez avec eux pour une soirée inoubliable...' : c.type === 'Beach Party' ? 'Retrouvez-les les pieds dans le sable pour une fête inoubliable...' : 'Rejoignez-les pour cet événement...'}`}
                         style={{ width: '100%', padding: '10px 12px', border: '1px solid #e0d5c8', borderRadius: 8, fontSize: 14, color: '#3a3330', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 70, marginBottom: 12 }}
                       />
                       <p style={{ fontSize: 11, color: '#9ca3af', fontStyle: 'italic', marginTop: -6, marginBottom: 12 }}>
@@ -5265,7 +5285,7 @@ function InlineRSVP({ ceremonies, accent, textColor, shareId, mariee1, mariee2, 
 
   const getCeremonyName = (c: Ceremony) => {
     if (c.type === 'Autre') return c.customName || 'Événement'
-    const names: Record<string, string> = { 'Cérémonie religieuse / Houppa': 'La Houppa', 'Mairie': 'La Mairie', 'Shabbat Hatan': 'Le Shabbat', 'Henné': 'Le Henné', 'Cocktail': 'Le Cocktail', 'Soirée': 'La Soirée', 'Boat Party': 'Boat Party' }
+    const names: Record<string, string> = { 'Cérémonie religieuse / Houppa': 'La Houppa', 'Mairie': 'La Mairie', 'Shabbat Hatan': 'Le Shabbat', 'Henné': 'Le Henné', 'Cocktail': 'Le Cocktail', 'Soirée': 'La Soirée', 'Boat Party': 'Boat Party', 'Beach Party': 'Beach Party' }
     return names[c.type] || c.type
   }
 
@@ -5449,7 +5469,7 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
   const dragOffset = useRef({ x: 0, y: 0 })
   const typeToCategory: Record<string, VisualCategory> = {
     'Mairie': 'mairie', 'Cérémonie religieuse / Houppa': 'houppa', 'Shabbat Hatan': 'shabbat',
-    'Henné': 'couples', 'Cocktail': 'couples', 'Soirée': 'couples', 'Boat Party': 'couples', 'Autre': 'couples',
+    'Henné': 'couples', 'Cocktail': 'couples', 'Soirée': 'couples', 'Boat Party': 'beach', 'Beach Party': 'beach', 'Autre': 'couples',
   }
   const category = typeToCategory[ceremonyType] || 'couples'
   const w = Math.max(30, Math.min(150, size))
@@ -5579,7 +5599,7 @@ function IllustrationAdder({ ceremonyType, accent, onSelect }: { ceremonyType: s
   const [open, setOpen] = useState(false)
   const typeToCategory: Record<string, VisualCategory> = {
     'Mairie': 'mairie', 'Cérémonie religieuse / Houppa': 'houppa', 'Shabbat Hatan': 'shabbat',
-    'Henné': 'couples', 'Cocktail': 'couples', 'Soirée': 'couples', 'Boat Party': 'couples', 'Autre': 'couples',
+    'Henné': 'couples', 'Cocktail': 'couples', 'Soirée': 'couples', 'Boat Party': 'beach', 'Beach Party': 'beach', 'Autre': 'couples',
   }
   const category = typeToCategory[ceremonyType] || 'couples'
 
@@ -5812,7 +5832,7 @@ const firstDate = sorted[0]?.date
           const typeTitle: Record<string, string> = {
             'Mairie': t.fairepart.cardTitles['Mairie'], 'Cérémonie religieuse / Houppa': data.mariageJuif ? t.fairepart.cardTitles['Cérémonie religieuse / Houppa'] : t.fairepart.cardTitles['Cérémonie'],
             'Shabbat Hatan': t.fairepart.cardTitles['Shabbat Hatan'], 'Henné': t.fairepart.cardTitles['Henné'], 'Cocktail': t.fairepart.cardTitles['Cocktail'],
-            'Soirée': t.fairepart.cardTitles['Soirée'], 'Boat Party': t.fairepart.cardTitles['Boat Party'],
+            'Soirée': t.fairepart.cardTitles['Soirée'], 'Boat Party': t.fairepart.cardTitles['Boat Party'], 'Beach Party': t.fairepart.cardTitles['Beach Party'],
           }
           const title = typeTitle[ceremony.type] || (ceremony.customName?.toUpperCase() || ceremony.type.toUpperCase())
           const hebrewDate = getHebrewDate(ceremony.date)
