@@ -1900,8 +1900,47 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
         </div>
       </AccordionSection>
 
-
-
+      {/* ── 2. Cadre ou Design libre ── */}
+      <AccordionSection title={locale === 'en' ? '🖼️ Frame & design' : '🖼️ Cadre & design'} defaultOpen>
+        <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 14, lineHeight: 1.5 }}>
+          {locale === 'en'
+            ? 'Choose a decorative frame, or select "Design it yourself" to add illustrations after generation.'
+            : 'Choisissez un cadre décoratif, ou sélectionnez "Designer moi-même" pour ajouter vos illustrations après la génération.'}
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+          {/* Option "Designer moi-même" en premier */}
+          <button type="button" onClick={() => onChange({ frameId: 'none' })} style={{
+            ...BTN, padding: 8, borderRadius: 10,
+            border: `2px solid ${(data.frameId ?? 'none') === 'none' ? accent : '#f0e0d0'}`,
+            background: (data.frameId ?? 'none') === 'none' ? `${accent}10` : 'white',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+            boxShadow: (data.frameId ?? 'none') === 'none' ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.08)',
+          }}>
+            <div style={{ width: 80, height: 80, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#faf8f5', borderRadius: 6, gap: 4 }}>
+              <span style={{ fontSize: 20 }}>+</span>
+              <span style={{ fontSize: 8, color: '#9a928a', lineHeight: 1.2, textAlign: 'center', padding: '0 4px' }}>Designer moi-même</span>
+            </div>
+            <span style={{ fontSize: 9, fontWeight: (data.frameId ?? 'none') === 'none' ? 700 : 400, color: (data.frameId ?? 'none') === 'none' ? accent : '#3a3330', textAlign: 'center', lineHeight: 1.3 }}>Design libre</span>
+          </button>
+          {/* Cadres décoratifs */}
+          {FRAMES.filter(fr => !fr.video && fr.url).map(fr => {
+            const sel = data.frameId === fr.id
+            return (
+              <button key={fr.id} type="button" onClick={() => onChange({ frameId: fr.id })} style={{
+                ...BTN, padding: 8, borderRadius: 10,
+                border: `2px solid ${sel ? accent : '#f0e0d0'}`,
+                background: sel ? `${accent}10` : 'white',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                boxShadow: sel ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.08)',
+              }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={fr.url!} alt={fr.label} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
+                <span style={{ fontSize: 9, fontWeight: sel ? 700 : 400, color: sel ? accent : '#3a3330', textAlign: 'center', lineHeight: 1.3 }}>{fr.label}</span>
+              </button>
+            )
+          })}
+        </div>
+      </AccordionSection>
 
       <AccordionSection title={locale === 'en' ? '✨ Text animations' : '✨ Animations de texte'}>
         <Label>{t.fairepart.animationTextLabel}</Label>
@@ -5504,6 +5543,7 @@ const firstDate = sorted[0]?.date
           return (
             <React.Fragment key={realIdx}>
               {/* Illustration aquarelle — image décorative entre les sections */}
+              {/* Illustration — visible uniquement en mode "Design libre" (sans cadre) */}
               {ceremony.illustrationUrl ? (
                 <div style={{ maxWidth: 520, margin: '0 auto 8px', padding: '0 16px', textAlign: 'center', position: 'relative' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -5518,7 +5558,7 @@ const firstDate = sorted[0]?.date
                     </button>
                   )}
                 </div>
-              ) : (role !== 'guest' && onUpdate) ? (
+              ) : (!hasFrame && role !== 'guest' && onUpdate) ? (
                 <IllustrationAdder
                   ceremonyType={ceremony.type}
                   accent={G}
@@ -6091,7 +6131,9 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '8px 16px 12px' }}>
         <div style={{ textAlign: 'center', marginBottom: 6 }}>
           <span style={{ fontSize: 11, color: '#8a7e72', fontWeight: 700, lineHeight: 1.4 }}>
-            Personnalisez votre faire-part : ajoutez des illustrations entre les sections avec le bouton +
+            {(data.frameId ?? 'none') === 'none'
+              ? 'Personnalisez votre faire-part : ajoutez des illustrations entre les sections avec le bouton +'
+              : 'Glissez chaque texte pour le repositionner. Cliquez dessus pour changer la taille, couleur et police.'}
           </span>
         </div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
