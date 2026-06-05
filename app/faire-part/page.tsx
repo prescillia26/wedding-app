@@ -6752,7 +6752,9 @@ export default function FairePartPage() {
     const onReset = () => { setFormData(defaultFormData); setShowCards(false); setStep(1); try { localStorage.removeItem('wedding-draft') } catch { /* ignore */ } }
 
     // Le rendu Premium ET Luxe passe par CardsView qui gère handleShare correctement
-    return <CardsView data={formData} onEdit={onEdit} onReset={onReset} isShared={isShared} role={role} onUpdate={update} isPaid={isPaid} />
+    // Pack Luxe : pas de cadre derrière le texte — fond uni avec aquarelles entre les événements
+    const displayData = isLuxePack ? { ...formData, frameId: 'none', ornamentId: 'none' } : formData
+    return <CardsView data={displayData} onEdit={onEdit} onReset={onReset} isShared={isShared} role={role} onUpdate={update} isPaid={isPaid} />
   }
 
   if (loadingShare) return (
