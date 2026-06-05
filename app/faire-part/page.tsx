@@ -5859,9 +5859,9 @@ const firstDate = sorted[0]?.date
                       {(ov[`ceremony_${i}_lieu`] || ceremony.lieu) && <div style={applyZoneStyle({ fontFamily: FP, fontWeight: 700, fontSize: 19, color: TEXT, textAlign: 'center', lineHeight: 1.5, marginBottom: 8, letterSpacing: 0.5 }, 'lieu', data.zoneStyles)}>{ceremony.type === 'Mairie' ? conjonctionLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu, locale) : formatLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu, locale)}</div>}
                       {ceremony.adresse && <div style={{ fontFamily: FC, fontSize: 14, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.65, marginBottom: 24, letterSpacing: 0.3 }}>{ceremony.adresse}</div>}
                       {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
-                        <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, textAlign: 'center', marginBottom: 16, borderTop: `1px solid ${G}22`, paddingTop: 14 }}>
+                        <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(11px, 2.8vw, 14px)', color: TEXT, textAlign: 'center', marginBottom: 8, borderTop: `1px solid ${G}22`, paddingTop: 14, maxWidth: '90%', margin: '0 auto 8px', textWrap: 'balance' } as React.CSSProperties}>
                           <div style={{ fontWeight: 700 }}>{t.fairepart.eventFollowedBy} {ceremony.evenementSuivantNom}</div>
-                          {ceremony.evenementSuivantAdresse && <div style={{ fontSize: 12, opacity: 0.75, marginTop: 4 }}>{ceremony.evenementSuivantAdresse}</div>}
+                          {ceremony.evenementSuivantAdresse && <div style={{ fontSize: 'clamp(10px, 2.5vw, 12px)', opacity: 0.75, marginTop: 4 }}>{ceremony.evenementSuivantAdresse}</div>}
                         </div>
                       )}
                     </AnimSection></DraggableElement>
