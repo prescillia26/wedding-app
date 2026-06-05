@@ -3217,13 +3217,13 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
                       border: `2px solid ${r.present === true ? accent : '#e0d5c8'}`,
                       background: r.present === true ? accent : 'white',
                       color: r.present === true ? 'white' : '#3a3330',
-                    }}>{t.fairepart.rsvpPresent} ✓</button>
+                    }}>{t.fairepart.rsvpPresent}</button>
                     <button type="button" onClick={() => setPresent(i, false)} style={{
                       ...BTN, padding: '10px 8px', borderRadius: 9, fontSize: 13, fontWeight: 600,
                       border: `2px solid ${r.present === false ? '#d45050' : '#e0d5c8'}`,
                       background: r.present === false ? '#d45050' : 'white',
                       color: r.present === false ? 'white' : '#3a3330',
-                    }}>{t.fairepart.rsvpAbsent} ✗</button>
+                    }}>{t.fairepart.rsvpAbsent}</button>
                   </div>
                   {r.present === true && (
                     <div>
@@ -5325,7 +5325,7 @@ function InlineRSVP({ ceremonies, accent, textColor, shareId, mariee1, mariee2, 
                 color: present === true ? 'white' : accent,
                 transition: 'all 0.2s',
               }}>
-                ✓ {locale === 'en' ? 'Will attend' : 'Présent'}
+                {locale === 'en' ? 'Will attend' : 'Présent'}
               </button>
               <button type="button" onClick={() => togglePresent(idx, false)} style={{
                 flex: 1, padding: '11px 0', borderRadius: 8, fontFamily: FC, fontSize: 14, fontWeight: 600, cursor: 'pointer',
@@ -5334,7 +5334,7 @@ function InlineRSVP({ ceremonies, accent, textColor, shareId, mariee1, mariee2, 
                 color: present === false ? 'white' : '#d45050',
                 transition: 'all 0.2s',
               }}>
-                ✗ {locale === 'en' ? 'Absent' : 'Absent'}
+                {locale === 'en' ? 'Absent' : 'Absent'}
               </button>
             </div>
 

@@ -122,23 +122,6 @@ export default function InvitationCover({
           </div>
         </div>
 
-        {/* Countdown */}
-        {date && (
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 40 }}>
-            {[
-              { v: countdown.days, l: 'JOURS' },
-              { v: countdown.hours, l: 'H' },
-              { v: countdown.minutes, l: 'MIN' },
-              { v: countdown.seconds, l: 'SEC' },
-            ].map(({ v, l }) => (
-              <div key={l}>
-                <div style={{ fontFamily: PD, fontSize: 24, color: accent, fontWeight: 700, lineHeight: 1 }}>{v}</div>
-                <div style={{ fontFamily: PD, fontSize: 7, color: accent, letterSpacing: 2, marginTop: 4, opacity: 0.5 }}>{l}</div>
-              </div>
-            ))}
-          </div>
-        )}
-
         {/* Bouton Découvrir */}
         <button
           type="button"
