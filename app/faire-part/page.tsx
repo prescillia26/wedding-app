@@ -5308,6 +5308,34 @@ function EditableIllustration({ url, size, offsetY, editable, accent, ceremonyTy
 }) {
   const [showControls, setShowControls] = useState(false)
   const [showPicker, setShowPicker] = useState(false)
+  const [dragging, setDragging] = useState(false)
+  const dragStartY = useRef(0)
+  const dragStartOffset = useRef(0)
+
+  const handleDragStart = (clientY: number) => {
+    if (!editable) return
+    setDragging(true)
+    dragStartY.current = clientY
+    dragStartOffset.current = offsetY
+  }
+  const handleDragMove = useCallback((clientY: number) => {
+    if (!dragging) return
+    const delta = clientY - dragStartY.current
+    onChangeOffsetY(Math.max(-120, Math.min(120, dragStartOffset.current + delta)))
+  }, [dragging, onChangeOffsetY])
+  const handleDragEnd = useCallback(() => { setDragging(false) }, [])
+
+  useEffect(() => {
+    if (!dragging) return
+    const onMove = (e: MouseEvent) => handleDragMove(e.clientY)
+    const onTouchMove = (e: TouchEvent) => handleDragMove(e.touches[0].clientY)
+    const onUp = () => handleDragEnd()
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+    window.addEventListener('touchmove', onTouchMove, { passive: true })
+    window.addEventListener('touchend', onUp)
+    return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); window.removeEventListener('touchmove', onTouchMove); window.removeEventListener('touchend', onUp) }
+  }, [dragging, handleDragMove, handleDragEnd])
   const typeToCategory: Record<string, VisualCategory> = {
     'Mairie': 'mairie', 'Cérémonie religieuse / Houppa': 'houppa', 'Shabbat Hatan': 'shabbat',
     'Henné': 'couples', 'Cocktail': 'couples', 'Soirée': 'couples', 'Boat Party': 'couples', 'Autre': 'couples',
@@ -5318,15 +5346,20 @@ function EditableIllustration({ url, size, offsetY, editable, accent, ceremonyTy
   return (
     <div style={{ maxWidth: 520, margin: '0 auto 8px', padding: '0 16px', textAlign: 'center', position: 'relative' }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={url} alt=""
-        onClick={editable ? () => setShowControls(c => !c) : undefined}
+        onClick={editable && !dragging ? () => setShowControls(c => !c) : undefined}
+        onMouseDown={editable ? (e) => { e.preventDefault(); handleDragStart(e.clientY) } : undefined}
+        onTouchStart={editable ? (e) => { handleDragStart(e.touches[0].clientY) } : undefined}
+        draggable={false}
         style={{
           width: `${widthPct}%`, maxHeight: 420, display: 'block', objectFit: 'contain',
           margin: '0 auto', mixBlendMode: 'multiply',
           transform: offsetY ? `translateY(${offsetY}px)` : undefined,
-          cursor: editable ? 'pointer' : 'default',
-          transition: 'width 0.2s, transform 0.2s',
+          cursor: editable ? (dragging ? 'grabbing' : 'grab') : 'default',
+          transition: dragging ? 'none' : 'width 0.2s, transform 0.2s',
+          userSelect: 'none',
         }}
       />
 
@@ -5633,47 +5666,6 @@ const firstDate = sorted[0]?.date
           return (
             <React.Fragment key={realIdx}>
               {/* Illustration aquarelle — image décorative entre les sections */}
-              {/* Illustration — visible uniquement en mode "Design libre" (sans cadre) */}
-              {ceremony.illustrationUrl ? (
-                <EditableIllustration
-                  url={ceremony.illustrationUrl}
-                  size={ceremony.illustrationSize ?? 100}
-                  offsetY={ceremony.illustrationOffsetY ?? 0}
-                  editable={role !== 'guest' && !!onUpdate}
-                  accent={G}
-                  ceremonyType={ceremony.type}
-                  onChangeSize={(size) => {
-                    const updated = [...(data.ceremonies ?? [])]
-                    updated[realIdx] = { ...updated[realIdx], illustrationSize: size }
-                    onUpdate?.({ ceremonies: updated })
-                  }}
-                  onChangeOffsetY={(y) => {
-                    const updated = [...(data.ceremonies ?? [])]
-                    updated[realIdx] = { ...updated[realIdx], illustrationOffsetY: y }
-                    onUpdate?.({ ceremonies: updated })
-                  }}
-                  onChangeUrl={(url) => {
-                    const updated = [...(data.ceremonies ?? [])]
-                    updated[realIdx] = { ...updated[realIdx], illustrationUrl: url }
-                    onUpdate?.({ ceremonies: updated })
-                  }}
-                  onRemove={() => {
-                    const updated = [...(data.ceremonies ?? [])]
-                    updated[realIdx] = { ...updated[realIdx], illustrationUrl: '', illustrationSize: 100, illustrationOffsetY: 0 }
-                    onUpdate?.({ ceremonies: updated })
-                  }}
-                />
-              ) : (!hasFrame && role !== 'guest' && onUpdate) ? (
-                <IllustrationAdder
-                  ceremonyType={ceremony.type}
-                  accent={G}
-                  onSelect={(url) => {
-                    const updated = [...(data.ceremonies ?? [])]
-                    updated[realIdx] = { ...updated[realIdx], illustrationUrl: url }
-                    onUpdate?.({ ceremonies: updated })
-                  }}
-                />
-              ) : null}
               <CeremonyCard isCard={isCard} accent={G}>
                 <section id={`ceremony-${realIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : 96, paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : 96, paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: (role !== 'guest' && !!onUpdate) ? 'visible' : 'hidden', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: `1px solid ${G}1a` } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
                   {hasFrame && frame.video ? (
@@ -5709,6 +5701,23 @@ const firstDate = sorted[0]?.date
                       <div style={applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 16, lineHeight: 1.4 }, 'titres', data.zoneStyles)}>{ov[`ceremony_${i}_titre`] || title}</div>
                       <OrnSep />
                     </AnimSection></DraggableElement>
+                    {/* Illustration aquarelle — après le titre, déplaçable par les mariés */}
+                    {ceremony.illustrationUrl ? (
+                      <EditableIllustration
+                        url={ceremony.illustrationUrl}
+                        size={ceremony.illustrationSize ?? 100}
+                        offsetY={ceremony.illustrationOffsetY ?? 0}
+                        editable={canEdit}
+                        accent={G}
+                        ceremonyType={ceremony.type}
+                        onChangeSize={(sz) => { const u = [...(data.ceremonies ?? [])]; u[realIdx] = { ...u[realIdx], illustrationSize: sz }; onUpdate?.({ ceremonies: u }) }}
+                        onChangeOffsetY={(y) => { const u = [...(data.ceremonies ?? [])]; u[realIdx] = { ...u[realIdx], illustrationOffsetY: y }; onUpdate?.({ ceremonies: u }) }}
+                        onChangeUrl={(url) => { const u = [...(data.ceremonies ?? [])]; u[realIdx] = { ...u[realIdx], illustrationUrl: url }; onUpdate?.({ ceremonies: u }) }}
+                        onRemove={() => { const u = [...(data.ceremonies ?? [])]; u[realIdx] = { ...u[realIdx], illustrationUrl: '', illustrationSize: 100, illustrationOffsetY: 0 }; onUpdate?.({ ceremonies: u }) }}
+                      />
+                    ) : (!hasFrame && canEdit) ? (
+                      <IllustrationAdder ceremonyType={ceremony.type} accent={G} onSelect={(url) => { const u = [...(data.ceremonies ?? [])]; u[realIdx] = { ...u[realIdx], illustrationUrl: url }; onUpdate?.({ ceremonies: u }) }} />
+                    ) : null}
                     {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
                       <DraggableElement id={pre+"hebrewVerse"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={100} skipAnim={canEdit}>
                         <div style={{ padding: '0 20px', marginBottom: 22 }}>
