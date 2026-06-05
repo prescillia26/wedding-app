@@ -35,6 +35,17 @@ const ILLU_COUPLES: Record<string, string> = {
   'couple-05': 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878835/87_hejtki.png',
   'couple-06': 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878838/94_l7zjbv.png',
   'couple-07': 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498222/1_dpwtiu.png',
+  'couple-08': 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498299/56_wny8tt.png',
+  'couple-09': 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498296/55_oxmray.png',
+  'couple-10': 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498291/49_iv6cle.png',
+  'couple-11': 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498289/43_xziory.png',
+  'couple-12': 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498289/46_nqxkzg.png',
+  'couple-13': 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498287/38_usomhj.png',
+  'couple-14': 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498283/34_wnjgyc.png',
+  'couple-15': 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498279/24_yh2poc.png',
+  'couple-16': 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498272/21_uq53kw.png',
+  'couple-17': 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498271/20_fsei03.png',
+  'couple-18': 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498230/13_vtlmbu.png',
 }
 
 // ✅ React cache() : évite que Redis soit appelé 2 fois par page

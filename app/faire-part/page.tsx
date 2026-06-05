@@ -109,6 +109,17 @@ const ILLUSTRATIONS_COUPLES = [
   { id: 'couple-05', label: '💕 Couple brun + brune', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878835/87_hejtki.png' },
   { id: 'couple-06', label: '🌸 Arche florale rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878838/94_l7zjbv.png' },
   { id: 'couple-07', label: '💕 Couple aquarelle', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498222/1_dpwtiu.png' },
+  { id: 'couple-08', label: '💕 Portail fleuri', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498299/56_wny8tt.png' },
+  { id: 'couple-09', label: '💕 Jardin romantique', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498296/55_oxmray.png' },
+  { id: 'couple-10', label: '💕 Arche végétale', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498291/49_iv6cle.png' },
+  { id: 'couple-11', label: '💕 Couple sous glycine', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498289/43_xziory.png' },
+  { id: 'couple-12', label: '💕 Allée fleurie', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498289/46_nqxkzg.png' },
+  { id: 'couple-13', label: '💕 Terrasse méditerranéenne', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498287/38_usomhj.png' },
+  { id: 'couple-14', label: '💕 Château aquarelle', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498283/34_wnjgyc.png' },
+  { id: 'couple-15', label: '💕 Domaine champêtre', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498279/24_yh2poc.png' },
+  { id: 'couple-16', label: '💕 Vignoble', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498272/21_uq53kw.png' },
+  { id: 'couple-17', label: '💕 Mas provençal', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498271/20_fsei03.png' },
+  { id: 'couple-18', label: '💕 Villa élégante', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498230/13_vtlmbu.png' },
 ] as const
 
 // ── Couleurs Luxe Aquarelle ──
