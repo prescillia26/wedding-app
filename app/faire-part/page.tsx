@@ -141,7 +141,7 @@ const VIDEO_BACKGROUNDS: { id: string; label: string; url: string; textPosition:
   { id: 'vid-194', label: '🕯️ Nuit & chandeliers', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511813/194_kvvbyk.mp4', textPosition: 'center', needsOverlay: true, dark: true },
 ]
 
-const FRAMES_STRONG_BG = new Set(['frame-80', 'frame-107', 'frame-108', 'frame-vid-180', 'frame-vid-188', 'frame-vid-193', 'frame-vid-194'])
+const FRAMES_STRONG_BG = new Set(['frame-80', 'frame-107', 'frame-108'])
 // Frames qui doivent être affichés en contain (cadres décoratifs qui ne doivent pas être coupés)
 const FRAMES_CONTAIN = new Set<string>()
 // Padding personnalisé pour les cadres à bordure — top/bottom/h adaptés à chaque cadre
@@ -178,22 +178,7 @@ const FRAMES: { id: string; label: string; url: string | null; video?: boolean }
   { id: 'frame-150', label: '🌿 Feuillage 150', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896741/150_rzlu80.png' },
   { id: 'frame-151', label: '🌿 Feuillage 151', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896742/151_mllw5q.png' },
   { id: 'frame-154', label: '🌿 Feuillage 154', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896718/154_pxirys.png' },
-  // Cadres vidéo animés
-  ...VIDEO_BACKGROUNDS.map(v => ({ id: `frame-${v.id}`, label: `🎬 ${v.label.replace(/^.+?\s/, '')}`, url: v.url, video: true })),
-  { id: 'frame-vid-196', label: '🎬 Feuillage ivoire', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511812/196_dft5qv.mp4', video: true },
-  { id: 'frame-vid-193', label: '🎬 Arche dorée', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511812/193_mf0npz.mp4', video: true },
-  { id: 'frame-vid-195', label: '🎬 Bougainvilliers', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511812/195_fnzjhs.mp4', video: true },
-  { id: 'frame-vid-197', label: '🎬 Blanc pur', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511810/197_vfoaoz.mp4', video: true },
-  { id: 'frame-vid-183', label: '🎬 Arche fleurs paons', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511806/183_fqh1h7.mp4', video: true },
-  { id: 'frame-vid-188', label: '🎬 Colonnes nuit', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511806/188_f9duya.mp4', video: true },
-  { id: 'frame-vid-186', label: '🎬 Cloches fleuries', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511804/186_drxgpg.mp4', video: true },
-  { id: 'frame-vid-185', label: '🎬 Lanternes dorées', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511801/185_e2dvxy.mp4', video: true },
-  { id: 'frame-vid-184', label: '🎬 Balançoire rose', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511800/184_ylxgb9.mp4', video: true },
-  { id: 'frame-vid-182', label: '🎬 Paons jardin', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511798/182_zkpu6m.mp4', video: true },
-  { id: 'frame-vid-181', label: '🎬 Arche paon', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511796/181_kpetye.mp4', video: true },
-  { id: 'frame-vid-179', label: '🎬 Éléphants mer', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511792/179_adyqit.mp4', video: true },
-  { id: 'frame-vid-175', label: '🎬 Lotus pêche', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511791/175_nzi6x0.mp4', video: true },
-  { id: 'frame-vid-174', label: '🎬 Jardin terrasse', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511791/174_ixceyk.mp4', video: true },
+  // Vidéos retirées des cadres — réservées pour la cover page invités
   { id: 'none', label: '⬜ Sans cadre', url: null },
 ]
 
