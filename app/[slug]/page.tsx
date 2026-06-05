@@ -8,12 +8,18 @@ const redis = new Redis({
   token: process.env.KV_REST_API_TOKEN!,
 })
 
-// ✅ Fonction unique qui transforme une URL Cloudinary au format OG parfait
-function toCloudinaryOgUrl(raw: string | undefined | null, version?: number): string {
+// ✅ Transforme une URL Cloudinary au format OG (1200x630)
+// Photos → c_fill (recadrage), illustrations → c_pad avec fond (pas de crop)
+function toCloudinaryOgUrl(raw: string | undefined | null, version?: number, bgColor?: string): string {
   if (!raw) return ''
   if (raw.includes('/upload/')) {
-    const url = raw.replace('/upload/', '/upload/w_1200,h_630,c_fill,g_face:center,q_auto,f_auto/')
-    // Ajouter un paramètre de version pour invalider le cache WhatsApp/Facebook quand les photos changent
+    // Détecter si c'est une illustration (pas une photo uploadée par l'utilisateur)
+    const isIllustration = raw.includes('/watercolors/') || raw.includes('_pzfb2j') || raw.includes('_gbqs4r') || raw.includes('_iw0wq9') || raw.includes('_e6oobi') || raw.includes('_hejtki') || raw.includes('_l7zjbv') || raw.includes('_dpwtiu')
+    const bg = bgColor ? bgColor.replace('#', '') : 'fdf8f0'
+    const transform = isIllustration
+      ? `w_1200,h_630,c_pad,b_rgb:${bg},q_auto,f_auto`
+      : 'w_1200,h_630,c_fill,g_face:center,q_auto,f_auto'
+    const url = raw.replace('/upload/', `/upload/${transform}/`)
     return version ? `${url}?v=${version}` : url
   }
   return version ? `${raw}?v=${version}` : raw
@@ -95,6 +101,15 @@ export async function generateMetadata(
 
   const coupleIlluUrl = result.data.illustrationCoupleId ? ILLU_COUPLES[result.data.illustrationCoupleId] : ''
 
+  // Couleur de fond du thème pour le padding des illustrations
+  const THEME_BG: Record<string, string> = {
+    'rose-fleuri': '#fff9f6', 'ivoire-or': '#fffdf5', 'bleu-floral': '#f6f9ff',
+    'champetre': '#f6faf4', 'blanc-gris': '#fafafa', 'noir-blanc': '#1a1a1a',
+    'chocolat': '#2c1a0e', 'bordeaux': '#fdf5f5', 'bordeaux-nuit': '#1a0810',
+    'fuchsia': '#fff5fc', 'marine-or': '#0a1628', 'menthe': '#f2fbf7',
+  }
+  const bgColor = THEME_BG[result.data.style || ''] || '#fdf8f0'
+
   // Priorité OG image : photo > illustration couple > illustration cérémonie > logo > monogramme > fallback
   const rawPhoto = result.data.photosFond?.[0]
     || result.data.photoFond
@@ -103,7 +118,7 @@ export async function generateMetadata(
     || result.data.customLogoUrl
     || result.data.luxeMonogramUrl
     || ''
-  const ogImage = rawPhoto ? toCloudinaryOgUrl(rawPhoto, result.data.ogVersion) : ''
+  const ogImage = rawPhoto ? toCloudinaryOgUrl(rawPhoto, result.data.ogVersion, bgColor) : ''
 
   return {
     title,
@@ -146,7 +161,8 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
     || result?.data?.customLogoUrl
     || result?.data?.luxeMonogramUrl
     || ''
-  const photo = rawPhoto ? toCloudinaryOgUrl(rawPhoto, result?.data?.ogVersion) : ''
+  const bgC = result?.data?.style ? (({ 'rose-fleuri': '#fff9f6', 'ivoire-or': '#fffdf5', 'bleu-floral': '#f6f9ff', 'champetre': '#f6faf4', 'blanc-gris': '#fafafa', 'noir-blanc': '#1a1a1a', 'chocolat': '#2c1a0e', 'bordeaux': '#fdf5f5', 'bordeaux-nuit': '#1a0810', 'fuchsia': '#fff5fc', 'marine-or': '#0a1628', 'menthe': '#f2fbf7' }) as Record<string, string>)[result.data.style] || '#fdf8f0' : '#fdf8f0'
+  const photo = rawPhoto ? toCloudinaryOgUrl(rawPhoto, result?.data?.ogVersion, bgC) : ''
   const accent = '#C9A84C'
   const targetUrl = result?.shareId
     ? `/faire-part?share=${result.shareId}&role=guest`
