@@ -2319,7 +2319,7 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
       <OrnementCorner url={ornUrl} corner="top-right" size={130} />
       <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
       {/* Zone texte avec voile blanc semi-transparent derrière pour garantir la lisibilité sur cadres chargés */}
-      <div style={{ position: 'relative', zIndex: 10, paddingTop: `${FRAMES_CUSTOM_PADDING[frameId]?.top ?? framePaddingV}%`, paddingBottom: `${FRAMES_CUSTOM_PADDING[frameId]?.bottom ?? framePaddingV}%`, paddingLeft: `${FRAMES_CUSTOM_PADDING[frameId]?.h ?? framePaddingH}%`, paddingRight: `${FRAMES_CUSTOM_PADDING[frameId]?.h ?? framePaddingH}%`, textAlign: 'center', opacity: textOpacity, transform: textOffsetY ? `translateY(${textOffsetY}px)` : undefined }}>
+      <div style={{ position: 'relative', zIndex: 10, paddingTop: `${FRAMES_CUSTOM_PADDING[frameId]?.top ?? framePaddingV}%`, paddingBottom: `${FRAMES_CUSTOM_PADDING[frameId]?.bottom ?? framePaddingV}%`, paddingLeft: `${FRAMES_CUSTOM_PADDING[frameId]?.h ?? framePaddingH}%`, paddingRight: `${FRAMES_CUSTOM_PADDING[frameId]?.h ?? framePaddingH}%`, textAlign: 'center', opacity: textOpacity, transform: textOffsetY ? `translateY(${textOffsetY}px)` : undefined, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
         {hasFrame && FRAMES_STRONG_BG.has(frameId) && (
           <div style={{ position: 'absolute', inset: '12% 18%', background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: -1 }} />
         )}
@@ -2568,12 +2568,12 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
         <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, textAlign: 'center', color: theme.texte, marginBottom: 16, lineHeight: 1.6 }}>
           {honore}
         </div>
-        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, color: theme.accent, textAlign: 'center', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>{formatDateFr(ceremony.date)}</div>
-        {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 18, color: theme.accent, direction: 'rtl', textAlign: 'center', marginBottom: 16 }}>{hebrewDate}</div>}
-        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 26, color: theme.accent, textAlign: 'center', marginBottom: 16, letterSpacing: 2 }}>{formatHeure(ceremony.heure)}</div>
-        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte, lineHeight: 1.6 }}>
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(14px, 3.5vw, 22px)', color: theme.accent, textAlign: 'center', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>{formatDateFr(ceremony.date)}</div>
+        {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 'clamp(14px, 3vw, 18px)', color: theme.accent, direction: 'rtl', textAlign: 'center', marginBottom: 16 }}>{hebrewDate}</div>}
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(18px, 4.5vw, 26px)', color: theme.accent, textAlign: 'center', marginBottom: 16, letterSpacing: 2 }}>{formatHeure(ceremony.heure)}</div>
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(14px, 3.5vw, 20px)', textAlign: 'center', color: theme.texte, lineHeight: 1.6, maxWidth: '90%', margin: '0 auto', textWrap: 'balance' } as React.CSSProperties}>
           {lieuDisplay && <><div>{formatLieu(lieuDisplay)}</div><div>{t.fairepart.cardFollowedByReception}</div></>}
-          {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 8, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
+          {ceremony.adresse && <div style={{ fontSize: 'clamp(11px, 2.5vw, 14px)', marginTop: 8, color: theme.textSecondaire, textWrap: 'balance' } as React.CSSProperties}>{ceremony.adresse}</div>}
         </div>
         {isShared && ceremony.adresse && (
           <div style={{ marginTop: 20, paddingBottom: 8 }}>
@@ -2610,15 +2610,15 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
         <div style={{ fontSize: 'small', letterSpacing: '3px', textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{t.fairepart.cardLaMairie}</div>
         <LogoOrMonogram data={data} theme={theme} />
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}><MairieIllustration color={theme.accent} /></div>
-        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(36px, 8vw, 60px)', color: theme.accent, textAlign: 'center', marginBottom: 12, lineHeight: 1.2 }}>{data.marie1Prenom} & {data.marie2Prenom}</div>
-        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, textAlign: 'center', color: theme.texte, marginBottom: 8 }}>{t.fairepart.cardSeDiront}</div>
-        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 72, color: theme.accent, textAlign: 'center', marginBottom: 20, lineHeight: 1 }}>{t.fairepart.cardOui}</div>
-        <div style={{ fontFamily: 'var(--font-playfair-display)', fontWeight: 'bold', fontSize: 20, textAlign: 'center', color: theme.texte, marginBottom: 12 }}>{formatDateFrCap(ceremony.date)}</div>
-        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, textAlign: 'center', color: theme.texte, marginBottom: 12, lineHeight: 1.6 }}>
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(28px, 7vw, 52px)', color: theme.accent, textAlign: 'center', marginBottom: 12, lineHeight: 1.2 }}>{data.marie1Prenom} & {data.marie2Prenom}</div>
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(16px, 4vw, 22px)', textAlign: 'center', color: theme.texte, marginBottom: 8 }}>{t.fairepart.cardSeDiront}</div>
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px, 12vw, 72px)', color: theme.accent, textAlign: 'center', marginBottom: 20, lineHeight: 1 }}>{t.fairepart.cardOui}</div>
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontWeight: 'bold', fontSize: 'clamp(14px, 3.5vw, 20px)', textAlign: 'center', color: theme.texte, marginBottom: 12 }}>{formatDateFrCap(ceremony.date)}</div>
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(13px, 3vw, 18px)', textAlign: 'center', color: theme.texte, marginBottom: 12, lineHeight: 1.6, maxWidth: '90%', margin: '0 auto 12px', textWrap: 'balance' } as React.CSSProperties}>
           <div>{lieuDisplay ? conjonctionLieu(lieuDisplay) : ''}</div>
-          {ceremony.adresse && <div style={{ fontSize: 14, marginTop: 6, color: theme.textSecondaire }}>{ceremony.adresse}</div>}
+          {ceremony.adresse && <div style={{ fontSize: 'clamp(11px, 2.5vw, 14px)', marginTop: 6, color: theme.textSecondaire, textWrap: 'balance' } as React.CSSProperties}>{ceremony.adresse}</div>}
         </div>
-        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 22, color: theme.accent, textAlign: 'center', marginBottom: 20 }}>{formatHeure(ceremony.heure)}</div>
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(16px, 4vw, 22px)', color: theme.accent, textAlign: 'center', marginBottom: 20 }}>{formatHeure(ceremony.heure)}</div>
         {isShared && ceremony.adresse && (
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
             <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ceremony.adresse)}`} target="_blank" rel="noopener noreferrer"
@@ -2628,12 +2628,12 @@ function CardMairie({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
           </div>
         )}
         {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
-          <div style={{ textAlign: 'center', paddingTop: 20, borderTop: `1px solid ${theme.accent}`, lineHeight: 1.8 }}>
-            <div style={{ fontFamily: 'var(--font-playfair-display)', fontWeight: 'bold', fontSize: 16, color: theme.texte }}>
+          <div style={{ textAlign: 'center', paddingTop: 20, borderTop: `1px solid ${theme.accent}`, lineHeight: 1.8, maxWidth: '90%', margin: '0 auto' }}>
+            <div style={{ fontFamily: 'var(--font-playfair-display)', fontWeight: 'bold', fontSize: 'clamp(12px, 3vw, 16px)', color: theme.texte, textWrap: 'balance' } as React.CSSProperties}>
               {t.fairepart.cardMairieFollowedBy} {ceremony.evenementSuivantNom}
             </div>
             {ceremony.evenementSuivantAdresse && (
-              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: theme.textSecondaire, marginTop: 4 }}>
+              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(11px, 2.5vw, 14px)', color: theme.textSecondaire, marginTop: 4, textWrap: 'balance' } as React.CSSProperties}>
                 {ceremony.evenementSuivantAdresse}
               </div>
             )}
