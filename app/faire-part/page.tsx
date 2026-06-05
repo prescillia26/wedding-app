@@ -143,12 +143,9 @@ const VIDEO_BACKGROUNDS: { id: string; label: string; url: string; textPosition:
 
 const FRAMES_STRONG_BG = new Set(['frame-80', 'frame-107', 'frame-108', 'frame-vid-180', 'frame-vid-188', 'frame-vid-193', 'frame-vid-194'])
 // Frames qui doivent être affichés en contain (cadres décoratifs qui ne doivent pas être coupés)
-const FRAMES_CONTAIN = new Set(['frame-84', 'frame-85'])
+const FRAMES_CONTAIN = new Set<string>()
 // Padding personnalisé pour les cadres à bordure — top/bottom/h adaptés à chaque cadre
-const FRAMES_CUSTOM_PADDING: Record<string, { top: number; bottom: number; h: number }> = {
-  'frame-84': { top: 42, bottom: 32, h: 26 },
-  'frame-85': { top: 40, bottom: 28, h: 24 },
-}
+const FRAMES_CUSTOM_PADDING: Record<string, { top: number; bottom: number; h: number }> = {}
 const FRAMES: { id: string; label: string; url: string | null; video?: boolean }[] = [
   { id: 'frame-02', label: '🤍 Roses Crème Haut/Bas', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/51_m9vx96.png' },
   { id: 'frame-03', label: '🌺 Cadre Floral Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/53_ho1gq8.png' },
@@ -183,8 +180,6 @@ const FRAMES: { id: string; label: string; url: string | null; video?: boolean }
   { id: 'frame-151', label: '🌿 Feuillage 151', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896742/151_mllw5q.png' },
   { id: 'frame-152', label: '🌿 Feuillage 152', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896745/152_vlbdi9.png' },
   { id: 'frame-154', label: '🌿 Feuillage 154', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896718/154_pxirys.png' },
-  { id: 'frame-84', label: '🌸 Floral 84', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780596712/84_hohsmt.png' },
-  { id: 'frame-85', label: '🌸 Floral 85', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780596682/85_ln6afv.png' },
   // Cadres vidéo animés
   ...VIDEO_BACKGROUNDS.map(v => ({ id: `frame-${v.id}`, label: `🎬 ${v.label.replace(/^.+?\s/, '')}`, url: v.url, video: true })),
   { id: 'frame-vid-196', label: '🎬 Feuillage ivoire', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511812/196_dft5qv.mp4', video: true },
