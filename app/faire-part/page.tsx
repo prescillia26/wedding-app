@@ -143,8 +143,8 @@ const FRAMES_STRONG_BG = new Set(['frame-80', 'frame-107', 'frame-108', 'frame-v
 const FRAMES_CONTAIN = new Set(['frame-84', 'frame-85'])
 // Padding personnalisé pour les cadres à bordure — top/bottom/h adaptés à chaque cadre
 const FRAMES_CUSTOM_PADDING: Record<string, { top: number; bottom: number; h: number }> = {
-  'frame-84': { top: 22, bottom: 14, h: 14 },
-  'frame-85': { top: 26, bottom: 10, h: 15 },
+  'frame-84': { top: 36, bottom: 24, h: 22 },
+  'frame-85': { top: 34, bottom: 20, h: 20 },
 }
 const FRAMES: { id: string; label: string; url: string | null; video?: boolean }[] = [
   { id: 'frame-02', label: '🤍 Roses Crème Haut/Bas', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/51_m9vx96.png' },
