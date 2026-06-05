@@ -19,6 +19,17 @@ function toCloudinaryOgUrl(raw: string | undefined | null, version?: number): st
   return version ? `${raw}?v=${version}` : raw
 }
 
+// Illustrations couples — pour résoudre l'OG image
+const ILLU_COUPLES: Record<string, string> = {
+  'couple-01': 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878822/81_pzfb2j.png',
+  'couple-02': 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878824/82_gbqs4r.png',
+  'couple-03': 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878831/83_iw0wq9.png',
+  'couple-04': 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878834/88_e6oobi.png',
+  'couple-05': 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878835/87_hejtki.png',
+  'couple-06': 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878838/94_l7zjbv.png',
+  'couple-07': 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498222/1_dpwtiu.png',
+}
+
 // ✅ React cache() : évite que Redis soit appelé 2 fois par page
 // (une fois dans generateMetadata + une fois dans SlugPage → mutualisé)
 const getData = cache(async (slug: string) => {
@@ -37,6 +48,8 @@ const getData = cache(async (slug: string) => {
     luxeMonogramUrl?: string
     ceremonies?: { illustrationUrl?: string }[]
     style?: string
+    illustrationCoupleId?: string
+    styleAccueil?: string
   }>(shareId)
   if (!data) return null
   return { shareId, data }
@@ -80,9 +93,12 @@ export async function generateMetadata(
   ].filter(Boolean)
   const description = descParts.join(' ') + '. Découvrez les informations et confirmez votre présence.'
 
-  // Priorité OG image : photo uploadée > illustration cérémonie > logo custom > monogramme
+  const coupleIlluUrl = result.data.illustrationCoupleId ? ILLU_COUPLES[result.data.illustrationCoupleId] : ''
+
+  // Priorité OG image : photo > illustration couple > illustration cérémonie > logo > monogramme > fallback
   const rawPhoto = result.data.photosFond?.[0]
     || result.data.photoFond
+    || coupleIlluUrl
     || result.data.ceremonies?.find(c => c.illustrationUrl)?.illustrationUrl
     || result.data.customLogoUrl
     || result.data.luxeMonogramUrl
@@ -122,8 +138,10 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const result = await getData(slug)
 
+  const coupleIllu2 = result?.data?.illustrationCoupleId ? ILLU_COUPLES[result.data.illustrationCoupleId] : ''
   const rawPhoto = result?.data?.photosFond?.[0]
     || result?.data?.photoFond
+    || coupleIllu2
     || result?.data?.ceremonies?.find(c => c.illustrationUrl)?.illustrationUrl
     || result?.data?.customLogoUrl
     || result?.data?.luxeMonogramUrl
