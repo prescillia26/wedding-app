@@ -5372,12 +5372,12 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
         }}
       />
       {editable && !showPicker && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 2, lineHeight: 1 }}>
-          <button type="button" onClick={(e) => { e.stopPropagation(); onChangeSize(Math.max(30, w - 10)) }} style={{
+        <div onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 2, lineHeight: 1, position: 'relative', zIndex: 10 }}>
+          <button type="button" onClick={() => onChangeSize(Math.max(30, w - 10))} style={{
             ...BTN, width: 24, height: 24, borderRadius: '50%', border: `1px solid ${accent}30`,
             background: 'white', color: accent, fontSize: 16, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, cursor: 'pointer',
           }}>−</button>
-          <button type="button" onClick={(e) => { e.stopPropagation(); onChangeSize(Math.min(150, w + 10)) }} style={{
+          <button type="button" onClick={() => onChangeSize(Math.min(150, w + 10))} style={{
             ...BTN, width: 24, height: 24, borderRadius: '50%', border: `1px solid ${accent}30`,
             background: 'white', color: accent, fontSize: 16, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, cursor: 'pointer',
           }}>+</button>
