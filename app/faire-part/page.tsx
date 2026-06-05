@@ -5306,12 +5306,18 @@ function EditableIllustration({ url, size, offsetY, editable, accent, ceremonyTy
   url: string; size: number; offsetY: number; editable: boolean; accent: string; ceremonyType: string
   onChangeSize: (s: number) => void; onChangeOffsetY: (y: number) => void; onChangeUrl: (url: string) => void; onRemove: () => void
 }) {
-  const [showControls, setShowControls] = useState(false)
   const [showPicker, setShowPicker] = useState(false)
   const [dragging, setDragging] = useState(false)
   const dragStartY = useRef(0)
   const dragStartOffset = useRef(0)
+  const typeToCategory: Record<string, VisualCategory> = {
+    'Mairie': 'mairie', 'Cérémonie religieuse / Houppa': 'houppa', 'Shabbat Hatan': 'shabbat',
+    'Henné': 'couples', 'Cocktail': 'couples', 'Soirée': 'couples', 'Boat Party': 'couples', 'Autre': 'couples',
+  }
+  const category = typeToCategory[ceremonyType] || 'couples'
+  const widthPct = Math.max(30, Math.min(150, size))
 
+  // Drag libre à la souris/touch
   const handleDragStart = (clientY: number) => {
     if (!editable) return
     setDragging(true)
@@ -5321,13 +5327,13 @@ function EditableIllustration({ url, size, offsetY, editable, accent, ceremonyTy
   const handleDragMove = useCallback((clientY: number) => {
     if (!dragging) return
     const delta = clientY - dragStartY.current
-    onChangeOffsetY(Math.max(-120, Math.min(120, dragStartOffset.current + delta)))
+    onChangeOffsetY(Math.max(-200, Math.min(200, dragStartOffset.current + delta)))
   }, [dragging, onChangeOffsetY])
   const handleDragEnd = useCallback(() => { setDragging(false) }, [])
 
   useEffect(() => {
     if (!dragging) return
-    const onMove = (e: MouseEvent) => handleDragMove(e.clientY)
+    const onMove = (e: MouseEvent) => { e.preventDefault(); handleDragMove(e.clientY) }
     const onTouchMove = (e: TouchEvent) => handleDragMove(e.touches[0].clientY)
     const onUp = () => handleDragEnd()
     window.addEventListener('mousemove', onMove)
@@ -5336,87 +5342,59 @@ function EditableIllustration({ url, size, offsetY, editable, accent, ceremonyTy
     window.addEventListener('touchend', onUp)
     return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); window.removeEventListener('touchmove', onTouchMove); window.removeEventListener('touchend', onUp) }
   }, [dragging, handleDragMove, handleDragEnd])
-  const typeToCategory: Record<string, VisualCategory> = {
-    'Mairie': 'mairie', 'Cérémonie religieuse / Houppa': 'houppa', 'Shabbat Hatan': 'shabbat',
-    'Henné': 'couples', 'Cocktail': 'couples', 'Soirée': 'couples', 'Boat Party': 'couples', 'Autre': 'couples',
-  }
-  const category = typeToCategory[ceremonyType] || 'couples'
-  const widthPct = Math.max(30, Math.min(150, size))
 
   return (
-    <div style={{ maxWidth: 520, margin: '0 auto 8px', padding: '0 16px', textAlign: 'center', position: 'relative' }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
+    <div style={{ textAlign: 'center', position: 'relative', margin: '4px 0' }}>
+      {/* Image — drag pour déplacer */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={url} alt=""
-        onClick={editable && !dragging ? () => setShowControls(c => !c) : undefined}
+        src={url} alt="" draggable={false}
         onMouseDown={editable ? (e) => { e.preventDefault(); handleDragStart(e.clientY) } : undefined}
-        onTouchStart={editable ? (e) => { handleDragStart(e.touches[0].clientY) } : undefined}
-        draggable={false}
+        onTouchStart={editable ? (e) => handleDragStart(e.touches[0].clientY) : undefined}
         style={{
-          width: `${widthPct}%`, maxHeight: 420, display: 'block', objectFit: 'contain',
+          width: `${widthPct}%`, maxHeight: 400, display: 'block', objectFit: 'contain',
           margin: '0 auto', mixBlendMode: 'multiply',
           transform: offsetY ? `translateY(${offsetY}px)` : undefined,
           cursor: editable ? (dragging ? 'grabbing' : 'grab') : 'default',
-          transition: dragging ? 'none' : 'width 0.2s, transform 0.2s',
+          transition: dragging ? 'none' : 'width 0.3s, transform 0.3s',
           userSelect: 'none',
         }}
       />
 
-      {/* Contrôles — apparaissent au clic */}
-      {editable && showControls && !showPicker && (
-        <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e8e0d8', padding: '14px 16px', marginTop: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}>
-          {/* Taille */}
-          <div style={{ marginBottom: 12 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-              <span style={{ fontSize: 11, fontWeight: 600, color: '#3a3330' }}>Taille</span>
-              <span style={{ fontSize: 10, color: '#9a928a' }}>{widthPct}%</span>
-            </div>
-            <input type="range" min={30} max={150} step={5} value={widthPct}
-              onChange={e => onChangeSize(Number(e.target.value))}
-              style={{ width: '100%', accentColor: accent }} />
-          </div>
-          {/* Position verticale */}
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-              <span style={{ fontSize: 11, fontWeight: 600, color: '#3a3330' }}>Position</span>
-              <span style={{ fontSize: 10, color: '#9a928a' }}>{offsetY > 0 ? `+${offsetY}` : offsetY}px</span>
-            </div>
-            <input type="range" min={-80} max={80} step={2} value={offsetY}
-              onChange={e => onChangeOffsetY(Number(e.target.value))}
-              style={{ width: '100%', accentColor: accent }} />
-          </div>
-          {/* Boutons */}
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button type="button" onClick={() => setShowPicker(true)} style={{
-              ...BTN, flex: 1, padding: '8px 0', borderRadius: 8, border: `1.5px solid ${accent}`,
-              background: 'transparent', color: accent, fontSize: 11, fontWeight: 600,
-            }}>Changer</button>
-            <button type="button" onClick={onRemove} style={{
-              ...BTN, flex: 1, padding: '8px 0', borderRadius: 8, border: '1.5px solid #d45050',
-              background: 'transparent', color: '#d45050', fontSize: 11, fontWeight: 600,
-            }}>Retirer</button>
-          </div>
+      {/* Barre de contrôle flottante — toujours visible en mode éditeur */}
+      {editable && !showPicker && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 6 }}>
+          <button type="button" onClick={() => onChangeSize(Math.max(30, widthPct - 10))} style={{
+            ...BTN, width: 28, height: 28, borderRadius: '50%', border: `1.5px solid ${accent}40`,
+            background: 'white', color: accent, fontSize: 16, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
+          }}>-</button>
+          <button type="button" onClick={() => onChangeSize(Math.min(150, widthPct + 10))} style={{
+            ...BTN, width: 28, height: 28, borderRadius: '50%', border: `1.5px solid ${accent}40`,
+            background: 'white', color: accent, fontSize: 16, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
+          }}>+</button>
+          <button type="button" onClick={() => setShowPicker(true)} style={{
+            ...BTN, padding: '4px 10px', borderRadius: 9999, border: `1.5px solid ${accent}40`,
+            background: 'white', color: accent, fontSize: 10, fontWeight: 600,
+          }}>Changer</button>
+          <button type="button" onClick={onRemove} style={{
+            ...BTN, padding: '4px 10px', borderRadius: 9999, border: '1.5px solid #d4505040',
+            background: 'white', color: '#d45050', fontSize: 10, fontWeight: 600,
+          }}>Retirer</button>
         </div>
       )}
 
       {/* Picker de remplacement */}
       {editable && showPicker && (
-        <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e8e0d8', padding: '16px', marginTop: 8, boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: '#3a3330' }}>Choisir une autre illustration</span>
-            <button type="button" onClick={() => setShowPicker(false)} style={{ ...BTN, background: '#f5f3f0', border: 'none', borderRadius: 9999, width: 28, height: 28, fontSize: 14, color: '#9a928a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
+        <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e8e0d8', padding: '14px', marginTop: 6, boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+            <span style={{ fontSize: 12, fontWeight: 600, color: '#3a3330' }}>Choisir une illustration</span>
+            <button type="button" onClick={() => setShowPicker(false)} style={{ ...BTN, background: '#f5f3f0', border: 'none', borderRadius: 9999, width: 26, height: 26, fontSize: 13, color: '#9a928a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
           </div>
           <VisualPicker category={category} onSelect={(id) => {
             const visual = visualById(id)
-            if (visual) { onChangeUrl(visual.url); setShowPicker(false); setShowControls(false) }
+            if (visual) { onChangeUrl(visual.url); setShowPicker(false) }
           }} accent={accent} />
         </div>
-      )}
-
-      {/* Indicateur discret pour le marié */}
-      {editable && !showControls && (
-        <div style={{ fontSize: 10, color: '#b0a898', marginTop: 4, fontStyle: 'italic' }}>Cliquez sur l&apos;image pour la modifier</div>
       )}
     </div>
   )
