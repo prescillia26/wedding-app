@@ -5653,7 +5653,10 @@ const firstDate = sorted[0]?.date
 
         {/* Cérémonies */}
         {(data.presentationStyle === 'cartes-separees' ? [sorted[currentCeremonyIdx]].filter(Boolean) : sorted).map((ceremony, i) => {
-          const realIdx = data.presentationStyle === 'cartes-separees' ? currentCeremonyIdx : i
+          const sortedIdx = data.presentationStyle === 'cartes-separees' ? currentCeremonyIdx : i
+          // Trouver l'index ORIGINAL dans data.ceremonies (pas dans sorted)
+          const realIdx = (data.ceremonies ?? []).indexOf(ceremony)
+          const displayIdx = realIdx >= 0 ? realIdx : sortedIdx
           const typeTitle: Record<string, string> = {
             'Mairie': t.fairepart.cardTitles['Mairie'], 'Cérémonie religieuse / Houppa': data.mariageJuif ? t.fairepart.cardTitles['Cérémonie religieuse / Houppa'] : t.fairepart.cardTitles['Cérémonie'],
             'Shabbat Hatan': t.fairepart.cardTitles['Shabbat Hatan'], 'Henné': t.fairepart.cardTitles['Henné'], 'Cocktail': t.fairepart.cardTitles['Cocktail'],
@@ -5710,13 +5713,13 @@ const firstDate = sorted[0]?.date
                         editable={canEdit}
                         accent={G}
                         ceremonyType={ceremony.type}
-                        onChangeSize={(sz) => { const u = [...(data.ceremonies ?? [])]; u[realIdx] = { ...u[realIdx], illustrationSize: sz }; onUpdate?.({ ceremonies: u }) }}
-                        onChangeOffsetY={(y) => { const u = [...(data.ceremonies ?? [])]; u[realIdx] = { ...u[realIdx], illustrationOffsetY: y }; onUpdate?.({ ceremonies: u }) }}
-                        onChangeUrl={(url) => { const u = [...(data.ceremonies ?? [])]; u[realIdx] = { ...u[realIdx], illustrationUrl: url }; onUpdate?.({ ceremonies: u }) }}
-                        onRemove={() => { const u = [...(data.ceremonies ?? [])]; u[realIdx] = { ...u[realIdx], illustrationUrl: '', illustrationSize: 100, illustrationOffsetY: 0 }; onUpdate?.({ ceremonies: u }) }}
+                        onChangeSize={(sz) => { const u = [...(data.ceremonies ?? [])]; u[displayIdx] = { ...u[displayIdx], illustrationSize: sz }; onUpdate?.({ ceremonies: u }) }}
+                        onChangeOffsetY={(y) => { const u = [...(data.ceremonies ?? [])]; u[displayIdx] = { ...u[displayIdx], illustrationOffsetY: y }; onUpdate?.({ ceremonies: u }) }}
+                        onChangeUrl={(url) => { const u = [...(data.ceremonies ?? [])]; u[displayIdx] = { ...u[displayIdx], illustrationUrl: url }; onUpdate?.({ ceremonies: u }) }}
+                        onRemove={() => { const u = [...(data.ceremonies ?? [])]; u[displayIdx] = { ...u[displayIdx], illustrationUrl: '', illustrationSize: 100, illustrationOffsetY: 0 }; onUpdate?.({ ceremonies: u }) }}
                       />
                     ) : (!hasFrame && canEdit) ? (
-                      <IllustrationAdder ceremonyType={ceremony.type} accent={G} onSelect={(url) => { const u = [...(data.ceremonies ?? [])]; u[realIdx] = { ...u[realIdx], illustrationUrl: url }; onUpdate?.({ ceremonies: u }) }} />
+                      <IllustrationAdder ceremonyType={ceremony.type} accent={G} onSelect={(url) => { const u = [...(data.ceremonies ?? [])]; u[displayIdx] = { ...u[displayIdx], illustrationUrl: url }; onUpdate?.({ ceremonies: u }) }} />
                     ) : null}
                     {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
                       <DraggableElement id={pre+"hebrewVerse"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={100} skipAnim={canEdit}>
