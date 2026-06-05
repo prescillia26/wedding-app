@@ -122,6 +122,19 @@ const ILLUSTRATIONS_COUPLES = [
   { id: 'couple-18', label: '💕 Villa élégante', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498230/13_vtlmbu.png' },
 ] as const
 
+// ── Illustrations RSVP (boîte aux lettres, enveloppes, etc.) ──
+const ILLUSTRATIONS_RSVP = [
+  { id: 'rsvp-01', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679794/87_k4isjc.png' },
+  { id: 'rsvp-02', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679796/86_owvqqb.png' },
+  { id: 'rsvp-03', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679801/88_l3pukk.png' },
+  { id: 'rsvp-04', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679813/90_aicvrs.png' },
+  { id: 'rsvp-05', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679819/91_dvzxei.png' },
+  { id: 'rsvp-06', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679836/89_ms4ox1.png' },
+  { id: 'rsvp-07', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679848/92_slsvpe.png' },
+  { id: 'rsvp-08', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679848/93_kyhcqx.png' },
+  { id: 'rsvp-09', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679849/94_aogybr.png' },
+] as const
+
 // ── Couleurs Luxe Aquarelle ──
 const LUXE_COLORS: { id: string; label: string; hex: string; palette: Palette }[] = [
   { id: 'dore',       label: 'Doré',         hex: '#C9A84C', palette: 'dore' },
@@ -6003,7 +6016,18 @@ const firstDate = sorted[0]?.date
 
         {/* SECTION 5 : Carton-réponse intégré complet */}
         {role === 'guest' && (
-          <section id="rsvp-section" style={{ paddingTop: 60, paddingBottom: 52, scrollMarginTop: 60 }}>
+          <section id="rsvp-section" style={{ paddingTop: 40, paddingBottom: 52, scrollMarginTop: 60 }}>
+            {/* Illustration RSVP — déterministe basée sur les prénoms */}
+            {(() => {
+              const hash = ((data.marie1Prenom || '').length + (data.marie2Prenom || '').length) % ILLUSTRATIONS_RSVP.length
+              const illu = ILLUSTRATIONS_RSVP[hash]
+              return (
+                <div style={{ textAlign: 'center', marginBottom: 8 }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={illu.url.replace('/upload/', '/upload/e_trim/')} alt="" style={{ width: '60%', maxHeight: 200, objectFit: 'contain', display: 'inline-block', mixBlendMode: 'multiply' }} />
+                </div>
+              )
+            })()}
             <InlineRSVP ceremonies={sorted} accent={G} textColor={TEXT} shareId={_lastShareId} mariee1={data.marie1Prenom} mariee2={data.marie2Prenom} rsvpText={data.textOverrides?.['global_rsvpText']} rsvpDeadline={data.rsvpDeadline} locale={locale} />
           </section>
         )}
