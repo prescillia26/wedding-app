@@ -337,6 +337,7 @@ interface FormData {
   illustrationUrl?: string // aquarelle IA v1 (rétrocompat)
   illustrations?: IllustrationElement[] // v2 : tableau d'illustrations (scènes + motifs)
   rsvpDeadline?: string // date limite de confirmation (YYYY-MM-DD)
+  rsvpIllustrationUrl?: string // illustration choisie pour le carton-réponse
   luxeColor?: string // couleur choisie pour le pack Luxe Aquarelle
   luxeDecoUrls?: Record<string, string> // decoId → saved URL des illustrations décoratives générées par IA
   luxeMonogramUrl?: string // URL du monogramme entrelacé IA (pack Luxe)
@@ -5503,6 +5504,39 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
   )
 }
 
+// ── Picker illustration RSVP ─────────────────────────────────────────────────
+function RsvpIllustrationPicker({ accent, onSelect }: { accent: string; onSelect: (url: string) => void }) {
+  const [open, setOpen] = useState(false)
+  if (!open) {
+    return (
+      <div style={{ marginTop: 4 }}>
+        <button type="button" onClick={() => setOpen(true)} style={{
+          ...BTN, padding: '3px 10px', borderRadius: 9999, border: `1px solid ${accent}30`,
+          background: 'white', color: accent, fontSize: 9, fontWeight: 600, cursor: 'pointer',
+        }}>Changer l&apos;illustration</button>
+      </div>
+    )
+  }
+  return (
+    <div style={{ background: 'white', borderRadius: 12, border: '1px solid #e8e0d8', padding: '12px', marginTop: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <span style={{ fontSize: 11, fontWeight: 600, color: '#3a3330' }}>Choisir une illustration</span>
+        <button type="button" onClick={() => setOpen(false)} style={{ ...BTN, background: '#f5f3f0', border: 'none', borderRadius: 9999, width: 24, height: 24, fontSize: 12, color: '#9a928a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+        {ILLUSTRATIONS_RSVP.map(illu => (
+          <button key={illu.id} type="button" onClick={() => { onSelect(illu.url); setOpen(false) }} style={{
+            ...BTN, padding: 4, borderRadius: 8, border: '2px solid #e8e0d8', background: 'white', cursor: 'pointer',
+          }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={illu.url.replace('/upload/', '/upload/w_200,c_fit,q_auto/')} alt="" loading="lazy" style={{ width: '100%', height: 'auto', borderRadius: 5, display: 'block', aspectRatio: '1', objectFit: 'contain' }} />
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // ── Zone d'ajout d'illustration entre les cérémonies ─────────────────────────
 function IllustrationAdder({ ceremonyType, accent, onSelect }: { ceremonyType: string; accent: string; onSelect: (url: string) => void }) {
   const [open, setOpen] = useState(false)
@@ -6014,34 +6048,39 @@ const firstDate = sorted[0]?.date
           </div>
         )}
 
-        {/* SECTION 5 : Carton-réponse intégré complet */}
-        {role === 'guest' && (
-          <section id="rsvp-section" style={{ paddingTop: 40, paddingBottom: 52, scrollMarginTop: 60 }}>
-            {/* Illustration RSVP — déterministe basée sur les prénoms */}
-            {(() => {
+        {/* SECTION 5 : Illustration RSVP + Carton-réponse */}
+        <section id="rsvp-section" style={{ paddingTop: 40, paddingBottom: 52, scrollMarginTop: 60 }}>
+          {/* Illustration RSVP — éditable par les mariés */}
+          {(() => {
+            const rsvpUrl = data.rsvpIllustrationUrl || (() => {
               const hash = ((data.marie1Prenom || '').length + (data.marie2Prenom || '').length) % ILLUSTRATIONS_RSVP.length
-              const illu = ILLUSTRATIONS_RSVP[hash]
-              return (
-                <div style={{ textAlign: 'center', marginBottom: 8 }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={illu.url.replace('/upload/', '/upload/e_trim/')} alt="" style={{ width: '60%', maxHeight: 200, objectFit: 'contain', display: 'inline-block', mixBlendMode: 'multiply' }} />
-                </div>
-              )
-            })()}
+              return ILLUSTRATIONS_RSVP[hash].url
+            })()
+            const canEditRsvp = role !== 'guest' && !!onUpdate
+            return (
+              <div style={{ textAlign: 'center', marginBottom: 8, position: 'relative' }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={rsvpUrl.replace('/upload/', '/upload/e_trim/')} alt="" style={{ width: '60%', maxHeight: 200, objectFit: 'contain', display: 'inline-block', mixBlendMode: 'multiply' }} />
+                {canEditRsvp && (
+                  <RsvpIllustrationPicker
+                    accent={G}
+                    onSelect={(url) => onUpdate?.({ rsvpIllustrationUrl: url })}
+                  />
+                )}
+              </div>
+            )
+          })()}
+          {role === 'guest' && (
             <InlineRSVP ceremonies={sorted} accent={G} textColor={TEXT} shareId={_lastShareId} mariee1={data.marie1Prenom} mariee2={data.marie2Prenom} rsvpText={data.textOverrides?.['global_rsvpText']} rsvpDeadline={data.rsvpDeadline} locale={locale} />
-          </section>
-        )}
-
-        {/* SECTION 5b : RSVP couple */}
-        {role === 'couple' && (
-          <section style={{ paddingTop: 52, paddingBottom: 40, borderBottom: `1px solid ${G}1a`, textAlign: 'center' }}>
-            <AnimSection animStyle={anim}>
+          )}
+          {role === 'couple' && (
+            <div style={{ textAlign: 'center', paddingTop: 20 }}>
               <button onClick={onRsvpListOpen} style={{ ...BTN, background: G, color: 'white', border: 'none', borderRadius: 2, padding: '13px 28px', fontFamily: FP, fontSize: 12, fontWeight: 700, letterSpacing: 2, boxShadow: `0 4px 16px ${G}44` }}>
-                📋 Voir les réponses
+                Voir les réponses
               </button>
-            </AnimSection>
-          </section>
-        )}
+            </div>
+          )}
+        </section>
       </div>
 
       {/* SECTION 7 : Footer */}
