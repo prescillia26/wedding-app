@@ -153,7 +153,6 @@ const FRAMES: { id: string; label: string; url: string | null; video?: boolean }
   { id: 'frame-34', label: '🌻 Floral 14', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778816/14_bzmmdm.png' },
   { id: 'frame-55', label: '🌸 Floral 55', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857011/55_l7xahl.png' },
   { id: 'frame-61', label: '🌸 Floral 61', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857014/61_nnkips.png' },
-  { id: 'frame-65', label: '🌸 Floral 65', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857017/65_hzdotl.png' },
   { id: 'frame-69', label: '🌸 Floral 69', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857021/69_vko7to.png' },
   { id: 'frame-70', label: '🌸 Floral 70', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857021/70_skvaop.png' },
   { id: 'frame-71', label: '🌸 Floral 71', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857022/71_ntcix8.png' },
@@ -1210,7 +1209,6 @@ function StyleAccueilSelector({ data, onChange }: { data: FormData; onChange: (d
   const options: Array<{ id: string; label: string; emoji: string }> = [
     { id: 'photo', label: 'Photos', emoji: '📸' },
     { id: 'illustration', label: 'Illustration', emoji: '🎨' },
-    { id: 'video', label: 'Vidéo animée', emoji: '🎬' },
   ]
   return (
     <div style={{ marginBottom: 16 }}>
@@ -2136,39 +2134,6 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
             })}
           </div>
 
-          {/* Séparateur */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-            <div style={{ flex: 1, height: 1, background: '#efe5d8' }} />
-            <span style={{ fontSize: 10, color: '#b0a898', fontStyle: 'italic' }}>ou</span>
-            <div style={{ flex: 1, height: 1, background: '#efe5d8' }} />
-          </div>
-
-          {/* Cadres vidéo animés */}
-          <div style={{ fontSize: 12, fontWeight: 700, color: '#3a3028', marginBottom: 8 }}>
-            {locale === 'en' ? '🎬 Animated video frames' : '🎬 Cadres vidéo animés'}
-          </div>
-          <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 10 }}>
-            {locale === 'en' ? 'Moving backgrounds that bring your invitation to life.' : 'Des fonds animés qui donnent vie à votre invitation.'}
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-            {FRAMES.filter(fr => fr.video).map(fr => {
-              const accent = THEMES[data.style].accent
-              const sel = (data.frameId ?? 'frame-09') === fr.id
-              return (
-                <button key={fr.id} type="button" onClick={() => onChange({ frameId: fr.id })} style={{
-                  ...BTN, padding: 8, borderRadius: 10,
-                  border: `2px solid ${sel ? accent : '#f0e0d0'}`,
-                  background: sel ? `${accent}10` : 'white',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-                  boxShadow: sel ? `0 0 0 1px ${accent}` : '0 1px 4px rgba(0,0,0,0.08)',
-                }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={fr.url!.replace('/video/upload/', '/video/upload/so_2,w_160,h_200,c_fill,f_jpg/').replace('.mp4', '.jpg')} alt={fr.label} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
-                  <span style={{ fontSize: 9, fontWeight: sel ? 700 : 400, color: sel ? accent : '#3a3330', textAlign: 'center', lineHeight: 1.3 }}>{fr.label}</span>
-                </button>
-              )
-            })}
-          </div>
         </AccordionSection>
       </>)}
 
