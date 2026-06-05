@@ -5260,7 +5260,7 @@ function InlineRSVP({ ceremonies, accent, textColor, shareId, mariee1, mariee2, 
   )
 }
 
-// ── Bouton "Ajouter une illustration" entre les cérémonies ───────────────────
+// ── Zone d'ajout d'illustration entre les cérémonies ─────────────────────────
 function IllustrationAdder({ ceremonyType, accent, onSelect }: { ceremonyType: string; accent: string; onSelect: (url: string) => void }) {
   const [open, setOpen] = useState(false)
   const typeToCategory: Record<string, VisualCategory> = {
@@ -5271,35 +5271,47 @@ function IllustrationAdder({ ceremonyType, accent, onSelect }: { ceremonyType: s
 
   if (!open) {
     return (
-      <div style={{ textAlign: 'center', padding: '12px 0' }}>
+      <div style={{ maxWidth: 480, margin: '0 auto', padding: '16px 24px' }}>
         <button type="button" onClick={() => setOpen(true)} style={{
-          ...BTN, padding: '8px 20px', borderRadius: 9999, border: `1.5px dashed ${accent}55`,
-          background: 'transparent', color: accent, fontSize: 12, fontWeight: 600,
-          fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic',
+          ...BTN, width: '100%', padding: '20px 16px', borderRadius: 14,
+          border: `2px dashed ${accent}40`, background: `${accent}08`,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+          cursor: 'pointer', transition: 'all 0.2s',
         }}>
-          + Ajouter une illustration
+          <div style={{ width: 40, height: 40, borderRadius: '50%', background: `${accent}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, color: accent }}>+</div>
+          <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 12, fontWeight: 600, color: accent, letterSpacing: '0.05em' }}>
+            Ajouter une illustration ici
+          </span>
+          <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: '#9a928a' }}>
+            Parcourez notre bibliothèque d&apos;aquarelles
+          </span>
         </button>
       </div>
     )
   }
 
   return (
-    <div style={{ maxWidth: 520, margin: '0 auto', padding: '16px', background: '#faf8f5', borderRadius: 12, border: '1px solid #e8e0d8' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <span style={{ fontSize: 12, fontWeight: 600, color: accent, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Choisir une illustration</span>
-        <button type="button" onClick={() => setOpen(false)} style={{ ...BTN, background: 'none', border: 'none', fontSize: 16, color: '#9a928a', padding: 0 }}>✕</button>
+    <div style={{ maxWidth: 520, margin: '0 auto', padding: '16px 24px' }}>
+      <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e8e0d8', padding: '20px 16px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div>
+            <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 13, fontWeight: 600, color: '#3a3330' }}>Choisissez une illustration</div>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: '#9a928a', marginTop: 2 }}>Cliquez sur une image pour l&apos;ajouter</div>
+          </div>
+          <button type="button" onClick={() => setOpen(false)} style={{ ...BTN, background: '#f5f3f0', border: 'none', borderRadius: 9999, width: 28, height: 28, fontSize: 14, color: '#9a928a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
+        </div>
+        <VisualPicker
+          category={category}
+          onSelect={(id) => {
+            const visual = visualById(id)
+            if (visual) {
+              onSelect(visual.url)
+              setOpen(false)
+            }
+          }}
+          accent={accent}
+        />
       </div>
-      <VisualPicker
-        category={category}
-        onSelect={(id) => {
-          const visual = visualById(id)
-          if (visual) {
-            onSelect(visual.url)
-            setOpen(false)
-          }
-        }}
-        accent={accent}
-      />
     </div>
   )
 }
@@ -6079,7 +6091,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '8px 16px 12px' }}>
         <div style={{ textAlign: 'center', marginBottom: 6 }}>
           <span style={{ fontSize: 11, color: '#8a7e72', fontWeight: 700, lineHeight: 1.4 }}>
-            Glissez chaque texte pour le repositionner. Cliquez dessus pour changer la taille, couleur et police.
+            Personnalisez votre faire-part : ajoutez des illustrations entre les sections avec le bouton +
           </span>
         </div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
