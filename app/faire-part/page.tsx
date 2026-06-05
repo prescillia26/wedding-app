@@ -4566,11 +4566,12 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, firstDate
   return (
     <>
       <div style={{
-        position: 'sticky', top: 0, zIndex: 100,
-        background: theme.dark ? 'rgba(20,20,20,0.9)' : 'rgba(255,255,255,0.9)',
+        position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
+        width: '100%', maxWidth: 480, zIndex: 100,
+        background: theme.dark ? 'rgba(20,20,20,0.92)' : 'rgba(255,255,255,0.92)',
         backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
         borderBottom: `1px solid ${accent}20`,
-        padding: '8px 16px',
+        padding: '8px 16px', boxSizing: 'border-box',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       } as React.CSSProperties}>
         {/* Logo */}
@@ -5618,7 +5619,7 @@ const firstDate = sorted[0]?.date
   return (
     <div style={{ backgroundColor: theme.fond, minHeight: '100vh' }}>
       {data.petalsEnabled && <PersistentParticles theme={theme} style={data.style} />}
-      <div style={{ backgroundColor: theme.fond, color: TEXT, minHeight: '100vh', maxWidth: 480, margin: '0 auto', boxShadow: '0 0 40px rgba(0,0,0,0.08)' }}>
+      <div style={{ backgroundColor: theme.fond, color: TEXT, minHeight: '100vh', maxWidth: 480, margin: '0 auto', boxShadow: '0 0 40px rgba(0,0,0,0.08)', paddingTop: 54 }}>
       <StickyHeader
         ceremonies={sorted}
         accent={G}
@@ -5696,14 +5697,7 @@ const firstDate = sorted[0]?.date
             {(data.textOverrides?.['global_pleaseJoin']) || t.fairepart.pleaseJoin}
           </div>
           </DraggableElement>
-          {/* Compte à rebours intégré dans l'accueil */}
-          {firstDate && (
-            <DraggableElement id="countdown" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-            <div style={{ marginBottom: 28, animation: 'sharedFadeIn 1s 0.65s ease forwards', opacity: 0 }}>
-              <Countdown targetDate={firstDate} accent={hasIntroPhoto ? 'rgba(255,255,255,0.9)' : G} />
-            </div>
-            </DraggableElement>
-          )}
+          {/* Compte à rebours déplacé dans le sticky header */}
           {/* Bouton "Découvrir" supprimé — la cover InvitationCover fait déjà ce rôle */}
           </>)
           })()}
