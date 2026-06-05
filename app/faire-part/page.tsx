@@ -5308,7 +5308,9 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
   onChangeSize: (s: number) => void; onChangeOffsetX: (x: number) => void; onChangeOffsetY: (y: number) => void; onChangeUrl: (url: string) => void; onRemove: () => void
 }) {
   const [showPicker, setShowPicker] = useState(false)
-  const [dragging, setDragging] = useState(false)
+  // Position locale pendant le drag (pas de re-render à chaque pixel)
+  const [localPos, setLocalPos] = useState<{ x: number; y: number } | null>(null)
+  const draggingRef = useRef(false)
   const dragStart = useRef({ x: 0, y: 0 })
   const dragOffset = useRef({ x: 0, y: 0 })
   const typeToCategory: Record<string, VisualCategory> = {
@@ -5317,63 +5319,73 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
   }
   const category = typeToCategory[ceremonyType] || 'couples'
   const w = Math.max(30, Math.min(150, size))
-
-  const startDrag = (cx: number, cy: number) => {
-    if (!editable) return
-    setDragging(true)
-    dragStart.current = { x: cx, y: cy }
-    dragOffset.current = { x: offsetX, y: offsetY }
-  }
-  const moveDrag = useCallback((cx: number, cy: number) => {
-    if (!dragging) return
-    onChangeOffsetX(Math.max(-150, Math.min(150, dragOffset.current.x + cx - dragStart.current.x)))
-    onChangeOffsetY(Math.max(-200, Math.min(200, dragOffset.current.y + cy - dragStart.current.y)))
-  }, [dragging, onChangeOffsetX, onChangeOffsetY])
-  const endDrag = useCallback(() => setDragging(false), [])
+  const cx = localPos?.x ?? offsetX
+  const cy = localPos?.y ?? offsetY
 
   useEffect(() => {
-    if (!dragging) return
-    const mm = (e: MouseEvent) => { e.preventDefault(); moveDrag(e.clientX, e.clientY) }
-    const tm = (e: TouchEvent) => moveDrag(e.touches[0].clientX, e.touches[0].clientY)
-    const up = () => endDrag()
+    const mm = (e: MouseEvent) => {
+      if (!draggingRef.current) return
+      e.preventDefault()
+      const nx = Math.max(-150, Math.min(150, dragOffset.current.x + e.clientX - dragStart.current.x))
+      const ny = Math.max(-200, Math.min(200, dragOffset.current.y + e.clientY - dragStart.current.y))
+      setLocalPos({ x: nx, y: ny })
+    }
+    const tm = (e: TouchEvent) => {
+      if (!draggingRef.current) return
+      const nx = Math.max(-150, Math.min(150, dragOffset.current.x + e.touches[0].clientX - dragStart.current.x))
+      const ny = Math.max(-200, Math.min(200, dragOffset.current.y + e.touches[0].clientY - dragStart.current.y))
+      setLocalPos({ x: nx, y: ny })
+    }
+    const up = () => {
+      if (!draggingRef.current) return
+      draggingRef.current = false
+      setLocalPos(p => { if (p) { onChangeOffsetX(p.x); onChangeOffsetY(p.y) }; return null })
+    }
     window.addEventListener('mousemove', mm)
     window.addEventListener('mouseup', up)
-    window.addEventListener('touchmove', tm, { passive: true })
+    window.addEventListener('touchmove', tm, { passive: false })
     window.addEventListener('touchend', up)
     return () => { window.removeEventListener('mousemove', mm); window.removeEventListener('mouseup', up); window.removeEventListener('touchmove', tm); window.removeEventListener('touchend', up) }
-  }, [dragging, moveDrag, endDrag])
+  }, [onChangeOffsetX, onChangeOffsetY])
+
+  const startDrag = (ex: number, ey: number) => {
+    if (!editable) return
+    draggingRef.current = true
+    dragStart.current = { x: ex, y: ey }
+    dragOffset.current = { x: offsetX, y: offsetY }
+  }
 
   return (
-    <div style={{ textAlign: 'center', position: 'relative', margin: '0', lineHeight: 0 }}>
+    <div style={{ textAlign: 'center', position: 'relative', margin: '-8px 0 -4px', overflow: 'visible' }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={url} alt="" draggable={false}
         onMouseDown={editable ? (e) => { e.preventDefault(); startDrag(e.clientX, e.clientY) } : undefined}
-        onTouchStart={editable ? (e) => startDrag(e.touches[0].clientX, e.touches[0].clientY) : undefined}
+        onTouchStart={editable ? (e) => { e.preventDefault(); startDrag(e.touches[0].clientX, e.touches[0].clientY) } : undefined}
         style={{
-          width: `${w}%`, maxHeight: 350, objectFit: 'contain', display: 'inline-block',
+          width: `${w}%`, maxHeight: 300, objectFit: 'contain', display: 'inline-block',
           mixBlendMode: 'multiply',
-          transform: `translate(${offsetX}px, ${offsetY}px)`,
-          cursor: editable ? (dragging ? 'grabbing' : 'grab') : 'default',
-          transition: dragging ? 'none' : 'width 0.2s, transform 0.2s',
+          transform: `translate(${cx}px, ${cy}px)`,
+          cursor: editable ? (draggingRef.current ? 'grabbing' : 'grab') : 'default',
+          transition: draggingRef.current ? 'none' : 'width 0.2s',
           userSelect: 'none',
         }}
       />
       {editable && !showPicker && (
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
-          <button type="button" onPointerDown={e => { e.stopPropagation(); onChangeSize(Math.max(30, w - 10)) }} style={{
-            ...BTN, width: 26, height: 26, borderRadius: '50%', border: `1px solid ${accent}30`,
-            background: 'white', color: accent, fontSize: 18, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, cursor: 'pointer',
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 2, lineHeight: 1 }}>
+          <button type="button" onClick={(e) => { e.stopPropagation(); onChangeSize(Math.max(30, w - 10)) }} style={{
+            ...BTN, width: 24, height: 24, borderRadius: '50%', border: `1px solid ${accent}30`,
+            background: 'white', color: accent, fontSize: 16, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, cursor: 'pointer',
           }}>−</button>
-          <button type="button" onPointerDown={e => { e.stopPropagation(); onChangeSize(Math.min(150, w + 10)) }} style={{
-            ...BTN, width: 26, height: 26, borderRadius: '50%', border: `1px solid ${accent}30`,
-            background: 'white', color: accent, fontSize: 18, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, cursor: 'pointer',
+          <button type="button" onClick={(e) => { e.stopPropagation(); onChangeSize(Math.min(150, w + 10)) }} style={{
+            ...BTN, width: 24, height: 24, borderRadius: '50%', border: `1px solid ${accent}30`,
+            background: 'white', color: accent, fontSize: 16, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, cursor: 'pointer',
           }}>+</button>
-          <button type="button" onPointerDown={e => { e.stopPropagation(); setShowPicker(true) }} style={{
+          <button type="button" onClick={() => setShowPicker(true)} style={{
             ...BTN, padding: '3px 8px', borderRadius: 9999, border: `1px solid ${accent}30`,
             background: 'white', color: accent, fontSize: 9, fontWeight: 600, cursor: 'pointer',
           }}>Changer</button>
-          <button type="button" onPointerDown={e => { e.stopPropagation(); onRemove() }} style={{
+          <button type="button" onClick={() => onRemove()} style={{
             ...BTN, padding: '3px 8px', borderRadius: 9999, border: '1px solid #d4505030',
             background: 'white', color: '#d45050', fontSize: 9, fontWeight: 600, cursor: 'pointer',
           }}>Retirer</button>
