@@ -11,6 +11,9 @@ import InvitationCover from '../components/InvitationCover'
 import type { Palette } from '@/lib/watercolorPrompt'
 import { toTitleCase } from '@/lib/titleCase'
 import { DELIMITERS } from '@/lib/delimiters'
+import VisualPicker from '../components/luxe/VisualPicker'
+import { byId as visualById } from '@/lib/visuals'
+import type { VisualCategory } from '@/lib/visuals'
 
 
 type Theme = 'rose-fleuri' | 'ivoire-or' | 'bleu-floral' | 'champetre' | 'blanc-gris' | 'noir-blanc' | 'chocolat' | 'bordeaux' | 'bordeaux-nuit' | 'fuchsia' | 'marine-or' | 'menthe'
@@ -1957,6 +1960,61 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
             style={{ ...S.input, minHeight: 80, resize: 'vertical', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic' }}
           />
           <div style={{ fontSize: 10, color: '#b0a898', textAlign: 'right', marginTop: 4 }}>{(data.luxeStory || '').length}/500</div>
+        </AccordionSection>
+
+        <AccordionSection title={locale === 'en' ? '🎨 Ceremony visuals' : '🎨 Visuels des cérémonies'} defaultOpen>
+          <p style={{ fontSize: 11, color: '#9a928a', marginBottom: 14, lineHeight: 1.5 }}>
+            {locale === 'en'
+              ? 'Choose a watercolor illustration for each ceremony. It will appear as a beautiful decorative element.'
+              : 'Choisissez une illustration aquarelle pour chaque cérémonie. Elle apparaîtra comme un bel élément décoratif.'}
+          </p>
+          {(data.ceremonies ?? []).map((ceremony, idx) => {
+            const typeToCategory: Record<string, VisualCategory> = {
+              'Mairie': 'mairie',
+              'Cérémonie religieuse / Houppa': 'houppa',
+              'Shabbat Hatan': 'shabbat',
+              'Henné': 'couples',
+              'Cocktail': 'couples',
+              'Soirée': 'couples',
+              'Boat Party': 'couples',
+              'Autre': 'couples',
+            }
+            const category = typeToCategory[ceremony.type] || 'couples'
+            const ceremonyName = ceremony.type === 'Autre' ? (ceremony.customName || 'Événement') : ceremony.type
+            return (
+              <div key={idx} style={{ marginBottom: 20 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: selectedLuxeColor.hex, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  {ceremonyName}
+                </div>
+                {ceremony.illustrationUrl && (
+                  <div style={{ textAlign: 'center', marginBottom: 8 }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={ceremony.illustrationUrl.replace('/upload/', '/upload/w_300,c_fit/')} alt="" style={{ maxHeight: 80, borderRadius: 8, opacity: 0.8 }} />
+                    <button type="button" onClick={() => {
+                      const updated = [...(data.ceremonies ?? [])]
+                      updated[idx] = { ...updated[idx], illustrationUrl: '' }
+                      onChange({ ceremonies: updated })
+                    }} style={{ ...BTN, display: 'block', margin: '4px auto 0', fontSize: 10, color: '#d45050', background: 'none', border: 'none' }}>
+                      {locale === 'en' ? 'Remove' : 'Retirer'}
+                    </button>
+                  </div>
+                )}
+                <VisualPicker
+                  category={category}
+                  selectedId={undefined}
+                  onSelect={(id) => {
+                    const visual = visualById(id)
+                    if (visual) {
+                      const updated = [...(data.ceremonies ?? [])]
+                      updated[idx] = { ...updated[idx], illustrationUrl: visual.url }
+                      onChange({ ceremonies: updated })
+                    }
+                  }}
+                  accent={selectedLuxeColor.hex}
+                />
+              </div>
+            )
+          })}
         </AccordionSection>
 
         <AccordionSection title={locale === 'en' ? '👗 Dress code' : '👗 Dress code'}>
@@ -5685,9 +5743,9 @@ const firstDate = sorted[0]?.date
             <React.Fragment key={realIdx}>
               {/* Aquarelle IA du lieu — image décorative entre les sections */}
               {ceremony.illustrationUrl && (
-                <div style={{ maxWidth: isCard ? undefined : 600, margin: '0 auto', padding: '8px 24px' }}>
+                <div style={{ maxWidth: 520, margin: '0 auto 8px', padding: '0 16px', textAlign: 'center' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={ceremony.illustrationUrl} alt={ceremony.lieu || ''} style={{ width: '100%', maxHeight: 280, display: 'block', objectFit: 'cover', borderRadius: 16 }} />
+                  <img src={ceremony.illustrationUrl} alt="" style={{ width: '100%', maxHeight: 360, display: 'block', objectFit: 'contain', margin: '0 auto', mixBlendMode: 'multiply' }} />
                 </div>
               )}
               <CeremonyCard isCard={isCard} accent={G}>
