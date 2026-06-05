@@ -4520,10 +4520,28 @@ function AnimSection({ children, delay = 0, style, animStyle = 'slide-up', skipA
 }
 
 // ── Menu flottant pour naviguer entre les événements ──────────────────────────
-function FloatingEventMenu({ ceremonies, accent, theme }: { ceremonies: { type: string; customName?: string }[]; accent: string; theme: ThemeObj }) {
+function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, firstDate }: { ceremonies: { type: string; customName?: string }[]; accent: string; theme: ThemeObj; logoUrl?: string; logoColor?: string; firstDate?: string }) {
   const [open, setOpen] = useState(false)
+  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
   const { t } = useT()
-  if (ceremonies.length < 2) return null
+
+  useEffect(() => {
+    if (!firstDate) return
+    const target = new Date(firstDate).getTime()
+    const tick = () => {
+      const diff = Math.max(0, target - Date.now())
+      setCountdown({
+        days: Math.floor(diff / 86400000),
+        hours: Math.floor((diff % 86400000) / 3600000),
+        minutes: Math.floor((diff % 3600000) / 60000),
+        seconds: Math.floor((diff % 60000) / 1000),
+      })
+    }
+    tick()
+    const id = setInterval(tick, 1000)
+    return () => clearInterval(id)
+  }, [firstDate])
+
   const typeTitle: Record<string, string> = {
     'Mairie': t.fairepart.cardTitles['Mairie'],
     'Cérémonie religieuse / Houppa': t.fairepart.cardTitles['Cérémonie religieuse / Houppa'],
@@ -4533,28 +4551,81 @@ function FloatingEventMenu({ ceremonies, accent, theme }: { ceremonies: { type: 
     'Soirée': t.fairepart.cardTitles['Soirée'],
     'Boat Party': t.fairepart.cardTitles['Boat Party'],
   }
+
+  // Logo affiché : custom logo ou monogramme initiales
+  let logoSrc = ''
+  if (logoUrl?.includes('cloudinary.com')) {
+    const hex = (logoColor || accent).replace('#', '')
+    logoSrc = hex
+      ? logoUrl.replace('/upload/', `/upload/e_background_removal/e_trim/e_grayscale/e_tint:100:${hex}:0p/`)
+      : logoUrl.replace('/upload/', '/upload/e_background_removal/e_trim/')
+  } else if (logoUrl) {
+    logoSrc = logoUrl
+  }
+
   return (
-    <div style={{ position: 'fixed', top: 16, right: 16, zIndex: 100 }}>
-      <button onClick={() => setOpen(!open)} style={{ width: 40, height: 40, borderRadius: '50%', border: `1.5px solid ${accent}66`, background: theme.dark ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.85)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 12px rgba(0,0,0,0.15)', color: accent, fontSize: 16, padding: 0 } as React.CSSProperties}>
-        {open ? '✕' : '☰'}
-      </button>
+    <>
+      <div style={{
+        position: 'sticky', top: 0, zIndex: 100,
+        background: theme.dark ? 'rgba(20,20,20,0.9)' : 'rgba(255,255,255,0.9)',
+        backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+        borderBottom: `1px solid ${accent}20`,
+        padding: '8px 16px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      } as React.CSSProperties}>
+        {/* Logo */}
+        <div style={{ width: 36, height: 36, flexShrink: 0 }}>
+          {logoSrc ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={logoSrc} alt="" style={{ width: 36, height: 36, objectFit: 'contain' }} />
+          ) : null}
+        </div>
+
+        {/* Countdown */}
+        {firstDate && (
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, fontFamily: 'var(--font-playfair-display)', color: accent }}>
+            <span style={{ fontSize: 16, fontWeight: 700 }}>{countdown.days}</span>
+            <span style={{ fontSize: 8, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', opacity: 0.7 }}>jours</span>
+            <span style={{ fontSize: 16, fontWeight: 700, marginLeft: 6 }}>{String(countdown.hours).padStart(2, '0')}</span>
+            <span style={{ fontSize: 8, fontWeight: 600, opacity: 0.7 }}>h</span>
+            <span style={{ fontSize: 16, fontWeight: 700 }}>{String(countdown.minutes).padStart(2, '0')}</span>
+            <span style={{ fontSize: 8, fontWeight: 600, opacity: 0.7 }}>m</span>
+            <span style={{ fontSize: 16, fontWeight: 700 }}>{String(countdown.seconds).padStart(2, '0')}</span>
+            <span style={{ fontSize: 8, fontWeight: 600, opacity: 0.7 }}>s</span>
+          </div>
+        )}
+
+        {/* Menu burger */}
+        <button onClick={() => setOpen(!open)} style={{
+          width: 36, height: 36, borderRadius: '50%', border: `1.5px solid ${accent}44`,
+          background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: 'pointer', color: accent, fontSize: 18, padding: 0, flexShrink: 0,
+        }}>
+          {open ? '✕' : '☰'}
+        </button>
+      </div>
+
+      {/* Menu déroulant */}
       {open && (
-        <div style={{ position: 'absolute', top: 48, right: 0, background: theme.dark ? 'rgba(20,20,20,0.95)' : 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderRadius: 12, border: `1px solid ${accent}33`, boxShadow: '0 8px 32px rgba(0,0,0,0.15)', padding: '8px 0', minWidth: 180 } as React.CSSProperties}>
-          {ceremonies.map((c, i) => {
-            const name = typeTitle[c.type] || c.customName || c.type
-            return (
-              <button key={i} onClick={() => { setOpen(false); document.getElementById(`ceremony-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} style={{ display: 'block', width: '100%', padding: '10px 20px', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: theme.texte, letterSpacing: 0.5 }}>
-                {name}
-              </button>
-            )
-          })}
+        <div style={{
+          position: 'fixed', top: 54, right: 16, zIndex: 101,
+          background: theme.dark ? 'rgba(20,20,20,0.95)' : 'rgba(255,255,255,0.97)',
+          backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+          borderRadius: 12, border: `1px solid ${accent}33`,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.15)', padding: '8px 0', minWidth: 180,
+        } as React.CSSProperties}>
+          {ceremonies.map((c, i) => (
+            <button key={i} onClick={() => { setOpen(false); document.getElementById(`ceremony-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} style={{ display: 'block', width: '100%', padding: '10px 20px', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: theme.texte, letterSpacing: 0.5 }}>
+              {typeTitle[c.type] || c.customName || c.type}
+            </button>
+          ))}
           <div style={{ height: 1, background: `${accent}22`, margin: '4px 12px' }} />
           <button onClick={() => { setOpen(false); document.getElementById('rsvp-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} style={{ display: 'block', width: '100%', padding: '10px 20px', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', fontFamily: 'var(--font-playfair-display)', fontSize: 13, fontWeight: 600, color: accent, letterSpacing: 1, textTransform: 'uppercase' }}>
             RSVP
           </button>
         </div>
       )}
-    </div>
+    </>
   )
 }
 
@@ -5548,7 +5619,14 @@ const firstDate = sorted[0]?.date
     <div style={{ backgroundColor: theme.fond, minHeight: '100vh' }}>
       {data.petalsEnabled && <PersistentParticles theme={theme} style={data.style} />}
       <div style={{ backgroundColor: theme.fond, color: TEXT, minHeight: '100vh', maxWidth: 480, margin: '0 auto', boxShadow: '0 0 40px rgba(0,0,0,0.08)' }}>
-      <FloatingEventMenu ceremonies={sorted} accent={G} theme={theme} />
+      <StickyHeader
+        ceremonies={sorted}
+        accent={G}
+        theme={theme}
+        logoUrl={data.customLogoUrl || data.luxeMonogramUrl}
+        logoColor={data.customLogoColor}
+        firstDate={sorted[0]?.date}
+      />
       <style>{`
         @keyframes sharedFadeIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
         .lovit-btn{transition:all 0.25s cubic-bezier(0.22,1,0.36,1)}
