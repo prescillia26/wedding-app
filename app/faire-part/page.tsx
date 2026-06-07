@@ -81,6 +81,21 @@ const COLOR_OPTIONS = [
   { value: '#91BDC9', label: 'Bleu mer doux',   swatch: '#91BDC9' },
   { value: '#FFD700', label: 'Jaune vif',       swatch: '#FFD700' },
   { value: '#FFEA00', label: 'Jaune fluo',      swatch: '#FFEA00' },
+  // Accents des thèmes
+  { value: '#c4829a', label: 'Rose fleuri',      swatch: '#c4829a' },
+  { value: '#888888', label: 'Gris moyen',       swatch: '#888888' },
+  { value: '#e0e0e0', label: 'Gris clair',       swatch: '#e0e0e0' },
+  { value: '#8b1a2a', label: 'Bordeaux profond', swatch: '#8b1a2a' },
+  { value: '#d4006a', label: 'Fuchsia vif',      swatch: '#d4006a' },
+  { value: '#b0a080', label: 'Lin naturel',      swatch: '#b0a080' },
+  { value: '#6a9a70', label: 'Vert sauge doux',  swatch: '#6a9a70' },
+  { value: '#d4826a', label: 'Rose pêche doux',  swatch: '#d4826a' },
+  { value: '#7aaed4', label: 'Bleu clair',       swatch: '#7aaed4' },
+  { value: '#9a9080', label: 'Taupe',            swatch: '#9a9080' },
+  { value: '#C9A030', label: 'Or ocre',          swatch: '#C9A030' },
+  { value: '#5a9a80', label: 'Céladon foncé',    swatch: '#5a9a80' },
+  { value: '#D4A830', label: 'Buttercup doré',   swatch: '#D4A830' },
+  { value: '#5a9ab0', label: 'Bleu mer profond', swatch: '#5a9ab0' },
 ]
 
 interface ZoneStyle {
