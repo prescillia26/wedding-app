@@ -5876,13 +5876,7 @@ const firstDate = sorted[0]?.date
             <IntroCarousel photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} themeAccent={G} photosData={data.photosData} />
           </div>
         )}
-        {/* Cadre (frame) en fond de la page d'accueil */}
-        {hasFrame && frame.url && !frame.video && (
-          <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={frame.url} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: data.frameOpacity ?? 0.6 }} />
-          </div>
-        )}
+        {/* Cadre (frame) réservé aux pages événements — PAS sur l'accueil */}
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '0 32px', maxWidth: 480, width: '100%', margin: '0 auto' }}>
           {(() => {
             const canEdit = role !== 'guest' && !!onUpdate
