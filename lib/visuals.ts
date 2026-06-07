@@ -88,7 +88,16 @@ export const VISUALS: Visual[] = [
   // ── Itinéraire (1) ──────────────────────────────────────────────────
   { id: 'IT01', category: 'itineraire', label: 'Itinéraire 1', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780683042/99_yvojqy.png' },
 
-  // ── RSVP (à compléter) ────────────────────────────────────────────────
+  // ── RSVP (9) ─────────────────────────────────────────────────────────
+  { id: 'R01', category: 'rsvp', label: 'RSVP 1', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679794/87_k4isjc.png' },
+  { id: 'R02', category: 'rsvp', label: 'RSVP 2', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679796/86_owvqqb.png' },
+  { id: 'R03', category: 'rsvp', label: 'RSVP 3', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679801/88_l3pukk.png' },
+  { id: 'R04', category: 'rsvp', label: 'RSVP 4', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679813/90_aicvrs.png' },
+  { id: 'R05', category: 'rsvp', label: 'RSVP 5', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679819/91_dvzxei.png' },
+  { id: 'R06', category: 'rsvp', label: 'RSVP 6', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679836/89_ms4ox1.png' },
+  { id: 'R07', category: 'rsvp', label: 'RSVP 7', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679848/92_slsvpe.png' },
+  { id: 'R08', category: 'rsvp', label: 'RSVP 8', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679848/93_kyhcqx.png' },
+  { id: 'R09', category: 'rsvp', label: 'RSVP 9', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679849/94_aogybr.png' },
 ]
 
 export function byCategory(category: VisualCategory): Visual[] {

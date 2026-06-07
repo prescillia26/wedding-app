@@ -5494,7 +5494,7 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
   const dragOffset = useRef({ x: 0, y: 0 })
   const typeToCategory: Record<string, VisualCategory> = {
     'Mairie': 'mairie', 'Cérémonie religieuse / Houppa': 'houppa', 'Shabbat Hatan': 'shabbat',
-    'Henné': 'couples', 'Cocktail': 'couples', 'Soirée': 'couples', 'Boat Party': 'beach', 'Beach Party': 'beach', 'Autre': 'couples',
+    'Henné': 'couples', 'Cocktail': 'couples', 'Soirée': 'couples', 'Boat Party': 'beach', 'Beach Party': 'beach', 'RSVP': 'rsvp', 'Autre': 'couples',
   }
   const category = typeToCategory[ceremonyType] || 'couples'
   const w = Math.max(30, Math.min(150, size))
@@ -5624,7 +5624,7 @@ function IllustrationAdder({ ceremonyType, accent, onSelect }: { ceremonyType: s
   const [open, setOpen] = useState(false)
   const typeToCategory: Record<string, VisualCategory> = {
     'Mairie': 'mairie', 'Cérémonie religieuse / Houppa': 'houppa', 'Shabbat Hatan': 'shabbat',
-    'Henné': 'couples', 'Cocktail': 'couples', 'Soirée': 'couples', 'Boat Party': 'beach', 'Beach Party': 'beach', 'Autre': 'couples',
+    'Henné': 'couples', 'Cocktail': 'couples', 'Soirée': 'couples', 'Boat Party': 'beach', 'Beach Party': 'beach', 'RSVP': 'rsvp', 'Autre': 'couples',
   }
   const category = typeToCategory[ceremonyType] || 'couples'
 
@@ -6202,7 +6202,7 @@ const firstDate = sorted[0]?.date
                   offsetY={data.rsvpIllustrationOffsetY ?? 0}
                   editable={canEditRsvp}
                   accent={G}
-                  ceremonyType="Cocktail"
+                  ceremonyType="RSVP"
                   onChangeSize={(sz) => onUpdate?.({ rsvpIllustrationSize: sz })}
                   onChangeOffsetX={(x) => onUpdate?.({ rsvpIllustrationOffsetX: x })}
                   onChangeOffsetY={(y) => onUpdate?.({ rsvpIllustrationOffsetY: y })}
