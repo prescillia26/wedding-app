@@ -5853,11 +5853,6 @@ const firstDate = sorted[0]?.date
             )
           })()}
           <DraggableElement id="names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', margin: '0 auto 10px', maxWidth: 140 }}>
-            <div style={{ flex: 1, height: 0.5, background: introTextColor, opacity: 0.4 }} />
-            <span style={{ color: introTextColor, fontSize: 8, opacity: 0.5 }}>◆</span>
-            <div style={{ flex: 1, height: 0.5, background: introTextColor, opacity: 0.4 }} />
-          </div>
           <div style={{ fontFamily: FS, fontSize: 'clamp(26px,7vw,40px)', color: introTextColor, marginBottom: 10, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.2, textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : readableShadow(theme) }}>
             {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
           </div>
