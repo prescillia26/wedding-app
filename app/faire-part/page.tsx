@@ -6367,6 +6367,8 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
             logoUrl={data.luxeMonogramUrl || data.customLogoUrl}
             logoColor={data.customLogoColor}
             onOpen={() => setCoverOpen(true)}
+            mariageJuif={data.mariageJuif}
+            illustrationUrl={data.illustrationCoupleId ? ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url : undefined}
           />
         )}
         {data.petalsEnabled && <FloatingPetals accent={theme.accent} />}
@@ -6429,6 +6431,8 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
           logoUrl={data.luxeMonogramUrl || data.customLogoUrl}
           logoColor={data.customLogoColor}
           onOpen={() => setCoverOpen(true)}
+          mariageJuif={data.mariageJuif}
+          illustrationUrl={data.illustrationCoupleId ? ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url : undefined}
         />
       )}
       {!isPaid && (

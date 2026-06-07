@@ -15,6 +15,8 @@ export default function InvitationCover({
   logoUrl,
   logoColor,
   onOpen,
+  mariageJuif,
+  illustrationUrl,
 }: {
   prenom1: string
   prenom2: string
@@ -25,6 +27,8 @@ export default function InvitationCover({
   logoUrl?: string
   logoColor?: string
   onOpen: () => void
+  mariageJuif?: boolean
+  illustrationUrl?: string
 }) {
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
   const [opened, setOpened] = useState(false)
@@ -79,6 +83,11 @@ export default function InvitationCover({
 
       <div style={{ textAlign: 'center', padding: '0 32px', animation: 'coverFadeIn 1.2s ease both' }}>
 
+        {/* בס״ד */}
+        {mariageJuif && (
+          <div style={{ fontFamily: 'serif', fontSize: 16, color: accent, direction: 'rtl', marginBottom: 20, opacity: 0.85 }}>בס״ד</div>
+        )}
+
         {/* Logo en gros */}
         {logoUrl ? (() => {
           const colorToUse = logoColor || accent.replace('#', '')
@@ -103,6 +112,14 @@ export default function InvitationCover({
           </div>
         )}
 
+        {/* Illustration couple */}
+        {illustrationUrl && (
+          <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'center' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={illustrationUrl} alt="" style={{ maxWidth: '65%', maxHeight: 220, objectFit: 'contain' }} />
+          </div>
+        )}
+
         {/* Séparateur */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 28 }}>
           <div style={{ width: 50, height: 0.5, background: accent, opacity: 0.3 }} />
@@ -112,13 +129,13 @@ export default function InvitationCover({
 
         {/* Phrase — mariage de Prénom & Prénom */}
         <div style={{ marginBottom: 32 }}>
-          <div style={{ fontFamily: PD, fontSize: 11, color: accent, letterSpacing: 4, textTransform: 'uppercase', marginBottom: 12, opacity: 0.6 }}>
-            Vous êtes conviés au mariage de
-          </div>
           <div>
             <span style={{ fontFamily: GV, fontSize: 'clamp(32px, 10vw, 52px)', color: accent }}>{p1}</span>
             <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 20, color: accent, margin: '0 10px', opacity: 0.5 }}>&</span>
             <span style={{ fontFamily: GV, fontSize: 'clamp(32px, 10vw, 52px)', color: accent }}>{p2}</span>
+          </div>
+          <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 15, color: accent, letterSpacing: 1, marginTop: 14, opacity: 0.7, lineHeight: 1.6 }}>
+            ont le plaisir de vous convier<br />à leur mariage
           </div>
         </div>
 
