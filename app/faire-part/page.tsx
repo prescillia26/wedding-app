@@ -1868,18 +1868,7 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
   if (logoUrl) {
     const LOGO_COLORS = [
       { value: '', label: 'Original', swatch: '' },
-      { value: '#c4829a', label: 'Rose Fleuri', swatch: '#c4829a' },
-      { value: '#C9A84C', label: 'Ivoire & Or', swatch: '#C9A84C' },
-      { value: '#2c4a7c', label: 'Bleu', swatch: '#2c4a7c' },
-      { value: '#7a9e6e', label: 'Champêtre', swatch: '#7a9e6e' },
-      { value: '#888888', label: 'Gris', swatch: '#888888' },
-      { value: '#e0e0e0', label: 'Blanc', swatch: '#e0e0e0' },
-      { value: '#d4a574', label: 'Chocolat', swatch: '#d4a574' },
-      { value: '#8b1a2a', label: 'Bordeaux', swatch: '#8b1a2a' },
-      { value: '#d4829a', label: 'Bordeaux Nuit', swatch: '#d4829a' },
-      { value: '#d4006a', label: 'Fuchsia', swatch: '#d4006a' },
-      { value: '#2a9a6a', label: 'Menthe', swatch: '#2a9a6a' },
-      { value: '#000000', label: 'Noir', swatch: '#000000' },
+      ...COLOR_OPTIONS.filter(c => c.value !== '').map(c => ({ value: c.value, label: c.label, swatch: c.swatch })),
     ]
     const previewSize = Math.min(220, 140 * (logoSize / 100))
     const imgSrc = logoUrl?.includes('cloudinary.com')
