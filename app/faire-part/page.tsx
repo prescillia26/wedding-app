@@ -5485,9 +5485,10 @@ function InlineRSVP({ ceremonies, accent, textColor, shareId, mariee1, mariee2, 
 }
 
 // ── Illustration éditable (redimensionner, déplacer, changer, retirer) ───────
-function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, ceremonyType, onChangeSize, onChangeOffsetX, onChangeOffsetY, onChangeUrl, onRemove }: {
+function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, ceremonyType, onChangeSize, onChangeOffsetX, onChangeOffsetY, onChangeUrl, onRemove, darkBg }: {
   url: string; size: number; offsetX: number; offsetY: number; editable: boolean; accent: string; ceremonyType: string
   onChangeSize: (s: number) => void; onChangeOffsetX: (x: number) => void; onChangeOffsetY: (y: number) => void; onChangeUrl: (url: string) => void; onRemove: () => void
+  darkBg?: boolean
 }) {
   const [showPicker, setShowPicker] = useState(false)
   // Position locale pendant le drag (pas de re-render à chaque pixel)
@@ -5546,7 +5547,7 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
         onTouchStart={editable ? (e) => { e.preventDefault(); startDrag(e.touches[0].clientX, e.touches[0].clientY) } : undefined}
         style={{
           width: `${w}%`, maxHeight: 250, objectFit: 'contain', display: 'inline-block',
-          mixBlendMode: 'multiply', verticalAlign: 'middle',
+          mixBlendMode: darkBg ? 'screen' : 'multiply', verticalAlign: 'middle',
           transform: `translate(${cx}px, ${cy}px)`,
           cursor: editable ? (draggingRef.current ? 'grabbing' : 'grab') : 'default',
           transition: draggingRef.current ? 'none' : 'width 0.2s',
@@ -5909,6 +5910,7 @@ const firstDate = sorted[0]?.date
                     }
                   }}
                   onRemove={() => onUpdate?.({ illustrationCoupleId: '', illustrationCoupleSize: 70, illustrationCoupleOffsetX: 0, illustrationCoupleOffsetY: 0 })}
+                  darkBg={!!theme.dark}
                 />
               </div>
             )
@@ -6038,6 +6040,7 @@ const firstDate = sorted[0]?.date
                         onChangeOffsetY={(y) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationOffsetY: y }; onUpdate?.({ ceremonies: u }) }}
                         onChangeUrl={(url) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationUrl: url }; onUpdate?.({ ceremonies: u }) }}
                         onRemove={() => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationUrl: '', illustrationSize: 80, illustrationOffsetX: 0, illustrationOffsetY: 0 }; onUpdate?.({ ceremonies: u }) }}
+                        darkBg={!!theme.dark}
                       />
                     ) : (!hasFrame && canEdit) ? (
                       <IllustrationAdder ceremonyType={ceremony.type} accent={G} onSelect={(url) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationUrl: url }; onUpdate?.({ ceremonies: u }) }} />
@@ -6293,6 +6296,7 @@ const firstDate = sorted[0]?.date
                   onChangeOffsetY={(y) => onUpdate?.({ rsvpIllustrationOffsetY: y })}
                   onChangeUrl={(url) => onUpdate?.({ rsvpIllustrationUrl: url })}
                   onRemove={() => onUpdate?.({ rsvpIllustrationUrl: '', rsvpIllustrationSize: 60, rsvpIllustrationOffsetX: 0, rsvpIllustrationOffsetY: 0 })}
+                  darkBg={!!theme.dark}
                 />
               </div>
             )
