@@ -5807,7 +5807,7 @@ const firstDate = sorted[0]?.date
           </div>
           </DraggableElement>
           {data.styleAccueil === 'illustration' && data.illustrationCoupleId && (() => {
-            const coupleUrl = ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url
+            const coupleUrl = ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url || (data.illustrationCoupleId.startsWith('http') ? data.illustrationCoupleId : '')
             if (!coupleUrl) return null
             return (
               <div style={{ marginBottom: 24, animation: 'sharedFadeIn 1s 0.2s ease forwards', opacity: 0 }}>
@@ -5824,7 +5824,12 @@ const firstDate = sorted[0]?.date
                   onChangeOffsetY={(y) => onUpdate?.({ illustrationCoupleOffsetY: y })}
                   onChangeUrl={(url) => {
                     const found = ILLUSTRATIONS_COUPLES.find(ic => ic.url === url)
-                    if (found) onUpdate?.({ illustrationCoupleId: found.id })
+                    if (found) {
+                      onUpdate?.({ illustrationCoupleId: found.id })
+                    } else {
+                      // Illustration venant du VisualPicker — stocker l'URL directement
+                      onUpdate?.({ illustrationCoupleId: url })
+                    }
                   }}
                   onRemove={() => onUpdate?.({ illustrationCoupleId: '', illustrationCoupleSize: 70, illustrationCoupleOffsetX: 0, illustrationCoupleOffsetY: 0 })}
                 />
@@ -5884,7 +5889,7 @@ const firstDate = sorted[0]?.date
               )}
               {/* Illustration aquarelle — image décorative entre les sections */}
               <CeremonyCard isCard={isCard} accent={G}>
-                <section id={`ceremony-${safeIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : 40, paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : 40, paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: (role !== 'guest' && !!onUpdate) ? 'visible' : 'hidden', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: theme.fond } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
+                <section id={`ceremony-${safeIdx}`} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' as const, justifyContent: 'center', paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : 40, paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : 40, paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: (role !== 'guest' && !!onUpdate) ? 'visible' : 'hidden', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: theme.fond } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
                   {hasFrame && frame.video ? (
                     <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
                   ) : hasFrame ? (
@@ -5912,7 +5917,7 @@ const firstDate = sorted[0]?.date
                     return (
                   <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame), transform: data.textOffsetY ? `translateY(${data.textOffsetY}px)` : undefined }}>
                     {data.mariageJuif && (
-                      <DraggableElement id={pre+"bsd"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><div style={{ position: 'absolute', top: 18, right: 22, fontSize: 16, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, zIndex: 5, opacity: 0.85, letterSpacing: 1 }}>בס״ד</div></DraggableElement>
+                      <DraggableElement id={pre+"bsd"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, opacity: 0.85, letterSpacing: 1, marginBottom: 8, paddingRight: 4 }}>בס״ד</div></DraggableElement>
                     )}
                     <DraggableElement id={pre+"titre"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} skipAnim={canEdit}>
                       <div style={applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: ceremony.illustrationUrl ? 6 : 16, lineHeight: 1.4 }, 'titres', data.zoneStyles)}>{ov[`ceremony_${i}_titre`] || title}</div>
@@ -6154,7 +6159,7 @@ const firstDate = sorted[0]?.date
           </div>
         )}
         {/* SECTION 5 : Illustration RSVP + Carton-réponse */}
-        <section id="rsvp-section" style={{ paddingTop: 40, paddingBottom: 52, scrollMarginTop: 60 }}>
+        <section id="rsvp-section" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingTop: 40, paddingBottom: 52, scrollMarginTop: 60 }}>
           {/* Illustration RSVP — éditable par les mariés */}
           {(() => {
             const rsvpUrl = data.rsvpIllustrationUrl || (() => {
