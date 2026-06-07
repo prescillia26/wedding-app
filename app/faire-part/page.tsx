@@ -5556,13 +5556,14 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
       />
       {editable && !showPicker && (
         <div onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 2, lineHeight: 1, position: 'relative', zIndex: 10 }}>
-          <button type="button" onClick={() => onChangeSize(Math.max(30, w - 10))} style={{
-            ...BTN, width: 24, height: 24, borderRadius: '50%', border: `1px solid ${accent}30`,
-            background: 'white', color: accent, fontSize: 16, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, cursor: 'pointer',
+          <button type="button" onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); onChangeSize(Math.max(30, w - 10)) }} style={{
+            ...BTN, width: 28, height: 28, borderRadius: '50%', border: `2px solid ${accent}`,
+            background: 'white', color: accent, fontSize: 18, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, cursor: 'pointer',
           }}>−</button>
-          <button type="button" onClick={() => onChangeSize(Math.min(150, w + 10))} style={{
-            ...BTN, width: 24, height: 24, borderRadius: '50%', border: `1px solid ${accent}30`,
-            background: 'white', color: accent, fontSize: 16, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, cursor: 'pointer',
+          <span style={{ fontSize: 10, color: accent, fontWeight: 600, minWidth: 30, textAlign: 'center' }}>{w}%</span>
+          <button type="button" onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); onChangeSize(Math.min(150, w + 10)) }} style={{
+            ...BTN, width: 28, height: 28, borderRadius: '50%', border: `2px solid ${accent}`,
+            background: 'white', color: accent, fontSize: 18, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, cursor: 'pointer',
           }}>+</button>
           <button type="button" onClick={() => setShowPicker(true)} style={{
             ...BTN, padding: '3px 8px', borderRadius: 9999, border: `1px solid ${accent}30`,
@@ -5902,7 +5903,7 @@ const firstDate = sorted[0]?.date
             const coupleUrl = ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url || (data.illustrationCoupleId.startsWith('http') ? data.illustrationCoupleId : '')
             if (!coupleUrl) return null
             return (
-              <div style={{ marginBottom: 20, animation: 'sharedFadeIn 1s 0.2s ease forwards', opacity: 0 }}>
+              <div style={{ marginBottom: 20 }}>
                 <EditableIllustration
                   url={coupleUrl}
                   size={data.illustrationCoupleSize ?? 70}
