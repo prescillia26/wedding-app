@@ -46,37 +46,9 @@ const FONT_OPTIONS = [
   { value: 'cursive',                        label: 'Cursive (script)' },
 ]
 
-// Couleurs de base
-const _BASE_COLORS = [
-  { value: '',        label: 'Thème',    swatch: '#C9A84C' },
-  { value: '#000000', label: 'Noir',     swatch: '#000000' },
-  { value: '#ffffff', label: 'Blanc',    swatch: '#ffffff' },
-  { value: '#9e9e9e', label: 'Argent',   swatch: '#9e9e9e' },
-  { value: '#8b0000', label: 'Bordeaux', swatch: '#8b0000' },
-  { value: '#4a3728', label: 'Chocolat', swatch: '#4a3728' },
-  { value: '#FFD700', label: 'Jaune vif',       swatch: '#FFD700' },
-  { value: '#FFEA00', label: 'Jaune fluo',      swatch: '#FFEA00' },
-  { value: '#E8D4A2', label: 'Sable doré',      swatch: '#E8D4A2' },
-  { value: '#EDE3D2', label: 'Lin écru',         swatch: '#EDE3D2' },
-  { value: '#9DBBA1', label: 'Vert sauge',       swatch: '#9DBBA1' },
-  { value: '#D63384', label: 'Fuchsia rose',     swatch: '#D63384' },
-  { value: '#5DBDC8', label: 'Turquoise lagune', swatch: '#5DBDC8' },
-  { value: '#7A8B5C', label: 'Vert olivier',     swatch: '#7A8B5C' },
-  { value: '#F5C6B0', label: 'Rose pêche',       swatch: '#F5C6B0' },
-  { value: '#1B3A5C', label: 'Bleu nuit profond', swatch: '#1B3A5C' },
-  { value: '#FAF5EB', label: 'Crème',            swatch: '#FAF5EB' },
-  { value: '#FBF9F4', label: 'Blanc immaculé',   swatch: '#FBF9F4' },
-  { value: '#F0CD7A', label: 'Jaune buttercup',  swatch: '#F0CD7A' },
-  { value: '#F5D480', label: 'Or doux',          swatch: '#F5D480' },
-  { value: '#E8C26E', label: 'Miel pastel',      swatch: '#E8C26E' },
-  { value: '#91BDC9', label: 'Bleu mer doux',    swatch: '#91BDC9' },
-]
-// Générer automatiquement toutes les couleurs des thèmes (accent, texte, textSecondaire, fond)
-// pour que CHAQUE couleur de thème soit disponible partout
-const _THEME_COLORS: { value: string; label: string; swatch: string }[] = []
-const _seenColors = new Set(_BASE_COLORS.map(c => c.value.toLowerCase()))
-// Sera rempli après la déclaration de THEMES — voir ci-dessous
-let COLOR_OPTIONS = [..._BASE_COLORS]
+// Placeholder — sera rempli avec toutes les couleurs après THEMES
+// eslint-disable-next-line prefer-const
+let COLOR_OPTIONS: { value: string; label: string; swatch: string }[] = []
 
 interface ZoneStyle {
   fontFamily?: string  // '' = police par défaut du thème
@@ -130,18 +102,56 @@ const ORNEMENTS_LIBRARY: { id: string; url: string; nom: string }[] = [
   { id: 'none', url: '', nom: 'Sans ornement' },
 ]
 
-// Injecter automatiquement TOUTES les couleurs des thèmes dans COLOR_OPTIONS
+// Construire COLOR_OPTIONS avec TOUTES les couleurs (base + chaque thème)
 ;(() => {
+  const base = [
+    { value: '',        label: 'Thème',    swatch: '#C9A84C' },
+    { value: '#000000', label: 'Noir',     swatch: '#000000' },
+    { value: '#ffffff', label: 'Blanc',    swatch: '#ffffff' },
+    { value: '#9e9e9e', label: 'Argent',   swatch: '#9e9e9e' },
+    { value: '#8b0000', label: 'Bordeaux', swatch: '#8b0000' },
+    { value: '#4a3728', label: 'Chocolat', swatch: '#4a3728' },
+    { value: '#FFD700', label: 'Jaune vif',       swatch: '#FFD700' },
+    { value: '#FFEA00', label: 'Jaune fluo',      swatch: '#FFEA00' },
+    { value: '#E8D4A2', label: 'Sable doré',      swatch: '#E8D4A2' },
+    { value: '#EDE3D2', label: 'Lin écru',        swatch: '#EDE3D2' },
+    { value: '#9DBBA1', label: 'Vert sauge',      swatch: '#9DBBA1' },
+    { value: '#D63384', label: 'Fuchsia rose',    swatch: '#D63384' },
+    { value: '#5DBDC8', label: 'Turquoise lagune', swatch: '#5DBDC8' },
+    { value: '#7A8B5C', label: 'Vert olivier',    swatch: '#7A8B5C' },
+    { value: '#F5C6B0', label: 'Rose pêche',      swatch: '#F5C6B0' },
+    { value: '#1B3A5C', label: 'Bleu nuit profond', swatch: '#1B3A5C' },
+    { value: '#FAF5EB', label: 'Crème',           swatch: '#FAF5EB' },
+    { value: '#FBF9F4', label: 'Blanc immaculé',  swatch: '#FBF9F4' },
+    { value: '#F0CD7A', label: 'Jaune buttercup', swatch: '#F0CD7A' },
+    { value: '#F5D480', label: 'Or doux',         swatch: '#F5D480' },
+    { value: '#E8C26E', label: 'Miel pastel',     swatch: '#E8C26E' },
+    { value: '#91BDC9', label: 'Bleu mer doux',   swatch: '#91BDC9' },
+    { value: '#E07856', label: 'Orange terracotta', swatch: '#E07856' },
+    { value: '#1E5BA8', label: 'Bleu méditerranée', swatch: '#1E5BA8' },
+    { value: '#E5B847', label: 'Jaune ocre',      swatch: '#E5B847' },
+    { value: '#8FB8A8', label: 'Vert céladon',    swatch: '#8FB8A8' },
+    { value: '#C97F4C', label: 'Terracotta',      swatch: '#C97F4C' },
+    { value: '#F4A165', label: 'Orange sunset',   swatch: '#F4A165' },
+    { value: '#C9A84C', label: 'Doré',            swatch: '#C9A84C' },
+    { value: '#2c4a7c', label: 'Marine',          swatch: '#2c4a7c' },
+    { value: '#7a9e6e', label: 'Vert',            swatch: '#7a9e6e' },
+    { value: '#d4a574', label: 'Cuivre',          swatch: '#d4a574' },
+    { value: '#d4829a', label: 'Rose',            swatch: '#d4829a' },
+    { value: '#2a9a6a', label: 'Menthe',          swatch: '#2a9a6a' },
+  ]
+  const seen = new Set(base.map(c => c.value.toLowerCase()))
+  const themeColors: typeof base = []
   Object.values(THEMES).forEach(t => {
     for (const hex of [t.accent, t.texte, t.textSecondaire, t.fond]) {
       const low = hex.toLowerCase()
-      if (!_seenColors.has(low)) {
-        _seenColors.add(low)
-        _THEME_COLORS.push({ value: hex, label: t.nom, swatch: hex })
+      if (!seen.has(low)) {
+        seen.add(low)
+        themeColors.push({ value: hex, label: t.nom, swatch: hex })
       }
     }
   })
-  COLOR_OPTIONS = [..._BASE_COLORS, ..._THEME_COLORS]
+  COLOR_OPTIONS.push(...base, ...themeColors)
 })()
 
 // ── Illustrations aquarelles Canva ────────────────────────────────────────────
