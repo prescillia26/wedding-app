@@ -5780,10 +5780,11 @@ const firstDate = sorted[0]?.date
         </div>
       )}
 {/* SECTION 1 : Écran d'accueil */}
-      <div style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center',
-        justifyContent: data.styleAccueil === 'video' ? 'flex-start' : 'center',
-        paddingTop: data.styleAccueil === 'video' ? (() => { const v = VIDEO_BACKGROUNDS.find(x => x.id === data.videoAccueilId); return v?.textPosition === 'top' ? '6%' : v?.textPosition === 'center-top' ? '12%' : '18%' })() : undefined,
-        maxWidth: 480, margin: '0 auto', boxShadow: '0 8px 60px rgba(0,0,0,0.15)' }}>
+      <div style={{ position: 'relative', height: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center',
+        paddingTop: data.styleAccueil === 'video' ? (() => { const v = VIDEO_BACKGROUNDS.find(x => x.id === data.videoAccueilId); return v?.textPosition === 'top' ? '6%' : v?.textPosition === 'center-top' ? '12%' : '18%' })() : 20,
+        paddingBottom: 20,
+        maxWidth: 480, margin: '0 auto', boxShadow: '0 8px 60px rgba(0,0,0,0.15)', overflow: 'hidden' }}>
         {/* Wrapper overflow:hidden pour le fond (photo carousel ou vidéo) */}
         {data.styleAccueil === 'video' && data.videoAccueilId ? (
           <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
@@ -5817,8 +5818,8 @@ const firstDate = sorted[0]?.date
             </DraggableElement>
           )}
           <DraggableElement id="monogram" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: data.styleAccueil === 'video' ? 8 : 12, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
-            {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={data.styleAccueil === 'video' ? 100 : 110} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={data.styleAccueil === 'video' ? 100 : 110} style={data.monogrammeStyle || 'cercle'} />}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
+            {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={90} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={90} style={data.monogrammeStyle || 'cercle'} />}
           </div>
           </DraggableElement>
           {data.styleAccueil === 'illustration' && data.illustrationCoupleId && (() => {
@@ -5828,7 +5829,7 @@ const firstDate = sorted[0]?.date
               <div style={{ marginBottom: 12, animation: 'sharedFadeIn 1s 0.2s ease forwards', opacity: 0 }}>
                 <EditableIllustration
                   url={coupleUrl}
-                  size={data.illustrationCoupleSize ?? 70}
+                  size={data.illustrationCoupleSize ?? 50}
                   offsetX={data.illustrationCoupleOffsetX ?? 0}
                   offsetY={data.illustrationCoupleOffsetY ?? 0}
                   editable={canEdit}
@@ -5923,7 +5924,7 @@ const firstDate = sorted[0]?.date
               {/* Illustration aquarelle — image décorative entre les sections */}
               <CeremonyCard isCard={isCard} accent={G}>
                 {i === 0 && <div id="first-ceremony" style={{ scrollMarginTop: 60 }} />}
-                <section id={`ceremony-${safeIdx}`} style={{ minHeight: '100vh', paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : 48, paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : 48, paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: 'visible', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: theme.fond } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
+                <section id={`ceremony-${safeIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : 48, paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : 48, paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: 'visible', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: theme.fond } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
                   {hasFrame && frame.video ? (
                     <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
                   ) : hasFrame ? (
@@ -6188,7 +6189,7 @@ const firstDate = sorted[0]?.date
           </div>
         )}
         {/* SECTION 5 : Illustration RSVP + Carton-réponse */}
-        <section id="rsvp-section" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingTop: 40, paddingBottom: 52, scrollMarginTop: 60 }}>
+        <section id="rsvp-section" style={{ paddingTop: 40, paddingBottom: 52, scrollMarginTop: 60 }}>
           {/* Illustration RSVP — éditable par les mariés */}
           {(() => {
             const rsvpUrl = data.rsvpIllustrationUrl || (() => {
