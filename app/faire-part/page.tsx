@@ -6560,10 +6560,11 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
         />
         {role === 'couple' && (
           <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button onClick={onEdit} style={{ ...BTN, padding: '10px 16px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 12, fontWeight: 600 }}>{t.fairepart.editBtn}</button>
-            <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '10px 16px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 12, fontWeight: 600 }}>✏️ Textes</button>
-            <button onClick={handleSave} disabled={saving} style={{ ...BTN, padding: '10px 16px', borderRadius: 9999, background: '#2a7d4f', color: 'white', border: 'none', fontSize: 12, fontWeight: 600, boxShadow: '0 4px 16px rgba(42,125,79,0.25)', opacity: saving ? 0.7 : 1 }}>{saving ? '...' : 'Enregistrer'}</button>
-            <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 16px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 12, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{sharing ? '...' : t.common.share}</button>
+            <button onClick={onEdit} style={{ ...BTN, padding: '10px 14px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 11, fontWeight: 600 }}>{t.fairepart.editBtn}</button>
+            <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '10px 14px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 11, fontWeight: 600 }}>✏️ Textes</button>
+            <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '10px 14px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 11, fontWeight: 600 }}>📋 Réponses</button>
+            <button onClick={handleSave} disabled={saving} style={{ ...BTN, padding: '10px 14px', borderRadius: 9999, background: '#2a7d4f', color: 'white', border: 'none', fontSize: 11, fontWeight: 600, boxShadow: '0 4px 16px rgba(42,125,79,0.25)', opacity: saving ? 0.7 : 1 }}>{saving ? '...' : 'Enregistrer'}</button>
+            <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 14px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 11, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{sharing ? '...' : t.common.share}</button>
           </div>
         )}
         {rsvpOpen && (
