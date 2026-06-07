@@ -5781,9 +5781,9 @@ const firstDate = sorted[0]?.date
       )}
 {/* SECTION 1 : Écran d'accueil */}
       <div style={{ position: 'relative', height: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center',
-        justifyContent: 'center',
-        paddingTop: data.styleAccueil === 'video' ? (() => { const v = VIDEO_BACKGROUNDS.find(x => x.id === data.videoAccueilId); return v?.textPosition === 'top' ? '6%' : v?.textPosition === 'center-top' ? '12%' : '18%' })() : 20,
-        paddingBottom: 20,
+        justifyContent: 'space-evenly',
+        paddingTop: data.styleAccueil === 'video' ? (() => { const v = VIDEO_BACKGROUNDS.find(x => x.id === data.videoAccueilId); return v?.textPosition === 'top' ? '6%' : v?.textPosition === 'center-top' ? '12%' : '18%' })() : 10,
+        paddingBottom: 10,
         maxWidth: 480, margin: '0 auto', boxShadow: '0 8px 60px rgba(0,0,0,0.15)', overflow: 'hidden' }}>
         {/* Wrapper overflow:hidden pour le fond (photo carousel ou vidéo) */}
         {data.styleAccueil === 'video' && data.videoAccueilId ? (
@@ -5819,17 +5819,17 @@ const firstDate = sorted[0]?.date
           )}
           <DraggableElement id="monogram" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
-            {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={90} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={90} style={data.monogrammeStyle || 'cercle'} />}
+            {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={110} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={110} style={data.monogrammeStyle || 'cercle'} />}
           </div>
           </DraggableElement>
           {data.styleAccueil === 'illustration' && data.illustrationCoupleId && (() => {
             const coupleUrl = ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url || (data.illustrationCoupleId.startsWith('http') ? data.illustrationCoupleId : '')
             if (!coupleUrl) return null
             return (
-              <div style={{ marginBottom: 12, animation: 'sharedFadeIn 1s 0.2s ease forwards', opacity: 0 }}>
+              <div style={{ marginBottom: 20, animation: 'sharedFadeIn 1s 0.2s ease forwards', opacity: 0 }}>
                 <EditableIllustration
                   url={coupleUrl}
-                  size={data.illustrationCoupleSize ?? 50}
+                  size={data.illustrationCoupleSize ?? 70}
                   offsetX={data.illustrationCoupleOffsetX ?? 0}
                   offsetY={data.illustrationCoupleOffsetY ?? 0}
                   editable={canEdit}
@@ -5853,12 +5853,12 @@ const firstDate = sorted[0]?.date
             )
           })()}
           <DraggableElement id="names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <div style={{ fontFamily: FS, fontSize: 'clamp(26px,7vw,40px)', color: introTextColor, marginBottom: 10, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.2, textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : readableShadow(theme) }}>
+          <div style={{ fontFamily: FS, fontSize: 'clamp(30px,8vw,46px)', color: introTextColor, marginBottom: 10, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.2, textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : readableShadow(theme) }}>
             {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
           </div>
           </DraggableElement>
           <DraggableElement id="phrase" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: introTextColor, marginBottom: 12, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}>
+          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: introTextColor, marginBottom: 0, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}>
             {(data.textOverrides?.['global_pleaseJoin']) || t.fairepart.pleaseJoin}
           </div>
           </DraggableElement>
