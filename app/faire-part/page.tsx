@@ -6171,7 +6171,8 @@ const firstDate = sorted[0]?.date
                             onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_sediront`]: v } })}
                             style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78 }}
                           />
-                          <div style={{ fontFamily: FS, fontSize: 'clamp(48px,12vw,80px)', color: G, textAlign: 'center', lineHeight: 1, marginBottom: 28 }}>{t.fairepart.cardOui}</div>
+                          <div style={{ fontFamily: FS, fontSize: 'clamp(48px,12vw,80px)', color: G, textAlign: 'center', lineHeight: 1, marginBottom: 12 }}>{t.fairepart.cardOui}</div>
+                          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', opacity: 0.7, marginBottom: 16 }}>le</div>
                         </>
                       ) : ceremony.type === 'Cérémonie religieuse / Houppa' ? (
                         <InlineEdit
