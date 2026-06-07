@@ -5880,11 +5880,25 @@ const firstDate = sorted[0]?.date
             </DraggableElement>
           )}
           <DraggableElement id="monogram" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 4, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
             {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={110} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={110} style={data.monogrammeStyle || 'cercle'} />}
           </div>
+          {canEdit && (
+            <div onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 6, maxWidth: 240, margin: '0 auto 6px' }}>
+              {COLOR_OPTIONS.filter(c => c.value).slice(0, 20).map(c => (
+                <button key={c.value} type="button" onClick={() => {
+                  if (data.customLogoUrl) onUpdate?.({ customLogoColor: c.value })
+                  else onUpdate?.({ monogrammeColor: c.value })
+                }} style={{
+                  ...BTN, width: 16, height: 16, borderRadius: '50%', padding: 0,
+                  background: c.swatch,
+                  border: ((data.customLogoColor || data.monogrammeColor || '') === c.value) ? `2px solid ${G}` : '1px solid #d6d1cb',
+                }} />
+              ))}
+            </div>
+          )}
           </DraggableElement>
-          {data.styleAccueil === 'illustration' && data.illustrationCoupleId && (() => {
+          {data.illustrationCoupleId && (() => {
             const coupleUrl = ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url || (data.illustrationCoupleId.startsWith('http') ? data.illustrationCoupleId : '')
             if (!coupleUrl) return null
             return (
