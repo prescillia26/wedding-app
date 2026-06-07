@@ -5676,45 +5676,54 @@ function IllustrationAdder({ ceremonyType, accent, onSelect }: { ceremonyType: s
 }
 
 // ── Composant d'édition inline — clic pour modifier le texte directement ──
-function InlineEdit({ value, defaultValue, onChange, editable, style, className }: {
+function InlineEdit({ value, defaultValue, onChange, editable, style }: {
   value: string; defaultValue: string; onChange: (v: string) => void; editable: boolean
-  style?: React.CSSProperties; className?: string
+  style?: React.CSSProperties
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const display = value || defaultValue
+  const [editing, setEditing] = useState(false)
 
   if (!editable) {
-    return <div style={style} className={className} dangerouslySetInnerHTML={{ __html: display.replace(/\n/g, '<br/>') }} />
+    return <div style={style} dangerouslySetInnerHTML={{ __html: display.replace(/\n/g, '<br/>') }} />
+  }
+
+  if (!editing) {
+    return (
+      <div
+        style={{ ...style, cursor: 'text', position: 'relative' }}
+        onClick={(e) => { e.stopPropagation(); setEditing(true) }}
+      >
+        {display.split('\n').map((line, i) => <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>)}
+        <span style={{ position: 'absolute', top: -6, right: -6, fontSize: 10, opacity: 0.4 }}>✏️</span>
+      </div>
+    )
   }
 
   return (
-    <div
-      ref={ref}
-      contentEditable
-      suppressContentEditableWarning
-      className={className}
-      style={{ ...style, cursor: 'text', outline: 'none', borderBottom: '1px dashed currentColor', borderBottomStyle: 'dashed', paddingBottom: 2 }}
-      onBlur={() => {
-        if (!ref.current) return
-        // Convertir <br> et <div> en \n
-        const html = ref.current.innerHTML
-        const text = html
-          .replace(/<div>/gi, '\n').replace(/<\/div>/gi, '')
-          .replace(/<br\s*\/?>/gi, '\n')
-          .replace(/&nbsp;/g, ' ')
-          .replace(/<[^>]+>/g, '')
-          .replace(/&amp;/g, '&')
-          .replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-          .trim()
-        if (text !== value && text !== defaultValue) {
+    <textarea
+      ref={ref as unknown as React.RefObject<HTMLTextAreaElement>}
+      autoFocus
+      defaultValue={display}
+      onBlur={(e) => {
+        const text = e.currentTarget.value.trim()
+        setEditing(false)
+        if (text !== (value || defaultValue)) {
           onChange(text)
         }
       }}
       onKeyDown={(e) => {
-        // Empêcher le drag du DraggableElement parent quand on édite
         e.stopPropagation()
+        if (e.key === 'Escape') { setEditing(false) }
       }}
-      dangerouslySetInnerHTML={{ __html: display.replace(/\n/g, '<br/>') }}
+      style={{
+        ...style,
+        width: '100%', boxSizing: 'border-box',
+        border: '2px solid currentColor', borderRadius: 8,
+        padding: '8px 12px', resize: 'vertical', minHeight: 60,
+        outline: 'none', background: 'rgba(255,255,255,0.95)',
+        whiteSpace: 'pre-wrap',
+      }}
     />
   )
 }
