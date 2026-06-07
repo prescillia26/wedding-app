@@ -6946,10 +6946,7 @@ export default function FairePartPage() {
   const [savedAt, setSavedAt] = useState<Date | null>(null)
   const [accessGranted, setAccessGranted] = useState(true) // Freemium : accès ouvert à tous
   const [checkingAccess, setCheckingAccess] = useState(false) // Plus de gate
-  const [isPaid, setIsPaid] = useState(() => {
-    // Si on a un code d'accès en localStorage, on est déjà payé
-    try { return !!localStorage.getItem('lovit_access_code') } catch { return false }
-  })
+  const [isPaid, setIsPaid] = useState(false) // false par défaut — sera true uniquement si connecté (checkAuth)
   const [userPack, setUserPack] = useState<'essentiel' | 'premium'>(() => {
     try {
       // URL ?pack=luxe → interne 'premium', ?pack=premium → interne 'essentiel'
