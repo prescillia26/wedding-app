@@ -46,9 +46,8 @@ const FONT_OPTIONS = [
   { value: 'cursive',                        label: 'Cursive (script)' },
 ]
 
-// Placeholder — sera rempli avec toutes les couleurs après THEMES
-// eslint-disable-next-line prefer-const
-let COLOR_OPTIONS: { value: string; label: string; swatch: string }[] = []
+// Placeholder — sera rempli après THEMES (voir buildColorOptions)
+const COLOR_OPTIONS: { value: string; label: string; swatch: string }[] = []
 
 interface ZoneStyle {
   fontFamily?: string  // '' = police par défaut du thème
