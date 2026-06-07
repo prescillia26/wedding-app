@@ -54,6 +54,7 @@ const CEREMONY_CONTEXT: Record<string, string> = {
   'Cocktail': 'an elegant cocktail reception',
   'Soirée': 'an elegant evening wedding reception',
   'Boat Party': 'a festive boat party celebration',
+  'Beach Party': 'a festive beach party celebration with sand and sea',
 };
 
 // Détecte le type d'architecture à partir du nom du lieu

@@ -22,6 +22,7 @@ const CEREMONY_LABELS: Record<string, string> = {
   'Cocktail': 'Cocktail',
   'Soirée': 'Soirée',
   'Boat Party': 'Boat Party',
+  'Beach Party': 'Beach Party',
   'Autre': 'Événement',
 }
 

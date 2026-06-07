@@ -340,6 +340,8 @@ export interface FairepartDict {
   inviteSoireeAllNight: string
   inviteBoatPartyIntro: string
   inviteBoatPartySea: string
+  inviteBeachPartyIntro: string
+  inviteBeachPartySea: string
   inviteAutreJoin: string
   inviteAutreFor: string
   inviteAutreDefaultEvent: string

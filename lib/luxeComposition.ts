@@ -40,6 +40,7 @@ export const DEFAULT_MOTIFS: Record<string, string> = {
   'Cocktail': 'champagne',
   'Soirée': 'bouquet',
   'Boat Party': 'arche',
+  'Beach Party': 'arche',
 }
 
 // ── Types de section ──
