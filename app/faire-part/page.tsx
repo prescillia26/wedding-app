@@ -5867,7 +5867,25 @@ const firstDate = sorted[0]?.date
           </div>
           </DraggableElement>
           {/* Compte à rebours déplacé dans le sticky header */}
-          {/* Bouton "Découvrir" supprimé — la cover InvitationCover fait déjà ce rôle */}
+          {/* Bouton "Découvrir" — scrolle vers le 1er événement */}
+          <div style={{ marginTop: 8, animation: 'sharedFadeIn 1s 0.8s ease forwards', opacity: 0 }}>
+            <button
+              type="button"
+              onClick={() => {
+                const el = document.getElementById('ceremony-0')
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              }}
+              style={{
+                fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase',
+                padding: '14px 32px', borderRadius: 0, border: `1.5px solid ${introTextColor}`,
+                background: 'transparent', color: introTextColor, cursor: 'pointer',
+                touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
+                textShadow: hasIntroPhoto ? '0 1px 4px rgba(0,0,0,0.5)' : 'none',
+              }}
+            >
+              Découvrir ✦
+            </button>
+          </div>
           </>)
           })()}
         </div>
@@ -6266,7 +6284,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
   const [sharing, setSharing] = useState(false)
   const [sharingStatus, setSharingStatus] = useState('')
   const [saving, setSaving] = useState(false)
-  const [coverOpen, setCoverOpen] = useState(!isShared) // en mode édition, pas de cover
+  const [coverOpen, setCoverOpen] = useState(true) // plus de cover overlay — toujours ouvert
 
   // Ouvrir directement le modal RSVP si ?rsvp=1 dans l'URL
   useEffect(() => {
