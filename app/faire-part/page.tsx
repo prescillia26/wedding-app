@@ -79,6 +79,8 @@ const COLOR_OPTIONS = [
   { value: '#E8C26E', label: 'Miel pastel',     swatch: '#E8C26E' },
   { value: '#F4A165', label: 'Orange sunset',   swatch: '#F4A165' },
   { value: '#91BDC9', label: 'Bleu mer doux',   swatch: '#91BDC9' },
+  { value: '#FFD700', label: 'Jaune vif',       swatch: '#FFD700' },
+  { value: '#FFEA00', label: 'Jaune fluo',      swatch: '#FFEA00' },
 ]
 
 interface ZoneStyle {
