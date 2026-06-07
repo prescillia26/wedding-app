@@ -5690,7 +5690,7 @@ function InlineEdit({ value, defaultValue, onChange, editable, style }: {
   const [editing, setEditing] = useState(false)
 
   if (!editable) {
-    return <div style={style} dangerouslySetInnerHTML={{ __html: display.replace(/\n/g, '<br/>') }} />
+    return <div style={style}>{display.split('\n').map((line, i) => <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>)}</div>
   }
 
   if (!editing) {

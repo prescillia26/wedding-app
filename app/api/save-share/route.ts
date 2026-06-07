@@ -11,8 +11,14 @@ export async function POST(request: Request) {
 
     const id = fixedId ?? randomUUID()
 
-    // Vérifier la propriété si c'est une mise à jour (fixedId fourni)
+    // ── Vérification paiement / authentification ──
+    // Pour CRÉER un nouveau partage (pas de fixedId), l'utilisateur DOIT être connecté (= a payé)
     const session = await getSession()
+    if (!fixedId && !session?.email) {
+      return Response.json({ error: 'Vous devez être connecté pour partager votre faire-part. Veuillez d\'abord effectuer le paiement.' }, { status: 403 })
+    }
+
+    // Vérifier la propriété si c'est une mise à jour (fixedId fourni)
     if (fixedId) {
       const existing = await redis.get<Record<string, unknown>>(fixedId)
       if (existing && existing.ownerEmail) {

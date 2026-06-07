@@ -5,6 +5,17 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting : max 10 analyses par IP par heure
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    const { Redis } = await import('@upstash/redis')
+    const rl = new Redis({ url: process.env.KV_REST_API_URL!, token: process.env.KV_REST_API_TOKEN! })
+    const rlKey = `ratelimit:analyze:${ip}`
+    const rlCount = await rl.get<number>(rlKey) ?? 0
+    if (rlCount >= 10) {
+      return NextResponse.json({ error: "Trop de requêtes. Réessayez plus tard." }, { status: 429 })
+    }
+    await rl.set(rlKey, rlCount + 1, { ex: 3600 })
+
     const { imageBase64, frameLabel, currentSettings } = await request.json()
 
     if (!imageBase64) {

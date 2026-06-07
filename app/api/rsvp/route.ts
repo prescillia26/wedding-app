@@ -10,6 +10,11 @@ const redis = new Redis({
 
 // Resend est initialisé à la demande pour éviter l'erreur au build si la clé est absente
 
+// Échapper le HTML pour éviter les injections XSS dans les emails
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+}
+
 export async function POST(request: Request) {
   try {
     const data = await request.json()
@@ -54,19 +59,19 @@ export async function POST(request: Request) {
       const nom: string = data.nom ?? 'Un invité'
       const mariee1: string = data.mariee1 ?? ''
       const mariee2: string = data.mariee2 ?? ''
-      const coupleUrl = `${process.env.NEXT_PUBLIC_BASE_URL ?? 'https://your-app.vercel.app'}/faire-part?share=${shareId}&role=couple`
+      const coupleUrl = `${process.env.NEXT_PUBLIC_BASE_URL ?? 'https://getlovit.fr'}/faire-part?share=${shareId}&role=couple`
 
       const reponsesHtml = (data.reponses ?? []).map((r: { ceremonie: string; present: boolean; nbPersonnes: number; accompagnants?: string[] }) => {
   const accList = (r.accompagnants ?? []).filter(Boolean)
   const accHtml = r.present && accList.length > 0
     ? `<div style="margin-top:6px;padding-left:12px;border-left:2px solid #C9A84C55;font-size:12px;color:#8a7860;line-height:1.6;">
-         ${accList.map(n => `<div>+ ${n}</div>`).join('')}
+         ${accList.map(n => `<div>+ ${escapeHtml(n)}</div>`).join('')}
        </div>`
     : ''
   return `
     <tr>
       <td style="padding:10px 16px;font-size:14px;color:#3a3330;border-bottom:1px solid #efe5d8;">
-        ${r.ceremonie}
+        ${escapeHtml(r.ceremonie)}
         ${accHtml}
       </td>
       <td style="padding:10px 16px;font-size:14px;text-align:center;border-bottom:1px solid #efe5d8;vertical-align:top;">
@@ -78,7 +83,7 @@ export async function POST(request: Request) {
 }).join('')
 
       const body = `
-              <p style="font-size:15px;color:#3a3330;margin:0 0 20px;">Bonne nouvelle ! <strong>${nom}</strong> a répondu à votre faire-part.</p>
+              <p style="font-size:15px;color:#3a3330;margin:0 0 20px;">Bonne nouvelle ! <strong>${escapeHtml(nom)}</strong> a répondu à votre faire-part.</p>
 
               <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
                 <thead>
@@ -94,7 +99,7 @@ export async function POST(request: Request) {
               ${data.message ? `
               <div style="background:#fdf8f0;border-left:3px solid #C9A84C;padding:14px 16px;border-radius:0 8px 8px 0;margin-bottom:24px;">
                 <div style="font-size:11px;color:#C9A84C;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">${et.rsvp.message}</div>
-                <p style="margin:0;font-size:14px;color:#3a3330;font-style:italic;">"${data.message}"</p>
+                <p style="margin:0;font-size:14px;color:#3a3330;font-style:italic;">"${escapeHtml(data.message)}"</p>
               </div>
               ` : ''}
 

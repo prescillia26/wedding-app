@@ -51,6 +51,17 @@ async function generateImageImg2Img(token: string, prompt: string, imageUrl: str
 }
 
 export async function POST(req: Request) {
+  // Rate limiting : max 10 générations par IP par heure
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  const { Redis } = await import('@upstash/redis')
+  const rl = new Redis({ url: process.env.KV_REST_API_URL!, token: process.env.KV_REST_API_TOKEN! })
+  const rlKey = `ratelimit:watercolor:${ip}`
+  const rlCount = await rl.get<number>(rlKey) ?? 0
+  if (rlCount >= 10) {
+    return Response.json({ error: "Trop de générations. Réessayez dans une heure." }, { status: 429 })
+  }
+  await rl.set(rlKey, rlCount + 1, { ex: 3600 })
+
   const token = process.env.REPLICATE_API_TOKEN;
   if (!token) {
     return Response.json({ error: "Configuration serveur manquante" }, { status: 500 });
