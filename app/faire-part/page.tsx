@@ -46,57 +46,37 @@ const FONT_OPTIONS = [
   { value: 'cursive',                        label: 'Cursive (script)' },
 ]
 
-const COLOR_OPTIONS = [
+// Couleurs de base
+const _BASE_COLORS = [
   { value: '',        label: 'Thème',    swatch: '#C9A84C' },
-  { value: '#C9A84C', label: 'Doré',     swatch: '#C9A84C' },
   { value: '#000000', label: 'Noir',     swatch: '#000000' },
-  { value: '#9e9e9e', label: 'Argent',   swatch: '#9e9e9e' },
-  { value: '#d4829a', label: 'Rose',     swatch: '#d4829a' },
-  { value: '#8b0000', label: 'Bordeaux', swatch: '#8b0000' },
-  { value: '#2c4a7c', label: 'Marine',   swatch: '#2c4a7c' },
-  { value: '#7a9e6e', label: 'Vert',     swatch: '#7a9e6e' },
-  { value: '#d4a574', label: 'Cuivre',   swatch: '#d4a574' },
-  { value: '#4a3728', label: 'Chocolat', swatch: '#4a3728' },
   { value: '#ffffff', label: 'Blanc',    swatch: '#ffffff' },
-  { value: '#2a9a6a', label: 'Menthe',   swatch: '#2a9a6a' },
-  { value: '#E8D4A2', label: 'Sable doré',     swatch: '#E8D4A2' },
-  { value: '#C97F4C', label: 'Terracotta',      swatch: '#C97F4C' },
-  { value: '#EDE3D2', label: 'Lin écru',        swatch: '#EDE3D2' },
-  { value: '#9DBBA1', label: 'Vert sauge',      swatch: '#9DBBA1' },
-  { value: '#D63384', label: 'Fuchsia',         swatch: '#D63384' },
-  { value: '#5DBDC8', label: 'Turquoise lagune', swatch: '#5DBDC8' },
-  { value: '#7A8B5C', label: 'Vert olivier',    swatch: '#7A8B5C' },
-  { value: '#F5C6B0', label: 'Rose pêche',      swatch: '#F5C6B0' },
-  { value: '#E07856', label: 'Orange terracotta', swatch: '#E07856' },
-  { value: '#1B3A5C', label: 'Bleu nuit',       swatch: '#1B3A5C' },
-  { value: '#FAF5EB', label: 'Crème',           swatch: '#FAF5EB' },
-  { value: '#1E5BA8', label: 'Bleu méditerranée', swatch: '#1E5BA8' },
-  { value: '#FBF9F4', label: 'Blanc immaculé',  swatch: '#FBF9F4' },
-  { value: '#E5B847', label: 'Jaune ocre',      swatch: '#E5B847' },
-  { value: '#8FB8A8', label: 'Vert céladon',    swatch: '#8FB8A8' },
-  { value: '#F0CD7A', label: 'Jaune buttercup', swatch: '#F0CD7A' },
-  { value: '#F5D480', label: 'Or doux',         swatch: '#F5D480' },
-  { value: '#E8C26E', label: 'Miel pastel',     swatch: '#E8C26E' },
-  { value: '#F4A165', label: 'Orange sunset',   swatch: '#F4A165' },
-  { value: '#91BDC9', label: 'Bleu mer doux',   swatch: '#91BDC9' },
+  { value: '#9e9e9e', label: 'Argent',   swatch: '#9e9e9e' },
+  { value: '#8b0000', label: 'Bordeaux', swatch: '#8b0000' },
+  { value: '#4a3728', label: 'Chocolat', swatch: '#4a3728' },
   { value: '#FFD700', label: 'Jaune vif',       swatch: '#FFD700' },
   { value: '#FFEA00', label: 'Jaune fluo',      swatch: '#FFEA00' },
-  // Accents des thèmes
-  { value: '#c4829a', label: 'Rose fleuri',      swatch: '#c4829a' },
-  { value: '#888888', label: 'Gris moyen',       swatch: '#888888' },
-  { value: '#e0e0e0', label: 'Gris clair',       swatch: '#e0e0e0' },
-  { value: '#8b1a2a', label: 'Bordeaux profond', swatch: '#8b1a2a' },
-  { value: '#d4006a', label: 'Fuchsia vif',      swatch: '#d4006a' },
-  { value: '#b0a080', label: 'Lin naturel',      swatch: '#b0a080' },
-  { value: '#6a9a70', label: 'Vert sauge doux',  swatch: '#6a9a70' },
-  { value: '#d4826a', label: 'Rose pêche doux',  swatch: '#d4826a' },
-  { value: '#7aaed4', label: 'Bleu clair',       swatch: '#7aaed4' },
-  { value: '#9a9080', label: 'Taupe',            swatch: '#9a9080' },
-  { value: '#C9A030', label: 'Or ocre',          swatch: '#C9A030' },
-  { value: '#5a9a80', label: 'Céladon foncé',    swatch: '#5a9a80' },
-  { value: '#D4A830', label: 'Buttercup doré',   swatch: '#D4A830' },
-  { value: '#5a9ab0', label: 'Bleu mer profond', swatch: '#5a9ab0' },
+  { value: '#E8D4A2', label: 'Sable doré',      swatch: '#E8D4A2' },
+  { value: '#EDE3D2', label: 'Lin écru',         swatch: '#EDE3D2' },
+  { value: '#9DBBA1', label: 'Vert sauge',       swatch: '#9DBBA1' },
+  { value: '#D63384', label: 'Fuchsia rose',     swatch: '#D63384' },
+  { value: '#5DBDC8', label: 'Turquoise lagune', swatch: '#5DBDC8' },
+  { value: '#7A8B5C', label: 'Vert olivier',     swatch: '#7A8B5C' },
+  { value: '#F5C6B0', label: 'Rose pêche',       swatch: '#F5C6B0' },
+  { value: '#1B3A5C', label: 'Bleu nuit profond', swatch: '#1B3A5C' },
+  { value: '#FAF5EB', label: 'Crème',            swatch: '#FAF5EB' },
+  { value: '#FBF9F4', label: 'Blanc immaculé',   swatch: '#FBF9F4' },
+  { value: '#F0CD7A', label: 'Jaune buttercup',  swatch: '#F0CD7A' },
+  { value: '#F5D480', label: 'Or doux',          swatch: '#F5D480' },
+  { value: '#E8C26E', label: 'Miel pastel',      swatch: '#E8C26E' },
+  { value: '#91BDC9', label: 'Bleu mer doux',    swatch: '#91BDC9' },
 ]
+// Générer automatiquement toutes les couleurs des thèmes (accent, texte, textSecondaire, fond)
+// pour que CHAQUE couleur de thème soit disponible partout
+const _THEME_COLORS: { value: string; label: string; swatch: string }[] = []
+const _seenColors = new Set(_BASE_COLORS.map(c => c.value.toLowerCase()))
+// Sera rempli après la déclaration de THEMES — voir ci-dessous
+let COLOR_OPTIONS = [..._BASE_COLORS]
 
 interface ZoneStyle {
   fontFamily?: string  // '' = police par défaut du thème
@@ -150,6 +130,19 @@ const ORNEMENTS_LIBRARY: { id: string; url: string; nom: string }[] = [
   { id: 'none', url: '', nom: 'Sans ornement' },
 ]
 
+// Injecter automatiquement TOUTES les couleurs des thèmes dans COLOR_OPTIONS
+;(() => {
+  Object.values(THEMES).forEach(t => {
+    for (const hex of [t.accent, t.texte, t.textSecondaire, t.fond]) {
+      const low = hex.toLowerCase()
+      if (!_seenColors.has(low)) {
+        _seenColors.add(low)
+        _THEME_COLORS.push({ value: hex, label: t.nom, swatch: hex })
+      }
+    }
+  })
+  COLOR_OPTIONS = [..._BASE_COLORS, ..._THEME_COLORS]
+})()
 
 // ── Illustrations aquarelles Canva ────────────────────────────────────────────
 
