@@ -5541,7 +5541,7 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
         onMouseDown={editable ? (e) => { e.preventDefault(); startDrag(e.clientX, e.clientY) } : undefined}
         onTouchStart={editable ? (e) => { e.preventDefault(); startDrag(e.touches[0].clientX, e.touches[0].clientY) } : undefined}
         style={{
-          width: `${w}%`, maxHeight: 300, objectFit: 'contain', display: 'inline-block',
+          width: `${w}%`, maxHeight: 250, objectFit: 'contain', display: 'inline-block',
           mixBlendMode: 'multiply', verticalAlign: 'middle',
           transform: `translate(${cx}px, ${cy}px)`,
           cursor: editable ? (draggingRef.current ? 'grabbing' : 'grab') : 'default',
@@ -6065,7 +6065,7 @@ const firstDate = sorted[0]?.date
                           <div style={{ fontFamily: FS, fontSize: 'clamp(48px,12vw,80px)', color: G, textAlign: 'center', lineHeight: 1, marginBottom: 28 }}>{t.fairepart.cardOui}</div>
                         </>
                       ) : ceremony.type === 'Cérémonie religieuse / Houppa' ? (
-                        <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginBottom: 28, opacity: 0.78 }, 'narratif', data.zoneStyles)}>{ov[`ceremony_${i}_honore`] || t.fairepart.cardHonore}</div>
+                        <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginTop: 16, marginBottom: 28, opacity: 0.78, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles)}>{ov[`ceremony_${i}_honore`] || t.fairepart.cardHonore}</div>
                       ) : (
                         <div style={{ marginBottom: 28 }}>
                           {ov[`ceremony_${i}_invitation`] ? (
