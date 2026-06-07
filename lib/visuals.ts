@@ -98,6 +98,7 @@ export const VISUALS: Visual[] = [
   { id: 'R07', category: 'rsvp', label: 'RSVP 7', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679848/92_slsvpe.png' },
   { id: 'R08', category: 'rsvp', label: 'RSVP 8', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679848/93_kyhcqx.png' },
   { id: 'R09', category: 'rsvp', label: 'RSVP 9', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679849/94_aogybr.png' },
+  { id: 'R10', category: 'rsvp', label: 'RSVP 10', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780842919/Intimate_Wedding_Brunch_under_Wisteria_ygh30p.png' },
 ]
 
 export function byCategory(category: VisualCategory): Visual[] {
