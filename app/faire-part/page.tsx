@@ -5675,6 +5675,50 @@ function IllustrationAdder({ ceremonyType, accent, onSelect }: { ceremonyType: s
   )
 }
 
+// ── Composant d'édition inline — clic pour modifier le texte directement ──
+function InlineEdit({ value, defaultValue, onChange, editable, style, className }: {
+  value: string; defaultValue: string; onChange: (v: string) => void; editable: boolean
+  style?: React.CSSProperties; className?: string
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const display = value || defaultValue
+
+  if (!editable) {
+    return <div style={style} className={className} dangerouslySetInnerHTML={{ __html: display.replace(/\n/g, '<br/>') }} />
+  }
+
+  return (
+    <div
+      ref={ref}
+      contentEditable
+      suppressContentEditableWarning
+      className={className}
+      style={{ ...style, cursor: 'text', outline: 'none', borderBottom: '1px dashed currentColor', borderBottomStyle: 'dashed', paddingBottom: 2 }}
+      onBlur={() => {
+        if (!ref.current) return
+        // Convertir <br> et <div> en \n
+        const html = ref.current.innerHTML
+        const text = html
+          .replace(/<div>/gi, '\n').replace(/<\/div>/gi, '')
+          .replace(/<br\s*\/?>/gi, '\n')
+          .replace(/&nbsp;/g, ' ')
+          .replace(/<[^>]+>/g, '')
+          .replace(/&amp;/g, '&')
+          .replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+          .trim()
+        if (text !== value && text !== defaultValue) {
+          onChange(text)
+        }
+      }}
+      onKeyDown={(e) => {
+        // Empêcher le drag du DraggableElement parent quand on édite
+        e.stopPropagation()
+      }}
+      dangerouslySetInnerHTML={{ __html: display.replace(/\n/g, '<br/>') }}
+    />
+  )
+}
+
 // ── SharedPageContent ─────────────────────────────────────────────────────────
 function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute, onUpdate, onTextEdit }: SharedPageContentProps) {
   const { t, locale } = useT()
@@ -5859,9 +5903,13 @@ const firstDate = sorted[0]?.date
           </div>
           </DraggableElement>
           <DraggableElement id="phrase" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <div onClick={canEdit && onTextEdit ? () => onTextEdit() : undefined} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: introTextColor, marginBottom: 0, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, cursor: canEdit ? 'text' : undefined, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}>
-            {(data.textOverrides?.['global_pleaseJoin']) || t.fairepart.pleaseJoin}
-          </div>
+          <InlineEdit
+            value={data.textOverrides?.['global_pleaseJoin'] || ''}
+            defaultValue={t.fairepart.pleaseJoin}
+            editable={canEdit}
+            onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, global_pleaseJoin: v } })}
+            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: introTextColor, marginBottom: 0, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}
+          />
           </DraggableElement>
           {/* Compte à rebours déplacé dans le sticky header */}
           {/* Bouton "Découvrir" — scrolle vers le 1er événement */}
@@ -5951,7 +5999,13 @@ const firstDate = sorted[0]?.date
                       <DraggableElement id={pre+"bsd"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, opacity: 0.85, letterSpacing: 1, marginBottom: 8, paddingRight: 4 }}>בס״ד</div></DraggableElement>
                     )}
                     <DraggableElement id={pre+"titre"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} skipAnim={canEdit}>
-                      <div style={applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: ceremony.illustrationUrl ? 10 : 24, lineHeight: 1.4 }, 'titres', data.zoneStyles)}>{ov[`ceremony_${i}_titre`] || title}</div>
+                      <InlineEdit
+                        value={ov[`ceremony_${i}_titre`] || ''}
+                        defaultValue={title}
+                        editable={canEdit}
+                        onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_titre`]: v } })}
+                        style={applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: ceremony.illustrationUrl ? 10 : 24, lineHeight: 1.4 }, 'titres', data.zoneStyles)}
+                      />
                     </AnimSection></DraggableElement>
                     {/* Illustration aquarelle — après le titre, déplaçable par les mariés */}
                     {ceremony.illustrationUrl ? (
@@ -6062,18 +6116,33 @@ const firstDate = sorted[0]?.date
                     <DraggableElement id={pre+"narratif"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={280} skipAnim={canEdit}>
                       {ceremony.type === 'Mairie' ? (
                         <>
-                          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78 }}>{ov[`ceremony_${i}_sediront`] || t.fairepart.cardSeDiront}</div>
+                          <InlineEdit
+                            value={ov[`ceremony_${i}_sediront`] || ''}
+                            defaultValue={t.fairepart.cardSeDiront}
+                            editable={canEdit}
+                            onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_sediront`]: v } })}
+                            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78 }}
+                          />
                           <div style={{ fontFamily: FS, fontSize: 'clamp(48px,12vw,80px)', color: G, textAlign: 'center', lineHeight: 1, marginBottom: 28 }}>{t.fairepart.cardOui}</div>
                         </>
                       ) : ceremony.type === 'Cérémonie religieuse / Houppa' ? (
-                        <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginTop: 16, marginBottom: 28, opacity: 0.78, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles)}>{ov[`ceremony_${i}_honore`] || t.fairepart.cardHonore}</div>
+                        <InlineEdit
+                          value={ov[`ceremony_${i}_honore`] || ''}
+                          defaultValue={t.fairepart.cardHonore}
+                          editable={canEdit}
+                          onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_honore`]: v } })}
+                          style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginTop: 16, marginBottom: 28, opacity: 0.78, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles)}
+                        />
                       ) : (
                         <div style={{ marginBottom: 28 }}>
-                          {ov[`ceremony_${i}_invitation`] ? (
-                            <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', opacity: 0.85, lineHeight: 1.7, padding: '0 8px', whiteSpace: 'pre-wrap' as const }, 'narratif', data.zoneStyles)}>
-                              {ov[`ceremony_${i}_invitation`]}
-                            </div>
-                          ) : (
+                          <InlineEdit
+                            value={ov[`ceremony_${i}_invitation`] || ''}
+                            defaultValue=""
+                            editable={canEdit}
+                            onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_invitation`]: v } })}
+                            style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', opacity: 0.85, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles)}
+                          />
+                          {!ov[`ceremony_${i}_invitation`] && !canEdit && (
                             <div style={applyZoneStyle({ padding: '0 8px' }, 'narratif', data.zoneStyles)}>
                               {renderInvitationPhrase(ceremony, data, G, TEXT, t.fairepart)}
                             </div>
