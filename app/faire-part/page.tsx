@@ -7058,10 +7058,9 @@ export default function FairePartPage() {
     if (urlCode) {
       checkAccess(urlCode.toUpperCase().trim())
     } else {
-      try {
-        const saved = localStorage.getItem('lovit_access_code')
-        if (saved) { checkAccess(saved); return }
-      } catch { /* ignore */ }
+      // Ne PAS vérifier lovit_access_code du localStorage
+      // → seule l'authentification serveur (checkAuth) détermine isPaid
+      // → empêche de partager sans être connecté même si un ancien code existe
       setCheckingAccess(false)
     }
 
@@ -7159,6 +7158,18 @@ export default function FairePartPage() {
       setServerSaving(false)
     }, 1000) // debounce 1 seconde
   }, [])
+
+  // Protection contre la fermeture accidentelle
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (showCards || step > 1) {
+        e.preventDefault()
+        e.returnValue = ''
+      }
+    }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [showCards, step])
 
   const update = useCallback((u: Partial<FormData>) => {
     setFormData(p => {
