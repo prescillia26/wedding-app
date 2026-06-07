@@ -406,7 +406,11 @@ interface FormData {
   rsvpDeadline?: string // date limite de confirmation (YYYY-MM-DD)
   rsvpIllustrationUrl?: string // illustration choisie pour le carton-réponse
   rsvpIllustrationSize?: number // taille illustration RSVP (30-150, default 60)
+  rsvpIllustrationOffsetX?: number
+  rsvpIllustrationOffsetY?: number
   illustrationCoupleSize?: number // taille illustration couple page d'accueil (30-150, default 70)
+  illustrationCoupleOffsetX?: number
+  illustrationCoupleOffsetY?: number
   luxeColor?: string // couleur choisie pour le pack Luxe Aquarelle
   luxeDecoUrls?: Record<string, string> // decoId → saved URL des illustrations décoratives générées par IA
   luxeMonogramUrl?: string // URL du monogramme entrelacé IA (pack Luxe)
@@ -2228,14 +2232,10 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
 
 function CeremoniesDivider({ themeAccent }: { themeAccent: string }) {
   return (
-    <div style={{ maxWidth: 480, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 16, padding: '32px 48px' }}>
-      <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to right, transparent, ${themeAccent}30)` }} />
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-        <span style={{ width: 4, height: 4, borderRadius: '50%', background: themeAccent, opacity: 0.2 }} />
-        <span style={{ color: themeAccent, fontSize: 10, opacity: 0.4 }}>◆</span>
-        <span style={{ width: 4, height: 4, borderRadius: '50%', background: themeAccent, opacity: 0.2 }} />
-      </div>
-      <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to left, transparent, ${themeAccent}30)` }} />
+    <div style={{ maxWidth: 200, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 12, padding: '32px 0' }}>
+      <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to right, transparent, ${themeAccent}40)` }} />
+      <span style={{ color: themeAccent, fontSize: 8, opacity: 0.5 }}>◆</span>
+      <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to left, transparent, ${themeAccent}40)` }} />
     </div>
   )
 }
@@ -5807,24 +5807,28 @@ const firstDate = sorted[0]?.date
           </div>
           </DraggableElement>
           {data.styleAccueil === 'illustration' && data.illustrationCoupleId && (() => {
-            const coupleIlluSize = data.illustrationCoupleSize ?? 70
+            const coupleUrl = ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url
+            if (!coupleUrl) return null
             return (
-            <div style={{ textAlign: 'center', marginBottom: 30, animation: 'sharedFadeIn 1s 0.2s ease forwards', opacity: 0 }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url} alt="" style={{ width: `${coupleIlluSize}%`, maxHeight: 300, objectFit: 'contain', mixBlendMode: 'multiply' }} />
-              {canEdit && (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 4 }}>
-                  <button type="button" onClick={() => onUpdate?.({ illustrationCoupleSize: Math.max(30, coupleIlluSize - 10) })} style={{
-                    ...BTN, width: 24, height: 24, borderRadius: '50%', border: `1px solid ${G}30`,
-                    background: 'white', color: G, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
-                  }}>−</button>
-                  <button type="button" onClick={() => onUpdate?.({ illustrationCoupleSize: Math.min(150, coupleIlluSize + 10) })} style={{
-                    ...BTN, width: 24, height: 24, borderRadius: '50%', border: `1px solid ${G}30`,
-                    background: 'white', color: G, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
-                  }}>+</button>
-                </div>
-              )}
-            </div>
+              <div style={{ marginBottom: 24, animation: 'sharedFadeIn 1s 0.2s ease forwards', opacity: 0 }}>
+                <EditableIllustration
+                  url={coupleUrl}
+                  size={data.illustrationCoupleSize ?? 70}
+                  offsetX={data.illustrationCoupleOffsetX ?? 0}
+                  offsetY={data.illustrationCoupleOffsetY ?? 0}
+                  editable={canEdit}
+                  accent={G}
+                  ceremonyType="Cocktail"
+                  onChangeSize={(sz) => onUpdate?.({ illustrationCoupleSize: sz })}
+                  onChangeOffsetX={(x) => onUpdate?.({ illustrationCoupleOffsetX: x })}
+                  onChangeOffsetY={(y) => onUpdate?.({ illustrationCoupleOffsetY: y })}
+                  onChangeUrl={(url) => {
+                    const found = ILLUSTRATIONS_COUPLES.find(ic => ic.url === url)
+                    if (found) onUpdate?.({ illustrationCoupleId: found.id })
+                  }}
+                  onRemove={() => onUpdate?.({ illustrationCoupleId: '', illustrationCoupleSize: 70, illustrationCoupleOffsetX: 0, illustrationCoupleOffsetY: 0 })}
+                />
+              </div>
             )
           })()}
           <DraggableElement id="names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
@@ -6046,7 +6050,7 @@ const firstDate = sorted[0]?.date
                         </div>
                       )}
                     </AnimSection></DraggableElement>
-                    <AnimSection animStyle={anim} delay={380} skipAnim={canEdit}><LineSep /></AnimSection>
+                    <div style={{ height: 20 }} />
                     <DraggableElement id={pre+"date"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={400} skipAnim={canEdit}>{ceremony.date ? (() => {
                         const d = new Date(ceremony.date + 'T12:00:00')
                         const parts = new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).formatToParts(d)
@@ -6158,29 +6162,22 @@ const firstDate = sorted[0]?.date
               return ILLUSTRATIONS_RSVP[hash].url
             })()
             const canEditRsvp = role !== 'guest' && !!onUpdate
-            const rsvpSize = data.rsvpIllustrationSize ?? 60
             return (
-              <div style={{ textAlign: 'center', marginBottom: 8, position: 'relative' }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={rsvpUrl.replace('/upload/', '/upload/e_trim/')} alt="" style={{ width: `${rsvpSize}%`, maxHeight: 280, objectFit: 'contain', display: 'inline-block', mixBlendMode: 'multiply' }} />
-                {canEditRsvp && (
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 4, marginBottom: 4 }}>
-                      <button type="button" onClick={() => onUpdate?.({ rsvpIllustrationSize: Math.max(30, rsvpSize - 10) })} style={{
-                        ...BTN, width: 24, height: 24, borderRadius: '50%', border: `1px solid ${G}30`,
-                        background: 'white', color: G, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
-                      }}>−</button>
-                      <button type="button" onClick={() => onUpdate?.({ rsvpIllustrationSize: Math.min(150, rsvpSize + 10) })} style={{
-                        ...BTN, width: 24, height: 24, borderRadius: '50%', border: `1px solid ${G}30`,
-                        background: 'white', color: G, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
-                      }}>+</button>
-                    </div>
-                    <RsvpIllustrationPicker
-                      accent={G}
-                      onSelect={(url) => onUpdate?.({ rsvpIllustrationUrl: url })}
-                    />
-                  </div>
-                )}
+              <div style={{ marginBottom: 8 }}>
+                <EditableIllustration
+                  url={rsvpUrl}
+                  size={data.rsvpIllustrationSize ?? 60}
+                  offsetX={data.rsvpIllustrationOffsetX ?? 0}
+                  offsetY={data.rsvpIllustrationOffsetY ?? 0}
+                  editable={canEditRsvp}
+                  accent={G}
+                  ceremonyType="Cocktail"
+                  onChangeSize={(sz) => onUpdate?.({ rsvpIllustrationSize: sz })}
+                  onChangeOffsetX={(x) => onUpdate?.({ rsvpIllustrationOffsetX: x })}
+                  onChangeOffsetY={(y) => onUpdate?.({ rsvpIllustrationOffsetY: y })}
+                  onChangeUrl={(url) => onUpdate?.({ rsvpIllustrationUrl: url })}
+                  onRemove={() => onUpdate?.({ rsvpIllustrationUrl: '', rsvpIllustrationSize: 60, rsvpIllustrationOffsetX: 0, rsvpIllustrationOffsetY: 0 })}
+                />
               </div>
             )
           })()}
