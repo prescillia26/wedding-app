@@ -155,6 +155,9 @@ const ILLUSTRATIONS_COUPLES = [
   { id: 'couple-16', label: '💕 Vignoble', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498272/21_uq53kw.png' },
   { id: 'couple-17', label: '💕 Mas provençal', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498271/20_fsei03.png' },
   { id: 'couple-18', label: '💕 Villa élégante', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498230/13_vtlmbu.png' },
+  { id: 'couple-19', label: '🎨 Fond aquarelle 1', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780836630/watercolor_back_1_n62jqo.png' },
+  { id: 'couple-20', label: '🎨 Fond aquarelle 2', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780836663/watercolor_back_2_uj4ama.png' },
+  { id: 'couple-21', label: '🎨 Fond aquarelle 3', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780836667/watercolor_back_3_fjtbqm.png' },
 ] as const
 
 // ── Illustrations RSVP (boîte aux lettres, enveloppes, etc.) ──
