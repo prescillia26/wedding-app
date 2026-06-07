@@ -5994,7 +5994,7 @@ const firstDate = sorted[0]?.date
                     const setLayout = (l: LayoutMap) => onUpdate?.({ accueilLayout: l })
                     const pre = `c${safeIdx}_`
                     return (
-                  <div onClick={canEdit && onTextEdit ? () => onTextEdit() : undefined} style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame), transform: data.textOffsetY ? `translateY(${data.textOffsetY}px)` : undefined, cursor: canEdit ? 'text' : undefined }}>
+                  <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame), transform: data.textOffsetY ? `translateY(${data.textOffsetY}px)` : undefined }}>
                     {data.mariageJuif && (
                       <DraggableElement id={pre+"bsd"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, opacity: 0.85, letterSpacing: 1, marginBottom: 8, paddingRight: 4 }}>בס״ד</div></DraggableElement>
                     )}
