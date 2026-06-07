@@ -883,7 +883,8 @@ function applyZoneStyle(baseStyle: React.CSSProperties, zone: TextZone, zoneStyl
 type LayoutEntry = { x: number; y: number; scale: number; color?: string; fontFamily?: string }
 type LayoutMap = Record<string, LayoutEntry>
 
-const DRAG_COLORS = ['', '#ffffff', '#000000', '#C9A84C', '#d4829a', '#8b0000', '#2c4a7c', '#7a9e6e', '#d4a574', '#2a9a6a']
+// Toutes les couleurs disponibles pour le DraggableElement inline style popup
+const DRAG_COLORS = COLOR_OPTIONS.map(c => c.value)
 const DRAG_FONTS = [
   { value: '', label: 'Défaut' },
   { value: 'var(--font-great-vibes)', label: 'Calligraphie' },
@@ -5842,11 +5843,11 @@ const firstDate = sorted[0]?.date
         </div>
       )}
 {/* SECTION 1 : Écran d'accueil */}
-      <div style={{ position: 'relative', height: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center',
+      <div style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center',
         justifyContent: 'space-evenly',
         paddingTop: data.styleAccueil === 'video' ? (() => { const v = VIDEO_BACKGROUNDS.find(x => x.id === data.videoAccueilId); return v?.textPosition === 'top' ? '6%' : v?.textPosition === 'center-top' ? '12%' : '18%' })() : 10,
         paddingBottom: 10,
-        maxWidth: 480, margin: '0 auto', boxShadow: '0 8px 60px rgba(0,0,0,0.15)', overflow: 'hidden' }}>
+        maxWidth: 480, margin: '0 auto', boxShadow: '0 8px 60px rgba(0,0,0,0.15)' }}>
         {/* Wrapper overflow:hidden pour le fond (photo carousel ou vidéo) */}
         {data.styleAccueil === 'video' && data.videoAccueilId ? (
           <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
