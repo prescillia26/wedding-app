@@ -5920,12 +5920,7 @@ const firstDate = sorted[0]?.date
                       <DraggableElement id={pre+"bsd"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, opacity: 0.85, letterSpacing: 1, marginBottom: 8, paddingRight: 4 }}>בס״ד</div></DraggableElement>
                     )}
                     <DraggableElement id={pre+"titre"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} skipAnim={canEdit}>
-                      <div style={applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: ceremony.illustrationUrl ? 6 : 16, lineHeight: 1.4 }, 'titres', data.zoneStyles)}>{ov[`ceremony_${i}_titre`] || title}</div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center', margin: `0 auto ${ceremony.illustrationUrl ? '4px' : '24px'}`, maxWidth: 200 }}>
-                        <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to right, transparent, ${G}40)` }} />
-                        <span style={{ color: G, fontSize: 8, opacity: 0.5 }}>◆</span>
-                        <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to left, transparent, ${G}40)` }} />
-                      </div>
+                      <div style={applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: ceremony.illustrationUrl ? 10 : 24, lineHeight: 1.4 }, 'titres', data.zoneStyles)}>{ov[`ceremony_${i}_titre`] || title}</div>
                     </AnimSection></DraggableElement>
                     {/* Illustration aquarelle — après le titre, déplaçable par les mariés */}
                     {ceremony.illustrationUrl ? (

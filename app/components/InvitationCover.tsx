@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 
 const GV = 'var(--font-great-vibes)'
 const PD = 'var(--font-playfair-display)'
@@ -9,7 +9,6 @@ const CG = 'var(--font-cormorant-garamond)'
 export default function InvitationCover({
   prenom1,
   prenom2,
-  date,
   accent,
   fond,
   logoUrl,
@@ -30,29 +29,18 @@ export default function InvitationCover({
   mariageJuif?: boolean
   illustrationUrl?: string
 }) {
-  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
   const [opened, setOpened] = useState(false)
-
-  useEffect(() => {
-    if (!date) return
-    const target = new Date(date).getTime()
-    const tick = () => {
-      const diff = Math.max(0, target - Date.now())
-      setCountdown({
-        days: Math.floor(diff / 86400000),
-        hours: Math.floor((diff % 86400000) / 3600000),
-        minutes: Math.floor((diff % 3600000) / 60000),
-        seconds: Math.floor((diff % 60000) / 1000),
-      })
-    }
-    tick()
-    const id = setInterval(tick, 1000)
-    return () => clearInterval(id)
-  }, [date])
 
   const handleOpen = () => {
     setOpened(true)
-    setTimeout(onOpen, 800)
+    // Scroll vers le premier événement après la transition
+    setTimeout(() => {
+      onOpen()
+      setTimeout(() => {
+        const el = document.getElementById('ceremony-0')
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+    }, 700)
   }
 
   const p1 = prenom1 || 'Prénom'
@@ -60,35 +48,35 @@ export default function InvitationCover({
 
   return (
     <div style={{
-      position: 'fixed', inset: 0, zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center',
+      position: 'fixed', inset: 0, zIndex: 300,
+      display: 'flex', flexDirection: 'column',
       background: fond,
       opacity: opened ? 0 : 1,
       transform: opened ? 'scale(1.05)' : 'scale(1)',
-      transition: 'opacity 0.8s ease, transform 0.8s ease',
+      transition: 'opacity 0.7s ease, transform 0.7s ease',
       pointerEvents: opened ? 'none' : 'auto',
+      overflowY: 'auto', WebkitOverflowScrolling: 'touch',
     }}>
-      {/* Animations */}
       <style>{`
-        @keyframes coverFloat1 { 0%,100% { transform: translateY(0) rotate(0deg); opacity: 0.15; } 50% { transform: translateY(-20px) rotate(5deg); opacity: 0.3; } }
-        @keyframes coverFloat2 { 0%,100% { transform: translateY(0) rotate(0deg); opacity: 0.1; } 50% { transform: translateY(-15px) rotate(-3deg); opacity: 0.2; } }
         @keyframes coverPulse { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
-        @keyframes coverFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes coverFadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
 
-      {/* Ornements coins */}
-      <div style={{ position: 'absolute', top: 40, left: 40, width: 60, height: 60, borderTop: `1px solid ${accent}30`, borderLeft: `1px solid ${accent}30`, animation: 'coverFloat1 6s ease infinite' }} />
-      <div style={{ position: 'absolute', top: 40, right: 40, width: 60, height: 60, borderTop: `1px solid ${accent}30`, borderRight: `1px solid ${accent}30`, animation: 'coverFloat2 7s ease infinite' }} />
-      <div style={{ position: 'absolute', bottom: 40, left: 40, width: 60, height: 60, borderBottom: `1px solid ${accent}30`, borderLeft: `1px solid ${accent}30`, animation: 'coverFloat2 6s ease infinite' }} />
-      <div style={{ position: 'absolute', bottom: 40, right: 40, width: 60, height: 60, borderBottom: `1px solid ${accent}30`, borderRight: `1px solid ${accent}30`, animation: 'coverFloat1 7s ease infinite' }} />
-
-      <div style={{ textAlign: 'center', padding: '0 32px', animation: 'coverFadeIn 1.2s ease both' }}>
+      {/* Contenu centré verticalement avec min-height */}
+      <div style={{
+        flex: 1, display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        minHeight: '100vh', padding: '40px 32px',
+        animation: 'coverFadeIn 1.2s ease both',
+        boxSizing: 'border-box',
+      }}>
 
         {/* בס״ד */}
         {mariageJuif && (
-          <div style={{ fontFamily: 'serif', fontSize: 16, color: accent, direction: 'rtl', marginBottom: 20, opacity: 0.85 }}>בס״ד</div>
+          <div style={{ fontFamily: 'serif', fontSize: 14, color: accent, direction: 'rtl', marginBottom: 16, opacity: 0.85, fontWeight: 700 }}>בס״ד</div>
         )}
 
-        {/* Logo en gros */}
+        {/* Logo */}
         {logoUrl ? (() => {
           const colorToUse = logoColor || accent.replace('#', '')
           let displayUrl = logoUrl
@@ -99,42 +87,35 @@ export default function InvitationCover({
               : logoUrl.replace('/upload/', '/upload/e_background_removal/e_trim/')
           }
           return (
-            <div style={{ marginBottom: 32 }}>
+            <div style={{ marginBottom: 20 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={displayUrl} alt="" style={{ width: 180, height: 180, objectFit: 'contain', display: 'inline-block' }} />
+              <img src={displayUrl} alt="" style={{ width: 140, height: 140, objectFit: 'contain', display: 'inline-block' }} />
             </div>
           )
         })() : (
-          <div style={{ marginBottom: 32 }}>
-            <span style={{ fontFamily: GV, fontSize: 72, color: accent }}>{p1[0]}</span>
-            <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 28, color: accent, margin: '0 8px', opacity: 0.5 }}>&</span>
-            <span style={{ fontFamily: GV, fontSize: 72, color: accent }}>{p2[0]}</span>
+          <div style={{ marginBottom: 20 }}>
+            <span style={{ fontFamily: GV, fontSize: 56, color: accent }}>{p1[0]}</span>
+            <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 22, color: accent, margin: '0 6px', opacity: 0.5 }}>&</span>
+            <span style={{ fontFamily: GV, fontSize: 56, color: accent }}>{p2[0]}</span>
           </div>
         )}
 
         {/* Illustration couple */}
         {illustrationUrl && (
-          <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'center' }}>
+          <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'center' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={illustrationUrl} alt="" style={{ maxWidth: '65%', maxHeight: 220, objectFit: 'contain' }} />
+            <img src={illustrationUrl} alt="" style={{ maxWidth: '55%', maxHeight: 180, objectFit: 'contain' }} />
           </div>
         )}
 
-        {/* Séparateur */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 28 }}>
-          <div style={{ width: 50, height: 0.5, background: accent, opacity: 0.3 }} />
-          <span style={{ color: accent, fontSize: 8, opacity: 0.4 }}>✦</span>
-          <div style={{ width: 50, height: 0.5, background: accent, opacity: 0.3 }} />
-        </div>
-
-        {/* Phrase — mariage de Prénom & Prénom */}
-        <div style={{ marginBottom: 32 }}>
+        {/* Prénoms */}
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <div>
-            <span style={{ fontFamily: GV, fontSize: 'clamp(32px, 10vw, 52px)', color: accent }}>{p1}</span>
-            <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 20, color: accent, margin: '0 10px', opacity: 0.5 }}>&</span>
-            <span style={{ fontFamily: GV, fontSize: 'clamp(32px, 10vw, 52px)', color: accent }}>{p2}</span>
+            <span style={{ fontFamily: GV, fontSize: 'clamp(28px, 8vw, 44px)', color: accent }}>{p1}</span>
+            <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 18, color: accent, margin: '0 8px', opacity: 0.5 }}>&</span>
+            <span style={{ fontFamily: GV, fontSize: 'clamp(28px, 8vw, 44px)', color: accent }}>{p2}</span>
           </div>
-          <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 15, color: accent, letterSpacing: 1, marginTop: 14, opacity: 0.7, lineHeight: 1.6 }}>
+          <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 14, color: accent, letterSpacing: 1, marginTop: 12, opacity: 0.7, lineHeight: 1.6 }}>
             ont le plaisir de vous convier<br />à leur mariage
           </div>
         </div>
@@ -144,11 +125,12 @@ export default function InvitationCover({
           type="button"
           onClick={handleOpen}
           style={{
-            fontFamily: PD, fontSize: 12, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase',
-            padding: '16px 40px', borderRadius: 0, border: `1.5px solid ${accent}`,
+            fontFamily: PD, fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase',
+            padding: '14px 32px', borderRadius: 0, border: `1.5px solid ${accent}`,
             background: 'transparent', color: accent, cursor: 'pointer',
             animation: 'coverPulse 3s ease infinite',
             transition: 'background 0.3s, color 0.3s',
+            touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
           }}
           onMouseEnter={e => { e.currentTarget.style.background = accent; e.currentTarget.style.color = fond }}
           onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = accent }}
