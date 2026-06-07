@@ -46,6 +46,9 @@ const ILLU_COUPLES: Record<string, string> = {
   'couple-16': 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498272/21_uq53kw.png',
   'couple-17': 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498271/20_fsei03.png',
   'couple-18': 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498230/13_vtlmbu.png',
+  'couple-19': 'https://res.cloudinary.com/dau96mui2/image/upload/v1780836630/watercolor_back_1_n62jqo.png',
+  'couple-20': 'https://res.cloudinary.com/dau96mui2/image/upload/v1780836663/watercolor_back_2_uj4ama.png',
+  'couple-21': 'https://res.cloudinary.com/dau96mui2/image/upload/v1780836667/watercolor_back_3_fjtbqm.png',
 }
 
 // ✅ React cache() : évite que Redis soit appelé 2 fois par page
@@ -122,10 +125,10 @@ export async function generateMetadata(
   }
   const bgColor = THEME_BG[result.data.style || ''] || '#fdf8f0'
 
-  // Priorité OG image : photo > illustration couple > illustration cérémonie > logo > monogramme > fallback
+  // Priorité OG image : photo > illustration couple > logo > monogramme > fallback
+  // ⚠️ JAMAIS d'illustration de cérémonie (houppa, mairie, etc.) — toujours la 1re page
   const userPhoto = result.data.photosFond?.[0] || result.data.photoFond || ''
   const fallbackImage = coupleIlluUrl
-    || result.data.ceremonies?.find(c => c.illustrationUrl)?.illustrationUrl
     || result.data.customLogoUrl
     || result.data.luxeMonogramUrl
     || ''
