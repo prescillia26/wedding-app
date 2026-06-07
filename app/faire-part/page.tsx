@@ -5876,6 +5876,13 @@ const firstDate = sorted[0]?.date
             <IntroCarousel photos={data.photosFond?.length ? data.photosFond : (data.photoFond ? [data.photoFond] : [])} themeAccent={G} photosData={data.photosData} />
           </div>
         )}
+        {/* Cadre (frame) en fond de la page d'accueil */}
+        {hasFrame && frame.url && !frame.video && (
+          <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={frame.url} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: data.frameOpacity ?? 0.6 }} />
+          </div>
+        )}
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '0 32px', maxWidth: 480, width: '100%', margin: '0 auto' }}>
           {(() => {
             const canEdit = role !== 'guest' && !!onUpdate
@@ -5888,7 +5895,7 @@ const firstDate = sorted[0]?.date
             </DraggableElement>
           )}
           <DraggableElement id="monogram" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>
             {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={hasIntroPhoto ? 90 : 110} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={hasIntroPhoto ? 90 : 110} style={data.monogrammeStyle || 'cercle'} />}
           </div>
           {canEdit && (
@@ -5938,7 +5945,7 @@ const firstDate = sorted[0]?.date
             )
           })()}
           <DraggableElement id="names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <div style={{ fontFamily: FS, fontSize: 'clamp(28px,7vw,42px)', color: introTextColor, marginBottom: 8, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.15, textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : readableShadow(theme) }}>
+          <div style={{ fontFamily: FS, fontSize: 'clamp(28px,7vw,42px)', color: introTextColor, marginBottom: 8, lineHeight: 1.15, textAlign: 'center', textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : readableShadow(theme) }}>
             {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
           </div>
           </DraggableElement>
@@ -5948,12 +5955,12 @@ const firstDate = sorted[0]?.date
             defaultValue={t.fairepart.pleaseJoin}
             editable={canEdit}
             onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, global_pleaseJoin: v } })}
-            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: introTextColor, marginBottom: 0, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.6, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}
+            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: introTextColor, marginBottom: 0, textAlign: 'center', lineHeight: 1.6, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}
           />
           </DraggableElement>
           {/* Compte à rebours déplacé dans le sticky header */}
           {/* Bouton "Découvrir" — scrolle vers le 1er événement */}
-          <div style={{ marginTop: 8, animation: 'sharedFadeIn 1s 0.8s ease forwards', opacity: 0 }}>
+          <div style={{ marginTop: 12 }}>
             <button
               type="button"
               onClick={() => {
