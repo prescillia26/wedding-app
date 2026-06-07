@@ -405,6 +405,8 @@ interface FormData {
   illustrations?: IllustrationElement[] // v2 : tableau d'illustrations (scènes + motifs)
   rsvpDeadline?: string // date limite de confirmation (YYYY-MM-DD)
   rsvpIllustrationUrl?: string // illustration choisie pour le carton-réponse
+  rsvpIllustrationSize?: number // taille illustration RSVP (30-150, default 60)
+  illustrationCoupleSize?: number // taille illustration couple page d'accueil (30-150, default 70)
   luxeColor?: string // couleur choisie pour le pack Luxe Aquarelle
   luxeDecoUrls?: Record<string, string> // decoId → saved URL des illustrations décoratives générées par IA
   luxeMonogramUrl?: string // URL du monogramme entrelacé IA (pack Luxe)
@@ -5756,6 +5758,12 @@ const firstDate = sorted[0]?.date
         .lovit-btn:hover{transform:translateY(-1px);filter:brightness(1.06);box-shadow:0 6px 24px rgba(0,0,0,0.12)}
         .lovit-btn:active{transform:translateY(0);filter:brightness(0.98)}
       `}</style>
+{/* Indicateur PAGE 1 — visible uniquement pour les mariés */}
+      {role !== 'guest' && (
+        <div style={{ textAlign: 'center', padding: '12px 0 4px', background: `${G}08`, borderBottom: `1px dashed ${G}30` }}>
+          <span style={{ fontFamily: FP, fontSize: 10, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', color: G, opacity: 0.5 }}>— PAGE 1 : ACCUEIL —</span>
+        </div>
+      )}
 {/* SECTION 1 : Écran d'accueil */}
       <div style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center',
         justifyContent: data.styleAccueil === 'video' ? 'flex-start' : 'center',
@@ -5798,12 +5806,27 @@ const firstDate = sorted[0]?.date
             {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={data.styleAccueil === 'video' ? 110 : 140} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={data.styleAccueil === 'video' ? 110 : 140} style={data.monogrammeStyle || 'cercle'} />}
           </div>
           </DraggableElement>
-          {data.styleAccueil === 'illustration' && data.illustrationCoupleId && (
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 30, animation: 'sharedFadeIn 1s 0.2s ease forwards', opacity: 0 }}>
+          {data.styleAccueil === 'illustration' && data.illustrationCoupleId && (() => {
+            const coupleIlluSize = data.illustrationCoupleSize ?? 70
+            return (
+            <div style={{ textAlign: 'center', marginBottom: 30, animation: 'sharedFadeIn 1s 0.2s ease forwards', opacity: 0 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url} alt="" style={{ maxWidth: '70%', maxHeight: 280, objectFit: 'contain' }} />
+              <img src={ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url} alt="" style={{ width: `${coupleIlluSize}%`, maxHeight: 300, objectFit: 'contain', mixBlendMode: 'multiply' }} />
+              {canEdit && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 4 }}>
+                  <button type="button" onClick={() => onUpdate?.({ illustrationCoupleSize: Math.max(30, coupleIlluSize - 10) })} style={{
+                    ...BTN, width: 24, height: 24, borderRadius: '50%', border: `1px solid ${G}30`,
+                    background: 'white', color: G, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
+                  }}>−</button>
+                  <button type="button" onClick={() => onUpdate?.({ illustrationCoupleSize: Math.min(150, coupleIlluSize + 10) })} style={{
+                    ...BTN, width: 24, height: 24, borderRadius: '50%', border: `1px solid ${G}30`,
+                    background: 'white', color: G, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
+                  }}>+</button>
+                </div>
+              )}
             </div>
-          )}
+            )
+          })()}
           <DraggableElement id="names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', margin: '0 auto 16px', maxWidth: 160 }}>
             <div style={{ flex: 1, height: 0.5, background: introTextColor, opacity: 0.4 }} />
@@ -5845,8 +5868,16 @@ const firstDate = sorted[0]?.date
           const hebrewDate = getHebrewDate(ceremony.date)
           const usePhotoBg = fondCeremonie === 'photo' && !!firstPhoto
           const isCard = (data.presentationStyle ?? 'page-unique') !== 'page-unique'
+          const pageNum = i + 2 // Page 2 = 1er événement, etc.
+          const ceremonyLabel = ceremony.type === 'Autre' ? (ceremony.customName || 'Événement') : ceremony.type
           return (
             <React.Fragment key={safeIdx}>
+              {/* Indicateur de page — visible uniquement pour les mariés */}
+              {role !== 'guest' && (
+                <div style={{ textAlign: 'center', padding: '12px 0 4px', background: `${G}08`, borderTop: `1px dashed ${G}30`, borderBottom: `1px dashed ${G}30` }}>
+                  <span style={{ fontFamily: FP, fontSize: 10, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', color: G, opacity: 0.5 }}>— PAGE {pageNum} : {ceremonyLabel.toUpperCase()} —</span>
+                </div>
+              )}
               {/* Illustration aquarelle — image décorative entre les sections */}
               <CeremonyCard isCard={isCard} accent={G}>
                 <section id={`ceremony-${safeIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : 40, paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : 40, paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: (role !== 'guest' && !!onUpdate) ? 'visible' : 'hidden', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: theme.fond } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
@@ -6112,6 +6143,12 @@ const firstDate = sorted[0]?.date
           </div>
         )}
 
+        {/* Indicateur page RSVP — visible uniquement pour les mariés */}
+        {role !== 'guest' && (
+          <div style={{ textAlign: 'center', padding: '12px 0 4px', background: `${G}08`, borderTop: `1px dashed ${G}30`, borderBottom: `1px dashed ${G}30` }}>
+            <span style={{ fontFamily: FP, fontSize: 10, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', color: G, opacity: 0.5 }}>— PAGE {sorted.length + 2} : CONFIRMATION —</span>
+          </div>
+        )}
         {/* SECTION 5 : Illustration RSVP + Carton-réponse */}
         <section id="rsvp-section" style={{ paddingTop: 40, paddingBottom: 52, scrollMarginTop: 60 }}>
           {/* Illustration RSVP — éditable par les mariés */}
@@ -6121,15 +6158,28 @@ const firstDate = sorted[0]?.date
               return ILLUSTRATIONS_RSVP[hash].url
             })()
             const canEditRsvp = role !== 'guest' && !!onUpdate
+            const rsvpSize = data.rsvpIllustrationSize ?? 60
             return (
               <div style={{ textAlign: 'center', marginBottom: 8, position: 'relative' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={rsvpUrl.replace('/upload/', '/upload/e_trim/')} alt="" style={{ width: '60%', maxHeight: 200, objectFit: 'contain', display: 'inline-block', mixBlendMode: 'multiply' }} />
+                <img src={rsvpUrl.replace('/upload/', '/upload/e_trim/')} alt="" style={{ width: `${rsvpSize}%`, maxHeight: 280, objectFit: 'contain', display: 'inline-block', mixBlendMode: 'multiply' }} />
                 {canEditRsvp && (
-                  <RsvpIllustrationPicker
-                    accent={G}
-                    onSelect={(url) => onUpdate?.({ rsvpIllustrationUrl: url })}
-                  />
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 4, marginBottom: 4 }}>
+                      <button type="button" onClick={() => onUpdate?.({ rsvpIllustrationSize: Math.max(30, rsvpSize - 10) })} style={{
+                        ...BTN, width: 24, height: 24, borderRadius: '50%', border: `1px solid ${G}30`,
+                        background: 'white', color: G, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
+                      }}>−</button>
+                      <button type="button" onClick={() => onUpdate?.({ rsvpIllustrationSize: Math.min(150, rsvpSize + 10) })} style={{
+                        ...BTN, width: 24, height: 24, borderRadius: '50%', border: `1px solid ${G}30`,
+                        background: 'white', color: G, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
+                      }}>+</button>
+                    </div>
+                    <RsvpIllustrationPicker
+                      accent={G}
+                      onSelect={(url) => onUpdate?.({ rsvpIllustrationUrl: url })}
+                    />
+                  </div>
                 )}
               </div>
             )
