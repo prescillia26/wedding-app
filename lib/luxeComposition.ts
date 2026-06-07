@@ -29,6 +29,9 @@ export const LUXE_PALETTES: Record<string, LuxePalette> = {
   fuchsia:    { id: 'fuchsia',    label: 'Fuchsia bougainvillée', primary: '#D63384', cream: '#FFFFFF', accent: '#5DBDC8', rsvpBg: '#FCE4F0', rsvpText: '#A02060', rsvpAccent: '#D63384', textSecondary: '#7A8B5C' },
   rose_peche: { id: 'rose_peche', label: 'Rose pêche',  primary: '#1B3A5C', cream: '#FAF5EB', accent: '#E07856', rsvpBg: '#FDE8E0', rsvpText: '#1B3A5C', rsvpAccent: '#E07856', textSecondary: '#6a5a50' },
   bleu_med:   { id: 'bleu_med',   label: 'Bleu méditerranée', primary: '#1E5BA8', cream: '#FBF9F4', accent: '#E5B847', rsvpBg: '#E0ECF8', rsvpText: '#153D6A', rsvpAccent: '#1E5BA8', textSecondary: '#4a6a8a' },
+  buttercup:  { id: 'buttercup',  label: 'Jaune buttercup', primary: '#D4A830', cream: '#FEFBF0', accent: '#F0CD7A', rsvpBg: '#F8F0D8', rsvpText: '#8A7020', rsvpAccent: '#D4A830', textSecondary: '#8a7a40' },
+  orange_sunset: { id: 'orange_sunset', label: 'Orange sunset', primary: '#D07838', cream: '#FEF6F0', accent: '#F4A165', rsvpBg: '#FDE8D5', rsvpText: '#8A5020', rsvpAccent: '#D07838', textSecondary: '#8a5a30' },
+  bleu_mer:   { id: 'bleu_mer',   label: 'Bleu mer doux', primary: '#5A9AB0', cream: '#F2F8FA', accent: '#91BDC9', rsvpBg: '#DFF0F5', rsvpText: '#2A5A6A', rsvpAccent: '#5A9AB0', textSecondary: '#4a7a8a' },
 }
 
 // ── Motifs par défaut entre cérémonies ──

@@ -1,5 +1,5 @@
 export type Ambiance = "plage" | "chateau" | "jardin" | "salle" | "synagogue" | "israel" | "universel";
-export type Palette = "lavande" | "rose" | "sauge" | "bleu_nuit" | "bleu_ciel" | "rose_clair" | "mauve" | "peche" | "dore" | "bordeaux" | "menthe" | "terracotta" | "sable_dore" | "fuchsia" | "rose_peche" | "bleu_med";
+export type Palette = "lavande" | "rose" | "sauge" | "bleu_nuit" | "bleu_ciel" | "rose_clair" | "mauve" | "peche" | "dore" | "bordeaux" | "menthe" | "terracotta" | "sable_dore" | "fuchsia" | "rose_peche" | "bleu_med" | "buttercup" | "orange_sunset" | "bleu_mer";
 
 const SCENES: Record<Ambiance, string> = {
   plage: "a Mediterranean beach wedding setup, turquoise calm sea, soft sand, granite rocks",
@@ -28,6 +28,9 @@ const PALETTES: Record<Palette, string> = {
   fuchsia: "vivid fuchsia bougainvillea, turquoise lagoon, olive green, pure white",
   rose_peche: "soft peach pink, warm terracotta orange, deep navy blue, creamy ivory",
   bleu_med: "Mediterranean blue, immaculate white, warm ochre yellow, celadon green",
+  buttercup: "soft buttercup yellow, warm gold, honey pastel, cream, gentle ivory",
+  orange_sunset: "warm sunset orange, apricot, soft coral, golden cream, ivory",
+  bleu_mer: "soft sea blue, powder aqua, seafoam, cream, gentle grey-blue",
 };
 
 export function buildWatercolorPrompt(ambiance: Ambiance, palette: Palette, freeText?: string): string {

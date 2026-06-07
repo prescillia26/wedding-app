@@ -16,7 +16,7 @@ import { byId as visualById, VISUALS } from '@/lib/visuals'
 import type { VisualCategory } from '@/lib/visuals'
 
 
-type Theme = 'rose-fleuri' | 'ivoire-or' | 'bleu-floral' | 'champetre' | 'blanc-gris' | 'noir-blanc' | 'chocolat' | 'bordeaux' | 'bordeaux-nuit' | 'fuchsia' | 'marine-or' | 'menthe' | 'sable-dore' | 'terracotta' | 'lin-ecru' | 'vert-sauge' | 'rose-peche' | 'orange-terra' | 'bleu-nuit' | 'creme' | 'bleu-med' | 'blanc-imm' | 'jaune-ocre' | 'vert-celadon'
+type Theme = 'rose-fleuri' | 'ivoire-or' | 'bleu-floral' | 'champetre' | 'blanc-gris' | 'noir-blanc' | 'chocolat' | 'bordeaux' | 'bordeaux-nuit' | 'fuchsia' | 'marine-or' | 'menthe' | 'sable-dore' | 'terracotta' | 'lin-ecru' | 'vert-sauge' | 'rose-peche' | 'orange-terra' | 'bleu-nuit' | 'creme' | 'bleu-med' | 'blanc-imm' | 'jaune-ocre' | 'vert-celadon' | 'buttercup' | 'orange-sunset' | 'bleu-mer'
 type PresentationStyle = 'page-unique' | 'cartes-scrollables' | 'cartes-separees'
 // ⚙️ Nombre max de photos uploadables par couple (carrousel de la section d'accueil)
 const MAX_PHOTOS = 3
@@ -74,6 +74,11 @@ const COLOR_OPTIONS = [
   { value: '#FBF9F4', label: 'Blanc immaculé',  swatch: '#FBF9F4' },
   { value: '#E5B847', label: 'Jaune ocre',      swatch: '#E5B847' },
   { value: '#8FB8A8', label: 'Vert céladon',    swatch: '#8FB8A8' },
+  { value: '#F0CD7A', label: 'Jaune buttercup', swatch: '#F0CD7A' },
+  { value: '#F5D480', label: 'Or doux',         swatch: '#F5D480' },
+  { value: '#E8C26E', label: 'Miel pastel',     swatch: '#E8C26E' },
+  { value: '#F4A165', label: 'Orange sunset',   swatch: '#F4A165' },
+  { value: '#91BDC9', label: 'Bleu mer doux',   swatch: '#91BDC9' },
 ]
 
 interface ZoneStyle {
@@ -110,6 +115,9 @@ const THEMES: Record<Theme, ThemeObj> = {
   'blanc-imm':     { fond: '#fbf9f4', accent: '#9a9080', texte: '#2a2820', textSecondaire: '#6a6558', nom: 'Blanc Immaculé' },
   'jaune-ocre':    { fond: '#faf6e8', accent: '#C9A030', texte: '#3a3010', textSecondaire: '#8a7a30', nom: 'Jaune Ocre' },
   'vert-celadon':  { fond: '#f0f6f3', accent: '#5a9a80', texte: '#1a3028', textSecondaire: '#4a7a68', nom: 'Vert Céladon' },
+  'buttercup':     { fond: '#fefbf0', accent: '#D4A830', texte: '#3a3010', textSecondaire: '#8a7a40', nom: 'Jaune Buttercup' },
+  'orange-sunset': { fond: '#fef6f0', accent: '#F4A165', texte: '#3a2010', textSecondaire: '#8a5a30', nom: 'Orange Sunset' },
+  'bleu-mer':      { fond: '#f2f8fa', accent: '#5a9ab0', texte: '#1a2a34', textSecondaire: '#4a7a8a', nom: 'Bleu Mer' },
 }
 
 const ORNEMENTS_LIBRARY: { id: string; url: string; nom: string }[] = [
@@ -198,6 +206,11 @@ const LUXE_COLORS: { id: string; label: string; hex: string; palette: Palette }[
   { id: 'lin_ecru',   label: 'Lin écru',     hex: '#EDE3D2', palette: 'sable_dore' },
   { id: 'orange_terra', label: 'Orange terracotta', hex: '#E07856', palette: 'rose_peche' },
   { id: 'blanc_imm',  label: 'Blanc immaculé', hex: '#FBF9F4', palette: 'bleu_med' },
+  { id: 'buttercup',  label: 'Jaune buttercup', hex: '#F0CD7A', palette: 'buttercup' },
+  { id: 'or_doux',    label: 'Or doux',       hex: '#F5D480', palette: 'buttercup' },
+  { id: 'miel',       label: 'Miel pastel',   hex: '#E8C26E', palette: 'buttercup' },
+  { id: 'orange_sunset', label: 'Orange sunset', hex: '#F4A165', palette: 'orange_sunset' },
+  { id: 'bleu_mer',   label: 'Bleu mer doux', hex: '#91BDC9', palette: 'bleu_mer' },
 ]
 
 

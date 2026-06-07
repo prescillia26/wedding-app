@@ -7,6 +7,9 @@ export const PALETTES = {
   fuchsia:     { main: '#D63384', accent: '#5DBDC8', cream: '#FFFFFF', rsvpBg: '#FCE4F0' },
   rose_peche:  { main: '#1B3A5C', accent: '#E07856', cream: '#FAF5EB', rsvpBg: '#FDE8E0' },
   bleu_med:    { main: '#1E5BA8', accent: '#E5B847', cream: '#FBF9F4', rsvpBg: '#E0ECF8' },
+  buttercup:   { main: '#D4A830', accent: '#F0CD7A', cream: '#FEFBF0', rsvpBg: '#F8F0D8' },
+  orange_sunset: { main: '#D07838', accent: '#F4A165', cream: '#FEF6F0', rsvpBg: '#FDE8D5' },
+  bleu_mer:    { main: '#5A9AB0', accent: '#91BDC9', cream: '#F2F8FA', rsvpBg: '#DFF0F5' },
 } as const;
 
 export type PaletteKey = keyof typeof PALETTES;
