@@ -5685,10 +5685,12 @@ function InlineEdit({ value, defaultValue, onChange, editable, style }: {
     return (
       <div
         style={{ ...style, cursor: 'text', position: 'relative' }}
-        onClick={(e) => { e.stopPropagation(); setEditing(true) }}
+        onClick={(e) => { e.stopPropagation(); e.preventDefault(); setEditing(true) }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
       >
         {display.split('\n').map((line, i) => <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>)}
-        <span style={{ position: 'absolute', top: -6, right: -6, fontSize: 10, opacity: 0.4 }}>✏️</span>
+        <span style={{ position: 'absolute', top: -8, right: -8, fontSize: 12, background: 'white', borderRadius: '50%', padding: 2, boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}>✏️</span>
       </div>
     )
   }
@@ -5698,6 +5700,8 @@ function InlineEdit({ value, defaultValue, onChange, editable, style }: {
       ref={ref as unknown as React.RefObject<HTMLTextAreaElement>}
       autoFocus
       defaultValue={display}
+      onMouseDown={(e) => e.stopPropagation()}
+      onTouchStart={(e) => e.stopPropagation()}
       onBlur={(e) => {
         const text = e.currentTarget.value.trim()
         setEditing(false)
