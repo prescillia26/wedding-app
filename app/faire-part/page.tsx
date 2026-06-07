@@ -6157,7 +6157,7 @@ const firstDate = sorted[0]?.date
                   })()}
                 </section>
               </CeremonyCard>
-              {!isCard && i < sorted.length - 1 && <CeremoniesDivider themeAccent={G} />}
+              {/* Séparateur entre cérémonies retiré — les indicateurs de page suffisent */}
             </React.Fragment>
           )
         })}
