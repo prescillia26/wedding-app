@@ -5890,7 +5890,10 @@ const firstDate = sorted[0]?.date
           )}
           <DraggableElement id="monogram" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>
-            {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={hasIntroPhoto ? 90 : 110} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={hasIntroPhoto ? 90 : 110} style={data.monogrammeStyle || 'cercle'} />}
+            {(() => {
+              const logoSz = data.illustrationCoupleId ? 80 : hasIntroPhoto ? 90 : 110
+              return data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={logoSz} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={logoSz} style={data.monogrammeStyle || 'cercle'} />
+            })()}
           </div>
           {canEdit && (
             <div onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 6, maxWidth: 240, margin: '0 auto 6px' }}>
@@ -5943,7 +5946,6 @@ const firstDate = sorted[0]?.date
             {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
           </div>
           </DraggableElement>
-          <DraggableElement id="phrase" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <InlineEdit
             value={data.textOverrides?.['global_pleaseJoin'] || ''}
             defaultValue={t.fairepart.pleaseJoin}
@@ -5951,7 +5953,6 @@ const firstDate = sorted[0]?.date
             onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, global_pleaseJoin: v } })}
             style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: introTextColor, marginBottom: 0, textAlign: 'center', lineHeight: 1.6, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}
           />
-          </DraggableElement>
           {/* Compte à rebours déplacé dans le sticky header */}
           {/* Bouton "Découvrir" — scrolle vers le 1er événement */}
           <div style={{ marginTop: 12 }}>
