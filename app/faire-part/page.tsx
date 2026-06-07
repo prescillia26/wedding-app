@@ -5844,10 +5844,17 @@ const firstDate = sorted[0]?.date
       )}
 {/* SECTION 1 : Écran d'accueil */}
       <div style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center',
-        justifyContent: 'space-evenly',
-        paddingTop: data.styleAccueil === 'video' ? (() => { const v = VIDEO_BACKGROUNDS.find(x => x.id === data.videoAccueilId); return v?.textPosition === 'top' ? '6%' : v?.textPosition === 'center-top' ? '12%' : '18%' })() : 10,
-        paddingBottom: 10,
+        justifyContent: 'center', gap: 0,
+        paddingTop: data.styleAccueil === 'video' ? (() => { const v = VIDEO_BACKGROUNDS.find(x => x.id === data.videoAccueilId); return v?.textPosition === 'top' ? '4%' : v?.textPosition === 'center-top' ? '8%' : '12%' })() : 24,
+        paddingBottom: 24,
         maxWidth: 480, margin: '0 auto', boxShadow: '0 8px 60px rgba(0,0,0,0.15)' }}>
+        {/* Voile de lisibilité sur les photos de fond */}
+        {(data.styleAccueil === 'photo' || (!data.styleAccueil)) && (data.photosFond?.length || data.photoFond) && (
+          <div style={{ position: 'absolute', inset: 0, background: theme.dark
+            ? 'linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.5) 100%)'
+            : 'linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.35) 40%, rgba(255,255,255,0.6) 100%)',
+            zIndex: 0, pointerEvents: 'none' }} />
+        )}
         {/* Wrapper overflow:hidden pour le fond (photo carousel ou vidéo) */}
         {data.styleAccueil === 'video' && data.videoAccueilId ? (
           <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
@@ -5877,12 +5884,12 @@ const firstDate = sorted[0]?.date
             return (<>
           {data.mariageJuif && (
             <DraggableElement id="bsd" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-              <div style={{ fontFamily: 'serif', fontSize: 14, color: introTextColor, direction: 'rtl', marginBottom: 10, animation: 'sharedFadeIn 0.9s ease forwards' }}>בס״ד</div>
+              <div style={{ fontFamily: 'serif', fontSize: 14, color: introTextColor, direction: 'rtl', marginBottom: 6, animation: 'sharedFadeIn 0.9s ease forwards' }}>בס״ד</div>
             </DraggableElement>
           )}
           <DraggableElement id="monogram" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 4, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
-            {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={110} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={110} style={data.monogrammeStyle || 'cercle'} />}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
+            {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={hasIntroPhoto ? 90 : 110} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={hasIntroPhoto ? 90 : 110} style={data.monogrammeStyle || 'cercle'} />}
           </div>
           {canEdit && (
             <div onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 6, maxWidth: 240, margin: '0 auto 6px' }}>
@@ -5903,10 +5910,10 @@ const firstDate = sorted[0]?.date
             const coupleUrl = ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url || (data.illustrationCoupleId.startsWith('http') ? data.illustrationCoupleId : '')
             if (!coupleUrl) return null
             return (
-              <div style={{ marginBottom: 20 }}>
+              <div style={{ marginBottom: 14 }}>
                 <EditableIllustration
                   url={coupleUrl}
-                  size={data.illustrationCoupleSize ?? 70}
+                  size={data.illustrationCoupleSize ?? (hasIntroPhoto ? 50 : 70)}
                   offsetX={data.illustrationCoupleOffsetX ?? 0}
                   offsetY={data.illustrationCoupleOffsetY ?? 0}
                   editable={canEdit}
@@ -5931,7 +5938,7 @@ const firstDate = sorted[0]?.date
             )
           })()}
           <DraggableElement id="names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <div style={{ fontFamily: FS, fontSize: 'clamp(30px,8vw,46px)', color: introTextColor, marginBottom: 10, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.2, textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : readableShadow(theme) }}>
+          <div style={{ fontFamily: FS, fontSize: 'clamp(28px,7vw,42px)', color: introTextColor, marginBottom: 8, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.15, textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : readableShadow(theme) }}>
             {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
           </div>
           </DraggableElement>
@@ -5941,7 +5948,7 @@ const firstDate = sorted[0]?.date
             defaultValue={t.fairepart.pleaseJoin}
             editable={canEdit}
             onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, global_pleaseJoin: v } })}
-            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: introTextColor, marginBottom: 0, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}
+            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: introTextColor, marginBottom: 0, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.6, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}
           />
           </DraggableElement>
           {/* Compte à rebours déplacé dans le sticky header */}
