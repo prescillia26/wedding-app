@@ -5813,19 +5813,19 @@ const firstDate = sorted[0]?.date
             return (<>
           {data.mariageJuif && (
             <DraggableElement id="bsd" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-              <div style={{ fontFamily: 'serif', fontSize: 16, color: introTextColor, direction: 'rtl', marginBottom: 20, animation: 'sharedFadeIn 0.9s ease forwards' }}>בס״ד</div>
+              <div style={{ fontFamily: 'serif', fontSize: 14, color: introTextColor, direction: 'rtl', marginBottom: 10, animation: 'sharedFadeIn 0.9s ease forwards' }}>בס״ד</div>
             </DraggableElement>
           )}
           <DraggableElement id="monogram" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: data.styleAccueil === 'video' ? 10 : 16, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
-            {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={data.styleAccueil === 'video' ? 110 : 140} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={data.styleAccueil === 'video' ? 110 : 140} style={data.monogrammeStyle || 'cercle'} />}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: data.styleAccueil === 'video' ? 8 : 12, animation: 'sharedFadeIn 1s ease forwards', opacity: 0 }}>
+            {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={data.styleAccueil === 'video' ? 100 : 110} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={data.styleAccueil === 'video' ? 100 : 110} style={data.monogrammeStyle || 'cercle'} />}
           </div>
           </DraggableElement>
           {data.styleAccueil === 'illustration' && data.illustrationCoupleId && (() => {
             const coupleUrl = ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url || (data.illustrationCoupleId.startsWith('http') ? data.illustrationCoupleId : '')
             if (!coupleUrl) return null
             return (
-              <div style={{ marginBottom: 24, animation: 'sharedFadeIn 1s 0.2s ease forwards', opacity: 0 }}>
+              <div style={{ marginBottom: 12, animation: 'sharedFadeIn 1s 0.2s ease forwards', opacity: 0 }}>
                 <EditableIllustration
                   url={coupleUrl}
                   size={data.illustrationCoupleSize ?? 70}
@@ -5852,17 +5852,17 @@ const firstDate = sorted[0]?.date
             )
           })()}
           <DraggableElement id="names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', margin: '0 auto 16px', maxWidth: 160 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', margin: '0 auto 10px', maxWidth: 140 }}>
             <div style={{ flex: 1, height: 0.5, background: introTextColor, opacity: 0.4 }} />
-            <span style={{ color: introTextColor, fontSize: 10, opacity: 0.7 }}>◆</span>
+            <span style={{ color: introTextColor, fontSize: 8, opacity: 0.5 }}>◆</span>
             <div style={{ flex: 1, height: 0.5, background: introTextColor, opacity: 0.4 }} />
           </div>
-          <div style={{ fontFamily: FS, fontSize: 'clamp(30px,8vw,46px)', color: introTextColor, marginBottom: 16, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.2, textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : readableShadow(theme) }}>
+          <div style={{ fontFamily: FS, fontSize: 'clamp(26px,7vw,40px)', color: introTextColor, marginBottom: 10, animation: 'sharedFadeIn 1s 0.35s ease forwards', opacity: 0, lineHeight: 1.2, textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : readableShadow(theme) }}>
             {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
           </div>
           </DraggableElement>
           <DraggableElement id="phrase" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: introTextColor, marginBottom: 20, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}>
+          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: introTextColor, marginBottom: 12, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}>
             {(data.textOverrides?.['global_pleaseJoin']) || t.fairepart.pleaseJoin}
           </div>
           </DraggableElement>
@@ -5872,7 +5872,7 @@ const firstDate = sorted[0]?.date
             <button
               type="button"
               onClick={() => {
-                const el = document.getElementById('ceremony-0')
+                const el = document.getElementById('first-ceremony')
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
               }}
               style={{
@@ -5922,6 +5922,7 @@ const firstDate = sorted[0]?.date
               )}
               {/* Illustration aquarelle — image décorative entre les sections */}
               <CeremonyCard isCard={isCard} accent={G}>
+                {i === 0 && <div id="first-ceremony" style={{ scrollMarginTop: 60 }} />}
                 <section id={`ceremony-${safeIdx}`} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' as const, justifyContent: 'center', paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : 40, paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : 40, paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: (role !== 'guest' && !!onUpdate) ? 'visible' : 'hidden', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: theme.fond } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
                   {hasFrame && frame.video ? (
                     <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
