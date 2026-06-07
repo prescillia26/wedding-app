@@ -6465,6 +6465,19 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
 
   const handleShare = async () => {
     if (!isPaid) {
+      // Sauvegarder le brouillon avant de rediriger
+      try { localStorage.setItem('wedding-draft', JSON.stringify(data)) } catch { /* ignore */ }
+      // Rediriger directement vers Stripe Checkout
+      try {
+        const pack = (() => { try { return localStorage.getItem('lovit_pack') === 'premium' ? 'premium' : 'essentiel' } catch { return 'essentiel' } })()
+        const res = await fetch('/api/create-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pack, locale: 'fr' }),
+        })
+        const { url } = await res.json()
+        if (url) { window.location.href = url; return }
+      } catch { /* fallback */ }
       window.location.href = '/paiement'
       return
     }
