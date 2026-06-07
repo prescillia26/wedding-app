@@ -4754,6 +4754,7 @@ interface SharedPageContentProps {
   ytIframeRef: React.RefObject<HTMLIFrameElement | null>
   ytMuted: boolean; onToggleYtMute: () => void
   onUpdate?: (d: Partial<FormData>) => void
+  onTextEdit?: () => void
 }
 // ── 💌 ENVELOPPE PREMIUM ─────────────────────────────────────────────────────
 // Design : prénoms en haut, sceau au centre, "Touchez" en bas, ornements SVG
@@ -5675,7 +5676,7 @@ function IllustrationAdder({ ceremonyType, accent, onSelect }: { ceremonyType: s
 }
 
 // ── SharedPageContent ─────────────────────────────────────────────────────────
-function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute, onUpdate }: SharedPageContentProps) {
+function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute, onUpdate, onTextEdit }: SharedPageContentProps) {
   const { t, locale } = useT()
   const contentRef = useRef<HTMLDivElement>(null)
   const [currentCeremonyIdx, setCurrentCeremonyIdx] = useState(0)
@@ -5858,7 +5859,7 @@ const firstDate = sorted[0]?.date
           </div>
           </DraggableElement>
           <DraggableElement id="phrase" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: introTextColor, marginBottom: 0, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}>
+          <div onClick={canEdit && onTextEdit ? () => onTextEdit() : undefined} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: introTextColor, marginBottom: 0, animation: 'sharedFadeIn 1s 0.55s ease forwards', opacity: 0, textAlign: 'center', lineHeight: 1.7, cursor: canEdit ? 'text' : undefined, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}>
             {(data.textOverrides?.['global_pleaseJoin']) || t.fairepart.pleaseJoin}
           </div>
           </DraggableElement>
@@ -5945,7 +5946,7 @@ const firstDate = sorted[0]?.date
                     const setLayout = (l: LayoutMap) => onUpdate?.({ accueilLayout: l })
                     const pre = `c${safeIdx}_`
                     return (
-                  <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame), transform: data.textOffsetY ? `translateY(${data.textOffsetY}px)` : undefined }}>
+                  <div onClick={canEdit && onTextEdit ? () => onTextEdit() : undefined} style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame), transform: data.textOffsetY ? `translateY(${data.textOffsetY}px)` : undefined, cursor: canEdit ? 'text' : undefined }}>
                     {data.mariageJuif && (
                       <DraggableElement id={pre+"bsd"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, opacity: 0.85, letterSpacing: 1, marginBottom: 8, paddingRight: 4 }}>בס״ד</div></DraggableElement>
                     )}
@@ -6451,12 +6452,14 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
           ytMuted={ytMuted}
           onToggleYtMute={toggleYtMute}
           onUpdate={onUpdate}
+          onTextEdit={() => setTextEditOpen(true)}
         />
         {role === 'couple' && (
           <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button onClick={onEdit} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 13, fontWeight: 600 }}>{t.fairepart.editBtn}</button>
-            <button onClick={handleSave} disabled={saving} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: '#2a7d4f', color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: '0 4px 16px rgba(42,125,79,0.25)', opacity: saving ? 0.7 : 1 }}>{saving ? 'Enregistrement...' : 'Enregistrer'}</button>
-            <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 20px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 13, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{sharing ? (sharingStatus || 'Chargement...') : t.common.share}</button>
+            <button onClick={onEdit} style={{ ...BTN, padding: '10px 16px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 12, fontWeight: 600 }}>{t.fairepart.editBtn}</button>
+            <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '10px 16px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 12, fontWeight: 600 }}>✏️ Textes</button>
+            <button onClick={handleSave} disabled={saving} style={{ ...BTN, padding: '10px 16px', borderRadius: 9999, background: '#2a7d4f', color: 'white', border: 'none', fontSize: 12, fontWeight: 600, boxShadow: '0 4px 16px rgba(42,125,79,0.25)', opacity: saving ? 0.7 : 1 }}>{saving ? '...' : 'Enregistrer'}</button>
+            <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 16px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 12, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{sharing ? '...' : t.common.share}</button>
           </div>
         )}
         {rsvpOpen && (
@@ -6522,6 +6525,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
         ytMuted={ytMuted}
         onToggleYtMute={toggleYtMute}
         onUpdate={onUpdate}
+        onTextEdit={() => setTextEditOpen(true)}
       />
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '8px 16px 12px' }}>
         <div style={{ textAlign: 'center', marginBottom: 6 }}>
