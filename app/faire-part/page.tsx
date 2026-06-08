@@ -918,8 +918,13 @@ function applyZoneStyle(baseStyle: React.CSSProperties, zone: TextZone, zoneStyl
 type LayoutEntry = { x: number; y: number; scale: number; color?: string; fontFamily?: string }
 type LayoutMap = Record<string, LayoutEntry>
 
-// Toutes les couleurs disponibles pour le DraggableElement inline style popup
-const DRAG_COLORS = COLOR_OPTIONS.map(c => c.value)
+// Couleurs pour le DraggableElement inline style popup — dédupliquées, essentielles
+const DRAG_COLORS = (() => {
+  const essential = ['', '#ffffff', '#000000', '#C9A84C', '#d4829a', '#8b0000', '#2c4a7c', '#7a9e6e',
+    '#d4a574', '#2a9a6a', '#D63384', '#5DBDC8', '#E07856', '#1E5BA8', '#F0CD7A', '#FFD700',
+    '#8FB8A8', '#F4A165', '#91BDC9', '#E5B847']
+  return essential
+})()
 const DRAG_FONTS = [
   { value: '', label: 'Défaut' },
   { value: 'var(--font-great-vibes)', label: 'Calligraphie' },
@@ -1018,7 +1023,7 @@ function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
         </div>
       )}
       {editable && selected && showPanel && (
-        <div ref={panelRef} style={{ position: 'absolute', top: -90, left: '50%', transform: 'translateX(-50%)', zIndex: 30, background: 'white', borderRadius: 10, padding: '10px 12px', boxShadow: '0 4px 20px rgba(0,0,0,0.18)', border: '1px solid #e0d5c8', minWidth: 200 }}>
+        <div ref={panelRef} style={{ position: 'absolute', bottom: '100%', left: '50%', transform: 'translateX(-50%)', marginBottom: 8, zIndex: 30, background: 'white', borderRadius: 10, padding: '10px 12px', boxShadow: '0 4px 20px rgba(0,0,0,0.18)', border: '1px solid #e0d5c8', minWidth: 220, maxWidth: 280 }}>
           <div style={{ fontSize: 9, color: '#8a7e72', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Couleur</div>
           <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 8 }}>
             {DRAG_COLORS.map(c => (
@@ -6998,6 +7003,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
   const [textOverrides, setTextOverrides] = useState<Record<string, string>>({})
   const [zoneStyles, setZoneStyles] = useState<ZoneStyles>(data.zoneStyles ?? {})
   const [textEditOpen, setTextEditOpen] = useState(false)
+  const [globalColorOpen, setGlobalColorOpen] = useState(false)
   const [shareModalOpen, setShareModalOpen] = useState(false)
   const [restoreModalOpen, setRestoreModalOpen] = useState(false)
   const [restoring, setRestoring] = useState(false)
@@ -7218,13 +7224,52 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
           onTextEdit={() => setTextEditOpen(true)}
         />
         {role === 'couple' && (
-          <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '12px 16px', display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button onClick={onEdit} style={{ ...BTN, padding: '10px 14px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 11, fontWeight: 600 }}>{t.fairepart.editBtn}</button>
-            <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '10px 14px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 11, fontWeight: 600 }}>✏️ Textes</button>
-            <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '10px 14px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 11, fontWeight: 600 }}>📋 Réponses</button>
-            <button onClick={handleSave} disabled={saving} style={{ ...BTN, padding: '10px 14px', borderRadius: 9999, background: '#2a7d4f', color: 'white', border: 'none', fontSize: 11, fontWeight: 600, boxShadow: '0 4px 16px rgba(42,125,79,0.25)', opacity: saving ? 0.7 : 1 }}>{saving ? '...' : 'Enregistrer'}</button>
-            <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '10px 14px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 11, fontWeight: 600, boxShadow: `0 4px 16px ${theme.accent}44`, opacity: sharing ? 0.7 : 1 }}>{sharing ? '...' : t.common.share}</button>
+          <>
+          {/* Panneau couleur globale */}
+          {globalColorOpen && (
+            <div style={{ position: 'fixed', bottom: 56, left: 0, right: 0, zIndex: 101, display: 'flex', justifyContent: 'center' }}>
+              <div style={{ background: 'white', borderRadius: 16, padding: '16px 20px', boxShadow: '0 -4px 30px rgba(0,0,0,0.15)', border: '1px solid #e0d5c8', maxWidth: 380, width: '90%' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <span style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 13, fontWeight: 700, color: theme.accent }}>🎨 Couleur de tous les textes</span>
+                  <button type="button" onClick={() => setGlobalColorOpen(false)} style={{ ...BTN, background: 'none', border: 'none', fontSize: 18, color: '#9ca3af', padding: 0 }}>✕</button>
+                </div>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
+                  {['#ffffff', '#000000', '#C9A84C', '#d4829a', '#8b0000', '#2c4a7c', '#7a9e6e', '#d4a574',
+                    '#2a9a6a', '#D63384', '#5DBDC8', '#E07856', '#1E5BA8', '#F0CD7A', '#FFD700', '#8FB8A8',
+                    '#F4A165', '#91BDC9', '#E5B847', theme.accent, theme.texte].filter((v, i, a) => a.indexOf(v) === i).map(c => (
+                    <button key={c} type="button" onClick={() => {
+                      const next: ZoneStyles = {}
+                      TEXT_ZONES.forEach(zone => { next[zone] = { ...(zoneStyles[zone] ?? {}), color: c } })
+                      setZoneStyles(next)
+                      onUpdate?.({ zoneStyles: next })
+                    }} style={{
+                      ...BTN, width: 28, height: 28, borderRadius: '50%', padding: 0,
+                      background: c, border: '2px solid white', boxShadow: '0 0 0 1px #e5e7eb',
+                    }} />
+                  ))}
+                </div>
+                <button type="button" onClick={() => {
+                  const next: ZoneStyles = {}
+                  TEXT_ZONES.forEach(zone => {
+                    const z = { ...(zoneStyles[zone] ?? {}) }; delete z.color
+                    if (Object.keys(z).length > 0) next[zone] = z
+                  })
+                  setZoneStyles(next); onUpdate?.({ zoneStyles: next })
+                }} style={{ ...BTN, background: 'none', border: 'none', color: '#9ca3af', fontSize: 11, textDecoration: 'underline' }}>
+                  Réinitialiser
+                </button>
+              </div>
+            </div>
+          )}
+          <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '10px 12px', display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button onClick={onEdit} style={{ ...BTN, padding: '8px 12px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 10, fontWeight: 600 }}>{t.fairepart.editBtn}</button>
+            <button onClick={() => setGlobalColorOpen(p => !p)} style={{ ...BTN, padding: '8px 12px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: globalColorOpen ? theme.accent : 'transparent', color: globalColorOpen ? 'white' : theme.accent, fontSize: 10, fontWeight: 600 }}>🎨 Couleurs</button>
+            <button onClick={() => setTextEditOpen(true)} style={{ ...BTN, padding: '8px 12px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 10, fontWeight: 600 }}>✏️ Textes</button>
+            <button onClick={() => setRsvpListOpen(true)} style={{ ...BTN, padding: '8px 12px', borderRadius: 9999, border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontSize: 10, fontWeight: 600 }}>📋</button>
+            <button onClick={handleSave} disabled={saving} style={{ ...BTN, padding: '8px 12px', borderRadius: 9999, background: '#2a7d4f', color: 'white', border: 'none', fontSize: 10, fontWeight: 600, opacity: saving ? 0.7 : 1 }}>{saving ? '...' : 'Sauver'}</button>
+            <button onClick={handleShare} disabled={sharing} style={{ ...BTN, padding: '8px 12px', borderRadius: 9999, background: theme.accent, color: 'white', border: 'none', fontSize: 10, fontWeight: 600, opacity: sharing ? 0.7 : 1 }}>{sharing ? '...' : 'Partager'}</button>
           </div>
+          </>
         )}
         {rsvpOpen && (
           <RSVPModal accent={theme.accent} onClose={() => setRsvpOpen(false)} mariee1={data.marie1Prenom} mariee2={data.marie2Prenom} shareId={lastShareId} ceremonies={sorted} />
