@@ -1787,7 +1787,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                     fd.append('upload_preset', 'wedding_music')
                     const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
                     const json = await res.json()
-                    if (json.secure_url) update(i, { ceremonyImage: json.secure_url })
+                    if (json.secure_url) update(i, { ceremonyImage: json.secure_url, illustrationUrl: '' })
                   } catch { showToast('Erreur upload', 'error') }
                 }} />
               </label>
