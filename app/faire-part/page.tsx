@@ -6034,13 +6034,49 @@ function CustomPageCard({ page, theme, editable, onUpdate, onRemove }: {
     { value: 'Helvetica, Arial, sans-serif', label: 'Moderne' },
   ]
 
-  // Bloc texte réutilisable (sur image)
+  // État édition inline du texte
+  const [editingText, setEditingText] = useState(false)
+
+  // Bloc texte réutilisable (sur image) — draggable + éditable
   const renderOverlayText = () => {
-    if (!page.texte) return null
+    if (!page.texte && !editable) return null
+
+    if (editable && editingText) {
+      return (
+        <div
+          onMouseDown={e => e.stopPropagation()}
+          onTouchStart={e => e.stopPropagation()}
+          style={{ position: 'absolute', left: 16, right: 16, bottom: 24, zIndex: 10, transform: `translate(${cx}px, ${cy}px)` }}
+        >
+          <textarea
+            autoFocus
+            defaultValue={page.texte ?? ''}
+            onBlur={(e) => {
+              setEditingText(false)
+              const v = e.currentTarget.value.trim()
+              if (v !== (page.texte ?? '')) onUpdate?.({ texte: v })
+            }}
+            onKeyDown={e => { e.stopPropagation(); if (e.key === 'Escape') setEditingText(false) }}
+            style={{
+              width: '100%', boxSizing: 'border-box', padding: '10px 14px',
+              fontFamily: textFont, fontSize: 18, color: textColor,
+              background: 'rgba(0,0,0,0.7)', border: `2px solid ${textColor}`,
+              borderRadius: 10, resize: 'vertical', minHeight: 60,
+              outline: 'none', textAlign: 'center', lineHeight: 1.5,
+            }}
+          />
+        </div>
+      )
+    }
+
     return (
       <div
-        onMouseDown={editable ? (e) => { e.preventDefault(); startDrag(e.clientX, e.clientY) } : undefined}
-        onTouchStart={editable ? (e) => { startDrag(e.touches[0].clientX, e.touches[0].clientY) } : undefined}
+        onPointerDown={editable ? (e) => {
+          e.stopPropagation()
+          e.preventDefault()
+          startDrag(e.clientX, e.clientY)
+        } : undefined}
+        onDoubleClick={editable ? (e) => { e.stopPropagation(); setEditingText(true) } : undefined}
         style={{
           position: 'absolute', left: 24, right: 24, bottom: 32, zIndex: 2,
           transform: `translate(${cx}px, ${cy}px)`,
@@ -6053,8 +6089,9 @@ function CustomPageCard({ page, theme, editable, onUpdate, onRemove }: {
           textAlign: 'center', lineHeight: 1.4, whiteSpace: 'pre-wrap',
           textShadow: '0 2px 8px rgba(0,0,0,0.6)',
         }}>
-          {page.texte}
+          {page.texte || (editable ? 'Double-clic pour ajouter du texte' : '')}
         </div>
+        {editable && <span style={{ position: 'absolute', top: -10, right: -10, fontSize: 12, background: 'rgba(255,255,255,0.9)', borderRadius: '50%', padding: 3, boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }}>✏️</span>}
       </div>
     )
   }
