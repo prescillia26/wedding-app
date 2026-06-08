@@ -6471,7 +6471,7 @@ const firstDate = sorted[0]?.date
             return (<>
           {data.mariageJuif && (
             <DraggableElement id="bsd" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-              <div style={{ fontFamily: 'serif', fontSize: 14, color: introTextColor, direction: 'rtl', marginBottom: 6, animation: 'sharedFadeIn 0.9s ease forwards' }}>בס״ד</div>
+              <div style={{ fontFamily: 'serif', fontSize: 14, color: data.customLogoColor || data.monogrammeColor || monoColor, direction: 'rtl', marginBottom: 6 }}>בס״ד</div>
             </DraggableElement>
           )}
           <DraggableElement id="monogram" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
@@ -6483,7 +6483,7 @@ const firstDate = sorted[0]?.date
           </div>
           {canEdit && (
             <div onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 6, maxWidth: 240, margin: '0 auto 6px' }}>
-              {dedupColors.map(c => (
+              {dedupColors.slice(0, 30).map(c => (
                 <button key={c.value} type="button" onClick={() => {
                   if (data.customLogoUrl) onUpdate?.({ customLogoColor: c.value })
                   else onUpdate?.({ monogrammeColor: c.value })
