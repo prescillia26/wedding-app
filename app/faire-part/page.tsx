@@ -469,6 +469,8 @@ interface FormData {
   luxeGiftsLabel?: string // label du lien (ex: "Notre liste sur Zankyou")
   luxeDelimiterId?: string // id du délimiteur signature (pack Luxe Pro)
   luxePalette?: string // palette Luxe Pro (lavande/rose/sauge/bleunuit)
+  // ── Couleur globale de tous les textes ──
+  globalTextColor?: string
   // ── Pages supplémentaires (libres, entre les cérémonies) ──
   customPages?: CustomPage[]
   // ── Position du bouton Découvrir (page d'accueil) ──
@@ -6333,8 +6335,9 @@ function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: 
     const indices = eventsParam.split(',').map(Number).filter(i => !isNaN(i) && i >= 0 && i < allSorted.length)
     return indices.length > 0 ? indices.map(i => allSorted[i]) : allSorted
   })()
-  const G = theme.accent
-  const TEXT = theme.texte
+  const _gc = data.globalTextColor
+  const G = _gc || theme.accent
+  const TEXT = _gc || theme.texte
   const FS = 'var(--font-great-vibes)'
   const FP = 'var(--font-playfair-display)'
   const FC = 'var(--font-cormorant-garamond)'
@@ -6353,7 +6356,7 @@ function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: 
 const firstDate = sorted[0]?.date
 
   const hasIntroPhoto = (data.photosFond?.length ?? 0) > 0 || !!data.photoFond
-  const introTextColor = hasIntroPhoto ? 'rgba(255,255,255,0.95)' : G
+  const introTextColor = _gc || (hasIntroPhoto ? 'rgba(255,255,255,0.95)' : G)
   const fondCeremonie = data.fondCeremonie ?? 'ornements'
   const firstPhoto = data.photosFond?.[0] ?? data.photoFond ?? ''
 
@@ -7266,25 +7269,18 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
                   <button type="button" onClick={() => setGlobalColorOpen(false)} style={{ ...BTN, background: 'none', border: 'none', fontSize: 18, color: '#9ca3af', padding: 0 }}>✕</button>
                 </div>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
-                  {DRAG_COLORS.filter(c => c !== '').map(c => (
+                  {DRAG_COLORS.filter(c => c !== '').slice(0, 30).map(c => (
                     <button key={c} type="button" onClick={() => {
-                      const next: ZoneStyles = {}
-                      TEXT_ZONES.forEach(zone => { next[zone] = { ...(zoneStyles[zone] ?? {}), color: c } })
-                      setZoneStyles(next)
-                      onUpdate?.({ zoneStyles: next })
+                      onUpdate?.({ globalTextColor: c })
                     }} style={{
                       ...BTN, width: 28, height: 28, borderRadius: '50%', padding: 0,
-                      background: c, border: '2px solid white', boxShadow: '0 0 0 1px #e5e7eb',
+                      background: c, border: data.globalTextColor === c ? `3px solid ${theme.accent}` : '2px solid white',
+                      boxShadow: data.globalTextColor === c ? `0 0 0 1px ${theme.accent}` : '0 0 0 1px #e5e7eb',
                     }} />
                   ))}
                 </div>
                 <button type="button" onClick={() => {
-                  const next: ZoneStyles = {}
-                  TEXT_ZONES.forEach(zone => {
-                    const z = { ...(zoneStyles[zone] ?? {}) }; delete z.color
-                    if (Object.keys(z).length > 0) next[zone] = z
-                  })
-                  setZoneStyles(next); onUpdate?.({ zoneStyles: next })
+                  onUpdate?.({ globalTextColor: '' })
                 }} style={{ ...BTN, background: 'none', border: 'none', color: '#9ca3af', fontSize: 11, textDecoration: 'underline' }}>
                   Réinitialiser
                 </button>
