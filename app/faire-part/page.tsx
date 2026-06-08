@@ -919,11 +919,10 @@ type LayoutEntry = { x: number; y: number; scale: number; color?: string; fontFa
 type LayoutMap = Record<string, LayoutEntry>
 
 // Couleurs pour le DraggableElement inline style popup — dédupliquées, essentielles
+// Mêmes couleurs que le logo — dédupliquées depuis COLOR_OPTIONS
 const DRAG_COLORS = (() => {
-  const essential = ['', '#ffffff', '#000000', '#C9A84C', '#d4829a', '#8b0000', '#2c4a7c', '#7a9e6e',
-    '#d4a574', '#2a9a6a', '#D63384', '#5DBDC8', '#E07856', '#1E5BA8', '#F0CD7A', '#FFD700',
-    '#8FB8A8', '#F4A165', '#91BDC9', '#E5B847']
-  return essential
+  const seen = new Set<string>()
+  return COLOR_OPTIONS.map(c => c.value).filter(v => { const k = v.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true })
 })()
 const DRAG_FONTS = [
   { value: '', label: 'Défaut' },
@@ -7267,9 +7266,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
                   <button type="button" onClick={() => setGlobalColorOpen(false)} style={{ ...BTN, background: 'none', border: 'none', fontSize: 18, color: '#9ca3af', padding: 0 }}>✕</button>
                 </div>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
-                  {['#ffffff', '#000000', '#C9A84C', '#d4829a', '#8b0000', '#2c4a7c', '#7a9e6e', '#d4a574',
-                    '#2a9a6a', '#D63384', '#5DBDC8', '#E07856', '#1E5BA8', '#F0CD7A', '#FFD700', '#8FB8A8',
-                    '#F4A165', '#91BDC9', '#E5B847', theme.accent, theme.texte].filter((v, i, a) => a.indexOf(v) === i).map(c => (
+                  {DRAG_COLORS.filter(c => c !== '').map(c => (
                     <button key={c} type="button" onClick={() => {
                       const next: ZoneStyles = {}
                       TEXT_ZONES.forEach(zone => { next[zone] = { ...(zoneStyles[zone] ?? {}), color: c } })
