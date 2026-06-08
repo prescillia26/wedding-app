@@ -6912,6 +6912,19 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
     try {
       const mergedData = { ...data, textOverrides: { ...data.textOverrides, ...textOverrides }, zoneStyles }
       const photosDataToSend = (data.photosData ?? []).map(({ cropX, cropY, cropScale }) => ({ cropX, cropY, cropScale }))
+      // Nettoyer les base64 des customPages et ceremonyImage avant envoi
+      if (mergedData.customPages) {
+        mergedData.customPages = mergedData.customPages.map(p => ({
+          ...p,
+          images: p.images.filter(img => !img.url.startsWith('data:'))
+        }))
+      }
+      if (mergedData.ceremonies) {
+        mergedData.ceremonies = mergedData.ceremonies.map(c => ({
+          ...c,
+          ceremonyImage: c.ceremonyImage?.startsWith('data:') ? '' : c.ceremonyImage
+        }))
+      }
       const dataToSend = { ...mergedData, photosFond: data.photosFond ?? [], photoFond: (data.photosFond ?? [])[0] ?? '', photosData: photosDataToSend }
       if (!dataToSend.slug || !dataToSend.slug.trim()) {
         dataToSend.slug = generateAutoSlug(dataToSend.marie1Prenom, dataToSend.marie2Prenom)
@@ -6957,6 +6970,19 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
       const photosDataToSend = (data.photosData ?? []).map(({ cropX, cropY, cropScale }) => ({ cropX, cropY, cropScale }))
       // Merger les modifications locales (textOverrides, zoneStyles) avec les données du formulaire
       const mergedData = { ...data, textOverrides: { ...data.textOverrides, ...textOverrides }, zoneStyles }
+      // Nettoyer les base64 avant envoi
+      if (mergedData.customPages) {
+        mergedData.customPages = mergedData.customPages.map(p => ({
+          ...p,
+          images: p.images.filter(img => !img.url.startsWith('data:'))
+        }))
+      }
+      if (mergedData.ceremonies) {
+        mergedData.ceremonies = mergedData.ceremonies.map(c => ({
+          ...c,
+          ceremonyImage: c.ceremonyImage?.startsWith('data:') ? '' : c.ceremonyImage
+        }))
+      }
       const buildPayload = () => ({ ...mergedData, photosFond: compressedPhotos, photoFond: compressedPhotos[0] ?? '', photosData: photosDataToSend })
       compressedPhotos = originalPhotos
       setSharingStatus('Envoi...')

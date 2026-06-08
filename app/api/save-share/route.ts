@@ -2,7 +2,7 @@ import { randomUUID } from 'crypto'
 import { redis } from '@/lib/redis'
 import { getSession, type User } from '@/lib/auth'
 
-const MAX_BYTES = 2_000_000
+const MAX_BYTES = 4_000_000
 
 export async function POST(request: Request) {
   try {
