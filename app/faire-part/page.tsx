@@ -6144,11 +6144,18 @@ function CustomPageCard({ page, theme, editable, onUpdate, onRemove }: {
         )
       )}
       {/* Texte seul si pas d'images */}
-      {!hasImages && page.texte && (
+      {!hasImages && (
         <div style={{ padding: '48px 32px', textAlign: 'center' }}>
-          <div style={{ fontFamily: textFont, fontStyle: 'italic', fontSize: 18, color: page.texteColor || theme.texte, lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
-            {page.texte}
-          </div>
+          {page.texte && (
+            <div style={{ fontFamily: textFont, fontStyle: 'italic', fontSize: 18, color: page.texteColor || theme.texte, lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
+              {page.texte}
+            </div>
+          )}
+          {editable && !page.texte && (
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: theme.textSecondaire, opacity: 0.6 }}>
+              Page vide — ajoutez des images ou du texte dans le formulaire
+            </div>
+          )}
         </div>
       )}
       {/* Contrôles édition : style du texte + supprimer */}
@@ -6768,6 +6775,27 @@ const firstDate = sorted[0]?.date
             </React.Fragment>
           )
         })}
+
+        {/* Pages supplémentaires non matchées (position hors range) */}
+        {(data.customPages ?? []).filter(p => {
+          const afterIdx = Math.floor(p.position / 10)
+          return !sorted.some((_, si) => {
+            const di = (data.ceremonies ?? []).findIndex(c => c.type === sorted[si].type && c.date === sorted[si].date && c.lieu === sorted[si].lieu)
+            return afterIdx === (di >= 0 ? di : si) + 1
+          })
+        }).map(page => (
+          <CustomPageCard
+            key={page.id}
+            page={page}
+            theme={theme}
+            editable={role !== 'guest' && !!onUpdate}
+            onUpdate={(patch) => {
+              const pages = (data.customPages ?? []).map(p => p.id === page.id ? { ...p, ...patch } : p)
+              onUpdate?.({ customPages: pages })
+            }}
+            onRemove={() => onUpdate?.({ customPages: (data.customPages ?? []).filter(p => p.id !== page.id) })}
+          />
+        ))}
 
         {/* Navigation cartes séparées */}
         {(data.presentationStyle === 'cartes-separees') && sorted.length > 1 && (
