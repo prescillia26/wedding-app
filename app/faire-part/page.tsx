@@ -6464,6 +6464,11 @@ const firstDate = sorted[0]?.date
             const canEdit = role !== 'guest' && !!onUpdate
             const layout = data.accueilLayout ?? {}
             const setLayout = (l: LayoutMap) => onUpdate?.({ accueilLayout: l })
+            // Couleurs dédupliquées pour logo et texte — mêmes partout
+            const dedupColors = (() => {
+              const seen = new Set<string>()
+              return COLOR_OPTIONS.filter(c => { if (!c.value) return false; const k = c.value.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true })
+            })()
             return (<>
           {data.mariageJuif && (
             <DraggableElement id="bsd" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
@@ -6479,7 +6484,7 @@ const firstDate = sorted[0]?.date
           </div>
           {canEdit && (
             <div onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 6, maxWidth: 240, margin: '0 auto 6px' }}>
-              {COLOR_OPTIONS.filter(c => c.value).slice(0, 20).map(c => (
+              {dedupColors.map(c => (
                 <button key={c.value} type="button" onClick={() => {
                   if (data.customLogoUrl) onUpdate?.({ customLogoColor: c.value })
                   else onUpdate?.({ monogrammeColor: c.value })
