@@ -5843,6 +5843,28 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
             <span style={{ fontSize: 11, fontWeight: 600, color: '#3a3330' }}>Choisir une illustration</span>
             <button type="button" onClick={() => setShowPicker(false)} style={{ ...BTN, background: '#f5f3f0', border: 'none', borderRadius: 9999, width: 24, height: 24, fontSize: 12, color: '#9a928a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
           </div>
+          {/* Upload custom */}
+          <label style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            padding: '10px', marginBottom: 8, borderRadius: 8,
+            border: `1.5px dashed ${accent}40`, background: `${accent}08`,
+            cursor: 'pointer', fontSize: 11, fontWeight: 600, color: accent,
+          }}>
+            📷 Importer votre image
+            <input type="file" accept="image/*" hidden onChange={async e => {
+              const file = e.target.files?.[0]
+              if (!file) return
+              if (file.size > 5 * 1024 * 1024) { showToast('Max 5 Mo', 'error'); return }
+              try {
+                const fd = new (globalThis.FormData)()
+                fd.append('file', file)
+                fd.append('upload_preset', 'wedding_music')
+                const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
+                const json = await res.json()
+                if (json.secure_url) { onChangeUrl(json.secure_url); setShowPicker(false) }
+              } catch { showToast('Erreur upload', 'error') }
+            }} />
+          </label>
           <VisualPicker category={category} onSelect={(id) => {
             const visual = visualById(id)
             if (visual) { onChangeUrl(visual.url); setShowPicker(false) }
@@ -5925,6 +5947,34 @@ function IllustrationAdder({ ceremonyType, accent, onSelect }: { ceremonyType: s
             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: '#9a928a', marginTop: 2 }}>Cliquez sur une image pour l&apos;ajouter</div>
           </div>
           <button type="button" onClick={() => setOpen(false)} style={{ ...BTN, background: '#f5f3f0', border: 'none', borderRadius: 9999, width: 28, height: 28, fontSize: 14, color: '#9a928a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
+        </div>
+        {/* Upload custom */}
+        <label style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+          padding: '12px 16px', marginBottom: 12, borderRadius: 10,
+          border: `2px dashed ${accent}40`, background: `${accent}08`,
+          cursor: 'pointer', fontSize: 12, fontWeight: 600, color: accent,
+          fontFamily: 'var(--font-playfair-display)',
+        }}>
+          📷 Importer votre propre image
+          <input type="file" accept="image/*" hidden onChange={async e => {
+            const file = e.target.files?.[0]
+            if (!file) return
+            if (file.size > 5 * 1024 * 1024) { showToast('Fichier trop volumineux (max 5 Mo)', 'error'); return }
+            try {
+              const fd = new (globalThis.FormData)()
+              fd.append('file', file)
+              fd.append('upload_preset', 'wedding_music')
+              const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
+              const json = await res.json()
+              if (json.secure_url) { onSelect(json.secure_url); setOpen(false) }
+            } catch { showToast('Erreur upload', 'error') }
+          }} />
+        </label>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+          <div style={{ flex: 1, height: 1, background: '#e8e0d8' }} />
+          <span style={{ fontSize: 10, color: '#9a928a', fontStyle: 'italic' }}>ou choisissez dans notre bibliothèque</span>
+          <div style={{ flex: 1, height: 1, background: '#e8e0d8' }} />
         </div>
         <VisualPicker
           category={category}
