@@ -5988,129 +5988,102 @@ function CustomPageCard({ page, theme, editable, onUpdate, onRemove }: {
   const G = theme.accent
   const hasImages = page.images.length > 0
 
-  // Mode carousel : chaque image = plein écran avec texte superposé
-  if (hasImages && page.imagesMode === 'carousel') {
-    return (
-      <section style={{ position: 'relative', minHeight: '100svh', overflow: 'hidden' }}>
-        {/* Carousel plein écran */}
-        <div
-          ref={scrollRef}
-          onScroll={() => {
-            if (!scrollRef.current) return
-            setCarouselIdx(Math.round(scrollRef.current.scrollLeft / scrollRef.current.clientWidth))
-          }}
-          style={{
-            position: 'absolute', inset: 0,
-            display: 'flex', overflowX: 'auto', scrollSnapType: 'x mandatory',
-            WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none',
-          }}
-        >
-          {page.images.map((img, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img key={i} src={img.url} alt="" style={{
-              flex: '0 0 100%', width: '100%', height: '100%', objectFit: 'cover',
-              scrollSnapAlign: 'start',
-            }} />
-          ))}
-        </div>
-        {/* Voile pour lisibilité du texte */}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.6) 100%)', pointerEvents: 'none' }} />
-        {/* Texte superposé */}
-        <div style={{ position: 'relative', zIndex: 1, minHeight: '100svh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '48px 32px' }}>
-          {page.texte && (
-            <div style={{
-              fontFamily: GV, fontSize: 'clamp(22px, 6vw, 36px)', color: 'white',
-              textAlign: 'center', lineHeight: 1.4, whiteSpace: 'pre-wrap',
-              textShadow: '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.4)',
-              marginBottom: 24,
-            }}>
-              {page.texte}
-            </div>
-          )}
-          {/* Dots */}
-          {page.images.length > 1 && (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginBottom: 16 }}>
-              {page.images.map((_, i) => (
-                <div key={i} style={{
-                  width: 8, height: 8, borderRadius: '50%',
-                  background: i === carouselIdx ? 'white' : 'rgba(255,255,255,0.4)',
-                  transition: 'background 0.2s',
-                }} />
+  return (
+    <section style={{ background: theme.fond, borderBottom: `1px solid ${G}1a` }}>
+      {/* Images */}
+      {hasImages && (
+        page.imagesMode === 'carousel' ? (
+          <div style={{ position: 'relative' }}>
+            <div
+              ref={scrollRef}
+              onScroll={() => {
+                if (!scrollRef.current) return
+                setCarouselIdx(Math.round(scrollRef.current.scrollLeft / scrollRef.current.clientWidth))
+              }}
+              style={{
+                display: 'flex', overflowX: 'auto', scrollSnapType: 'x mandatory',
+                WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none',
+              }}
+            >
+              {page.images.map((img, i) => (
+                <div key={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', position: 'relative' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={img.url} alt="" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                  {/* Texte sur chaque image du carousel */}
+                  {page.texte && (
+                    <>
+                      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%', background: 'linear-gradient(to top, rgba(0,0,0,0.55), transparent)', pointerEvents: 'none' }} />
+                      <div style={{ position: 'absolute', bottom: 24, left: 24, right: 24, zIndex: 1 }}>
+                        <div style={{
+                          fontFamily: GV, fontSize: 'clamp(20px, 5vw, 30px)', color: 'white',
+                          textAlign: 'center', lineHeight: 1.4, whiteSpace: 'pre-wrap',
+                          textShadow: '0 2px 8px rgba(0,0,0,0.6)',
+                        }}>
+                          {page.texte}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
               ))}
             </div>
-          )}
-          {/* Contrôles édition */}
-          {editable && (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
-              <button type="button" onClick={() => onRemove?.()} style={{
-                ...BTN, padding: '6px 16px', borderRadius: 9999,
-                background: 'rgba(255,255,255,0.9)', color: '#d45050',
-                border: 'none', fontSize: 11, fontWeight: 600,
-              }}>Supprimer</button>
-            </div>
-          )}
-        </div>
-      </section>
-    )
-  }
-
-  // Mode statique : chaque image plein écran empilée, texte sur la dernière
-  if (hasImages) {
-    return (
-      <section>
-        {page.images.map((img, i) => {
-          const isLast = i === page.images.length - 1
-          return (
-            <div key={i} style={{ position: 'relative', minHeight: '100svh' }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={img.url} alt="" style={{
-                position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover',
-              }} />
-              {/* Voile + texte sur la dernière image */}
-              {isLast && page.texte && (
-                <>
-                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.6) 100%)', pointerEvents: 'none' }} />
-                  <div style={{ position: 'relative', zIndex: 1, minHeight: '100svh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '48px 32px' }}>
-                    <div style={{
-                      fontFamily: GV, fontSize: 'clamp(22px, 6vw, 36px)', color: 'white',
-                      textAlign: 'center', lineHeight: 1.4, whiteSpace: 'pre-wrap',
-                      textShadow: '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.4)',
-                    }}>
-                      {page.texte}
-                    </div>
-                  </div>
-                </>
-              )}
-              {/* Contrôles édition sur la dernière image */}
-              {isLast && editable && (
-                <div style={{ position: 'absolute', bottom: 16, left: 0, right: 0, zIndex: 2, display: 'flex', justifyContent: 'center' }}>
-                  <button type="button" onClick={() => onRemove?.()} style={{
-                    ...BTN, padding: '6px 16px', borderRadius: 9999,
-                    background: 'rgba(255,255,255,0.9)', color: '#d45050',
-                    border: 'none', fontSize: 11, fontWeight: 600,
-                  }}>Supprimer</button>
+            {/* Dots */}
+            {page.images.length > 1 && (
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 6, padding: '10px 0', background: theme.fond }}>
+                {page.images.map((_, i) => (
+                  <div key={i} style={{
+                    width: 8, height: 8, borderRadius: '50%',
+                    background: i === carouselIdx ? G : `${G}33`,
+                    transition: 'background 0.2s',
+                  }} />
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Mode statique : images empilées, taille naturelle */
+          <div>
+            {page.images.map((img, i) => {
+              const isLast = i === page.images.length - 1
+              return (
+                <div key={i} style={{ position: 'relative' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={img.url} alt="" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                  {/* Texte sur la dernière image */}
+                  {isLast && page.texte && (
+                    <>
+                      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%', background: 'linear-gradient(to top, rgba(0,0,0,0.55), transparent)', pointerEvents: 'none' }} />
+                      <div style={{ position: 'absolute', bottom: 24, left: 24, right: 24, zIndex: 1 }}>
+                        <div style={{
+                          fontFamily: GV, fontSize: 'clamp(20px, 5vw, 30px)', color: 'white',
+                          textAlign: 'center', lineHeight: 1.4, whiteSpace: 'pre-wrap',
+                          textShadow: '0 2px 8px rgba(0,0,0,0.6)',
+                        }}>
+                          {page.texte}
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
-              )}
-            </div>
-          )
-        })}
-      </section>
-    )
-  }
-
-  // Pas d'images — texte seul
-  return (
-    <section style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', background: theme.fond, padding: '48px 32px' }}>
-      {page.texte && (
-        <div style={{
-          fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: theme.texte,
-          textAlign: 'center', lineHeight: 1.8, whiteSpace: 'pre-wrap',
-        }}>
-          {page.texte}
+              )
+            })}
+          </div>
+        )
+      )}
+      {/* Texte seul si pas d'images */}
+      {!hasImages && page.texte && (
+        <div style={{ padding: '48px 32px', textAlign: 'center' }}>
+          <div style={{
+            fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: theme.texte,
+            lineHeight: 1.8, whiteSpace: 'pre-wrap',
+          }}>
+            {page.texte}
+          </div>
         </div>
       )}
+      {/* Contrôles édition */}
       {editable && (
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 24 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, padding: '12px 0', background: theme.fond }}>
           <button type="button" onClick={() => onRemove?.()} style={{
             ...BTN, padding: '6px 16px', borderRadius: 9999,
             border: '1px solid #d4505030', background: 'white',
