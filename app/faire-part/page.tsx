@@ -5878,9 +5878,9 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
         onMouseDown={editable ? (e) => { e.preventDefault(); startDrag(e.clientX, e.clientY) } : undefined}
         onTouchStart={editable ? (e) => { e.preventDefault(); startDrag(e.touches[0].clientX, e.touches[0].clientY) } : undefined}
         style={{
-          width: `${w}%`, maxHeight: isPhoto ? 200 : 250,
+          width: isPhoto ? '100%' : `${w}%`, maxHeight: isPhoto ? 280 : 250,
           objectFit: isPhoto ? 'cover' : 'contain', display: 'inline-block',
-          borderRadius: isPhoto ? 12 : 0,
+          borderRadius: isPhoto ? 10 : 0,
           boxShadow: isPhoto ? '0 4px 20px rgba(0,0,0,0.12)' : 'none',
           mixBlendMode: isPhoto ? undefined : (darkBg ? undefined : 'multiply'), verticalAlign: 'middle',
           transform: `translate(${cx}px, ${cy}px)`,
@@ -6662,7 +6662,7 @@ const firstDate = sorted[0]?.date
                     {(ceremony.illustrationUrl || ceremony.ceremonyImage) ? (
                       <EditableIllustration
                         url={ceremony.illustrationUrl || ceremony.ceremonyImage!}
-                        size={ceremony.illustrationSize ?? (ceremony.ceremonyImage && !ceremony.illustrationUrl ? 70 : 80)}
+                        size={ceremony.illustrationSize ?? (ceremony.ceremonyImage && !ceremony.illustrationUrl ? 100 : 80)}
                         offsetX={ceremony.illustrationOffsetX ?? 0}
                         offsetY={ceremony.illustrationOffsetY ?? 0}
                         editable={canEdit}
