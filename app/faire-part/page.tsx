@@ -6340,6 +6340,16 @@ function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: 
   const TEXT = _gc || theme.texte
   const FS = 'var(--font-great-vibes)'
   const FP = 'var(--font-playfair-display)'
+
+  // Effet doré/gradient sur le texte si la couleur est dans la gamme or
+  const GOLD_COLORS = new Set(['#c9a84c', '#c9a030', '#d4a830', '#e5b847', '#f0cd7a', '#f5d480', '#e8c26e', '#ffd700', '#e8d4a2', '#d4a574'])
+  const isGoldText = GOLD_COLORS.has(G.toLowerCase())
+  const goldStyle: React.CSSProperties = isGoldText ? {
+    background: `linear-gradient(135deg, ${G}, #f5e6a8, ${G}, #e8c96a)`,
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
+  } : {}
   const FC = 'var(--font-cormorant-garamond)'
   const ov = data.textOverrides ?? {}
   const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
@@ -6474,7 +6484,7 @@ const firstDate = sorted[0]?.date
             return (<>
           {data.mariageJuif && (
             <DraggableElement id="bsd" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-              <div style={{ fontFamily: 'serif', fontSize: 14, color: data.customLogoColor || data.monogrammeColor || monoColor, direction: 'rtl', marginBottom: 6 }}>בס״ד</div>
+              <div style={{ fontFamily: 'serif', fontSize: 14, color: data.customLogoColor || data.monogrammeColor || monoColor, direction: 'rtl', marginBottom: 6, ...goldStyle }}>בס״ד</div>
             </DraggableElement>
           )}
           <DraggableElement id="monogram" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
@@ -6531,7 +6541,7 @@ const firstDate = sorted[0]?.date
             )
           })()}
           <DraggableElement id="names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <div style={{ fontFamily: FS, fontSize: 'clamp(28px,7vw,42px)', color: introTextColor, marginBottom: 8, lineHeight: 1.15, textAlign: 'center', textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : readableShadow(theme) }}>
+          <div style={{ fontFamily: FS, fontSize: 'clamp(28px,7vw,42px)', color: introTextColor, marginBottom: 8, lineHeight: 1.15, textAlign: 'center', textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : readableShadow(theme), ...goldStyle }}>
             {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
           </div>
           </DraggableElement>
@@ -6540,7 +6550,7 @@ const firstDate = sorted[0]?.date
             defaultValue={t.fairepart.pleaseJoin}
             editable={canEdit}
             onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, global_pleaseJoin: v } })}
-            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: introTextColor, marginBottom: 0, textAlign: 'center', lineHeight: 1.6, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}
+            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: introTextColor, marginBottom: 0, textAlign: 'center', lineHeight: 1.6, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme), ...goldStyle }}
           />
           {/* Compte à rebours déplacé dans le sticky header */}
           {/* Bouton "Découvrir" — draggable par les mariés */}
@@ -6558,6 +6568,7 @@ const firstDate = sorted[0]?.date
                 background: 'transparent', color: introTextColor, cursor: 'pointer',
                 touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
                 textShadow: hasIntroPhoto ? '0 1px 4px rgba(0,0,0,0.5)' : 'none',
+                ...goldStyle,
               }}
             >
               Découvrir ✦
