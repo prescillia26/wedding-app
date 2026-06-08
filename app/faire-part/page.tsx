@@ -6032,6 +6032,20 @@ function CustomPageCard({ page, theme, editable, onUpdate, onRemove }: {
     { value: 'Helvetica, Arial, sans-serif', label: 'Moderne' },
   ]
 
+  // Auto-slide du carousel
+  const imgCount = page.images.length
+  useEffect(() => {
+    if (page.imagesMode !== 'carousel' || imgCount <= 1) return
+    const interval = setInterval(() => {
+      setCarouselIdx(prev => {
+        const next = (prev + 1) % imgCount
+        scrollRef.current?.scrollTo({ left: next * (scrollRef.current.clientWidth || 0), behavior: 'smooth' })
+        return next
+      })
+    }, 4000)
+    return () => clearInterval(interval)
+  }, [imgCount, page.imagesMode])
+
   // État édition inline du texte
   const [editingText, setEditingText] = useState(false)
 
@@ -6102,13 +6116,9 @@ function CustomPageCard({ page, theme, editable, onUpdate, onRemove }: {
           <div style={{ position: 'relative' }}>
             <div
               ref={scrollRef}
-              onScroll={() => {
-                if (!scrollRef.current) return
-                setCarouselIdx(Math.round(scrollRef.current.scrollLeft / scrollRef.current.clientWidth))
-              }}
               style={{
-                display: 'flex', overflowX: 'auto', scrollSnapType: 'x mandatory',
-                WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none',
+                display: 'flex', overflowX: 'hidden',
+                scrollbarWidth: 'none',
               }}
             >
               {page.images.map((img, i) => (
