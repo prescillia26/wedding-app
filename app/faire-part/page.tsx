@@ -4332,35 +4332,11 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
   const [tab, setTab] = useState<'texte' | 'style'>('texte')
   const [localText, setLocalText] = useState<Record<string, string>>(textOverrides)
   const [localStyles, setLocalStyles] = useState<ZoneStyles>(zoneStyles ?? {})
-  // Couleurs essentielles pour le sélecteur (pas de doublons, max 24)
+  // Mêmes couleurs que le logo — dédupliquées
   const localizedColors = (() => {
-    const essential = [
-      { value: '', label: 'Thème', swatch: theme.accent },
-      { value: '#ffffff', label: 'Blanc', swatch: '#ffffff' },
-      { value: '#000000', label: 'Noir', swatch: '#000000' },
-      { value: '#C9A84C', label: 'Doré', swatch: '#C9A84C' },
-      { value: '#d4829a', label: 'Rose', swatch: '#d4829a' },
-      { value: '#8b0000', label: 'Bordeaux', swatch: '#8b0000' },
-      { value: '#2c4a7c', label: 'Marine', swatch: '#2c4a7c' },
-      { value: '#7a9e6e', label: 'Vert', swatch: '#7a9e6e' },
-      { value: '#d4a574', label: 'Cuivre', swatch: '#d4a574' },
-      { value: '#2a9a6a', label: 'Menthe', swatch: '#2a9a6a' },
-      { value: '#D63384', label: 'Fuchsia', swatch: '#D63384' },
-      { value: '#5DBDC8', label: 'Turquoise', swatch: '#5DBDC8' },
-      { value: '#E07856', label: 'Orange', swatch: '#E07856' },
-      { value: '#1E5BA8', label: 'Bleu', swatch: '#1E5BA8' },
-      { value: '#F0CD7A', label: 'Buttercup', swatch: '#F0CD7A' },
-      { value: '#FFD700', label: 'Jaune vif', swatch: '#FFD700' },
-      { value: '#8FB8A8', label: 'Céladon', swatch: '#8FB8A8' },
-      { value: '#F4A165', label: 'Sunset', swatch: '#F4A165' },
-      { value: '#91BDC9', label: 'Bleu mer', swatch: '#91BDC9' },
-      { value: '#E5B847', label: 'Ocre', swatch: '#E5B847' },
-    ]
-    // Ajouter accent et texte du thème s'ils ne sont pas déjà inclus
-    const seen = new Set(essential.map(c => c.value))
-    if (!seen.has(theme.accent)) essential.push({ value: theme.accent, label: 'Accent', swatch: theme.accent })
-    if (!seen.has(theme.texte)) essential.push({ value: theme.texte, label: 'Texte', swatch: theme.texte })
-    return essential
+    const all = [{ value: '', label: 'Thème', swatch: theme.accent }, ...COLOR_OPTIONS.filter(c => c.value !== '')]
+    const seen = new Set<string>()
+    return all.filter(c => { const k = c.value.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true })
   })()
   const setText = (k: string, v: string) => {
     setLocalText(prev => {
