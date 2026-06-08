@@ -1760,18 +1760,14 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             )}
           </div>
 
-          {/* ── Photo du lieu (toutes cérémonies) ── */}
+          {/* ── Photo du lieu (illustration sous le titre) ── */}
           <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px dashed #e0d5c8' }}>
-            <Label>Photo du lieu (fond de la carte)</Label>
+            <Label>Photo du lieu (s&apos;affiche comme illustration)</Label>
             {c.ceremonyImage ? (
               <div style={{ position: 'relative', marginBottom: 8 }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={c.ceremonyImage} alt="" style={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 8 }} />
-                <button type="button" onClick={() => update(i, { ceremonyImage: '', ceremonyImageOpacity: 30 })} style={{ ...BTN, position: 'absolute', top: 4, right: 4, width: 22, height: 22, borderRadius: '50%', background: '#d45050', color: 'white', border: 'none', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
-                <div style={{ marginTop: 6 }}>
-                  <Label>Opacité ({c.ceremonyImageOpacity ?? 30}%)</Label>
-                  <input type="range" min={5} max={80} value={c.ceremonyImageOpacity ?? 30} onChange={e => update(i, { ceremonyImageOpacity: Number(e.target.value) })} style={{ width: '100%', accentColor: '#C9A84C' }} />
-                </div>
+                <button type="button" onClick={() => update(i, { ceremonyImage: '' })} style={{ ...BTN, position: 'absolute', top: 4, right: 4, width: 22, height: 22, borderRadius: '50%', background: '#d45050', color: 'white', border: 'none', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
               </div>
             ) : (
               <label style={{ display: 'block', padding: '14px', border: '2px dashed #C9A84C44', borderRadius: 10, textAlign: 'center', cursor: 'pointer', color: '#C9A84C', fontSize: 12, fontWeight: 600 }}>
@@ -1786,7 +1782,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                     fd.append('upload_preset', 'wedding_music')
                     const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
                     const json = await res.json()
-                    if (json.secure_url) update(i, { ceremonyImage: json.secure_url, ceremonyImageOpacity: 30 })
+                    if (json.secure_url) update(i, { ceremonyImage: json.secure_url })
                   } catch { showToast('Erreur upload', 'error') }
                 }} />
               </label>
@@ -6605,14 +6601,7 @@ const firstDate = sorted[0]?.date
                   {hasFrame && FRAMES_STRONG_BG.has(data.frameId ?? '') && (
                     <div style={{ position: 'absolute', inset: '12% 18%', background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: 0 }} />
                   )}
-                  {/* Photo du lieu en fond */}
-                  {ceremony.ceremonyImage && (
-                    <>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={ceremony.ceremonyImage} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none', zIndex: 0, opacity: (ceremony.ceremonyImageOpacity ?? 30) / 100 }} />
-                      <div style={{ position: 'absolute', inset: 0, background: theme.dark ? `${theme.fond}cc` : 'rgba(255,255,255,0.7)', pointerEvents: 'none', zIndex: 0 }} />
-                    </>
-                  )}
+                  {/* Photo du lieu — affichée comme illustration sous le titre */}
                   {(() => {
                     const canEdit = role !== 'guest' && !!onUpdate
                     const layout = data.accueilLayout ?? {}
@@ -6629,13 +6618,13 @@ const firstDate = sorted[0]?.date
                         defaultValue={title}
                         editable={canEdit}
                         onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_titre`]: v } })}
-                        style={applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: ceremony.illustrationUrl ? 10 : 24, lineHeight: 1.4 }, 'titres', data.zoneStyles)}
+                        style={applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: (ceremony.illustrationUrl || ceremony.ceremonyImage) ? 10 : 24, lineHeight: 1.4 }, 'titres', data.zoneStyles)}
                       />
                     </AnimSection></DraggableElement>
                     {/* Illustration aquarelle — après le titre, déplaçable par les mariés */}
-                    {ceremony.illustrationUrl ? (
+                    {(ceremony.illustrationUrl || ceremony.ceremonyImage) ? (
                       <EditableIllustration
-                        url={ceremony.illustrationUrl}
+                        url={ceremony.illustrationUrl || ceremony.ceremonyImage!}
                         size={ceremony.illustrationSize ?? 80}
                         offsetX={ceremony.illustrationOffsetX ?? 0}
                         offsetY={ceremony.illustrationOffsetY ?? 0}
@@ -6645,8 +6634,8 @@ const firstDate = sorted[0]?.date
                         onChangeSize={(sz) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationSize: sz }; onUpdate?.({ ceremonies: u }) }}
                         onChangeOffsetX={(x) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationOffsetX: x }; onUpdate?.({ ceremonies: u }) }}
                         onChangeOffsetY={(y) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationOffsetY: y }; onUpdate?.({ ceremonies: u }) }}
-                        onChangeUrl={(url) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationUrl: url }; onUpdate?.({ ceremonies: u }) }}
-                        onRemove={() => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationUrl: '', illustrationSize: 80, illustrationOffsetX: 0, illustrationOffsetY: 0 }; onUpdate?.({ ceremonies: u }) }}
+                        onChangeUrl={(url) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationUrl: url, ceremonyImage: '' }; onUpdate?.({ ceremonies: u }) }}
+                        onRemove={() => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationUrl: '', ceremonyImage: '', illustrationSize: 80, illustrationOffsetX: 0, illustrationOffsetY: 0 }; onUpdate?.({ ceremonies: u }) }}
                         darkBg={!!theme.dark}
                       />
                     ) : (!hasFrame && canEdit) ? (
