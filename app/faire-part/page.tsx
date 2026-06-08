@@ -6032,16 +6032,12 @@ function CustomPageCard({ page, theme, editable, onUpdate, onRemove }: {
     { value: 'Helvetica, Arial, sans-serif', label: 'Moderne' },
   ]
 
-  // Auto-slide du carousel
+  // Auto-slide du carousel (fondu enchaîné)
   const imgCount = page.images.length
   useEffect(() => {
     if (page.imagesMode !== 'carousel' || imgCount <= 1) return
     const interval = setInterval(() => {
-      setCarouselIdx(prev => {
-        const next = (prev + 1) % imgCount
-        scrollRef.current?.scrollTo({ left: next * (scrollRef.current.clientWidth || 0), behavior: 'smooth' })
-        return next
-      })
+      setCarouselIdx(prev => (prev + 1) % imgCount)
     }, 4000)
     return () => clearInterval(interval)
   }, [imgCount, page.imagesMode])
@@ -6113,32 +6109,23 @@ function CustomPageCard({ page, theme, editable, onUpdate, onRemove }: {
       {/* Images */}
       {hasImages && (
         page.imagesMode === 'carousel' ? (
-          <div style={{ position: 'relative' }}>
-            <div
-              ref={scrollRef}
-              style={{
-                display: 'flex', overflowX: 'hidden',
-                scrollbarWidth: 'none',
-              }}
-            >
-              {page.images.map((img, i) => (
-                <div key={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', position: 'relative' }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={img.url} alt="" style={{ width: '100%', height: 'auto', display: 'block' }} />
-                  {/* Voile gradient */}
-                  {page.texte && <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%', background: 'linear-gradient(to top, rgba(0,0,0,0.5), transparent)', pointerEvents: 'none' }} />}
-                  {/* Texte draggable */}
-                  {renderOverlayText()}
-                </div>
-              ))}
-            </div>
-            {page.images.length > 1 && (
-              <div style={{ display: 'flex', justifyContent: 'center', gap: 6, padding: '10px 0', background: theme.fond }}>
-                {page.images.map((_, i) => (
-                  <div key={i} style={{ width: 8, height: 8, borderRadius: '50%', background: i === carouselIdx ? G : `${G}33`, transition: 'background 0.2s' }} />
-                ))}
-              </div>
-            )}
+          <div style={{ position: 'relative', overflow: 'hidden' }}>
+            {/* Première image pour définir la hauteur */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={page.images[0].url} alt="" style={{ width: '100%', height: 'auto', display: 'block', visibility: 'hidden' }} />
+            {/* Images empilées avec fondu */}
+            {page.images.map((img, i) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img key={i} src={img.url} alt="" style={{
+                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover',
+                opacity: i === carouselIdx ? 1 : 0,
+                transition: 'opacity 1.2s ease-in-out',
+              }} />
+            ))}
+            {/* Voile gradient */}
+            {page.texte && <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%', background: 'linear-gradient(to top, rgba(0,0,0,0.5), transparent)', pointerEvents: 'none', zIndex: 1 }} />}
+            {/* Texte draggable */}
+            {renderOverlayText()}
           </div>
         ) : (
           <div>
