@@ -5788,10 +5788,10 @@ function InlineRSVP({ ceremonies, accent, textColor, shareId, mariee1, mariee2, 
 }
 
 // ── Illustration éditable (redimensionner, déplacer, changer, retirer) ───────
-function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, ceremonyType, onChangeSize, onChangeOffsetX, onChangeOffsetY, onChangeUrl, onRemove, darkBg }: {
+function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, ceremonyType, onChangeSize, onChangeOffsetX, onChangeOffsetY, onChangeUrl, onRemove, darkBg, isPhoto }: {
   url: string; size: number; offsetX: number; offsetY: number; editable: boolean; accent: string; ceremonyType: string
   onChangeSize: (s: number) => void; onChangeOffsetX: (x: number) => void; onChangeOffsetY: (y: number) => void; onChangeUrl: (url: string) => void; onRemove: () => void
-  darkBg?: boolean
+  darkBg?: boolean; isPhoto?: boolean
 }) {
   const [showPicker, setShowPicker] = useState(false)
   // Position locale pendant le drag (pas de re-render à chaque pixel)
@@ -5845,12 +5845,15 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
     <div style={{ textAlign: 'center', position: 'relative', margin: '0 0 4px', padding: 0, overflow: 'visible', lineHeight: 0 }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={url.includes('cloudinary.com') ? url.replace('/upload/', darkBg ? '/upload/e_background_removal/e_trim/' : '/upload/e_trim/') : url} alt="" draggable={false}
+        src={isPhoto ? url : (url.includes('cloudinary.com') ? url.replace('/upload/', darkBg ? '/upload/e_background_removal/e_trim/' : '/upload/e_trim/') : url)} alt="" draggable={false}
         onMouseDown={editable ? (e) => { e.preventDefault(); startDrag(e.clientX, e.clientY) } : undefined}
         onTouchStart={editable ? (e) => { e.preventDefault(); startDrag(e.touches[0].clientX, e.touches[0].clientY) } : undefined}
         style={{
-          width: `${w}%`, maxHeight: 250, objectFit: 'contain', display: 'inline-block',
-          mixBlendMode: darkBg ? undefined : 'multiply', verticalAlign: 'middle',
+          width: `${w}%`, maxHeight: isPhoto ? 200 : 250,
+          objectFit: isPhoto ? 'cover' : 'contain', display: 'inline-block',
+          borderRadius: isPhoto ? 12 : 0,
+          boxShadow: isPhoto ? '0 4px 20px rgba(0,0,0,0.12)' : 'none',
+          mixBlendMode: isPhoto ? undefined : (darkBg ? undefined : 'multiply'), verticalAlign: 'middle',
           transform: `translate(${cx}px, ${cy}px)`,
           cursor: editable ? (draggingRef.current ? 'grabbing' : 'grab') : 'default',
           transition: draggingRef.current ? 'none' : 'width 0.2s',
@@ -6630,7 +6633,7 @@ const firstDate = sorted[0]?.date
                     {(ceremony.illustrationUrl || ceremony.ceremonyImage) ? (
                       <EditableIllustration
                         url={ceremony.illustrationUrl || ceremony.ceremonyImage!}
-                        size={ceremony.illustrationSize ?? 80}
+                        size={ceremony.illustrationSize ?? (ceremony.ceremonyImage && !ceremony.illustrationUrl ? 70 : 80)}
                         offsetX={ceremony.illustrationOffsetX ?? 0}
                         offsetY={ceremony.illustrationOffsetY ?? 0}
                         editable={canEdit}
@@ -6642,6 +6645,7 @@ const firstDate = sorted[0]?.date
                         onChangeUrl={(url) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationUrl: url, ceremonyImage: '' }; onUpdate?.({ ceremonies: u }) }}
                         onRemove={() => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationUrl: '', ceremonyImage: '', illustrationSize: 80, illustrationOffsetX: 0, illustrationOffsetY: 0 }; onUpdate?.({ ceremonies: u }) }}
                         darkBg={!!theme.dark}
+                        isPhoto={!!ceremony.ceremonyImage && !ceremony.illustrationUrl}
                       />
                     ) : (!hasFrame && canEdit) ? (
                       <IllustrationAdder ceremonyType={ceremony.type} accent={G} onSelect={(url) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationUrl: url }; onUpdate?.({ ceremonies: u }) }} />
