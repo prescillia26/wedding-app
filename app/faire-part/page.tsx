@@ -6336,16 +6336,15 @@ function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: 
     return indices.length > 0 ? indices.map(i => allSorted[i]) : allSorted
   })()
   const _gc = data.globalTextColor
-  const _rawG = _gc || theme.accent
-  const _rawTEXT = _gc || theme.texte
-  // Si couleur dorée → utiliser le vrai or (pas le jaune)
-  const _GOLD_SET = new Set(['#c9a84c', '#c9a030', '#d4a830', '#e5b847', '#f0cd7a', '#f5d480', '#e8c26e', '#ffd700', '#e8d4a2', '#d4a574'])
-  const G = _GOLD_SET.has(_rawG.toLowerCase()) ? '#b8943d' : _rawG
-  const TEXT = _GOLD_SET.has(_rawTEXT.toLowerCase()) ? '#b8943d' : _rawTEXT
+  const G = _gc || theme.accent
+  const TEXT = _gc || theme.texte
   const FS = 'var(--font-great-vibes)'
   const FP = 'var(--font-playfair-display)'
 
-  // goldStyle retiré — la couleur or est corrigée directement dans G/TEXT
+  // Ombre dorée pour donner de la profondeur aux textes or (comme le logo)
+  const _GOLD_SET = new Set(['#c9a84c', '#c9a030', '#d4a830', '#e5b847', '#f0cd7a', '#f5d480', '#e8c26e', '#ffd700', '#e8d4a2', '#d4a574'])
+  const isGold = _GOLD_SET.has(G.toLowerCase())
+  const goldShadow = isGold ? '0 1px 2px rgba(139,105,20,0.6), 0 0 8px rgba(201,168,76,0.3)' : ''
   const FC = 'var(--font-cormorant-garamond)'
   const ov = data.textOverrides ?? {}
   const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
@@ -6480,7 +6479,7 @@ const firstDate = sorted[0]?.date
             return (<>
           {data.mariageJuif && (
             <DraggableElement id="bsd" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-              <div style={{ fontFamily: 'serif', fontSize: 14, color: G, direction: 'rtl', marginBottom: 6 }}>בס״ד</div>
+              <div style={{ fontFamily: 'serif', fontSize: 14, color: G, direction: 'rtl', marginBottom: 6, textShadow: goldShadow }}>בס״ד</div>
             </DraggableElement>
           )}
           <DraggableElement id="monogram" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
@@ -6537,7 +6536,7 @@ const firstDate = sorted[0]?.date
             )
           })()}
           <DraggableElement id="names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <div style={{ fontFamily: FS, fontSize: 'clamp(28px,7vw,42px)', color: introTextColor, marginBottom: 8, lineHeight: 1.15, textAlign: 'center', textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : readableShadow(theme) }}>
+          <div style={{ fontFamily: FS, fontSize: 'clamp(28px,7vw,42px)', color: introTextColor, marginBottom: 8, lineHeight: 1.15, textAlign: 'center', textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : (goldShadow || readableShadow(theme)) }}>
             {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
           </div>
           </DraggableElement>
@@ -6546,7 +6545,7 @@ const firstDate = sorted[0]?.date
             defaultValue={t.fairepart.pleaseJoin}
             editable={canEdit}
             onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, global_pleaseJoin: v } })}
-            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: introTextColor, marginBottom: 0, textAlign: 'center', lineHeight: 1.6, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}
+            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: introTextColor, marginBottom: 0, textAlign: 'center', lineHeight: 1.6, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : (goldShadow || readableShadow(theme)) }}
           />
           {/* Compte à rebours déplacé dans le sticky header */}
           {/* Bouton "Découvrir" — draggable par les mariés */}
@@ -6563,7 +6562,8 @@ const firstDate = sorted[0]?.date
                 padding: '14px 32px', borderRadius: 0, border: `1.5px solid ${introTextColor}`,
                 background: 'transparent', color: introTextColor, cursor: 'pointer',
                 touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
-                textShadow: hasIntroPhoto ? '0 1px 4px rgba(0,0,0,0.5)' : 'none',
+                textShadow: hasIntroPhoto ? '0 1px 4px rgba(0,0,0,0.5)' : goldShadow,
+                borderImage: isGold ? 'linear-gradient(135deg, #8b6914, #c9a84c, #f2d87a, #c9a84c, #8b6914) 1' : undefined,
               }}
             >
               Découvrir ✦
@@ -6636,7 +6636,7 @@ const firstDate = sorted[0]?.date
                     return (
                   <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame), transform: data.textOffsetY ? `translateY(${data.textOffsetY}px)` : undefined }}>
                     {data.mariageJuif && (
-                      <DraggableElement id={pre+"bsd"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, opacity: 0.85, letterSpacing: 1, marginBottom: 8, paddingRight: 4 }}>בס״ד</div></DraggableElement>
+                      <DraggableElement id={pre+"bsd"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, opacity: 0.85, letterSpacing: 1, marginBottom: 8, paddingRight: 4, textShadow: goldShadow }}>בס״ד</div></DraggableElement>
                     )}
                     <DraggableElement id={pre+"titre"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} skipAnim={canEdit}>
                       <InlineEdit
