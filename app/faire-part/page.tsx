@@ -4440,6 +4440,46 @@ function TextEditModal({ ceremonies, textOverrides, zoneStyles, onApply, onApply
               {`💡 ${t.fairepart.textEditStyleSub}`}
             </p>
 
+            {/* Couleur globale — toute la carte d'un coup */}
+            <div style={{ marginBottom: 24, padding: 16, border: `2px solid ${theme.accent}`, borderRadius: 12, background: `${theme.accent}08` }}>
+              <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 14, fontWeight: 700, color: theme.accent, marginBottom: 10 }}>
+                🎨 Couleur de tous les textes
+              </div>
+              <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>Appliquer une couleur à toutes les zones en un clic</p>
+              <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+                {localizedColors.filter(c => c.value).slice(0, 24).map(c => (
+                  <button key={c.value} type="button" onClick={() => {
+                    const next: ZoneStyles = {}
+                    TEXT_ZONES.forEach(zone => {
+                      next[zone] = { ...(localStyles[zone] ?? {}), color: c.value }
+                    })
+                    setLocalStyles(next)
+                    onApplyStyles(next)
+                  }}
+                    title={c.label}
+                    style={{
+                      ...BTN, width: 28, height: 28, borderRadius: '50%',
+                      background: c.swatch, padding: 0,
+                      border: '2px solid white',
+                      boxShadow: '0 0 0 1px #e5e7eb',
+                    }}
+                  />
+                ))}
+              </div>
+              <button type="button" onClick={() => {
+                const next: ZoneStyles = {}
+                TEXT_ZONES.forEach(zone => {
+                  const z = { ...(localStyles[zone] ?? {}) }
+                  delete z.color
+                  if (Object.keys(z).length > 0) next[zone] = z
+                })
+                setLocalStyles(next)
+                onApplyStyles(next)
+              }} style={{ ...BTN, marginTop: 8, background: 'none', border: 'none', color: '#9ca3af', fontSize: 11, textDecoration: 'underline' }}>
+                Réinitialiser toutes les couleurs
+              </button>
+            </div>
+
             {TEXT_ZONES.map(zone => {
               const z = localStyles[zone] ?? {}
               return (
