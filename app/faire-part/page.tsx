@@ -1779,9 +1779,15 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                 <input type="file" accept="image/*" hidden onChange={async e => {
                   const file = e.target.files?.[0]
                   if (!file) return
-                  const reader = new FileReader()
-                  reader.onload = () => update(i, { ceremonyImage: reader.result as string, ceremonyImageOpacity: 30 })
-                  reader.readAsDataURL(file)
+                  if (file.size > 5 * 1024 * 1024) { showToast('Fichier trop volumineux (max 5 Mo)', 'error'); return }
+                  try {
+                    const fd = new (globalThis.FormData)()
+                    fd.append('file', file)
+                    fd.append('upload_preset', 'wedding_music')
+                    const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
+                    const json = await res.json()
+                    if (json.secure_url) update(i, { ceremonyImage: json.secure_url, ceremonyImageOpacity: 30 })
+                  } catch { showToast('Erreur upload', 'error') }
                 }} />
               </label>
             )}
@@ -1995,16 +2001,21 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                   const files = Array.from(e.target.files ?? [])
                   const newImages: CustomPageImage[] = []
                   for (const file of files) {
-                    const reader = new FileReader()
-                    const url = await new Promise<string>(resolve => {
-                      reader.onload = () => resolve(reader.result as string)
-                      reader.readAsDataURL(file)
-                    })
-                    newImages.push({ url })
+                    if (file.size > 5 * 1024 * 1024) { showToast('Fichier trop volumineux (max 5 Mo)', 'error'); continue }
+                    try {
+                      const fd = new (globalThis.FormData)()
+                      fd.append('file', file)
+                      fd.append('upload_preset', 'wedding_music')
+                      const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
+                      const json = await res.json()
+                      if (json.secure_url) newImages.push({ url: json.secure_url })
+                    } catch { showToast('Erreur upload image', 'error') }
                   }
-                  const pages = [...(data.customPages ?? [])]
-                  pages[pi] = { ...pages[pi], images: [...pages[pi].images, ...newImages] }
-                  onChange({ customPages: pages })
+                  if (newImages.length > 0) {
+                    const pages = [...(data.customPages ?? [])]
+                    pages[pi] = { ...pages[pi], images: [...pages[pi].images, ...newImages] }
+                    onChange({ customPages: pages })
+                  }
                 }} />
               </label>
             </div>
