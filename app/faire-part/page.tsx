@@ -4924,36 +4924,46 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, firstDate
     logoSrc = logoUrl
   }
 
+  const PD = 'var(--font-playfair-display)'
+  const countdownItems = [
+    { value: countdown.days, label: 'Jours' },
+    { value: countdown.hours, label: 'Heures' },
+    { value: countdown.minutes, label: 'Minutes' },
+    { value: countdown.seconds, label: 'Secondes' },
+  ]
+
   return (
     <>
       <div style={{
         position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
         width: '100%', maxWidth: 480, zIndex: 100,
-        background: theme.dark ? 'rgba(20,20,20,0.92)' : 'rgba(255,255,255,0.92)',
-        backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-        borderBottom: `1px solid ${accent}20`,
-        padding: '8px 16px', boxSizing: 'border-box',
+        background: theme.dark ? 'rgba(20,20,20,0.95)' : 'rgba(255,255,255,0.95)',
+        backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: `1px solid ${accent}22`,
+        padding: '10px 14px', boxSizing: 'border-box',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       } as React.CSSProperties}>
-        {/* Logo */}
-        <div style={{ width: 36, height: 36, flexShrink: 0 }}>
+        {/* Logo — plus grand */}
+        <div style={{ width: 48, height: 48, flexShrink: 0 }}>
           {logoSrc ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoSrc} alt="" style={{ width: 36, height: 36, objectFit: 'contain' }} />
+            <img src={logoSrc} alt="" style={{ width: 48, height: 48, objectFit: 'contain' }} />
           ) : null}
         </div>
 
-        {/* Countdown */}
+        {/* Countdown — style bloc comme la référence */}
         {firstDate && (
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, fontFamily: 'var(--font-playfair-display)', color: accent }}>
-            <span style={{ fontSize: 16, fontWeight: 700 }}>{countdown.days}</span>
-            <span style={{ fontSize: 8, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', opacity: 0.7 }}>jours</span>
-            <span style={{ fontSize: 16, fontWeight: 700, marginLeft: 6 }}>{String(countdown.hours).padStart(2, '0')}</span>
-            <span style={{ fontSize: 8, fontWeight: 600, opacity: 0.7 }}>h</span>
-            <span style={{ fontSize: 16, fontWeight: 700 }}>{String(countdown.minutes).padStart(2, '0')}</span>
-            <span style={{ fontSize: 8, fontWeight: 600, opacity: 0.7 }}>m</span>
-            <span style={{ fontSize: 16, fontWeight: 700 }}>{String(countdown.seconds).padStart(2, '0')}</span>
-            <span style={{ fontSize: 8, fontWeight: 600, opacity: 0.7 }}>s</span>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            {countdownItems.map((item, idx) => (
+              <div key={idx} style={{ textAlign: 'center' }}>
+                <div style={{ fontFamily: PD, fontSize: 20, fontWeight: 700, color: accent, lineHeight: 1 }}>
+                  {String(item.value).padStart(2, '0')}
+                </div>
+                <div style={{ fontFamily: PD, fontSize: 7, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', color: accent, opacity: 0.7, marginTop: 2 }}>
+                  {item.label}
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
