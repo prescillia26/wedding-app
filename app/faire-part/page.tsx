@@ -327,6 +327,10 @@ interface CustomPageImage {
 interface CustomPage {
   id: string
   texte?: string
+  texteColor?: string
+  texteFont?: string
+  texteOffsetX?: number
+  texteOffsetY?: number
   images: CustomPageImage[]
   imagesMode: 'carousel' | 'statique'
   position: number
@@ -5982,11 +5986,67 @@ function CustomPageCard({ page, theme, editable, onUpdate, onRemove }: {
   onUpdate?: (patch: Partial<CustomPage>) => void; onRemove?: () => void
 }) {
   const [carouselIdx, setCarouselIdx] = useState(0)
+  const [showStylePanel, setShowStylePanel] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const FC = 'var(--font-cormorant-garamond)'
-  const GV = 'var(--font-great-vibes)'
   const G = theme.accent
   const hasImages = page.images.length > 0
+
+  const textColor = page.texteColor || 'white'
+  const textFont = page.texteFont || 'var(--font-great-vibes)'
+  const textOffsetX = page.texteOffsetX ?? 0
+  const textOffsetY = page.texteOffsetY ?? 0
+
+  // Drag du texte sur la photo
+  const dragging = useRef(false)
+  const dragStart = useRef({ x: 0, y: 0, ox: 0, oy: 0 })
+  const [localOff, setLocalOff] = useState<{ x: number; y: number } | null>(null)
+
+  useEffect(() => {
+    const mm = (e: MouseEvent) => { if (!dragging.current) return; e.preventDefault(); setLocalOff({ x: Math.max(-150, Math.min(150, dragStart.current.ox + e.clientX - dragStart.current.x)), y: Math.max(-200, Math.min(200, dragStart.current.oy + e.clientY - dragStart.current.y)) }) }
+    const tm = (e: TouchEvent) => { if (!dragging.current) return; setLocalOff({ x: Math.max(-150, Math.min(150, dragStart.current.ox + e.touches[0].clientX - dragStart.current.x)), y: Math.max(-200, Math.min(200, dragStart.current.oy + e.touches[0].clientY - dragStart.current.y)) }) }
+    const up = () => { if (!dragging.current) return; dragging.current = false; setLocalOff(p => { if (p) onUpdate?.({ texteOffsetX: p.x, texteOffsetY: p.y }); return null }) }
+    window.addEventListener('mousemove', mm); window.addEventListener('mouseup', up)
+    window.addEventListener('touchmove', tm, { passive: false }); window.addEventListener('touchend', up)
+    return () => { window.removeEventListener('mousemove', mm); window.removeEventListener('mouseup', up); window.removeEventListener('touchmove', tm); window.removeEventListener('touchend', up) }
+  }, [onUpdate])
+
+  const startDrag = (ex: number, ey: number) => { if (!editable) return; dragging.current = true; dragStart.current = { x: ex, y: ey, ox: textOffsetX, oy: textOffsetY } }
+  const cx = localOff?.x ?? textOffsetX
+  const cy = localOff?.y ?? textOffsetY
+
+  const CUSTOM_FONTS = [
+    { value: 'var(--font-great-vibes)', label: 'Calligraphie' },
+    { value: 'var(--font-cormorant-garamond)', label: 'Élégant' },
+    { value: 'var(--font-playfair-display)', label: 'Serif' },
+    { value: 'Georgia, serif', label: 'Georgia' },
+    { value: 'Helvetica, Arial, sans-serif', label: 'Moderne' },
+  ]
+
+  // Bloc texte réutilisable (sur image)
+  const renderOverlayText = () => {
+    if (!page.texte) return null
+    return (
+      <div
+        onMouseDown={editable ? (e) => { e.preventDefault(); startDrag(e.clientX, e.clientY) } : undefined}
+        onTouchStart={editable ? (e) => { startDrag(e.touches[0].clientX, e.touches[0].clientY) } : undefined}
+        style={{
+          position: 'absolute', left: 24, right: 24, bottom: 32, zIndex: 2,
+          transform: `translate(${cx}px, ${cy}px)`,
+          cursor: editable ? 'grab' : 'default',
+          transition: dragging.current ? 'none' : 'transform 0.15s',
+        }}
+      >
+        <div style={{
+          fontFamily: textFont, fontSize: 'clamp(20px, 5vw, 30px)', color: textColor,
+          textAlign: 'center', lineHeight: 1.4, whiteSpace: 'pre-wrap',
+          textShadow: '0 2px 8px rgba(0,0,0,0.6)',
+        }}>
+          {page.texte}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <section style={{ background: theme.fond, borderBottom: `1px solid ${G}1a` }}>
@@ -6009,39 +6069,22 @@ function CustomPageCard({ page, theme, editable, onUpdate, onRemove }: {
                 <div key={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', position: 'relative' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={img.url} alt="" style={{ width: '100%', height: 'auto', display: 'block' }} />
-                  {/* Texte sur chaque image du carousel */}
-                  {page.texte && (
-                    <>
-                      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%', background: 'linear-gradient(to top, rgba(0,0,0,0.55), transparent)', pointerEvents: 'none' }} />
-                      <div style={{ position: 'absolute', bottom: 24, left: 24, right: 24, zIndex: 1 }}>
-                        <div style={{
-                          fontFamily: GV, fontSize: 'clamp(20px, 5vw, 30px)', color: 'white',
-                          textAlign: 'center', lineHeight: 1.4, whiteSpace: 'pre-wrap',
-                          textShadow: '0 2px 8px rgba(0,0,0,0.6)',
-                        }}>
-                          {page.texte}
-                        </div>
-                      </div>
-                    </>
-                  )}
+                  {/* Voile gradient */}
+                  {page.texte && <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%', background: 'linear-gradient(to top, rgba(0,0,0,0.5), transparent)', pointerEvents: 'none' }} />}
+                  {/* Texte draggable */}
+                  {renderOverlayText()}
                 </div>
               ))}
             </div>
-            {/* Dots */}
             {page.images.length > 1 && (
               <div style={{ display: 'flex', justifyContent: 'center', gap: 6, padding: '10px 0', background: theme.fond }}>
                 {page.images.map((_, i) => (
-                  <div key={i} style={{
-                    width: 8, height: 8, borderRadius: '50%',
-                    background: i === carouselIdx ? G : `${G}33`,
-                    transition: 'background 0.2s',
-                  }} />
+                  <div key={i} style={{ width: 8, height: 8, borderRadius: '50%', background: i === carouselIdx ? G : `${G}33`, transition: 'background 0.2s' }} />
                 ))}
               </div>
             )}
           </div>
         ) : (
-          /* Mode statique : images empilées, taille naturelle */
           <div>
             {page.images.map((img, i) => {
               const isLast = i === page.images.length - 1
@@ -6049,21 +6092,8 @@ function CustomPageCard({ page, theme, editable, onUpdate, onRemove }: {
                 <div key={i} style={{ position: 'relative' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={img.url} alt="" style={{ width: '100%', height: 'auto', display: 'block' }} />
-                  {/* Texte sur la dernière image */}
-                  {isLast && page.texte && (
-                    <>
-                      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%', background: 'linear-gradient(to top, rgba(0,0,0,0.55), transparent)', pointerEvents: 'none' }} />
-                      <div style={{ position: 'absolute', bottom: 24, left: 24, right: 24, zIndex: 1 }}>
-                        <div style={{
-                          fontFamily: GV, fontSize: 'clamp(20px, 5vw, 30px)', color: 'white',
-                          textAlign: 'center', lineHeight: 1.4, whiteSpace: 'pre-wrap',
-                          textShadow: '0 2px 8px rgba(0,0,0,0.6)',
-                        }}>
-                          {page.texte}
-                        </div>
-                      </div>
-                    </>
-                  )}
+                  {isLast && page.texte && <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%', background: 'linear-gradient(to top, rgba(0,0,0,0.5), transparent)', pointerEvents: 'none' }} />}
+                  {isLast && renderOverlayText()}
                 </div>
               )
             })}
@@ -6073,22 +6103,57 @@ function CustomPageCard({ page, theme, editable, onUpdate, onRemove }: {
       {/* Texte seul si pas d'images */}
       {!hasImages && page.texte && (
         <div style={{ padding: '48px 32px', textAlign: 'center' }}>
-          <div style={{
-            fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: theme.texte,
-            lineHeight: 1.8, whiteSpace: 'pre-wrap',
-          }}>
+          <div style={{ fontFamily: textFont, fontStyle: 'italic', fontSize: 18, color: page.texteColor || theme.texte, lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
             {page.texte}
           </div>
         </div>
       )}
-      {/* Contrôles édition */}
+      {/* Contrôles édition : style du texte + supprimer */}
       {editable && (
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, padding: '12px 0', background: theme.fond }}>
-          <button type="button" onClick={() => onRemove?.()} style={{
-            ...BTN, padding: '6px 16px', borderRadius: 9999,
-            border: '1px solid #d4505030', background: 'white',
-            color: '#d45050', fontSize: 11, fontWeight: 600,
-          }}>Supprimer</button>
+        <div style={{ padding: '12px 16px', background: theme.fond }}>
+          {page.texte && (
+            <>
+              <button type="button" onClick={() => setShowStylePanel(p => !p)} style={{
+                ...BTN, display: 'block', margin: '0 auto 8px', padding: '6px 16px', borderRadius: 9999,
+                border: `1px solid ${G}44`, background: showStylePanel ? `${G}15` : 'white',
+                color: G, fontSize: 11, fontWeight: 600,
+              }}>🎨 Style du texte</button>
+              {showStylePanel && (
+                <div style={{ background: 'white', borderRadius: 12, padding: 14, border: '1px solid #e0d5c8', marginBottom: 8 }}>
+                  {/* Couleur */}
+                  <div style={{ fontSize: 9, color: '#8a7e72', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Couleur</div>
+                  <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 10 }}>
+                    {['white', '#000000', '#C9A84C', '#d4829a', '#8b0000', '#2c4a7c', '#7a9e6e', '#F0CD7A', '#E07856', '#D63384', '#1E5BA8', G].map(c => (
+                      <button key={c} type="button" onClick={() => onUpdate?.({ texteColor: c })} style={{
+                        ...BTN, width: 22, height: 22, borderRadius: '50%', padding: 0,
+                        background: c, border: textColor === c ? `2px solid ${G}` : '1px solid #d6d1cb',
+                      }} />
+                    ))}
+                  </div>
+                  {/* Police */}
+                  <div style={{ fontSize: 9, color: '#8a7e72', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Police</div>
+                  <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                    {CUSTOM_FONTS.map(f => (
+                      <button key={f.value} type="button" onClick={() => onUpdate?.({ texteFont: f.value })} style={{
+                        ...BTN, padding: '4px 10px', borderRadius: 8, fontSize: 10,
+                        fontFamily: f.value, fontWeight: textFont === f.value ? 700 : 400,
+                        border: `1.5px solid ${textFont === f.value ? G : '#e0d5c8'}`,
+                        background: textFont === f.value ? `${G}15` : 'white',
+                        color: textFont === f.value ? G : '#3a3330',
+                      }}>{f.label}</button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
+            <button type="button" onClick={() => onRemove?.()} style={{
+              ...BTN, padding: '6px 16px', borderRadius: 9999,
+              border: '1px solid #d4505030', background: 'white',
+              color: '#d45050', fontSize: 11, fontWeight: 600,
+            }}>Supprimer</button>
+          </div>
         </div>
       )}
     </section>
@@ -6647,6 +6712,10 @@ const firstDate = sorted[0]?.date
                   page={page}
                   theme={theme}
                   editable={role !== 'guest' && !!onUpdate}
+                  onUpdate={(patch) => {
+                    const pages = (data.customPages ?? []).map(p => p.id === page.id ? { ...p, ...patch } : p)
+                    onUpdate?.({ customPages: pages })
+                  }}
                   onRemove={() => onUpdate?.({ customPages: (data.customPages ?? []).filter(p => p.id !== page.id) })}
                 />
               ))}
