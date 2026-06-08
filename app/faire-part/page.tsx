@@ -6671,13 +6671,32 @@ const firstDate = sorted[0]?.date
                         onChangeSize={(sz) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationSize: sz }; onUpdate?.({ ceremonies: u }) }}
                         onChangeOffsetX={(x) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationOffsetX: x }; onUpdate?.({ ceremonies: u }) }}
                         onChangeOffsetY={(y) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationOffsetY: y }; onUpdate?.({ ceremonies: u }) }}
-                        onChangeUrl={(url) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationUrl: url, ceremonyImage: '' }; onUpdate?.({ ceremonies: u }) }}
+                        onChangeUrl={(url) => {
+                          const u = [...(data.ceremonies ?? [])]
+                          const isFromLibrary = VISUALS.some(v => v.url === url)
+                          if (isFromLibrary) {
+                            u[safeIdx] = { ...u[safeIdx], illustrationUrl: url, ceremonyImage: '' }
+                          } else {
+                            u[safeIdx] = { ...u[safeIdx], ceremonyImage: url, illustrationUrl: '' }
+                          }
+                          onUpdate?.({ ceremonies: u })
+                        }}
                         onRemove={() => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationUrl: '', ceremonyImage: '', illustrationSize: 80, illustrationOffsetX: 0, illustrationOffsetY: 0 }; onUpdate?.({ ceremonies: u }) }}
                         darkBg={!!theme.dark}
                         isPhoto={!!ceremony.ceremonyImage && !ceremony.illustrationUrl}
                       />
                     ) : (!hasFrame && canEdit) ? (
-                      <IllustrationAdder ceremonyType={ceremony.type} accent={G} onSelect={(url) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationUrl: url }; onUpdate?.({ ceremonies: u }) }} />
+                      <IllustrationAdder ceremonyType={ceremony.type} accent={G} onSelect={(url) => {
+                        const u = [...(data.ceremonies ?? [])]
+                        // Si c'est une URL Cloudinary d'un upload custom (pas dans notre bibliothèque), stocker comme ceremonyImage (photo)
+                        const isFromLibrary = VISUALS.some(v => v.url === url)
+                        if (isFromLibrary) {
+                          u[safeIdx] = { ...u[safeIdx], illustrationUrl: url }
+                        } else {
+                          u[safeIdx] = { ...u[safeIdx], ceremonyImage: url }
+                        }
+                        onUpdate?.({ ceremonies: u })
+                      }} />
                     ) : null}
                     {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
                       <DraggableElement id={pre+"hebrewVerse"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={100} skipAnim={canEdit}>
