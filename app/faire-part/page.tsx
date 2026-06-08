@@ -5804,12 +5804,12 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
     <div style={{ textAlign: 'center', position: 'relative', margin: '0 0 4px', padding: 0, overflow: 'visible', lineHeight: 0 }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={url.includes('cloudinary.com') ? url.replace('/upload/', '/upload/e_trim/') : url} alt="" draggable={false}
+        src={url.includes('cloudinary.com') ? url.replace('/upload/', darkBg ? '/upload/e_background_removal/e_trim/' : '/upload/e_trim/') : url} alt="" draggable={false}
         onMouseDown={editable ? (e) => { e.preventDefault(); startDrag(e.clientX, e.clientY) } : undefined}
         onTouchStart={editable ? (e) => { e.preventDefault(); startDrag(e.touches[0].clientX, e.touches[0].clientY) } : undefined}
         style={{
           width: `${w}%`, maxHeight: 250, objectFit: 'contain', display: 'inline-block',
-          mixBlendMode: darkBg ? 'screen' : 'multiply', verticalAlign: 'middle',
+          mixBlendMode: darkBg ? undefined : 'multiply', verticalAlign: 'middle',
           transform: `translate(${cx}px, ${cy}px)`,
           cursor: editable ? (draggingRef.current ? 'grabbing' : 'grab') : 'default',
           transition: draggingRef.current ? 'none' : 'width 0.2s',
