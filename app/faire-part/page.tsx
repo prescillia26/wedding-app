@@ -319,6 +319,29 @@ const THEME_CARD_BG: Record<string, string> = {
 
 const CEREMONY_TYPES = ['Mairie', 'Cérémonie religieuse / Houppa', 'Shabbat Hatan', 'Henné', 'Cocktail', 'Soirée', 'Boat Party', 'Beach Party', 'Autre']
 
+// ── Pages supplémentaires (pages libres entre les cérémonies) ──
+interface CustomPageImage {
+  url: string
+}
+
+interface CustomPage {
+  id: string
+  texte?: string
+  images: CustomPageImage[]
+  imagesMode: 'carousel' | 'statique'
+  position: number
+}
+
+// ── Shabbat Hatan : moments multi-jours ──
+interface ShabbatMoment {
+  id: string
+  label: string
+  heure?: string
+  lieu?: string
+  adresse?: string
+  note?: string
+}
+
 interface Ceremony {
   type: string
   customName: string
@@ -344,6 +367,11 @@ interface Ceremony {
   illustrationSize?: number // % de largeur (30-150, défaut 80)
   illustrationOffsetX?: number // décalage horizontal en px
   illustrationOffsetY?: number // décalage vertical en px
+  // ── Shabbat multi-jours ──
+  multiJours?: ShabbatMoment[]
+  // ── Photo de fond du lieu ──
+  ceremonyImage?: string
+  ceremonyImageOpacity?: number // 0-100, default 30
 }
 interface FormData {
   marie1Prenom: string
@@ -437,6 +465,10 @@ interface FormData {
   luxeGiftsLabel?: string // label du lien (ex: "Notre liste sur Zankyou")
   luxeDelimiterId?: string // id du délimiteur signature (pack Luxe Pro)
   luxePalette?: string // palette Luxe Pro (lavande/rose/sauge/bleunuit)
+  // ── Pages supplémentaires (libres, entre les cérémonies) ──
+  customPages?: CustomPage[]
+  // ── Position du bouton Découvrir (page d'accueil) ──
+  decouvrirButtonPosition?: { x: number; y: number }
 }
 
 type IllustrationKind = 'scene' | 'motif'
@@ -1724,6 +1756,77 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             )}
           </div>
 
+          {/* ── Photo du lieu (toutes cérémonies) ── */}
+          <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px dashed #e0d5c8' }}>
+            <Label>Photo du lieu (fond de la carte)</Label>
+            {c.ceremonyImage ? (
+              <div style={{ position: 'relative', marginBottom: 8 }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={c.ceremonyImage} alt="" style={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 8 }} />
+                <button type="button" onClick={() => update(i, { ceremonyImage: '', ceremonyImageOpacity: 30 })} style={{ ...BTN, position: 'absolute', top: 4, right: 4, width: 22, height: 22, borderRadius: '50%', background: '#d45050', color: 'white', border: 'none', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
+                <div style={{ marginTop: 6 }}>
+                  <Label>Opacité ({c.ceremonyImageOpacity ?? 30}%)</Label>
+                  <input type="range" min={5} max={80} value={c.ceremonyImageOpacity ?? 30} onChange={e => update(i, { ceremonyImageOpacity: Number(e.target.value) })} style={{ width: '100%', accentColor: '#C9A84C' }} />
+                </div>
+              </div>
+            ) : (
+              <label style={{ display: 'block', padding: '14px', border: '2px dashed #C9A84C44', borderRadius: 10, textAlign: 'center', cursor: 'pointer', color: '#C9A84C', fontSize: 12, fontWeight: 600 }}>
+                + Ajouter une photo du lieu
+                <input type="file" accept="image/*" hidden onChange={async e => {
+                  const file = e.target.files?.[0]
+                  if (!file) return
+                  const reader = new FileReader()
+                  reader.onload = () => update(i, { ceremonyImage: reader.result as string, ceremonyImageOpacity: 30 })
+                  reader.readAsDataURL(file)
+                }} />
+              </label>
+            )}
+          </div>
+
+          {/* ── Shabbat Hatan multi-jours ── */}
+          {c.type === 'Shabbat Hatan' && (
+            <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px dashed #e0d5c8' }}>
+              <Label>Moments du Shabbat</Label>
+              <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>Ajoutez les différents moments (Vendredi soir, Samedi midi, etc.)</p>
+              {(c.multiJours ?? []).map((moment, mi) => (
+                <div key={moment.id} style={{ background: 'white', borderRadius: 10, padding: 12, marginBottom: 8, border: '1px solid #e0d5c8' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#C9A84C' }}>{moment.label}</span>
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      {mi > 0 && <button type="button" onClick={() => {
+                        const mj = [...(c.multiJours ?? [])]
+                        ;[mj[mi - 1], mj[mi]] = [mj[mi], mj[mi - 1]]
+                        update(i, { multiJours: mj })
+                      }} style={{ ...BTN, background: 'none', border: '1px solid #e0d5c8', borderRadius: 6, padding: '2px 6px', fontSize: 11 }}>↑</button>}
+                      {mi < (c.multiJours ?? []).length - 1 && <button type="button" onClick={() => {
+                        const mj = [...(c.multiJours ?? [])]
+                        ;[mj[mi], mj[mi + 1]] = [mj[mi + 1], mj[mi]]
+                        update(i, { multiJours: mj })
+                      }} style={{ ...BTN, background: 'none', border: '1px solid #e0d5c8', borderRadius: 6, padding: '2px 6px', fontSize: 11 }}>↓</button>}
+                      <button type="button" onClick={() => {
+                        update(i, { multiJours: (c.multiJours ?? []).filter((_, j) => j !== mi) })
+                      }} style={{ ...BTN, background: 'none', border: 'none', color: '#d45050', fontSize: 11 }}>✕</button>
+                    </div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                    <div><Label>Heure</Label><input type="time" value={moment.heure ?? ''} onChange={e => { const mj = [...(c.multiJours ?? [])]; mj[mi] = { ...mj[mi], heure: e.target.value }; update(i, { multiJours: mj }) }} style={S.input} /></div>
+                    <div><Label>Lieu</Label><input type="text" value={moment.lieu ?? ''} onChange={e => { const mj = [...(c.multiJours ?? [])]; mj[mi] = { ...mj[mi], lieu: e.target.value }; update(i, { multiJours: mj }) }} style={S.input} placeholder="Nom du lieu" /></div>
+                  </div>
+                  <div style={{ marginTop: 8 }}><Label>Adresse</Label><input type="text" value={moment.adresse ?? ''} onChange={e => { const mj = [...(c.multiJours ?? [])]; mj[mi] = { ...mj[mi], adresse: e.target.value }; update(i, { multiJours: mj }) }} style={S.input} placeholder="Adresse complète" /></div>
+                  <div style={{ marginTop: 8 }}><Label>Note</Label><input type="text" value={moment.note ?? ''} onChange={e => { const mj = [...(c.multiJours ?? [])]; mj[mi] = { ...mj[mi], note: e.target.value }; update(i, { multiJours: mj }) }} style={S.input} placeholder="Info complémentaire (optionnel)" /></div>
+                </div>
+              ))}
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {['Vendredi soir', 'Samedi midi', 'Samedi soir', 'Personnalisé'].map(label => (
+                  <button key={label} type="button" onClick={() => {
+                    const newMoment: ShabbatMoment = { id: `sm-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, label, heure: '', lieu: '', adresse: '', note: '' }
+                    update(i, { multiJours: [...(c.multiJours ?? []), newMoment] })
+                  }} style={{ ...BTN, padding: '6px 12px', borderRadius: 9999, border: '1px dashed #C9A84C', background: 'transparent', color: '#C9A84C', fontSize: 11, fontWeight: 600 }}>+ {label}</button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* ── Pensées pour les défunts (Houppa uniquement) ── */}
           {c.type === 'Cérémonie religieuse / Houppa' && (
             <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px dashed #e0d5c8' }}>
@@ -1822,6 +1925,118 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           background: 'transparent', color: '#C9A84C', fontSize: 14,
         }}>{`+ ${t.fairepart.addCeremony}`}</button>
       )}
+
+      {/* ── Pages supplémentaires ── */}
+      <div style={{ marginTop: 24, borderTop: '1px solid #e8d5c8', paddingTop: 20 }}>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: '#3a3330', marginBottom: 12 }}>Pages supplémentaires</h3>
+        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 16 }}>Ajoutez des pages libres entre vos événements (photos, textes, etc.)</p>
+        {(data.customPages ?? []).map((page, pi) => (
+          <div key={page.id} style={{ background: '#FAF6F0', borderRadius: 12, padding: 16, marginBottom: 12, border: '1px solid #E8D5D8' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <span style={{ fontSize: 11, color: '#8B3A52', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Page {pi + 1}</span>
+              <div style={{ display: 'flex', gap: 4 }}>
+                {pi > 0 && <button type="button" onClick={() => {
+                  const pages = [...(data.customPages ?? [])]
+                  ;[pages[pi - 1], pages[pi]] = [pages[pi], pages[pi - 1]]
+                  pages.forEach((p, idx) => { p.position = (data.ceremonies.length + idx) * 10 + 5 })
+                  onChange({ customPages: pages })
+                }} style={{ ...BTN, background: 'none', border: '1px solid #E8D5D8', borderRadius: 6, padding: '2px 8px', fontSize: 12, color: '#3D2B1F' }}>↑</button>}
+                {pi < (data.customPages ?? []).length - 1 && <button type="button" onClick={() => {
+                  const pages = [...(data.customPages ?? [])]
+                  ;[pages[pi], pages[pi + 1]] = [pages[pi + 1], pages[pi]]
+                  pages.forEach((p, idx) => { p.position = (data.ceremonies.length + idx) * 10 + 5 })
+                  onChange({ customPages: pages })
+                }} style={{ ...BTN, background: 'none', border: '1px solid #E8D5D8', borderRadius: 6, padding: '2px 8px', fontSize: 12, color: '#3D2B1F' }}>↓</button>}
+                <button type="button" onClick={() => {
+                  if (!confirm('Supprimer cette page ?')) return
+                  onChange({ customPages: (data.customPages ?? []).filter((_, j) => j !== pi) })
+                }} style={{ ...BTN, background: 'none', border: 'none', color: '#d45050', fontSize: 12 }}>Supprimer</button>
+              </div>
+            </div>
+            {/* Position : entre quel événement */}
+            <Label>Afficher après l&apos;événement n°</Label>
+            <select value={Math.floor(page.position / 10)} onChange={e => {
+              const pages = [...(data.customPages ?? [])]
+              pages[pi] = { ...pages[pi], position: Number(e.target.value) * 10 + 5 }
+              onChange({ customPages: pages })
+            }} style={{ ...S.input, marginBottom: 12 }}>
+              {data.ceremonies.map((c, ci) => (
+                <option key={ci} value={ci + 1}>{c.type === 'Autre' ? (c.customName || 'Événement') : c.type} (n°{ci + 1})</option>
+              ))}
+            </select>
+            {/* Texte */}
+            <Label>Texte (optionnel)</Label>
+            <textarea value={page.texte ?? ''} onChange={e => {
+              const pages = [...(data.customPages ?? [])]
+              pages[pi] = { ...pages[pi], texte: e.target.value }
+              onChange({ customPages: pages })
+            }} placeholder="Texte libre..." style={{ ...S.input, minHeight: 60, resize: 'vertical', marginBottom: 12 }} />
+            {/* Upload images */}
+            <Label>Images</Label>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+              {page.images.map((img, ii) => (
+                <div key={ii} style={{ position: 'relative', width: 70, height: 70, borderRadius: 8, overflow: 'hidden', border: '1px solid #E8D5D8' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={img.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <button type="button" onClick={() => {
+                    const pages = [...(data.customPages ?? [])]
+                    pages[pi] = { ...pages[pi], images: pages[pi].images.filter((_, j) => j !== ii) }
+                    onChange({ customPages: pages })
+                  }} style={{ ...BTN, position: 'absolute', top: 2, right: 2, width: 18, height: 18, borderRadius: '50%', background: '#d45050', color: 'white', border: 'none', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
+                </div>
+              ))}
+              <label style={{ width: 70, height: 70, borderRadius: 8, border: '2px dashed #C9A84C', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 24, color: '#C9A84C' }}>
+                +
+                <input type="file" accept="image/*" multiple hidden onChange={async e => {
+                  const files = Array.from(e.target.files ?? [])
+                  const newImages: CustomPageImage[] = []
+                  for (const file of files) {
+                    const reader = new FileReader()
+                    const url = await new Promise<string>(resolve => {
+                      reader.onload = () => resolve(reader.result as string)
+                      reader.readAsDataURL(file)
+                    })
+                    newImages.push({ url })
+                  }
+                  const pages = [...(data.customPages ?? [])]
+                  pages[pi] = { ...pages[pi], images: [...pages[pi].images, ...newImages] }
+                  onChange({ customPages: pages })
+                }} />
+              </label>
+            </div>
+            {/* Mode affichage */}
+            {page.images.length > 1 && (
+              <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                {(['carousel', 'statique'] as const).map(mode => (
+                  <button key={mode} type="button" onClick={() => {
+                    const pages = [...(data.customPages ?? [])]
+                    pages[pi] = { ...pages[pi], imagesMode: mode }
+                    onChange({ customPages: pages })
+                  }} style={{
+                    ...BTN, flex: 1, padding: '8px', borderRadius: 8, fontSize: 12,
+                    border: `1.5px solid ${page.imagesMode === mode ? '#C9A84C' : '#E8D5D8'}`,
+                    background: page.imagesMode === mode ? '#C9A84C10' : 'white',
+                    color: page.imagesMode === mode ? '#C9A84C' : '#3D2B1F', fontWeight: page.imagesMode === mode ? 700 : 400,
+                  }}>{mode === 'carousel' ? 'Carrousel' : 'Statique'}</button>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+        <button type="button" onClick={() => {
+          const newPage: CustomPage = {
+            id: `page-${Date.now()}`,
+            texte: '',
+            images: [],
+            imagesMode: 'carousel',
+            position: (data.ceremonies.length + (data.customPages ?? []).length) * 10 + 5,
+          }
+          onChange({ customPages: [...(data.customPages ?? []), newPage] })
+        }} style={{
+          ...BTN, width: '100%', padding: 12, border: '2px dashed #8B3A52', borderRadius: 10,
+          background: 'transparent', color: '#8B3A52', fontSize: 13, fontWeight: 600,
+        }}>+ Ajouter une page</button>
+      </div>
     </div>
   )
 }
@@ -2743,6 +2958,30 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
         {ceremony.note && (
           <div style={{ marginTop: 20, paddingTop: 14, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, textAlign: 'center', color: theme.texte, maxWidth: '90%', margin: '0 auto' }}>{ceremony.note}</div>
+          </div>
+        )}
+        {/* Shabbat multi-jours */}
+        {ceremony.multiJours && ceremony.multiJours.length > 0 && (
+          <div style={{ marginTop: 28 }}>
+            {ceremony.multiJours.map((moment, mi) => (
+              <div key={moment.id} style={{ marginBottom: mi < ceremony.multiJours!.length - 1 ? 24 : 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center', marginBottom: 16, maxWidth: 200, margin: '0 auto 16px' }}>
+                  <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to right, transparent, ${theme.accent}40)` }} />
+                  <span style={{ color: theme.accent, fontSize: 8, opacity: 0.5 }}>✡</span>
+                  <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to left, transparent, ${theme.accent}40)` }} />
+                </div>
+                <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 12, fontWeight: 600, letterSpacing: 4, textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 8 }}>{moment.label}</div>
+                {moment.heure && <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(14px, 3.5vw, 18px)', color: theme.accent, textAlign: 'center', marginBottom: 6 }}>{formatHeure(moment.heure)}</div>}
+                {moment.lieu && <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: theme.texte, textAlign: 'center', marginBottom: 4 }}>{moment.lieu}</div>}
+                {moment.adresse && <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: theme.textSecondaire, textAlign: 'center', marginBottom: 4 }}>{moment.adresse}</div>}
+                {moment.note && <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 12, color: theme.textSecondaire, textAlign: 'center', opacity: 0.8 }}>{moment.note}</div>}
+                {isShared && moment.adresse && (
+                  <div style={{ marginTop: 10 }}>
+                    <ItineraireButtons adresse={moment.adresse} theme={theme} compact />
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         )}
         {isShared && (
@@ -5737,6 +5976,92 @@ function InlineEdit({ value, defaultValue, onChange, editable, style }: {
   )
 }
 
+// ── CustomPageCard — page libre entre les cérémonies ──────────────────────────
+function CustomPageCard({ page, theme, editable, onUpdate, onRemove }: {
+  page: CustomPage; theme: ThemeObj; editable: boolean
+  onUpdate?: (patch: Partial<CustomPage>) => void; onRemove?: () => void
+}) {
+  const [carouselIdx, setCarouselIdx] = useState(0)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const FC = 'var(--font-cormorant-garamond)'
+  const G = theme.accent
+
+  return (
+    <section style={{ paddingTop: 48, paddingBottom: 48, background: theme.fond, borderBottom: `1px solid ${G}1a` }}>
+      {/* Images */}
+      {page.images.length > 0 && (
+        page.imagesMode === 'carousel' ? (
+          <div style={{ position: 'relative', marginBottom: page.texte ? 24 : 0 }}>
+            <div
+              ref={scrollRef}
+              onScroll={() => {
+                if (!scrollRef.current) return
+                const idx = Math.round(scrollRef.current.scrollLeft / scrollRef.current.clientWidth)
+                setCarouselIdx(idx)
+              }}
+              style={{
+                display: 'flex', overflowX: 'auto', scrollSnapType: 'x mandatory',
+                WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+              }}
+            >
+              {page.images.map((img, i) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={i} src={img.url} alt="" style={{
+                  flex: '0 0 100%', width: '100%', height: 300, objectFit: 'cover',
+                  scrollSnapAlign: 'start',
+                }} />
+              ))}
+            </div>
+            {/* Dots */}
+            {page.images.length > 1 && (
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 10 }}>
+                {page.images.map((_, i) => (
+                  <div key={i} style={{
+                    width: 8, height: 8, borderRadius: '50%',
+                    background: i === carouselIdx ? G : `${G}33`,
+                    transition: 'background 0.2s',
+                  }} />
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div style={{ marginBottom: page.texte ? 24 : 0 }}>
+            {page.images.map((img, i) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img key={i} src={img.url} alt="" style={{
+                width: '100%', height: 'auto', display: 'block',
+                marginBottom: i < page.images.length - 1 ? 8 : 0,
+              }} />
+            ))}
+          </div>
+        )
+      )}
+      {/* Texte */}
+      {page.texte && (
+        <div style={{
+          fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: theme.texte,
+          textAlign: 'center', lineHeight: 1.8, padding: '0 32px',
+          whiteSpace: 'pre-wrap',
+        }}>
+          {page.texte}
+        </div>
+      )}
+      {/* Contrôles édition */}
+      {editable && (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 16 }}>
+          <button type="button" onClick={() => onRemove?.()} style={{
+            ...BTN, padding: '6px 16px', borderRadius: 9999,
+            border: '1px solid #d4505030', background: 'white',
+            color: '#d45050', fontSize: 11, fontWeight: 600,
+          }}>Supprimer la page</button>
+        </div>
+      )}
+    </section>
+  )
+}
+
 // ── SharedPageContent ─────────────────────────────────────────────────────────
 function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute, onUpdate, onTextEdit }: SharedPageContentProps) {
   const { t, locale } = useT()
@@ -5954,7 +6279,8 @@ const firstDate = sorted[0]?.date
             style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: introTextColor, marginBottom: 0, textAlign: 'center', lineHeight: 1.6, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : readableShadow(theme) }}
           />
           {/* Compte à rebours déplacé dans le sticky header */}
-          {/* Bouton "Découvrir" — scrolle vers le 1er événement */}
+          {/* Bouton "Découvrir" — draggable par les mariés */}
+          <DraggableElement id="decouvrir" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <div style={{ marginTop: 12 }}>
             <button
               type="button"
@@ -5973,6 +6299,7 @@ const firstDate = sorted[0]?.date
               Découvrir ✦
             </button>
           </div>
+          </DraggableElement>
           </>)
           })()}
         </div>
@@ -6029,6 +6356,14 @@ const firstDate = sorted[0]?.date
                   )}
                   {hasFrame && FRAMES_STRONG_BG.has(data.frameId ?? '') && (
                     <div style={{ position: 'absolute', inset: '12% 18%', background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: 0 }} />
+                  )}
+                  {/* Photo du lieu en fond */}
+                  {ceremony.ceremonyImage && (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={ceremony.ceremonyImage} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none', zIndex: 0, opacity: (ceremony.ceremonyImageOpacity ?? 30) / 100 }} />
+                      <div style={{ position: 'absolute', inset: 0, background: theme.dark ? `${theme.fond}cc` : 'rgba(255,255,255,0.7)', pointerEvents: 'none', zIndex: 0 }} />
+                    </>
                   )}
                   {(() => {
                     const canEdit = role !== 'guest' && !!onUpdate
@@ -6272,6 +6607,16 @@ const firstDate = sorted[0]?.date
                 </section>
               </CeremonyCard>
               {/* Séparateur entre cérémonies retiré — les indicateurs de page suffisent */}
+              {/* Pages supplémentaires positionnées après cette cérémonie */}
+              {(data.customPages ?? []).filter(p => Math.floor(p.position / 10) === i + 1).map(page => (
+                <CustomPageCard
+                  key={page.id}
+                  page={page}
+                  theme={theme}
+                  editable={role !== 'guest' && !!onUpdate}
+                  onRemove={() => onUpdate?.({ customPages: (data.customPages ?? []).filter(p => p.id !== page.id) })}
+                />
+              ))}
             </React.Fragment>
           )
         })}
