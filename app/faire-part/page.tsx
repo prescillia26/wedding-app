@@ -1948,13 +1948,11 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                 {pi > 0 && <button type="button" onClick={() => {
                   const pages = [...(data.customPages ?? [])]
                   ;[pages[pi - 1], pages[pi]] = [pages[pi], pages[pi - 1]]
-                  pages.forEach((p, idx) => { p.position = (data.ceremonies.length + idx) * 10 + 5 })
                   onChange({ customPages: pages })
                 }} style={{ ...BTN, background: 'none', border: '1px solid #E8D5D8', borderRadius: 6, padding: '2px 8px', fontSize: 12, color: '#3D2B1F' }}>↑</button>}
                 {pi < (data.customPages ?? []).length - 1 && <button type="button" onClick={() => {
                   const pages = [...(data.customPages ?? [])]
                   ;[pages[pi], pages[pi + 1]] = [pages[pi + 1], pages[pi]]
-                  pages.forEach((p, idx) => { p.position = (data.ceremonies.length + idx) * 10 + 5 })
                   onChange({ customPages: pages })
                 }} style={{ ...BTN, background: 'none', border: '1px solid #E8D5D8', borderRadius: 6, padding: '2px 8px', fontSize: 12, color: '#3D2B1F' }}>↓</button>}
                 <button type="button" onClick={() => {
@@ -2044,7 +2042,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             texte: '',
             images: [],
             imagesMode: 'carousel',
-            position: (data.ceremonies.length + (data.customPages ?? []).length) * 10 + 5,
+            position: data.ceremonies.length * 10 + 5,
           }
           onChange({ customPages: [...(data.customPages ?? []), newPage] })
         }} style={{
@@ -6754,7 +6752,10 @@ const firstDate = sorted[0]?.date
               </CeremonyCard>
               {/* Séparateur entre cérémonies retiré — les indicateurs de page suffisent */}
               {/* Pages supplémentaires positionnées après cette cérémonie */}
-              {(data.customPages ?? []).filter(p => Math.floor(p.position / 10) === i + 1).map(page => (
+              {(data.customPages ?? []).filter(p => {
+                const afterIdx = Math.floor(p.position / 10)
+                return afterIdx === safeIdx + 1
+              }).map(page => (
                 <CustomPageCard
                   key={page.id}
                   page={page}
