@@ -6341,15 +6341,15 @@ function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: 
   const FS = 'var(--font-great-vibes)'
   const FP = 'var(--font-playfair-display)'
 
-  // Effet doré/gradient sur le texte si la couleur est dans la gamme or
+  // Effet doré/gradient sur le texte — même rendu que le logo Cloudinary
   const GOLD_COLORS = new Set(['#c9a84c', '#c9a030', '#d4a830', '#e5b847', '#f0cd7a', '#f5d480', '#e8c26e', '#ffd700', '#e8d4a2', '#d4a574'])
   const isGoldText = GOLD_COLORS.has(G.toLowerCase())
   const goldStyle: React.CSSProperties = isGoldText ? {
-    background: `linear-gradient(135deg, ${G}, #f5e6a8, ${G}, #e8c96a)`,
+    background: 'linear-gradient(160deg, #a17c2e 0%, #c9a84c 20%, #f2d87a 35%, #ffe8a0 45%, #f2d87a 55%, #c9a84c 70%, #8b6914 85%, #c9a84c 100%)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     backgroundClip: 'text',
-  } : {}
+  } as React.CSSProperties : {}
   const FC = 'var(--font-cormorant-garamond)'
   const ov = data.textOverrides ?? {}
   const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
