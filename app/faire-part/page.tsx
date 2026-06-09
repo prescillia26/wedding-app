@@ -6795,7 +6795,7 @@ const firstDate = sorted[0]?.date
                           style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginTop: 16, marginBottom: 28, opacity: 0.78, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles)}
                         />
                       ) : ceremony.type === 'Shabbat Hatan' ? (
-                        <div style={{ textAlign: 'center', marginTop: 16, marginBottom: 16, padding: '0 12px' }}>
+                        <div style={{ textAlign: 'center', marginTop: 32, marginBottom: 16, padding: '0 12px' }}>
                           <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, lineHeight: 1.8, opacity: 0.85 }, 'narratif', data.zoneStyles)}>
                             Les Familles
                           </div>
