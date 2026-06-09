@@ -18,7 +18,7 @@ function toCloudinaryOgUrl(raw: string | undefined | null, version?: number, bgC
   if (raw.includes('/upload/')) {
     const bg = bgColor ? bgColor.replace('#', '') : 'fdf8f0'
     const transform = isPhoto
-      ? 'w_1200,h_630,c_fill,g_face:center,q_auto,f_auto'
+      ? 'w_1200,h_630,c_fill,g_face:center,z_1.3,q_auto,f_auto'
       : `w_1200,h_630,c_pad,b_rgb:${bg},q_auto,f_auto`
     const url = raw.replace('/upload/', `/upload/${transform}/`)
     return version ? `${url}?v=${version}` : url
