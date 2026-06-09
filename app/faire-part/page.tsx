@@ -3022,15 +3022,18 @@ function renderCard(ceremony: Ceremony, data: FormData, theme: ThemeObj, photoId
 
 // ── Style élégant ──────────────────────────────────────────────────────────────
 
-function CustomLogo({ url, size, scale = 100, color }: { url: string; size: number; scale?: number; color?: string }) {
+function CustomLogo({ url, size, scale = 100, color, bgColor }: { url: string; size: number; scale?: number; color?: string; bgColor?: string }) {
   const s = size * (scale / 100)
   let src = url
   if (url.includes('cloudinary.com')) {
+    // Fond transparent → remplacer par la couleur du fond du thème
+    const bgHex = bgColor ? bgColor.replace('#', '') : ''
+    const bgTransform = bgHex ? `/b_rgb:${bgHex}` : ''
     if (color) {
       const hex = color.replace('#', '')
-      src = url.replace('/upload/', `/upload/e_background_removal/e_trim/e_grayscale/e_tint:100:${hex}:0p/`)
+      src = url.replace('/upload/', `/upload/e_background_removal/e_trim/e_grayscale/e_tint:100:${hex}:0p${bgTransform}/`)
     } else {
-      src = url.replace('/upload/', '/upload/e_background_removal/e_trim/')
+      src = url.replace('/upload/', `/upload/e_background_removal/e_trim${bgTransform}/`)
     }
   }
   // eslint-disable-next-line @next/next/no-img-element
@@ -3041,7 +3044,7 @@ function LogoOrMonogram({ data, theme }: { data: FormData; theme: ThemeObj }) {
   if (data.customLogoUrl) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
-        <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={110} />
+        <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={110} bgColor={theme.fond} />
       </div>
     )
   }
@@ -3244,7 +3247,7 @@ function ElegantPage2({ data, theme }: { data: FormData; theme: ThemeObj }) {
   return (
     <div style={{ maxWidth: 600, margin: '0 auto', borderRadius: 4, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', backgroundColor: theme.fond, padding: '56px 48px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
       {data.mariageJuif && <div style={{ fontSize: 14, fontFamily: 'serif', color: theme.accent, direction: 'rtl', marginBottom: 20 }}>בס״ד</div>}
-      {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={200} /> : <MonogramByStyle initial1={i1} initial2={i2} color={data.monogrammeColor || theme.accent} size={200} style={data.monogrammeStyle || 'cercle'} />}
+      {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={200} bgColor={theme.fond} /> : <MonogramByStyle initial1={i1} initial2={i2} color={data.monogrammeColor || theme.accent} size={200} style={data.monogrammeStyle || 'cercle'} />}
       <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, marginTop: 20, textAlign: 'center', lineHeight: 1.2 }}>
         {data.marie1Prenom} & {data.marie2Prenom}
       </div>
@@ -5421,7 +5424,7 @@ function AnimSceau({ data, theme, onDone }: { data: FormData; theme: ThemeObj; o
             </svg>
             {/* Monogramme */}
             <div style={{ position: 'relative', zIndex: 2 }}>
-              {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={90} /> : <MonogramByStyle initial1={i1} initial2={i2} color="white" size={90} style={data.monogrammeStyle || 'cercle'} />}
+              {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={90} bgColor={theme.fond} /> : <MonogramByStyle initial1={i1} initial2={i2} color="white" size={90} style={data.monogrammeStyle || 'cercle'} />}
             </div>
           </div>
           {/* Fissures quand le sceau s'ouvre */}
@@ -5571,7 +5574,7 @@ function AnimParchemin({ data, theme, onDone }: { data: FormData; theme: ThemeOb
             </div>
             <div style={{ width: 50, height: '0.5px', background: theme.accent, margin: '0 auto 20px', animation: 'parchTextIn 0.4s ease 1.1s forwards', opacity: 0 }} />
             <div style={{ animation: 'parchTextIn 0.6s ease 1.2s forwards', opacity: 0, marginBottom: 16 }}>
-              {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={60} /> : <MonogramByStyle initial1={(data.marie1Prenom || 'A')[0].toUpperCase()} initial2={(data.marie2Prenom || 'B')[0].toUpperCase()} color={theme.accent} size={60} style={data.monogrammeStyle || 'cercle'} />}
+              {data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={60} bgColor={theme.fond} /> : <MonogramByStyle initial1={(data.marie1Prenom || 'A')[0].toUpperCase()} initial2={(data.marie2Prenom || 'B')[0].toUpperCase()} color={theme.accent} size={60} style={data.monogrammeStyle || 'cercle'} />}
             </div>
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, lineHeight: 1.1, animation: 'parchTextIn 0.8s ease 1.4s forwards', opacity: 0 }}>
               {data.marie1Prenom}
@@ -6484,7 +6487,7 @@ const firstDate = sorted[0]?.date
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>
             {(() => {
               const logoSz = data.illustrationCoupleId ? 80 : hasIntroPhoto ? 90 : 110
-              return data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={logoSz} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={logoSz} style={data.monogrammeStyle || 'cercle'} />
+              return data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={logoSz} bgColor={theme.fond} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={logoSz} style={data.monogrammeStyle || 'cercle'} />
             })()}
           </div>
           {canEdit && (
