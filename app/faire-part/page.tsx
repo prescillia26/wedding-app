@@ -2460,7 +2460,7 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
     <div style={{ position: 'relative', width: '100%', margin: 0, padding: 0, background: hasFrame ? '#ffffff' : themeCardBg, overflow: 'hidden' }}>
       {hasFrame && !isVideo && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: frameOpacity * 0.85, transform: `scale(${frameSize / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
+        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: FRAMES_CONTAIN.has(frameId) ? 'contain' : 'cover', mixBlendMode: 'multiply', opacity: frameOpacity, transform: `scale(${frameSize / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
       )}
       {hasFrame && isVideo && (
         <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: frameOpacity, pointerEvents: 'none', zIndex: 1 }} />
@@ -6606,24 +6606,12 @@ const firstDate = sorted[0]?.date
               {/* Illustration aquarelle — image décorative entre les sections */}
               <CeremonyCard isCard={isCard} accent={G}>
                 {i === 0 && <div id="first-ceremony" style={{ scrollMarginTop: 60 }} />}
-                <section id={`ceremony-${safeIdx}`} style={{
-                  padding: hasFrame ? 0 : '48px 0',
-                  position: 'relative', overflow: 'hidden', scrollMarginTop: 60, overflowWrap: 'break-word',
-                  // Cadre floral : casser le conteneur 480px pour toucher les bords du viewport
-                  ...(hasFrame ? { width: '100vw', marginLeft: 'calc(-50vw + 50%)', maxWidth: '100vw' } : {}),
-                  ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: theme.fond } : { background: hasFrame ? '#ffffff' : theme.fond }),
-                }}>
+                <section id={`ceremony-${safeIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : 48, paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : 48, paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: 'hidden', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: theme.fond } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
                   {hasFrame && frame.video ? (
                     <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
                   ) : hasFrame ? (
-                    <>
-                      {/* Fleurs haut : image originale, proportions naturelles, touche les bords */}
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 'auto', mixBlendMode: 'multiply', opacity: (data.frameOpacity ?? 1) * 0.85, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
-                      {/* Fleurs bas : même image retournée 180° */}
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={frame.url!} alt="" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: 'auto', mixBlendMode: 'multiply', opacity: (data.frameOpacity ?? 1) * 0.85, transform: 'rotate(180deg)', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
-                    </>
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: FRAMES_CONTAIN.has(data.frameId ?? '') ? 'contain' : 'cover', mixBlendMode: 'multiply', opacity: data.frameOpacity ?? 1, transform: `scale(${(data.frameSize ?? 100) / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
                   ) : usePhotoBg ? (
                     <>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -6645,7 +6633,7 @@ const firstDate = sorted[0]?.date
                     const setLayout = (l: LayoutMap) => onUpdate?.({ accueilLayout: l })
                     const pre = `c${safeIdx}_`
                     return (
-                  <div style={{ position: 'relative', zIndex: 10, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame), transform: data.textOffsetY ? `translateY(${data.textOffsetY}px)` : undefined, ...(hasFrame ? { maxWidth: '62%', margin: '0 auto', padding: '48px 16px' } : {}), textAlign: 'center' as const }}>
+                  <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame), transform: data.textOffsetY ? `translateY(${data.textOffsetY}px)` : undefined }}>
                     {data.mariageJuif && (
                       <DraggableElement id={pre+"bsd"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, opacity: 0.85, letterSpacing: 1, marginBottom: 8, paddingRight: 4, textShadow: goldShadow }}>בס״ד</div></DraggableElement>
                     )}
