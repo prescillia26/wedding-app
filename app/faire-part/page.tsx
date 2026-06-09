@@ -6478,9 +6478,7 @@ const firstDate = sorted[0]?.date
             })()
             return (<>
           {data.mariageJuif && (
-            <DraggableElement id="bsd" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-              <div style={{ fontFamily: 'serif', fontSize: 14, color: G, direction: 'rtl', marginBottom: 6, textShadow: goldShadow }}>בס״ד</div>
-            </DraggableElement>
+              <div style={{ textAlign: 'right', fontFamily: 'serif', fontSize: 14, color: G, direction: 'rtl', fontWeight: 700, opacity: 0.85, letterSpacing: 1, marginBottom: 6, paddingRight: 4, textShadow: goldShadow }}>בס״ד</div>
           )}
           <DraggableElement id="monogram" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>
@@ -6654,7 +6652,7 @@ const firstDate = sorted[0]?.date
                     return (
                   <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame), transform: data.textOffsetY ? `translateY(${data.textOffsetY}px)` : undefined }}>
                     {data.mariageJuif && (
-                      <DraggableElement id={pre+"bsd"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, opacity: 0.85, letterSpacing: 1, marginBottom: 8, paddingRight: 4, textShadow: goldShadow }}>בס״ד</div></DraggableElement>
+                      <div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, opacity: 0.85, letterSpacing: 1, marginBottom: 8, paddingRight: 4, textShadow: goldShadow }}>בס״ד</div>
                     )}
                     <DraggableElement id={pre+"titre"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} skipAnim={canEdit}>
                       <InlineEdit
