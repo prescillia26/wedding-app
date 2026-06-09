@@ -1962,15 +1962,15 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                 }} style={{ ...BTN, background: 'none', border: 'none', color: '#d45050', fontSize: 12 }}>Supprimer</button>
               </div>
             </div>
-            {/* Position : entre quel événement */}
-            <Label>Afficher après l&apos;événement n°</Label>
-            <select value={Math.floor(page.position / 10)} onChange={e => {
+            {/* Position : avant quel événement */}
+            <Label>Afficher avant l&apos;événement</Label>
+            <select value={page.position} onChange={e => {
               const pages = [...(data.customPages ?? [])]
-              pages[pi] = { ...pages[pi], position: Number(e.target.value) * 10 + 5 }
+              pages[pi] = { ...pages[pi], position: Number(e.target.value) }
               onChange({ customPages: pages })
             }} style={{ ...S.input, marginBottom: 12 }}>
               {data.ceremonies.map((c, ci) => (
-                <option key={ci} value={ci + 1}>{c.type === 'Autre' ? (c.customName || 'Événement') : c.type} (n°{ci + 1})</option>
+                <option key={ci} value={ci}>{c.type === 'Autre' ? (c.customName || 'Événement') : c.type}</option>
               ))}
             </select>
             {/* Texte */}
@@ -2043,7 +2043,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             texte: '',
             images: [],
             imagesMode: 'carousel',
-            position: data.ceremonies.length * 10 + 5,
+            position: 0, // Par défaut avant le 1er événement
           }
           onChange({ customPages: [...(data.customPages ?? []), newPage] })
         }} style={{
@@ -6614,6 +6614,20 @@ const firstDate = sorted[0]?.date
           const ceremonyLabel = ceremony.type === 'Autre' ? (ceremony.customName || 'Événement') : ceremony.type
           return (
             <React.Fragment key={safeIdx}>
+              {/* Pages supplémentaires AVANT cette cérémonie */}
+              {(data.customPages ?? []).filter(p => p.position === safeIdx).map(page => (
+                <CustomPageCard
+                  key={page.id}
+                  page={page}
+                  theme={theme}
+                  editable={role !== 'guest' && !!onUpdate}
+                  onUpdate={(patch) => {
+                    const pages = (data.customPages ?? []).map(p => p.id === page.id ? { ...p, ...patch } : p)
+                    onUpdate?.({ customPages: pages })
+                  }}
+                  onRemove={() => onUpdate?.({ customPages: (data.customPages ?? []).filter(p => p.id !== page.id) })}
+                />
+              ))}
               {/* Indicateur de page — visible uniquement pour les mariés */}
               {role !== 'guest' && (
                 <div style={{ textAlign: 'center', padding: '12px 0 4px', background: `${G}08`, borderTop: `1px dashed ${G}30`, borderBottom: `1px dashed ${G}30` }}>
@@ -6979,33 +6993,16 @@ const firstDate = sorted[0]?.date
                 </section>
               </CeremonyCard>
               {/* Séparateur entre cérémonies retiré — les indicateurs de page suffisent */}
-              {/* Pages supplémentaires positionnées après cette cérémonie */}
-              {(data.customPages ?? []).filter(p => {
-                const afterIdx = Math.floor(p.position / 10)
-                return afterIdx === safeIdx + 1
-              }).map(page => (
-                <CustomPageCard
-                  key={page.id}
-                  page={page}
-                  theme={theme}
-                  editable={role !== 'guest' && !!onUpdate}
-                  onUpdate={(patch) => {
-                    const pages = (data.customPages ?? []).map(p => p.id === page.id ? { ...p, ...patch } : p)
-                    onUpdate?.({ customPages: pages })
-                  }}
-                  onRemove={() => onUpdate?.({ customPages: (data.customPages ?? []).filter(p => p.id !== page.id) })}
-                />
-              ))}
+              {/* Pages supplémentaires rendues AVANT chaque cérémonie (voir plus haut) */}
             </React.Fragment>
           )
         })}
 
-        {/* Pages supplémentaires non matchées (position hors range) */}
+        {/* Pages supplémentaires qui ne matchent aucune cérémonie → après tout */}
         {(data.customPages ?? []).filter(p => {
-          const afterIdx = Math.floor(p.position / 10)
           return !sorted.some((_, si) => {
             const di = (data.ceremonies ?? []).findIndex(c => c.type === sorted[si].type && c.date === sorted[si].date && c.lieu === sorted[si].lieu)
-            return afterIdx === (di >= 0 ? di : si) + 1
+            return p.position === (di >= 0 ? di : si)
           })
         }).map(page => (
           <CustomPageCard
