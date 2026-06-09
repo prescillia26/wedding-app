@@ -7765,7 +7765,8 @@ export default function FairePartPage() {
     }
 
     if (id) {
-      // Vue partagée — pas de protection
+      // Vue partagée — supprimer le brouillon local pour éviter tout mélange entre comptes
+      try { localStorage.removeItem('wedding-draft') } catch { /* ignore */ }
       setIsShared(true)
       setRole(r)
       setAccessGranted(true)
@@ -7894,23 +7895,10 @@ export default function FairePartPage() {
 
         // Si connecté et qu'on a des faire-parts, tenter de charger le brouillon serveur
         // SAUF en mode share/edit (le faire-part est déjà chargé via get-share)
-        if (!isShareMode) {
-          const faireparts: string[] = data.faireparts ?? []
-          if (faireparts.length > 0) {
-            const shareId = faireparts[faireparts.length - 1]
-            try {
-              const draftRes = await fetch(`/api/get-draft?shareId=${shareId}`)
-              if (draftRes.ok) {
-                const draftData = await draftRes.json()
-                if (!cancelled && draftData.formData) {
-                  setFormData(draftData.formData as FormData)
-                  setHasDraft(true)
-                  setAccessGranted(true)
-                  setCheckingAccess(false)
-                }
-              }
-            } catch { /* ignore */ }
-          }
+        // AUSSI vérifier que activeShareId n'est pas déjà set (= le 1er useEffect a déjà chargé)
+        if (!isShareMode && !activeShareId) {
+          // Ne PAS charger automatiquement — l'utilisateur doit aller sur Mon Espace
+          // pour choisir quel faire-part modifier
         }
       } catch { /* pas connecté, ignore */ }
     }
