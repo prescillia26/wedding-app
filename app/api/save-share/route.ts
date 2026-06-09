@@ -21,21 +21,12 @@ export async function POST(request: Request) {
     // Vérifier la propriété si c'est une mise à jour (fixedId fourni)
     if (fixedId) {
       const existing = await redis.get<Record<string, unknown>>(fixedId)
-      if (existing && existing.ownerEmail) {
-        if (session?.email) {
-          // Vérifier si cet email fait partie du même compte (a ce faire-part dans ses faireparts)
-          const user = await redis.get<User>(`user:${session.email}`)
-          const ownsIt = user?.faireparts?.includes(fixedId) || session.email === existing.ownerEmail
-          if (!ownsIt) {
-            return Response.json({ error: 'Accès non autorisé' }, { status: 403 })
-          }
-          // Mettre à jour l'ownerEmail si le compte a changé d'email
-          shareData.ownerEmail = session.email
-        } else {
-          // Pas connecté → on laisse passer (la session a pu expirer mais
-          // l'utilisateur a le shareId = il est le propriétaire)
-          shareData.ownerEmail = existing.ownerEmail
-        }
+      if (existing && existing.ownerEmail && session?.email) {
+        // Connecté → mettre à jour l'ownerEmail
+        shareData.ownerEmail = session.email
+      } else if (existing && existing.ownerEmail) {
+        // Pas connecté → garder l'ownerEmail existant
+        shareData.ownerEmail = existing.ownerEmail as string
       }
       if (!existing?.ownerEmail && session?.email) {
         shareData.ownerEmail = session.email
