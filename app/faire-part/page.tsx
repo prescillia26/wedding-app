@@ -2443,7 +2443,7 @@ function OrnementCorner({ url, corner, size = 130 }: {
   }
   return (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={url} alt="" style={{ position: 'absolute', ...positions[corner], width: size, height: size, objectFit: 'contain', pointerEvents: 'none', zIndex: 0, opacity: 0.9 } as React.CSSProperties} />
+    <img src={url} alt="" style={{ position: 'absolute', ...positions[corner], width: size, height: size, maxWidth: '25%', maxHeight: 200, objectFit: 'contain', pointerEvents: 'none', zIndex: 0, opacity: 0.7 } as React.CSSProperties} />
   )
 }
 
@@ -2465,8 +2465,8 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
       {hasFrame && isVideo && (
         <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: frameOpacity, pointerEvents: 'none', zIndex: 1 }} />
       )}
-      <OrnementCorner url={ornUrl} corner="top-right" size={130} />
-      <OrnementCorner url={ornUrl} corner="bottom-left" size={130} />
+      <OrnementCorner url={ornUrl} corner="top-right" size={90} />
+      <OrnementCorner url={ornUrl} corner="bottom-left" size={90} />
       {/* Zone texte avec voile blanc semi-transparent derrière pour garantir la lisibilité sur cadres chargés */}
       <div style={{ position: 'relative', zIndex: 10, paddingTop: `${FRAMES_CUSTOM_PADDING[frameId]?.top ?? framePaddingV}%`, paddingBottom: `${FRAMES_CUSTOM_PADDING[frameId]?.bottom ?? framePaddingV}%`, paddingLeft: `${FRAMES_CUSTOM_PADDING[frameId]?.h ?? framePaddingH}%`, paddingRight: `${FRAMES_CUSTOM_PADDING[frameId]?.h ?? framePaddingH}%`, textAlign: 'center', opacity: textOpacity, transform: textOffsetY ? `translateY(${textOffsetY}px)` : undefined, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
         {hasFrame && FRAMES_STRONG_BG.has(frameId) && (
@@ -6367,10 +6367,10 @@ const firstDate = sorted[0]?.date
   const ornUrl = ORNEMENTS_LIBRARY.find(o => o.id === (data.ornamentId ?? 'none'))?.url ?? ''
   const frame = FRAMES.find(f => f.id === (data.frameId ?? 'none')) ?? FRAMES[FRAMES.length - 1]
   const hasFrame = !!frame.url
-  const OrnTR = () => <OrnementCorner url={ornUrl} corner="top-right" size={85} />
-  const OrnBL = () => <OrnementCorner url={ornUrl} corner="bottom-left" size={85} />
-  const OrnTL = () => <OrnementCorner url={ornUrl} corner="top-left" size={85} />
-  const OrnBR = () => <OrnementCorner url={ornUrl} corner="bottom-right" size={85} />
+  const OrnTR = () => <OrnementCorner url={ornUrl} corner="top-right" size={70} />
+  const OrnBL = () => <OrnementCorner url={ornUrl} corner="bottom-left" size={70} />
+  const OrnTL = () => <OrnementCorner url={ornUrl} corner="top-left" size={70} />
+  const OrnBR = () => <OrnementCorner url={ornUrl} corner="bottom-right" size={70} />
 
   const anim = data.animationStyle || 'slide-up'
 
