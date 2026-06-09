@@ -6768,10 +6768,10 @@ const firstDate = sorted[0]?.date
                     {(ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Mairie') && (
                       <DraggableElement id={pre+"prenoms"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={250} skipAnim={canEdit}>
                         {/* Prénoms sur la même ligne */}
-                        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(8px,2vw,14px)', flexWrap: 'wrap', marginBottom: 4 }}>
-                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(32px,8vw,52px)', color: G, lineHeight: 1.15, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom}</div>
+                        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(8px,2vw,14px)', flexWrap: 'wrap', marginBottom: 4, overflow: 'visible' }}>
+                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(32px,8vw,52px)', color: G, lineHeight: 1.3, whiteSpace: 'nowrap' as const, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom}</div>
                           <div style={{ fontFamily: FS, fontSize: 'clamp(18px,4vw,28px)', color: G, opacity: 0.5 }}>&</div>
-                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(32px,8vw,52px)', color: G, lineHeight: 1.15, whiteSpace: 'nowrap' as const }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom}</div>
+                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(32px,8vw,52px)', color: G, lineHeight: 1.3, whiteSpace: 'nowrap' as const, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom}</div>
                         </div>
                         {/* Prénoms hébraïques */}
                         {data.mariageJuif && (data.marie1PrenomHebreu || data.marie2PrenomHebreu) && (
@@ -6825,9 +6825,9 @@ const firstDate = sorted[0]?.date
                             sont ravies de vous convier au Shabbat Hatan de
                           </div>
                           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(6px,2vw,10px)', marginBottom: 8 }}>
-                            <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,46px)', color: G, lineHeight: 1.15 }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom || 'Prénom'}</div>
+                            <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,46px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom || 'Prénom'}</div>
                             <div style={{ fontFamily: FS, fontSize: 'clamp(16px,4vw,24px)', color: G, opacity: 0.5 }}>&</div>
-                            <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,46px)', color: G, lineHeight: 1.15 }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom || 'Prénom'}</div>
+                            <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,46px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom || 'Prénom'}</div>
                           </div>
                         </div>
                       ) : (
