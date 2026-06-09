@@ -7148,15 +7148,14 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
 
  // ✅ Enregistrer les modifications et mettre à jour la version publiée (visible par les invités)
   const handleSave = async () => {
+    const email = (() => { try { return localStorage.getItem('lovit_user_email') || '' } catch { return '' } })()
     const existingId = lastShareId
-      || (() => { try { return localStorage.getItem('lovit_share_id') } catch { return null } })()
+      || (() => { try { return localStorage.getItem(`lovit_share_id_${email}`) || localStorage.getItem('lovit_share_id') } catch { return null } })()
       || (() => { try { return new URLSearchParams(window.location.search).get('share') } catch { return null } })()
     if (!existingId) {
       showToast('Aucun faire-part à enregistrer — partagez d\'abord', 'error')
       return
     }
-    // Sauvegarder le shareId dans localStorage pour les prochaines fois
-    try { localStorage.setItem('lovit_share_id', existingId) } catch { /* ignore */ }
     if (saving) return
     setSaving(true)
     try {
@@ -7244,8 +7243,9 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
         dataToSend.slug = generateAutoSlug(dataToSend.marie1Prenom, dataToSend.marie2Prenom)
       }
 
+      const _email = (() => { try { return localStorage.getItem('lovit_user_email') || '' } catch { return '' } })()
       const existingId = lastShareId
-        || (() => { try { return localStorage.getItem('lovit_share_id') } catch { return null } })()
+        || (() => { try { return localStorage.getItem(`lovit_share_id_${_email}`) || localStorage.getItem('lovit_share_id') } catch { return null } })()
         || (() => { try { return new URLSearchParams(window.location.search).get('share') } catch { return null } })()
       if (!existingId) {
         showToast('Nouveau lien créé', 'success')
@@ -7790,9 +7790,18 @@ export default function FairePartPage() {
             setShowCards(false)
             setStep(1)
             setIsPaid(true)
-            try { localStorage.setItem('lovit_share_id', id) } catch { /* */ }
+            // Sauvegarder le shareId lié à l'email du compte
+            try {
+              const email = localStorage.getItem('lovit_user_email') || ''
+              localStorage.setItem(`lovit_share_id_${email}`, id)
+              localStorage.setItem('lovit_share_id', id)
+            } catch { /* */ }
           } else {
-            try { localStorage.setItem('lovit_share_id', id) } catch { /* */ }
+            try {
+              const email = localStorage.getItem('lovit_user_email') || ''
+              localStorage.setItem(`lovit_share_id_${email}`, id)
+              localStorage.setItem('lovit_share_id', id)
+            } catch { /* */ }
             setShowCards(true)
           }
         })
