@@ -3065,7 +3065,7 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
   // On ajoute du padding sur chaque span + letter-spacing pour éviter tout clipping.
   const gv: React.CSSProperties = { fontFamily: GV, fontSize: fs, color, padding: '0 0.08em', lineHeight: 1.1 }
   // Le "&" calligraphique entre les initiales — serré contre les lettres
-  const ampersand = <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: Math.round(fs * 0.4), color, opacity: 0.5, margin: '0 1px', lineHeight: 1 }}>&</span>
+  const ampersand = <span style={{ fontFamily: GV, fontSize: Math.round(fs * 0.4), color, opacity: 0.5, margin: '0 1px', lineHeight: 1 }}>&</span>
 
   // ── Style 1 : Entrelacé Luxe ──────────────────────────────────────────────
   if (style === 'cercle') return (
@@ -3092,7 +3092,7 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
     const r1 = d / 2 - 2, r2 = d / 2 - Math.round(d * 0.07)
     const sw1 = Math.max(0.5, d * 0.005), sw2 = Math.max(0.3, d * 0.003)
     const sfs = Math.round(fs * 0.84)
-    const ampSmall = <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: Math.round(sfs * 0.4), color, opacity: 0.5, margin: '0 1px', lineHeight: 1 }}>&</span>
+    const ampSmall = <span style={{ fontFamily: GV, fontSize: Math.round(sfs * 0.4), color, opacity: 0.5, margin: '0 1px', lineHeight: 1 }}>&</span>
     return (
       <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
         <svg style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', pointerEvents: 'none' }} width={d} height={d} viewBox={`0 0 ${d} ${d}`} xmlns="http://www.w3.org/2000/svg">
@@ -3112,7 +3112,7 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
     return (
       <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
         <span style={{ ...gv, fontSize: lfs, textAlign: 'center', marginBottom: Math.round(lfs * -0.2) }}>{a}</span>
-        <span style={{ fontFamily: CG, fontStyle: 'italic', fontSize: Math.round(lfs * 0.35), color, opacity: 0.45, lineHeight: 1, margin: `${Math.round(lfs * -0.05)}px 0` }}>&</span>
+        <span style={{ fontFamily: GV, fontSize: Math.round(lfs * 0.35), color, opacity: 0.5, lineHeight: 1, margin: `${Math.round(lfs * -0.05)}px 0` }}>&</span>
         <span style={{ ...gv, fontSize: lfs, opacity: 0.78, textAlign: 'center', marginTop: Math.round(lfs * -0.2) }}>{b}</span>
       </div>
     )
@@ -3125,7 +3125,7 @@ function MonogramByStyle({ initial1, initial2, color, size = 220, style = 'cercl
       <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: Math.round(size * 0.04) }}>
         <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: Math.round(fs * 0.06) }}>
           <span style={{ fontFamily: CG, fontSize: cfs, color, fontStyle: 'italic', fontWeight: 300, letterSpacing: Math.round(fs * 0.04) }}>{a}</span>
-          <span style={{ fontFamily: CG, fontSize: Math.round(cfs * 0.45), color, fontStyle: 'italic', fontWeight: 300, opacity: 0.45 }}>&</span>
+          <span style={{ fontFamily: GV, fontSize: Math.round(cfs * 0.45), color, opacity: 0.5 }}>&</span>
           <span style={{ fontFamily: CG, fontSize: cfs, color, fontStyle: 'italic', fontWeight: 300, letterSpacing: Math.round(fs * 0.04) }}>{b}</span>
         </div>
         <div style={{ width: Math.round(size * 0.72), height: 0.5, background: color, opacity: 0.35 }} />
@@ -5298,7 +5298,7 @@ function AnimBougie({ data, theme, onDone }: { data: FormData; theme: ThemeObj; 
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 42, color: theme.accent, lineHeight: 1.2, textShadow: `0 0 30px ${theme.accent}88` }}>
               {data.marie1Prenom}
             </div>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, color: `${theme.accent}99`, margin: '4px 0' }}>&</div>
+            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 20, color: `${theme.accent}99`, margin: '4px 0' }}>&</div>
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 42, color: theme.accent, lineHeight: 1.2, textShadow: `0 0 30px ${theme.accent}88` }}>
               {data.marie2Prenom}
             </div>
@@ -5357,7 +5357,7 @@ function AnimPlume({ data, theme, onDone }: { data: FormData; theme: ThemeObj; o
         {phase >= 2 && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 8, animation: 'fadeInUp 0.5s ease forwards' }}>
             <div style={{ height: '0.5px', background: theme.accent, opacity: 0.4, animation: 'separateur 0.6s ease forwards', width: 0 }} />
-            <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, color: theme.accent, opacity: 0.7 }}>&</span>
+            <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 22, color: theme.accent, opacity: 0.5 }}>&</span>
             <div style={{ height: '0.5px', background: theme.accent, opacity: 0.4, animation: 'separateur 0.6s ease forwards', width: 0 }} />
           </div>
         )}
@@ -5576,7 +5576,7 @@ function AnimParchemin({ data, theme, onDone }: { data: FormData; theme: ThemeOb
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, lineHeight: 1.1, animation: 'parchTextIn 0.8s ease 1.4s forwards', opacity: 0 }}>
               {data.marie1Prenom}
             </div>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, color: '#8a6040', animation: 'parchTextIn 0.5s ease 1.7s forwards', opacity: 0 }}>&</div>
+            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 22, color: '#8a6040', animation: 'parchTextIn 0.5s ease 1.7s forwards', opacity: 0 }}>&</div>
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 52, color: theme.accent, lineHeight: 1.1, marginBottom: 20, animation: 'parchTextIn 0.8s ease 1.9s forwards', opacity: 0 }}>
               {data.marie2Prenom}
             </div>
