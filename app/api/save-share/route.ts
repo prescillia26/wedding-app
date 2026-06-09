@@ -19,24 +19,13 @@ export async function POST(request: Request) {
     }
 
     // Vérifier la propriété si c'est une mise à jour (fixedId fourni)
+    // Quiconque a le shareId peut modifier (il faut le shareId pour modifier)
+    // L'ownerEmail est préservé — jamais écrasé
     if (fixedId) {
       const existing = await redis.get<Record<string, unknown>>(fixedId)
-      if (existing && existing.ownerEmail) {
-        if (session?.email) {
-          // Vérifier que le faire-part appartient bien à ce compte
-          const isOwner = session.email === existing.ownerEmail
-          const user = await redis.get<User>(`user:${session.email}`)
-          const inFaireparts = user?.faireparts?.includes(fixedId)
-          if (!isOwner && !inFaireparts) {
-            return Response.json({ error: 'Ce faire-part appartient à un autre compte.' }, { status: 403 })
-          }
-          shareData.ownerEmail = existing.ownerEmail as string
-        } else {
-          // Pas connecté → garder l'ownerEmail existant
-          shareData.ownerEmail = existing.ownerEmail as string
-        }
-      }
-      if (!existing?.ownerEmail && session?.email) {
+      if (existing?.ownerEmail) {
+        shareData.ownerEmail = existing.ownerEmail as string
+      } else if (session?.email) {
         shareData.ownerEmail = session.email
       }
     }
