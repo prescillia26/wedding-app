@@ -2460,7 +2460,7 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
     <div style={{ position: 'relative', width: '100%', margin: 0, padding: 0, background: hasFrame ? '#ffffff' : themeCardBg, overflow: 'hidden' }}>
       {hasFrame && !isVideo && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', mixBlendMode: 'multiply', opacity: frameOpacity * 0.8, transform: `scale(${frameSize / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
+        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: frameOpacity * 0.85, transform: `scale(${frameSize / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
       )}
       {hasFrame && isVideo && (
         <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: frameOpacity, pointerEvents: 'none', zIndex: 1 }} />
@@ -6606,12 +6606,12 @@ const firstDate = sorted[0]?.date
               {/* Illustration aquarelle — image décorative entre les sections */}
               <CeremonyCard isCard={isCard} accent={G}>
                 {i === 0 && <div id="first-ceremony" style={{ scrollMarginTop: 60 }} />}
-                <section id={`ceremony-${safeIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : 48, paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : 48, paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: 'visible', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: theme.fond } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
+                <section id={`ceremony-${safeIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 28}%` : 48, paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 28}%` : 48, paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 12}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 12}%` : undefined, position: 'relative', overflow: 'hidden', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: theme.fond } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
                   {hasFrame && frame.video ? (
                     <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
                   ) : hasFrame ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', mixBlendMode: 'multiply', opacity: (data.frameOpacity ?? 1) * 0.8, transform: `scale(${(data.frameSize ?? 100) / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+                    <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: (data.frameOpacity ?? 1) * 0.85, transform: `scale(${(data.frameSize ?? 100) / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
                   ) : usePhotoBg ? (
                     <>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
