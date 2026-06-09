@@ -6891,27 +6891,52 @@ const firstDate = sorted[0]?.date
                     {/* Shabbat Hatan multi-jours */}
                     {ceremony.type === 'Shabbat Hatan' && ceremony.multiJours && ceremony.multiJours.length > 0 && (
                       <AnimSection animStyle={anim} delay={460} skipAnim={canEdit}>
-                        <div style={{ marginTop: 8 }}>
-                          {ceremony.multiJours.map((moment, mi) => (
-                            <div key={moment.id} style={{ marginBottom: mi < ceremony.multiJours!.length - 1 ? 28 : 16 }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center', marginBottom: 12, maxWidth: 200, margin: '0 auto 12px' }}>
-                                <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to right, transparent, ${G}40)` }} />
-                                <span style={{ color: G, fontSize: 8, opacity: 0.5 }}>✡</span>
-                                <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to left, transparent, ${G}40)` }} />
+                        {(() => {
+                          const moments = ceremony.multiJours!
+                          const allLieux = moments.map(m => m.lieu || '').filter(Boolean)
+                          const allAdresses = moments.map(m => m.adresse || '').filter(Boolean)
+                          const sameLieu = allLieux.length > 0 && allLieux.every(l => l === allLieux[0])
+                          const sameAdresse = allAdresses.length > 0 && allAdresses.every(a => a === allAdresses[0])
+                          // Lieu global : celui de la cérémonie OU le lieu commun des moments
+                          const globalLieu = ceremony.lieu || (sameLieu ? allLieux[0] : '')
+                          const globalAdresse = ceremony.adresse || (sameAdresse ? allAdresses[0] : '')
+                          const showGlobalLieu = !!globalLieu && (sameLieu || !allLieux.length)
+
+                          return (
+                          <div style={{ marginTop: 8 }}>
+                            {/* Lieu commun affiché une seule fois au-dessus */}
+                            {showGlobalLieu && (
+                              <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                                <div style={{ fontFamily: FP, fontWeight: 700, fontSize: 17, color: TEXT, marginBottom: 4 }}>{globalLieu}</div>
+                                {globalAdresse && <div style={{ fontFamily: FC, fontSize: 13, color: theme.textSecondaire }}>{globalAdresse}</div>}
                               </div>
-                              <div style={{ fontFamily: FP, fontSize: 12, fontWeight: 600, letterSpacing: 4, textTransform: 'uppercase', color: G, textAlign: 'center', marginBottom: 8 }}>{moment.label}</div>
-                              {moment.heure && <div style={{ fontFamily: FP, fontSize: 18, fontWeight: 600, color: G, textAlign: 'center', marginBottom: 6, letterSpacing: 2 }}>{formatHeure(moment.heure, locale)}</div>}
-                              {moment.lieu && <div style={{ fontFamily: FP, fontWeight: 700, fontSize: 17, color: TEXT, textAlign: 'center', marginBottom: 4 }}>{moment.lieu}</div>}
-                              {moment.adresse && <div style={{ fontFamily: FC, fontSize: 13, color: theme.textSecondaire, textAlign: 'center', marginBottom: 4 }}>{moment.adresse}</div>}
-                              {moment.note && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: theme.textSecondaire, textAlign: 'center', opacity: 0.8 }}>{moment.note}</div>}
-                              {role === 'guest' && moment.adresse && (
-                                <div style={{ marginTop: 10, textAlign: 'center' }}>
-                                  <ItineraireButtons adresse={moment.adresse} theme={theme} compact />
+                            )}
+                            {moments.map((moment, mi) => {
+                              // Afficher le lieu seulement s'il est différent du lieu global
+                              const showMomentLieu = !showGlobalLieu && !!moment.lieu
+                              const showMomentAdresse = !showGlobalLieu && !!moment.adresse
+                              return (
+                              <div key={moment.id} style={{ marginBottom: mi < moments.length - 1 ? 24 : 16 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center', marginBottom: 12, maxWidth: 200, margin: '0 auto 12px' }}>
+                                  <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to right, transparent, ${G}40)` }} />
+                                  <span style={{ color: G, fontSize: 8, opacity: 0.5 }}>✡</span>
+                                  <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to left, transparent, ${G}40)` }} />
                                 </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
+                                <div style={{ fontFamily: FP, fontSize: 12, fontWeight: 600, letterSpacing: 4, textTransform: 'uppercase', color: G, textAlign: 'center', marginBottom: 8 }}>{moment.label}</div>
+                                {moment.heure && <div style={{ fontFamily: FP, fontSize: 18, fontWeight: 600, color: G, textAlign: 'center', marginBottom: 6, letterSpacing: 2 }}>{formatHeure(moment.heure, locale)}</div>}
+                                {showMomentLieu && <div style={{ fontFamily: FP, fontWeight: 700, fontSize: 17, color: TEXT, textAlign: 'center', marginBottom: 4 }}>{moment.lieu}</div>}
+                                {showMomentAdresse && <div style={{ fontFamily: FC, fontSize: 13, color: theme.textSecondaire, textAlign: 'center', marginBottom: 4 }}>{moment.adresse}</div>}
+                                {moment.note && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: theme.textSecondaire, textAlign: 'center', opacity: 0.8 }}>{moment.note}</div>}
+                                {role === 'guest' && showMomentAdresse && moment.adresse && (
+                                  <div style={{ marginTop: 10, textAlign: 'center' }}>
+                                    <ItineraireButtons adresse={moment.adresse} theme={theme} compact />
+                                  </div>
+                                )}
+                              </div>
+                            )})}
+                          </div>
+                          )
+                        })()}
                       </AnimSection>
                     )}
                     {ceremony.note && (
