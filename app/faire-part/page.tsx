@@ -471,6 +471,7 @@ interface FormData {
   luxePalette?: string // palette Luxe Pro (lavande/rose/sauge/bleunuit)
   // ── Couleur globale de tous les textes ──
   globalTextColor?: string
+  phraseColor?: string // couleur de la phrase "ont le plaisir..."
   // ── Pages supplémentaires (libres, entre les cérémonies) ──
   customPages?: CustomPage[]
   // ── Position du bouton Découvrir (page d'accueil) ──
@@ -6539,13 +6540,31 @@ const firstDate = sorted[0]?.date
             {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
           </div>
           </DraggableElement>
+          {(data.textOverrides?.['global_pleaseJoin'] !== '__hidden__') && (
+          <DraggableElement id="phrase" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <InlineEdit
             value={data.textOverrides?.['global_pleaseJoin'] || ''}
             defaultValue={t.fairepart.pleaseJoin}
             editable={canEdit}
             onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, global_pleaseJoin: v } })}
-            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: introTextColor, marginBottom: 0, textAlign: 'center', lineHeight: 1.6, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : (goldShadow || readableShadow(theme)) }}
+            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: data.phraseColor || introTextColor, marginBottom: 0, textAlign: 'center', lineHeight: 1.6, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : (goldShadow || readableShadow(theme)) }}
           />
+          {canEdit && (
+            <div onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ display: 'flex', gap: 4, justifyContent: 'center', marginTop: 4 }}>
+              {DRAG_COLORS.filter(c => c).slice(0, 12).map(c => (
+                <button key={c} type="button" onClick={() => onUpdate?.({ phraseColor: c })} style={{
+                  ...BTN, width: 14, height: 14, borderRadius: '50%', padding: 0,
+                  background: c, border: (data.phraseColor || '') === c ? `2px solid ${G}` : '1px solid #d6d1cb',
+                }} />
+              ))}
+              <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, global_pleaseJoin: '__hidden__' } })} style={{
+                ...BTN, padding: '1px 6px', borderRadius: 9999, border: '1px solid #d4505030',
+                background: 'white', color: '#d45050', fontSize: 8, fontWeight: 600,
+              }}>✕</button>
+            </div>
+          )}
+          </DraggableElement>
+          )}
           {/* Compte à rebours déplacé dans le sticky header */}
           {/* Bouton "Découvrir" — draggable par les mariés */}
           <DraggableElement id="decouvrir" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
