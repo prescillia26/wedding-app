@@ -6613,12 +6613,17 @@ const firstDate = sorted[0]?.date
                   ...(hasFrame ? { width: '100vw', marginLeft: 'calc(-50vw + 50%)', maxWidth: '100vw' } : {}),
                   ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: theme.fond } : { background: hasFrame ? '#ffffff' : theme.fond }),
                 }}>
-                  {/* Cadre floral — touche les bords du viewport */}
                   {hasFrame && frame.video ? (
                     <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
                   ) : hasFrame ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity: (data.frameOpacity ?? 1) * 0.85, transform: `scale(${(data.frameSize ?? 100) / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+                    <>
+                      {/* Fleurs haut : image originale, proportions naturelles, touche les bords */}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 'auto', mixBlendMode: 'multiply', opacity: (data.frameOpacity ?? 1) * 0.85, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+                      {/* Fleurs bas : même image retournée 180° */}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={frame.url!} alt="" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: 'auto', mixBlendMode: 'multiply', opacity: (data.frameOpacity ?? 1) * 0.85, transform: 'rotate(180deg)', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+                    </>
                   ) : usePhotoBg ? (
                     <>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
