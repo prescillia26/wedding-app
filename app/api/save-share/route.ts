@@ -73,23 +73,15 @@ export async function POST(request: Request) {
       if (slug) {
         const existingSlugOwner = await redis.get<string>(`slug:${slug}`)
         if (existingSlugOwner && existingSlugOwner !== id) {
-          // Slug pris par un autre ID — vérifier si c'est le MÊME propriétaire
-          const otherData = await redis.get<Record<string, unknown>>(existingSlugOwner)
-          if (otherData?.ownerEmail && otherData.ownerEmail === shareData.ownerEmail) {
-            // Même propriétaire (ancien ID du même faire-part) → mettre à jour le slug + rediriger l'ancien ID
-            await redis.set(`slug:${slug}`, id, { ex: 31536000 })
-            // ✅ Poser un pointeur canonique sur l'ancien ID → get-share suivra le lien
-            await redis.set(existingSlugOwner, { ...otherData, canonicalId: id }, { ex: 31536000 })
-          } else {
-            // Propriétaire différent → ajouter un suffixe aléatoire
-            const chars = 'abcdefghijkmnpqrstuvwxyz23456789'
-            let suffix = ''
-            for (let i = 0; i < 4; i++) suffix += chars[Math.floor(Math.random() * chars.length)]
-            const newSlug = `${slug}-${suffix}`
-            shareData.slug = newSlug
-            await redis.set(`slug:${newSlug}`, id, { ex: 31536000 })
-          }
+          // Slug pris par un autre faire-part → toujours ajouter un suffixe
+          const chars = 'abcdefghijkmnpqrstuvwxyz23456789'
+          let suffix = ''
+          for (let i = 0; i < 4; i++) suffix += chars[Math.floor(Math.random() * chars.length)]
+          const newSlug = `${slug}-${suffix}`
+          shareData.slug = newSlug
+          await redis.set(`slug:${newSlug}`, id, { ex: 31536000 })
         } else {
+          // Slug libre ou déjà attribué à ce même id → garder
           await redis.set(`slug:${slug}`, id, { ex: 31536000 })
         }
       }
