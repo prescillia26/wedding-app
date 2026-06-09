@@ -6795,13 +6795,24 @@ const firstDate = sorted[0]?.date
                           style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginTop: 16, marginBottom: 28, opacity: 0.78, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles)}
                         />
                       ) : ceremony.type === 'Shabbat Hatan' ? (
-                        <InlineEdit
-                          value={ov[`ceremony_${i}_joie`] || ''}
-                          defaultValue={`Les familles ${data.famille1PereNom || data.marie1Nom || '...'} et ${data.famille2PereNom || data.marie2Nom || '...'} sont ravies de vous convier au Shabbat Hatan de`}
-                          editable={canEdit}
-                          onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_joie`]: v } })}
-                          style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginTop: 16, marginBottom: 16, opacity: 0.82, lineHeight: 1.7, padding: '0 12px' }, 'narratif', data.zoneStyles)}
-                        />
+                        <div style={{ textAlign: 'center', marginTop: 16, marginBottom: 16, padding: '0 12px' }}>
+                          <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, lineHeight: 1.8, opacity: 0.85 }, 'narratif', data.zoneStyles)}>
+                            Les Familles
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(6px,2vw,10px)', marginTop: 4, marginBottom: 4 }}>
+                            <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(24px,6vw,38px)', color: G, lineHeight: 1.15 }, 'prenoms', data.zoneStyles)}>{data.famille1PereNom || data.marie1Nom || '...'}</div>
+                            <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(14px,3vw,20px)', color: G, opacity: 0.45 }}>&</div>
+                            <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(24px,6vw,38px)', color: G, lineHeight: 1.15 }, 'prenoms', data.zoneStyles)}>{data.famille2PereNom || data.marie2Nom || '...'}</div>
+                          </div>
+                          <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, lineHeight: 1.8, opacity: 0.85, marginBottom: 8 }, 'narratif', data.zoneStyles)}>
+                            sont ravies de vous convier au Shabbat Hatan de
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(6px,2vw,10px)', marginBottom: 8 }}>
+                            <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,46px)', color: G, lineHeight: 1.15 }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom || 'Prénom'}</div>
+                            <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(16px,4vw,24px)', color: G, opacity: 0.45 }}>&</div>
+                            <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,46px)', color: G, lineHeight: 1.15 }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom || 'Prénom'}</div>
+                          </div>
+                        </div>
                       ) : (
                         <div style={{ marginBottom: 28 }}>
                           <InlineEdit
