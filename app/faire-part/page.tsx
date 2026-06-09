@@ -2936,22 +2936,17 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
             {parents2.map((l, i) => <div key={i}>{l}</div>)}
           </div>
         </div>
-        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, textAlign: 'center', color: theme.texte, marginBottom: 24, lineHeight: 1.5 }}>
-          {joie}
+        {/* Texte d'invitation — toujours affiché */}
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, textAlign: 'center', color: theme.texte, marginBottom: 16, lineHeight: 1.7, padding: '0 12px' }}>
+          {ov[`ceremony_${ci}_joie`] || `Les familles ${data.famille1PereNom || data.marie1Nom || '...'} et ${data.famille2PereNom || data.marie2Nom || '...'} sont ravies de vous convier au Shabbat Hatan de`}
         </div>
-        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+        {/* Prénoms */}
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(6px,2vw,12px)', flexWrap: 'wrap' }}>
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(28px, 8vw, 56px)', color: theme.accent, lineHeight: 1.1 }}>{data.marie1Prenom || 'Prénom'}</div>
             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(16px, 4vw, 24px)', color: theme.accent, opacity: 0.45 }}>&</div>
             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(28px, 8vw, 56px)', color: theme.accent, lineHeight: 1.1 }}>{data.marie2Prenom || 'Prénom'}</div>
           </div>
-          {!data.mariageJuif && (data.marie1Prenom2 || data.marie2Prenom2) && (
-            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(16px,4vw,32px)', marginTop: 2 }}>
-              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(12px,3vw,18px)', letterSpacing: '0.04em', color: theme.accent, opacity: 0.7 }}>{data.marie1Prenom2 || ''}</div>
-              {(data.marie1Prenom2 && data.marie2Prenom2) && <div style={{ width: 1, height: 14, background: theme.accent, opacity: 0.2 }} />}
-              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(12px,3vw,18px)', letterSpacing: '0.04em', color: theme.accent, opacity: 0.7 }}>{data.marie2Prenom2 || ''}</div>
-            </div>
-          )}
           {data.mariageJuif && (data.marie1PrenomHebreu || data.marie2PrenomHebreu) && (
             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(16px,4vw,32px)', marginTop: 4 }}>
               {data.marie1PrenomHebreu && <div dir="rtl" lang="he" style={{ fontFamily: 'var(--font-bellefair), serif', fontSize: 'clamp(14px, 3.5vw, 20px)', color: theme.accent, opacity: 0.55 }}>{data.marie1PrenomHebreu}</div>}
@@ -2959,35 +2954,20 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
             </div>
           )}
         </div>
-        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(14px, 3.5vw, 22px)', color: theme.accent, textAlign: 'center', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 12 }}>{formatDateFr(ceremony.date)}</div>
-        <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(16px, 4vw, 22px)', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{formatHeure(ceremony.heure)}</div>
-        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte }}>
-          {lieuDisplay && <div style={{ maxWidth: '90%', margin: '0 auto', textWrap: 'balance' } as React.CSSProperties}>{formatLieu(lieuDisplay)}</div>}
-          {ceremony.adresse && <div style={{ fontSize: 'clamp(11px, 2.5vw, 14px)', marginTop: 8, color: theme.textSecondaire, textWrap: 'balance' } as React.CSSProperties}>{ceremony.adresse}</div>}
-        </div>
-        {isShared && ceremony.adresse && (
-          <div style={{ marginTop: 20, paddingBottom: 8 }}>
-            <ItineraireButtons adresse={ceremony.adresse} theme={theme} compact />
-          </div>
-        )}
-        {ceremony.note && (
-          <div style={{ marginTop: 20, paddingTop: 14, borderTop: `1px solid ${theme.accent}`, opacity: 0.8 }}>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, textAlign: 'center', color: theme.texte, maxWidth: '90%', margin: '0 auto' }}>{ceremony.note}</div>
-          </div>
-        )}
-        {/* Shabbat multi-jours */}
-        {ceremony.multiJours && ceremony.multiJours.length > 0 && (
-          <div style={{ marginTop: 28 }}>
+        {/* Moments du Shabbat OU date unique */}
+        {ceremony.multiJours && ceremony.multiJours.length > 0 ? (
+          <div>
             {ceremony.multiJours.map((moment, mi) => (
-              <div key={moment.id} style={{ marginBottom: mi < ceremony.multiJours!.length - 1 ? 24 : 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center', marginBottom: 16, maxWidth: 200, margin: '0 auto 16px' }}>
+              <div key={moment.id} style={{ marginBottom: mi < ceremony.multiJours!.length - 1 ? 28 : 0 }}>
+                {/* Séparateur */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center', marginBottom: 14, maxWidth: 200, margin: '0 auto 14px' }}>
                   <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to right, transparent, ${theme.accent}40)` }} />
                   <span style={{ color: theme.accent, fontSize: 8, opacity: 0.5 }}>✡</span>
                   <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to left, transparent, ${theme.accent}40)` }} />
                 </div>
-                <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 12, fontWeight: 600, letterSpacing: 4, textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 8 }}>{moment.label}</div>
-                {moment.heure && <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(14px, 3.5vw, 18px)', color: theme.accent, textAlign: 'center', marginBottom: 6 }}>{formatHeure(moment.heure)}</div>}
-                {moment.lieu && <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: theme.texte, textAlign: 'center', marginBottom: 4 }}>{moment.lieu}</div>}
+                <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 13, fontWeight: 600, letterSpacing: 4, textTransform: 'uppercase', color: theme.accent, textAlign: 'center', marginBottom: 10 }}>{moment.label}</div>
+                {moment.heure && <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(16px, 4vw, 22px)', color: theme.accent, textAlign: 'center', marginBottom: 6 }}>{formatHeure(moment.heure)}</div>}
+                {moment.lieu && <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 19, color: theme.texte, textAlign: 'center', marginBottom: 4 }}>{moment.lieu}</div>}
                 {moment.adresse && <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: theme.textSecondaire, textAlign: 'center', marginBottom: 4 }}>{moment.adresse}</div>}
                 {moment.note && <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 12, color: theme.textSecondaire, textAlign: 'center', opacity: 0.8 }}>{moment.note}</div>}
                 {isShared && moment.adresse && (
@@ -2997,6 +2977,25 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
                 )}
               </div>
             ))}
+          </div>
+        ) : (
+          <>
+            <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(14px, 3.5vw, 22px)', color: theme.accent, textAlign: 'center', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 12 }}>{formatDateFr(ceremony.date)}</div>
+            <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 'clamp(16px, 4vw, 22px)', color: theme.accent, textAlign: 'center', marginBottom: 16 }}>{formatHeure(ceremony.heure)}</div>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 20, textAlign: 'center', color: theme.texte }}>
+              {lieuDisplay && <div style={{ maxWidth: '90%', margin: '0 auto', textWrap: 'balance' } as React.CSSProperties}>{formatLieu(lieuDisplay)}</div>}
+              {ceremony.adresse && <div style={{ fontSize: 'clamp(11px, 2.5vw, 14px)', marginTop: 8, color: theme.textSecondaire, textWrap: 'balance' } as React.CSSProperties}>{ceremony.adresse}</div>}
+            </div>
+            {isShared && ceremony.adresse && (
+              <div style={{ marginTop: 20, paddingBottom: 8 }}>
+                <ItineraireButtons adresse={ceremony.adresse} theme={theme} compact />
+              </div>
+            )}
+          </>
+        )}
+        {ceremony.note && (
+          <div style={{ marginTop: 20, paddingTop: 14, borderTop: `1px solid ${theme.accent}22`, opacity: 0.8 }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, textAlign: 'center', color: theme.texte, maxWidth: '90%', margin: '0 auto' }}>{ceremony.note}</div>
           </div>
         )}
         {isShared && (
