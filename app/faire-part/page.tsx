@@ -6831,6 +6831,8 @@ const firstDate = sorted[0]?.date
                       )}
                     </AnimSection></DraggableElement>
                     <div style={{ height: 20 }} />
+                    {/* Date + lieu : masqués si Shabbat Hatan avec multiJours (les moments ont leur propre date/lieu) */}
+                    {!(ceremony.type === 'Shabbat Hatan' && ceremony.multiJours && ceremony.multiJours.length > 0) && (<>
                     <DraggableElement id={pre+"date"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={400} skipAnim={canEdit}>{ceremony.date ? (() => {
                         const d = new Date(ceremony.date + 'T12:00:00')
                         const parts = new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).formatToParts(d)
@@ -6868,6 +6870,7 @@ const firstDate = sorted[0]?.date
                         </div>
                       )}
                     </AnimSection></DraggableElement>
+                    </>)}
                     {/* Shabbat Hatan multi-jours */}
                     {ceremony.type === 'Shabbat Hatan' && ceremony.multiJours && ceremony.multiJours.length > 0 && (
                       <AnimSection animStyle={anim} delay={460} skipAnim={canEdit}>
