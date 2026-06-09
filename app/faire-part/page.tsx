@@ -3022,18 +3022,15 @@ function renderCard(ceremony: Ceremony, data: FormData, theme: ThemeObj, photoId
 
 // ── Style élégant ──────────────────────────────────────────────────────────────
 
-function CustomLogo({ url, size, scale = 100, color, bgColor }: { url: string; size: number; scale?: number; color?: string; bgColor?: string }) {
+function CustomLogo({ url, size, scale = 100, color }: { url: string; size: number; scale?: number; color?: string; bgColor?: string }) {
   const s = size * (scale / 100)
   let src = url
   if (url.includes('cloudinary.com')) {
-    // Fond transparent → remplacer par la couleur du fond du thème
-    const bgHex = bgColor ? bgColor.replace('#', '') : ''
-    const bgTransform = bgHex ? `/b_rgb:${bgHex}` : ''
     if (color) {
       const hex = color.replace('#', '')
-      src = url.replace('/upload/', `/upload/e_background_removal/e_trim/e_grayscale/e_tint:100:${hex}:0p${bgTransform}/`)
+      src = url.replace('/upload/', `/upload/e_background_removal/e_trim/e_grayscale/e_tint:100:${hex}:0p/`)
     } else {
-      src = url.replace('/upload/', `/upload/e_background_removal/e_trim${bgTransform}/`)
+      src = url.replace('/upload/', '/upload/e_background_removal/e_trim/')
     }
   }
   // eslint-disable-next-line @next/next/no-img-element
