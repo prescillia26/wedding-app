@@ -542,7 +542,7 @@ const fr: Dictionary = {
     // Event note (J)
     eventNoteLabel: 'Note pour cet événement (optionnel)',
     eventNotePlaceholder: 'ex: Tenue de soirée exigée / Parking disponible / Entrée par la rue de...',
-    eventFollowedBy: 'La mairie sera suivie de',
+    eventFollowedBy: 'Sera suivie de',
     afterEventPlaceholder: "ex: Cocktail, Vin d'honneur...",
     // Memorial
     memorialCustomPlaceholder: 'Ou écrivez votre propre formule...',
