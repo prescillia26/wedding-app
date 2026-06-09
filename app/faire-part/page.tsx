@@ -371,6 +371,8 @@ interface Ceremony {
   illustrationSize?: number // % de largeur (30-150, défaut 80)
   illustrationOffsetX?: number // décalage horizontal en px
   illustrationOffsetY?: number // décalage vertical en px
+  // ── Masquer du carton-réponse ──
+  rsvpHidden?: boolean
   // ── Shabbat multi-jours ──
   multiJours?: ShabbatMoment[]
   // ── Photo de fond du lieu ──
@@ -7069,7 +7071,7 @@ const firstDate = sorted[0]?.date
             )
           })()}
           {role === 'guest' && (
-            <InlineRSVP ceremonies={sorted} accent={G} textColor={TEXT} shareId={_lastShareId} mariee1={data.marie1Prenom} mariee2={data.marie2Prenom} rsvpText={data.textOverrides?.['global_rsvpText']} rsvpDeadline={data.rsvpDeadline} locale={locale} />
+            <InlineRSVP ceremonies={sorted.filter(c => !c.rsvpHidden)} accent={G} textColor={TEXT} shareId={_lastShareId} mariee1={data.marie1Prenom} mariee2={data.marie2Prenom} rsvpText={data.textOverrides?.['global_rsvpText']} rsvpDeadline={data.rsvpDeadline} locale={locale} />
           )}
           {role === 'couple' && (
             <div style={{ textAlign: 'center', paddingTop: 20 }}>
