@@ -6794,6 +6794,14 @@ const firstDate = sorted[0]?.date
                           onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_honore`]: v } })}
                           style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginTop: 16, marginBottom: 28, opacity: 0.78, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles)}
                         />
+                      ) : ceremony.type === 'Shabbat Hatan' ? (
+                        <InlineEdit
+                          value={ov[`ceremony_${i}_joie`] || ''}
+                          defaultValue={`Les familles ${data.famille1PereNom || data.marie1Nom || '...'} et ${data.famille2PereNom || data.marie2Nom || '...'} sont ravies de vous convier au Shabbat Hatan de`}
+                          editable={canEdit}
+                          onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_joie`]: v } })}
+                          style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginTop: 16, marginBottom: 16, opacity: 0.82, lineHeight: 1.7, padding: '0 12px' }, 'narratif', data.zoneStyles)}
+                        />
                       ) : (
                         <div style={{ marginBottom: 28 }}>
                           <InlineEdit
@@ -6849,6 +6857,32 @@ const firstDate = sorted[0]?.date
                         </div>
                       )}
                     </AnimSection></DraggableElement>
+                    {/* Shabbat Hatan multi-jours */}
+                    {ceremony.type === 'Shabbat Hatan' && ceremony.multiJours && ceremony.multiJours.length > 0 && (
+                      <AnimSection animStyle={anim} delay={460} skipAnim={canEdit}>
+                        <div style={{ marginTop: 8 }}>
+                          {ceremony.multiJours.map((moment, mi) => (
+                            <div key={moment.id} style={{ marginBottom: mi < ceremony.multiJours!.length - 1 ? 28 : 16 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center', marginBottom: 12, maxWidth: 200, margin: '0 auto 12px' }}>
+                                <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to right, transparent, ${G}40)` }} />
+                                <span style={{ color: G, fontSize: 8, opacity: 0.5 }}>✡</span>
+                                <div style={{ flex: 1, height: 0.5, background: `linear-gradient(to left, transparent, ${G}40)` }} />
+                              </div>
+                              <div style={{ fontFamily: FP, fontSize: 12, fontWeight: 600, letterSpacing: 4, textTransform: 'uppercase', color: G, textAlign: 'center', marginBottom: 8 }}>{moment.label}</div>
+                              {moment.heure && <div style={{ fontFamily: FP, fontSize: 18, fontWeight: 600, color: G, textAlign: 'center', marginBottom: 6, letterSpacing: 2 }}>{formatHeure(moment.heure, locale)}</div>}
+                              {moment.lieu && <div style={{ fontFamily: FP, fontWeight: 700, fontSize: 17, color: TEXT, textAlign: 'center', marginBottom: 4 }}>{moment.lieu}</div>}
+                              {moment.adresse && <div style={{ fontFamily: FC, fontSize: 13, color: theme.textSecondaire, textAlign: 'center', marginBottom: 4 }}>{moment.adresse}</div>}
+                              {moment.note && <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: theme.textSecondaire, textAlign: 'center', opacity: 0.8 }}>{moment.note}</div>}
+                              {role === 'guest' && moment.adresse && (
+                                <div style={{ marginTop: 10, textAlign: 'center' }}>
+                                  <ItineraireButtons adresse={moment.adresse} theme={theme} compact />
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </AnimSection>
+                    )}
                     {ceremony.note && (
                       <DraggableElement id={pre+"note"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={460} skipAnim={canEdit}><div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: theme.textSecondaire, textAlign: 'center', marginBottom: 16, padding: '12px 0', borderTop: `1px solid ${G}18` }}>{ceremony.note}</div></AnimSection></DraggableElement>
                     )}
