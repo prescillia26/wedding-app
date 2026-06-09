@@ -6606,8 +6606,14 @@ const firstDate = sorted[0]?.date
               {/* Illustration aquarelle — image décorative entre les sections */}
               <CeremonyCard isCard={isCard} accent={G}>
                 {i === 0 && <div id="first-ceremony" style={{ scrollMarginTop: 60 }} />}
-                <section id={`ceremony-${safeIdx}`} style={{ padding: hasFrame ? 0 : '48px 0', position: 'relative', overflow: 'hidden', scrollMarginTop: 60, overflowWrap: 'break-word', width: '100%', ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: theme.fond } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
-                  {/* Cadre floral — touche les bords (cover), le texte vit à l'intérieur */}
+                <section id={`ceremony-${safeIdx}`} style={{
+                  padding: hasFrame ? 0 : '48px 0',
+                  position: 'relative', overflow: 'hidden', scrollMarginTop: 60, overflowWrap: 'break-word',
+                  // Cadre floral : casser le conteneur 480px pour toucher les bords du viewport
+                  ...(hasFrame ? { width: '100vw', marginLeft: 'calc(-50vw + 50%)', maxWidth: '100vw' } : {}),
+                  ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: theme.fond } : { background: hasFrame ? '#ffffff' : theme.fond }),
+                }}>
+                  {/* Cadre floral — touche les bords du viewport */}
                   {hasFrame && frame.video ? (
                     <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
                   ) : hasFrame ? (
@@ -6634,7 +6640,7 @@ const firstDate = sorted[0]?.date
                     const setLayout = (l: LayoutMap) => onUpdate?.({ accueilLayout: l })
                     const pre = `c${safeIdx}_`
                     return (
-                  <div style={{ position: 'relative', zIndex: 10, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame), transform: data.textOffsetY ? `translateY(${data.textOffsetY}px)` : undefined, padding: hasFrame ? 'clamp(40px, 8%, 60px) clamp(32px, 18%, 90px)' : undefined, textAlign: 'center' as const }}>
+                  <div style={{ position: 'relative', zIndex: 10, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame), transform: data.textOffsetY ? `translateY(${data.textOffsetY}px)` : undefined, ...(hasFrame ? { maxWidth: '62%', margin: '0 auto', padding: '48px 16px' } : {}), textAlign: 'center' as const }}>
                     {data.mariageJuif && (
                       <DraggableElement id={pre+"bsd"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, opacity: 0.85, letterSpacing: 1, marginBottom: 8, paddingRight: 4, textShadow: goldShadow }}>בס״ד</div></DraggableElement>
                     )}
