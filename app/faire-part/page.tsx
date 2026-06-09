@@ -7251,7 +7251,9 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
         dataToSend.slug = generateAutoSlug(dataToSend.marie1Prenom, dataToSend.marie2Prenom)
       }
 
-      const existingId = (() => { try { return localStorage.getItem('lovit_share_id') } catch { return null } })()
+      const existingId = lastShareId
+        || (() => { try { return localStorage.getItem('lovit_share_id') } catch { return null } })()
+        || (() => { try { return new URLSearchParams(window.location.search).get('share') } catch { return null } })()
       if (!existingId) {
         showToast('Nouveau lien créé', 'success')
       }
@@ -7795,9 +7797,9 @@ export default function FairePartPage() {
             setShowCards(false)
             setStep(1)
             setIsPaid(true)
-            // Sauver le shareId pour les futures sauvegardes auto
             try { localStorage.setItem('lovit_share_id', id) } catch { /* */ }
           } else {
+            try { localStorage.setItem('lovit_share_id', id) } catch { /* */ }
             setShowCards(true)
           }
         })
