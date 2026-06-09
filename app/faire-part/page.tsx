@@ -7071,7 +7071,7 @@ const firstDate = sorted[0]?.date
 }
 
 // ── CardsView ─────────────────────────────────────────────────────────────────
-function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = true }: { data: FormData; onEdit: () => void; onReset: () => void; isShared: boolean; role: string | null; onUpdate?: (d: Partial<FormData>) => void; isPaid?: boolean }) {
+function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = true, activeShareId: parentShareId }: { data: FormData; onEdit: () => void; onReset: () => void; isShared: boolean; role: string | null; onUpdate?: (d: Partial<FormData>) => void; isPaid?: boolean; activeShareId?: string | null }) {
   const { t } = useT()
   const theme = THEMES[data.style]
   const allSorted = sortByDate(data.ceremonies)
@@ -7148,9 +7148,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
 
  // ✅ Enregistrer les modifications et mettre à jour la version publiée (visible par les invités)
   const handleSave = async () => {
-    const email = (() => { try { return localStorage.getItem('lovit_user_email') || '' } catch { return '' } })()
-    const existingId = lastShareId
-      || (() => { try { return localStorage.getItem(`lovit_share_id_${email}`) || localStorage.getItem('lovit_share_id') } catch { return null } })()
+    const existingId = parentShareId || lastShareId
       || (() => { try { return new URLSearchParams(window.location.search).get('share') } catch { return null } })()
     if (!existingId) {
       showToast('Aucun faire-part à enregistrer — partagez d\'abord', 'error')
@@ -7243,9 +7241,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
         dataToSend.slug = generateAutoSlug(dataToSend.marie1Prenom, dataToSend.marie2Prenom)
       }
 
-      const _email = (() => { try { return localStorage.getItem('lovit_user_email') || '' } catch { return '' } })()
-      const existingId = lastShareId
-        || (() => { try { return localStorage.getItem(`lovit_share_id_${_email}`) || localStorage.getItem('lovit_share_id') } catch { return null } })()
+      const existingId = parentShareId || lastShareId
         || (() => { try { return new URLSearchParams(window.location.search).get('share') } catch { return null } })()
       if (!existingId) {
         showToast('Nouveau lien créé', 'success')
@@ -7736,6 +7732,7 @@ export default function FairePartPage() {
   const [accessGranted, setAccessGranted] = useState(true) // Freemium : accès ouvert à tous
   const [checkingAccess, setCheckingAccess] = useState(false) // Plus de gate
   const [isPaid, setIsPaid] = useState(false) // false par défaut — sera true uniquement si connecté (checkAuth)
+  const [activeShareId, setActiveShareId] = useState<string | null>(null) // shareId du faire-part actuellement chargé
   const [userPack, setUserPack] = useState<'essentiel' | 'premium'>(() => {
     try {
       // URL ?pack=luxe → interne 'premium', ?pack=premium → interne 'essentiel'
@@ -7783,25 +7780,15 @@ export default function FairePartPage() {
             d.photosData = d.photosData.map((c, i) => ({ ...c, url: d.photosFond![i] ?? '' }))
           }
           setFormData(d)
+          // Sauvegarder le shareId dans le state React (source de vérité)
+          setActiveShareId(id)
           if (r === 'edit') {
-            // Mode édition depuis Mon espace
             setIsShared(false)
             setRole(null)
             setShowCards(false)
             setStep(1)
             setIsPaid(true)
-            // Sauvegarder le shareId lié à l'email du compte
-            try {
-              const email = localStorage.getItem('lovit_user_email') || ''
-              localStorage.setItem(`lovit_share_id_${email}`, id)
-              localStorage.setItem('lovit_share_id', id)
-            } catch { /* */ }
           } else {
-            try {
-              const email = localStorage.getItem('lovit_user_email') || ''
-              localStorage.setItem(`lovit_share_id_${email}`, id)
-              localStorage.setItem('lovit_share_id', id)
-            } catch { /* */ }
             setShowCards(true)
           }
         })
@@ -8051,7 +8038,7 @@ export default function FairePartPage() {
     const onEdit = () => { try { localStorage.setItem('wedding-draft', JSON.stringify(formData)) } catch { /* ignore */ } setShowCards(false); setStep(4) }
     const onReset = () => { setFormData(defaultFormData); setShowCards(false); setStep(1); try { localStorage.removeItem('wedding-draft') } catch { /* ignore */ } }
 
-    return <CardsView data={formData} onEdit={onEdit} onReset={onReset} isShared={isShared} role={role} onUpdate={update} isPaid={isPaid} />
+    return <CardsView data={formData} onEdit={onEdit} onReset={onReset} isShared={isShared} role={role} onUpdate={update} isPaid={isPaid} activeShareId={activeShareId} />
   }
 
   if (loadingShare) return (
