@@ -7155,11 +7155,15 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
 
  // ✅ Enregistrer les modifications et mettre à jour la version publiée (visible par les invités)
   const handleSave = async () => {
-    const existingId = (() => { try { return localStorage.getItem('lovit_share_id') } catch { return null } })()
+    const existingId = lastShareId
+      || (() => { try { return localStorage.getItem('lovit_share_id') } catch { return null } })()
+      || (() => { try { return new URLSearchParams(window.location.search).get('share') } catch { return null } })()
     if (!existingId) {
       showToast('Aucun faire-part à enregistrer — partagez d\'abord', 'error')
       return
     }
+    // Sauvegarder le shareId dans localStorage pour les prochaines fois
+    try { localStorage.setItem('lovit_share_id', existingId) } catch { /* ignore */ }
     if (saving) return
     setSaving(true)
     try {
