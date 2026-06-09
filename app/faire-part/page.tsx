@@ -6770,7 +6770,7 @@ const firstDate = sorted[0]?.date
                         {/* Prénoms sur la même ligne */}
                         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(8px,2vw,14px)', flexWrap: 'wrap', marginBottom: 4, overflow: 'visible' }}>
                           <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(32px,8vw,52px)', color: G, lineHeight: 1.3, whiteSpace: 'nowrap' as const, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom}</div>
-                          <div style={{ fontFamily: FS, fontSize: 'clamp(18px,4vw,28px)', color: G, opacity: 0.5 }}>&</div>
+                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(18px,4vw,28px)', color: G, opacity: 0.5 }, 'prenoms', data.zoneStyles)}>&</div>
                           <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(32px,8vw,52px)', color: G, lineHeight: 1.3, whiteSpace: 'nowrap' as const, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom}</div>
                         </div>
                         {/* Prénoms hébraïques */}
@@ -6817,16 +6817,16 @@ const firstDate = sorted[0]?.date
                             Les Familles
                           </div>
                           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(6px,2vw,10px)', marginTop: 4, marginBottom: 4 }}>
-                            <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(24px,6vw,38px)', color: G, lineHeight: 1.15 }, 'prenoms', data.zoneStyles)}>{data.famille1PereNom || data.marie1Nom || '...'}</div>
-                            <div style={{ fontFamily: FS, fontSize: 'clamp(14px,3vw,20px)', color: G, opacity: 0.5 }}>&</div>
-                            <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(24px,6vw,38px)', color: G, lineHeight: 1.15 }, 'prenoms', data.zoneStyles)}>{data.famille2PereNom || data.marie2Nom || '...'}</div>
+                            <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(24px,6vw,38px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)}>{data.famille1PereNom || data.marie1Nom || '...'}</div>
+                            <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(14px,3vw,20px)', color: G, opacity: 0.5 }, 'prenoms', data.zoneStyles)}>&</div>
+                            <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(24px,6vw,38px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)}>{data.famille2PereNom || data.marie2Nom || '...'}</div>
                           </div>
                           <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, lineHeight: 1.8, opacity: 0.85, marginBottom: 8 }, 'narratif', data.zoneStyles)}>
                             sont ravies de vous convier au Shabbat Hatan de
                           </div>
                           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(6px,2vw,10px)', marginBottom: 8 }}>
                             <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,46px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom || 'Prénom'}</div>
-                            <div style={{ fontFamily: FS, fontSize: 'clamp(16px,4vw,24px)', color: G, opacity: 0.5 }}>&</div>
+                            <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(16px,4vw,24px)', color: G, opacity: 0.5 }, 'prenoms', data.zoneStyles)}>&</div>
                             <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,46px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom || 'Prénom'}</div>
                           </div>
                         </div>
