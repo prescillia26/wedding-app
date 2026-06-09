@@ -1709,8 +1709,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             <Field label={t.fairepart.date} value={c.date} onChange={v => update(i, { date: v })} type="date" />
             <Field label={t.fairepart.time} value={c.heure} onChange={v => update(i, { heure: v })} type="time" />
           </div>
-          {c.type === 'Mairie' && (
-            <div>
+          <div>
               <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: '#3a3330' }}>
                 <input type="checkbox" checked={c.suiviDAutre} onChange={e => update(i, { suiviDAutre: e.target.checked })} />
                 {t.fairepart.afterEvent}
@@ -1721,8 +1720,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                   <Field label={t.fairepart.afterEventAddress} value={c.evenementSuivantAdresse} onChange={v => update(i, { evenementSuivantAdresse: v })} />
                 </div>
               )}
-            </div>
-          )}
+          </div>
           <div style={{ marginTop: 4 }}>
             <Label>{t.fairepart.eventNoteLabel}</Label>
             <textarea value={c.note} onChange={e => update(i, { note: e.target.value })}
