@@ -7258,14 +7258,13 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
       }
       const id = json.id
       setLastShareId(id)
-      try { localStorage.setItem('lovit_share_id', id) } catch { /* ignore */ }
       // Ajouter ?v=timestamp pour forcer WhatsApp à recharger la preview
       const cacheBust = `?v=${Math.floor(Date.now() / 1000)}`
       const base = window.location.origin + '/faire-part?share=' + id
-      setGuestUrl(base + '&role=guest')
       if (data.slug) {
-      const slugUrl = window.location.origin + '/' + data.slug + cacheBust
-      setGuestUrl(slugUrl)
+        setGuestUrl(window.location.origin + '/' + data.slug + cacheBust)
+      } else {
+        setGuestUrl(base + '&role=guest')
       }
       setCoupleUrl(base + '&role=couple')
       setShareModalOpen(true)
@@ -7818,7 +7817,7 @@ export default function FairePartPage() {
           // 2) Si pas de brouillon local, charger le faire-part depuis le serveur via shareId
           if (!hasLocalDraft) {
             try {
-              const savedShareId = localStorage.getItem('lovit_share_id')
+              const savedShareId = activeShareId || localStorage.getItem('lovit_share_id')
               if (savedShareId) {
                 const shareRes = await fetch(`/api/get-share?id=${savedShareId}`)
                 if (shareRes.ok) {
@@ -7921,8 +7920,9 @@ export default function FairePartPage() {
 
   // ✅ Sauvegarde serveur debounced — publie aussi pour que les invités voient les modifs
   const saveToServer = useCallback((data: FormData) => {
-    // Trouver le shareId actif (pas besoin d'attendre userEmail — le serveur vérifie l'auth)
-    const shareId = (() => { try { return localStorage.getItem('lovit_share_id') } catch { return null } })()
+    // Trouver le shareId actif depuis le state React ou l'URL (jamais localStorage)
+    const shareId = activeShareId
+      || (() => { try { return new URLSearchParams(window.location.search).get('share') } catch { return null } })()
     if (!shareId) return
 
     if (serverSaveTimer.current) clearTimeout(serverSaveTimer.current)
