@@ -6478,7 +6478,9 @@ const firstDate = sorted[0]?.date
             })()
             return (<>
           {data.mariageJuif && (
-              <div style={{ textAlign: 'right', fontFamily: 'serif', fontSize: 14, color: G, direction: 'rtl', fontWeight: 700, opacity: 0.85, letterSpacing: 1, marginBottom: 6, paddingRight: 4, textShadow: goldShadow }}>בס״ד</div>
+            <DraggableElement id="bsd" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
+              <div style={{ fontFamily: 'serif', fontSize: 14, color: G, direction: 'rtl', fontWeight: 700, opacity: 0.85, letterSpacing: 1, marginBottom: 6, textShadow: goldShadow }}>בס״ד</div>
+            </DraggableElement>
           )}
           <DraggableElement id="monogram" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>
