@@ -114,7 +114,9 @@ export async function generateMetadata(
   ].filter(Boolean)
   const description = descParts.join(' ') + '. Découvrez les informations et confirmez votre présence.'
 
-  const coupleIlluUrl = result.data.illustrationCoupleId ? ILLU_COUPLES[result.data.illustrationCoupleId] : ''
+  const coupleIlluUrl = result.data.illustrationCoupleId
+    ? (ILLU_COUPLES[result.data.illustrationCoupleId] || (result.data.illustrationCoupleId.startsWith('http') ? result.data.illustrationCoupleId : ''))
+    : ''
 
   // Couleur de fond du thème pour le padding des illustrations
   const THEME_BG: Record<string, string> = {
