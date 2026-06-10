@@ -5068,10 +5068,10 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, firstDate
 
 // ── SharedPageContent : vue partagée page unique luxe ─────────────────────────
 
-function CeremonyCard({ isCard, accent, children }: { isCard: boolean; accent: string; children: React.ReactNode }) {
+function CeremonyCard({ isCard, accent, hasFrame, children }: { isCard: boolean; accent: string; hasFrame?: boolean; children: React.ReactNode }) {
   if (!isCard) return <>{children}</>
   return (
-    <div style={{ margin: '24px 0', borderRadius: 16, overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.13)', border: `1.5px solid ${accent}22` }}>
+    <div style={{ margin: hasFrame ? '0' : '24px 0', borderRadius: hasFrame ? 0 : 16, overflow: 'hidden', boxShadow: hasFrame ? 'none' : '0 8px 32px rgba(0,0,0,0.13)', border: hasFrame ? 'none' : `1.5px solid ${accent}22` }}>
       {children}
     </div>
   )
@@ -6657,7 +6657,7 @@ const firstDate = sorted[0]?.date
                 </div>
               )}
               {/* Illustration aquarelle — image décorative entre les sections */}
-              <CeremonyCard isCard={isCard} accent={G}>
+              <CeremonyCard isCard={isCard} accent={G} hasFrame={hasFrame}>
                 {i === 0 && !(data.customPages ?? []).some(p => p.position === safeIdx) && <div id="first-content" style={{ scrollMarginTop: 60 }} />}
                 <section id={`ceremony-${safeIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : 48, paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : 48, paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: 'hidden', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: theme.fond } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
                   {hasFrame && frame.video ? (
