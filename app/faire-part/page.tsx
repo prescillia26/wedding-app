@@ -279,11 +279,9 @@ const FRAMES: { id: string; label: string; url: string | null; video?: boolean; 
   { id: 'frame-34', label: '🌻 Floral Doré', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778816/14_bzmmdm.png', frameType: 'full-border' },
   { id: 'frame-61', label: '🌸 Couronne Florale', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857014/61_nnkips.png', frameType: 'full-border' },
   { id: 'frame-75', label: '🌸 Cadre Complet', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878823/75_qc4gsm.png', frameType: 'full-border' },
-  { id: 'frame-76', label: '🌸 Bordure Florale', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878833/76_g2u8xr.png', frameType: 'full-border' },
   { id: 'frame-78', label: '🌸 Cadre Pêche', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878816/78_umvdax.png', frameType: 'full-border' },
   { id: 'frame-79', label: '🌸 Cadre Pastel', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878824/79_msrbl6.png', frameType: 'full-border' },
   // ── Watermark : fond pâle en filigrane ──
-  { id: 'frame-101', label: '🌸 Filigrane 2', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878850/101_s1bjjf.png', frameType: 'watermark' },
   // ── Sans cadre ──
   { id: 'none', label: '⬜ Sans cadre', url: null },
 ]
