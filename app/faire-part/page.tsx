@@ -256,34 +256,26 @@ const FRAMES_CUSTOM_PADDING: Record<string, { top: number; bottom: number; h: nu
 // Types de templates décoratifs
 type FrameType = 'floral-corners' | 'full-border' | 'watermark'
 
-// Rendering helpers per frameType
-function frameImgStyle(ft: FrameType | undefined, opacity: number, size: number): React.CSSProperties {
-  const base: React.CSSProperties = { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity, transform: `scale(${size / 100})`, transformOrigin: 'center center', pointerEvents: 'none' }
-  if (ft === 'floral-corners') {
-    // fill = étire l'image pour que les coins floraux collent aux coins de la carte
-    return { ...base, objectFit: 'fill' }
-  }
-  if (ft === 'watermark') {
-    return { ...base, opacity: Math.min(opacity, 0.18) }
-  }
-  // full-border (default)
-  return { ...base, mixBlendMode: 'multiply' }
+// Rendering helpers per frameType — pour l'instant tous identiques (cover + multiply)
+// La distinction par frameType sera activée plus tard cadre par cadre
+function frameImgStyle(_ft: FrameType | undefined, opacity: number, size: number): React.CSSProperties {
+  return { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity, transform: `scale(${size / 100})`, transformOrigin: 'center center', pointerEvents: 'none' }
 }
 
 const FRAMES: { id: string; label: string; url: string | null; video?: boolean; frameType?: FrameType }[] = [
   // ── Floral corners : fleurs dans les coins, centre vide pour le texte ──
-  { id: 'frame-55', label: '🌸 Bouquet Bleu', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781112161/55_l7xahl.png', frameType: 'floral-corners' },
-  { id: 'frame-69', label: '🌸 Roses Pâles', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857021/69_vko7to.png', frameType: 'floral-corners' },
-  { id: 'frame-70', label: '🌸 Fleurs Sauvages', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857021/70_skvaop.png', frameType: 'floral-corners' },
-  { id: 'frame-71', label: '🌸 Pivoine Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857022/71_ntcix8.png', frameType: 'floral-corners' },
-  { id: 'frame-95', label: '🌸 Cascade Florale', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878845/95_w9natp.png', frameType: 'floral-corners' },
-  { id: 'frame-96', label: '🌸 Bouquet Délicat', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878838/96_bauksw.png', frameType: 'floral-corners' },
-  { id: 'frame-97', label: '🌸 Floral Doux', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878845/97_dcccon.png', frameType: 'floral-corners' },
-  { id: 'frame-147', label: '🌿 Feuillage Vert', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896737/147_vmtvha.png', frameType: 'floral-corners' },
-  { id: 'frame-148', label: '🌿 Eucalyptus', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896737/148_hdqw48.png', frameType: 'floral-corners' },
-  { id: 'frame-149', label: '🌿 Olive & Sauge', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896746/149_jwshu6.png', frameType: 'floral-corners' },
-  { id: 'frame-150', label: '🌿 Fougère', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896741/150_rzlu80.png', frameType: 'floral-corners' },
-  { id: 'frame-154', label: '🌿 Laurier', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896718/154_pxirys.png', frameType: 'floral-corners' },
+  { id: 'frame-55', label: '🌸 Bouquet Bleu', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781115458/55_l7xahl.png', frameType: 'floral-corners' },
+  { id: 'frame-69', label: '🌸 Roses Pâles', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1776857021/69_vko7to.png', frameType: 'floral-corners' },
+  { id: 'frame-70', label: '🌸 Fleurs Sauvages', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1776857021/70_skvaop.png', frameType: 'floral-corners' },
+  { id: 'frame-71', label: '🌸 Pivoine Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1776857022/71_ntcix8.png', frameType: 'floral-corners' },
+  { id: 'frame-95', label: '🌸 Cascade Florale', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1776878845/95_w9natp.png', frameType: 'floral-corners' },
+  { id: 'frame-96', label: '🌸 Bouquet Délicat', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1776878838/96_bauksw.png', frameType: 'floral-corners' },
+  { id: 'frame-97', label: '🌸 Floral Doux', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1776878845/97_dcccon.png', frameType: 'floral-corners' },
+  { id: 'frame-147', label: '🌿 Feuillage Vert', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1777896737/147_vmtvha.png', frameType: 'floral-corners' },
+  { id: 'frame-148', label: '🌿 Eucalyptus', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1777896737/148_hdqw48.png', frameType: 'floral-corners' },
+  { id: 'frame-149', label: '🌿 Olive & Sauge', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1777896746/149_jwshu6.png', frameType: 'floral-corners' },
+  { id: 'frame-150', label: '🌿 Fougère', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1777896741/150_rzlu80.png', frameType: 'floral-corners' },
+  { id: 'frame-154', label: '🌿 Laurier', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1777896718/154_pxirys.png', frameType: 'floral-corners' },
   // ── Full border : cadre complet autour de toute la section ──
   { id: 'frame-02', label: '🤍 Roses Crème', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/51_m9vx96.png', frameType: 'full-border' },
   { id: 'frame-03', label: '🌺 Cadre Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/53_ho1gq8.png', frameType: 'full-border' },
