@@ -258,14 +258,16 @@ type FrameType = 'floral-corners' | 'full-border' | 'watermark'
 
 // Rendering helpers per frameType
 function frameImgStyle(ft: FrameType | undefined, opacity: number, size: number): React.CSSProperties {
+  const base: React.CSSProperties = { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity, transform: `scale(${size / 100})`, transformOrigin: 'center center', pointerEvents: 'none' }
   if (ft === 'floral-corners') {
-    return { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain', opacity, transform: `scale(${size / 100})`, transformOrigin: 'center center', pointerEvents: 'none' }
+    // Pas de mixBlendMode — fleurs dans les coins, centre transparent
+    return base
   }
   if (ft === 'watermark') {
-    return { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: Math.min(opacity, 0.2), pointerEvents: 'none' }
+    return { ...base, opacity: Math.min(opacity, 0.18) }
   }
   // full-border (default)
-  return { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity, transform: `scale(${size / 100})`, transformOrigin: 'center center', pointerEvents: 'none' }
+  return { ...base, mixBlendMode: 'multiply' }
 }
 
 const FRAMES: { id: string; label: string; url: string | null; video?: boolean; frameType?: FrameType }[] = [
