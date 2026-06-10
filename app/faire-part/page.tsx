@@ -251,41 +251,57 @@ const VIDEO_BACKGROUNDS: { id: string; label: string; url: string; textPosition:
 ]
 
 const FRAMES_STRONG_BG = new Set(['frame-80', 'frame-107', 'frame-108'])
-// Frames qui doivent être affichés en contain (cadres décoratifs qui ne doivent pas être coupés)
-const FRAMES_CONTAIN = new Set<string>()
 // Padding personnalisé pour les cadres à bordure — top/bottom/h adaptés à chaque cadre
 const FRAMES_CUSTOM_PADDING: Record<string, { top: number; bottom: number; h: number }> = {}
-const FRAMES: { id: string; label: string; url: string | null; video?: boolean }[] = [
-  { id: 'frame-02', label: '🤍 Roses Crème Haut/Bas', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/51_m9vx96.png' },
-  { id: 'frame-03', label: '🌺 Cadre Floral Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/53_ho1gq8.png' },
-  { id: 'frame-07', label: '🌷 Fleurs Rose Aquarelle', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785416/49_ewrr8v.png' },
-  { id: 'frame-34', label: '🌻 Floral 14', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778816/14_bzmmdm.png' },
-  { id: 'frame-55', label: '🌸 Floral 55', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781112161/55_l7xahl.png' },
-  { id: 'frame-61', label: '🌸 Floral 61', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857014/61_nnkips.png' },
-  { id: 'frame-69', label: '🌸 Floral 69', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857021/69_vko7to.png' },
-  { id: 'frame-70', label: '🌸 Floral 70', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857021/70_skvaop.png' },
-  { id: 'frame-71', label: '🌸 Floral 71', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857022/71_ntcix8.png' },
-  { id: 'frame-75', label: '🌸 Floral 75', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878823/75_qc4gsm.png' },
-  { id: 'frame-76', label: '🌸 Floral 76', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878833/76_g2u8xr.png' },
-  { id: 'frame-77', label: '🌸 Floral 77', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878824/77_rnfcni.png' },
-  { id: 'frame-78', label: '🌸 Floral 78', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878816/78_umvdax.png' },
-  { id: 'frame-79', label: '🌸 Floral 79', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878824/79_msrbl6.png' },
-  { id: 'frame-95', label: '🌸 Floral 95', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878845/95_w9natp.png' },
-  { id: 'frame-96', label: '🌸 Floral 96', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878838/96_bauksw.png' },
-  { id: 'frame-97', label: '🌸 Floral 97', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878845/97_dcccon.png' },
-  { id: 'frame-100', label: '🌸 Floral 100', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878852/100_kzuxzq.png' },
-  { id: 'frame-101', label: '🌸 Floral 101', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878850/101_s1bjjf.png' },
-  { id: 'frame-102', label: '🌸 Floral 102', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878855/102_atqmm6.png' },
-  { id: 'frame-103', label: '🌸 Floral 103', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878853/103_siefgf.png' },
-  { id: 'frame-104', label: '🌸 Floral 104', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878854/104_mafsu8.png' },
-  { id: 'frame-105', label: '🌸 Floral 105', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878857/105_cyugrg.png' },
-  { id: 'frame-106', label: '🌸 Floral 106', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878859/106_lv0kwe.png' },
-  { id: 'frame-147', label: '🌿 Feuillage 147', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896737/147_vmtvha.png' },
-  { id: 'frame-148', label: '🌿 Feuillage 148', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896737/148_hdqw48.png' },
-  { id: 'frame-149', label: '🌿 Feuillage 149', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896746/149_jwshu6.png' },
-  { id: 'frame-150', label: '🌿 Feuillage 150', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896741/150_rzlu80.png' },
-  { id: 'frame-154', label: '🌿 Feuillage 154', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896718/154_pxirys.png' },
-  // Vidéos retirées des cadres — réservées pour la cover page invités
+// Types de templates décoratifs
+type FrameType = 'floral-corners' | 'full-border' | 'watermark'
+
+// Rendering helpers per frameType
+function frameImgStyle(ft: FrameType | undefined, opacity: number, size: number): React.CSSProperties {
+  if (ft === 'floral-corners') {
+    return { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain', opacity, transform: `scale(${size / 100})`, transformOrigin: 'center center', pointerEvents: 'none' }
+  }
+  if (ft === 'watermark') {
+    return { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: Math.min(opacity, 0.2), pointerEvents: 'none' }
+  }
+  // full-border (default)
+  return { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply', opacity, transform: `scale(${size / 100})`, transformOrigin: 'center center', pointerEvents: 'none' }
+}
+
+const FRAMES: { id: string; label: string; url: string | null; video?: boolean; frameType?: FrameType }[] = [
+  // ── Floral corners : fleurs dans les coins, centre vide pour le texte ──
+  { id: 'frame-55', label: '🌸 Bouquet Bleu', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781112161/55_l7xahl.png', frameType: 'floral-corners' },
+  { id: 'frame-69', label: '🌸 Roses Pâles', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857021/69_vko7to.png', frameType: 'floral-corners' },
+  { id: 'frame-70', label: '🌸 Fleurs Sauvages', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857021/70_skvaop.png', frameType: 'floral-corners' },
+  { id: 'frame-71', label: '🌸 Pivoine Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857022/71_ntcix8.png', frameType: 'floral-corners' },
+  { id: 'frame-95', label: '🌸 Cascade Florale', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878845/95_w9natp.png', frameType: 'floral-corners' },
+  { id: 'frame-96', label: '🌸 Bouquet Délicat', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878838/96_bauksw.png', frameType: 'floral-corners' },
+  { id: 'frame-97', label: '🌸 Floral Doux', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878845/97_dcccon.png', frameType: 'floral-corners' },
+  { id: 'frame-147', label: '🌿 Feuillage Vert', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896737/147_vmtvha.png', frameType: 'floral-corners' },
+  { id: 'frame-148', label: '🌿 Eucalyptus', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896737/148_hdqw48.png', frameType: 'floral-corners' },
+  { id: 'frame-149', label: '🌿 Olive & Sauge', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896746/149_jwshu6.png', frameType: 'floral-corners' },
+  { id: 'frame-150', label: '🌿 Fougère', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896741/150_rzlu80.png', frameType: 'floral-corners' },
+  { id: 'frame-154', label: '🌿 Laurier', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1777896718/154_pxirys.png', frameType: 'floral-corners' },
+  // ── Full border : cadre complet autour de toute la section ──
+  { id: 'frame-02', label: '🤍 Roses Crème', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/51_m9vx96.png', frameType: 'full-border' },
+  { id: 'frame-03', label: '🌺 Cadre Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/53_ho1gq8.png', frameType: 'full-border' },
+  { id: 'frame-07', label: '🌷 Aquarelle Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785416/49_ewrr8v.png', frameType: 'full-border' },
+  { id: 'frame-34', label: '🌻 Floral Doré', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778816/14_bzmmdm.png', frameType: 'full-border' },
+  { id: 'frame-61', label: '🌸 Couronne Florale', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857014/61_nnkips.png', frameType: 'full-border' },
+  { id: 'frame-75', label: '🌸 Cadre Complet', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878823/75_qc4gsm.png', frameType: 'full-border' },
+  { id: 'frame-76', label: '🌸 Bordure Florale', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878833/76_g2u8xr.png', frameType: 'full-border' },
+  { id: 'frame-77', label: '🌸 Encadrement', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878824/77_rnfcni.png', frameType: 'full-border' },
+  { id: 'frame-78', label: '🌸 Cadre Pêche', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878816/78_umvdax.png', frameType: 'full-border' },
+  { id: 'frame-79', label: '🌸 Cadre Pastel', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878824/79_msrbl6.png', frameType: 'full-border' },
+  // ── Watermark : fond pâle en filigrane ──
+  { id: 'frame-100', label: '🌸 Filigrane 1', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878852/100_kzuxzq.png', frameType: 'watermark' },
+  { id: 'frame-101', label: '🌸 Filigrane 2', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878850/101_s1bjjf.png', frameType: 'watermark' },
+  { id: 'frame-102', label: '🌸 Filigrane 3', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878855/102_atqmm6.png', frameType: 'watermark' },
+  { id: 'frame-103', label: '🌸 Filigrane 4', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878853/103_siefgf.png', frameType: 'watermark' },
+  { id: 'frame-104', label: '🌸 Filigrane 5', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878854/104_mafsu8.png', frameType: 'watermark' },
+  { id: 'frame-105', label: '🌸 Filigrane 6', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878857/105_cyugrg.png', frameType: 'watermark' },
+  { id: 'frame-106', label: '🌸 Filigrane 7', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878859/106_lv0kwe.png', frameType: 'watermark' },
+  // ── Sans cadre ──
   { id: 'none', label: '⬜ Sans cadre', url: null },
 ]
 
@@ -2461,7 +2477,7 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
     <div style={{ position: 'relative', width: '100%', margin: 0, padding: 0, background: hasFrame ? '#ffffff' : themeCardBg, overflow: 'hidden' }}>
       {hasFrame && !isVideo && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: FRAMES_CONTAIN.has(frameId) ? 'contain' : 'cover', mixBlendMode: 'multiply', opacity: frameOpacity, transform: `scale(${frameSize / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 1 } as React.CSSProperties} />
+        <img src={frame.url!} alt="" style={{ ...frameImgStyle(frame.frameType, frameOpacity, frameSize), zIndex: 1 } as React.CSSProperties} />
       )}
       {hasFrame && isVideo && (
         <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: frameOpacity, pointerEvents: 'none', zIndex: 1 }} />
@@ -6646,7 +6662,7 @@ const firstDate = sorted[0]?.date
                     <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
                   ) : hasFrame ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={frame.url!} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: FRAMES_CONTAIN.has(data.frameId ?? '') ? 'contain' : 'cover', mixBlendMode: 'multiply', opacity: data.frameOpacity ?? 1, transform: `scale(${(data.frameSize ?? 100) / 100})`, transformOrigin: 'center center', pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+                    <img src={frame.url!} alt="" style={{ ...frameImgStyle(frame.frameType, data.frameOpacity ?? 1, data.frameSize ?? 100), zIndex: 0 } as React.CSSProperties} />
                   ) : usePhotoBg ? (
                     <>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
