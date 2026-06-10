@@ -260,8 +260,8 @@ type FrameType = 'floral-corners' | 'full-border' | 'watermark'
 function frameImgStyle(ft: FrameType | undefined, opacity: number, size: number): React.CSSProperties {
   const base: React.CSSProperties = { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity, transform: `scale(${size / 100})`, transformOrigin: 'center center', pointerEvents: 'none' }
   if (ft === 'floral-corners') {
-    // Pas de mixBlendMode — fleurs dans les coins, centre transparent
-    return base
+    // fill = étire l'image pour que les coins floraux collent aux coins de la carte
+    return { ...base, objectFit: 'fill' }
   }
   if (ft === 'watermark') {
     return { ...base, opacity: Math.min(opacity, 0.18) }
