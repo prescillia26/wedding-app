@@ -268,13 +268,9 @@ const FRAMES: { id: string; label: string; url: string | null; video?: boolean; 
   { id: 'frame-69', label: '🌸 Roses Pâles', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1776857021/69_vko7to.png', frameType: 'floral-corners' },
   { id: 'frame-70', label: '🌸 Fleurs Sauvages', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1776857021/70_skvaop.png', frameType: 'floral-corners' },
   { id: 'frame-71', label: '🌸 Pivoine Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1776857022/71_ntcix8.png', frameType: 'floral-corners' },
-  { id: 'frame-95', label: '🌸 Cascade Florale', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1776878845/95_w9natp.png', frameType: 'floral-corners' },
   { id: 'frame-96', label: '🌸 Bouquet Délicat', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1776878838/96_bauksw.png', frameType: 'floral-corners' },
   { id: 'frame-97', label: '🌸 Floral Doux', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1776878845/97_dcccon.png', frameType: 'floral-corners' },
   { id: 'frame-147', label: '🌿 Feuillage Vert', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1777896737/147_vmtvha.png', frameType: 'floral-corners' },
-  { id: 'frame-148', label: '🌿 Eucalyptus', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1777896737/148_hdqw48.png', frameType: 'floral-corners' },
-  { id: 'frame-149', label: '🌿 Olive & Sauge', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1777896746/149_jwshu6.png', frameType: 'floral-corners' },
-  { id: 'frame-150', label: '🌿 Fougère', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1777896741/150_rzlu80.png', frameType: 'floral-corners' },
   { id: 'frame-154', label: '🌿 Laurier', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1777896718/154_pxirys.png', frameType: 'floral-corners' },
   // ── Full border : cadre complet autour de toute la section ──
   { id: 'frame-02', label: '🤍 Roses Crème', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/51_m9vx96.png', frameType: 'full-border' },
@@ -284,17 +280,10 @@ const FRAMES: { id: string; label: string; url: string | null; video?: boolean; 
   { id: 'frame-61', label: '🌸 Couronne Florale', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857014/61_nnkips.png', frameType: 'full-border' },
   { id: 'frame-75', label: '🌸 Cadre Complet', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878823/75_qc4gsm.png', frameType: 'full-border' },
   { id: 'frame-76', label: '🌸 Bordure Florale', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878833/76_g2u8xr.png', frameType: 'full-border' },
-  { id: 'frame-77', label: '🌸 Encadrement', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878824/77_rnfcni.png', frameType: 'full-border' },
   { id: 'frame-78', label: '🌸 Cadre Pêche', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878816/78_umvdax.png', frameType: 'full-border' },
   { id: 'frame-79', label: '🌸 Cadre Pastel', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878824/79_msrbl6.png', frameType: 'full-border' },
   // ── Watermark : fond pâle en filigrane ──
-  { id: 'frame-100', label: '🌸 Filigrane 1', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878852/100_kzuxzq.png', frameType: 'watermark' },
   { id: 'frame-101', label: '🌸 Filigrane 2', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878850/101_s1bjjf.png', frameType: 'watermark' },
-  { id: 'frame-102', label: '🌸 Filigrane 3', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878855/102_atqmm6.png', frameType: 'watermark' },
-  { id: 'frame-103', label: '🌸 Filigrane 4', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878853/103_siefgf.png', frameType: 'watermark' },
-  { id: 'frame-104', label: '🌸 Filigrane 5', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878854/104_mafsu8.png', frameType: 'watermark' },
-  { id: 'frame-105', label: '🌸 Filigrane 6', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878857/105_cyugrg.png', frameType: 'watermark' },
-  { id: 'frame-106', label: '🌸 Filigrane 7', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878859/106_lv0kwe.png', frameType: 'watermark' },
   // ── Sans cadre ──
   { id: 'none', label: '⬜ Sans cadre', url: null },
 ]
