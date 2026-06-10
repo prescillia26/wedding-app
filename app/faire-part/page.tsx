@@ -260,7 +260,7 @@ const FRAMES: { id: string; label: string; url: string | null; video?: boolean }
   { id: 'frame-03', label: '🌺 Cadre Floral Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/53_ho1gq8.png' },
   { id: 'frame-07', label: '🌷 Fleurs Rose Aquarelle', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785416/49_ewrr8v.png' },
   { id: 'frame-34', label: '🌻 Floral 14', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778816/14_bzmmdm.png' },
-  { id: 'frame-55', label: '🌸 Floral 55', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857011/55_l7xahl.png' },
+  { id: 'frame-55', label: '🌸 Floral 55', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781112161/55_l7xahl.png' },
   { id: 'frame-61', label: '🌸 Floral 61', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857014/61_nnkips.png' },
   { id: 'frame-69', label: '🌸 Floral 69', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857021/69_vko7to.png' },
   { id: 'frame-70', label: '🌸 Floral 70', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857021/70_skvaop.png' },
@@ -6572,7 +6572,7 @@ const firstDate = sorted[0]?.date
             <button
               type="button"
               onClick={() => {
-                const el = document.getElementById('first-ceremony')
+                const el = document.getElementById('first-content')
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
               }}
               style={{
@@ -6617,7 +6617,8 @@ const firstDate = sorted[0]?.date
           return (
             <React.Fragment key={safeIdx}>
               {/* Pages supplémentaires AVANT cette cérémonie */}
-              {(data.customPages ?? []).filter(p => p.position === safeIdx).map(page => (
+              {(data.customPages ?? []).filter(p => p.position === safeIdx).map((page, pi) => (
+                <div key={page.id + '-wrap'} id={i === 0 && pi === 0 ? 'first-content' : undefined} style={{ scrollMarginTop: 60 }}>
                 <CustomPageCard
                   key={page.id}
                   page={page}
@@ -6629,6 +6630,7 @@ const firstDate = sorted[0]?.date
                   }}
                   onRemove={() => onUpdate?.({ customPages: (data.customPages ?? []).filter(p => p.id !== page.id) })}
                 />
+                </div>
               ))}
               {/* Indicateur de page — visible uniquement pour les mariés */}
               {role !== 'guest' && (
@@ -6638,7 +6640,7 @@ const firstDate = sorted[0]?.date
               )}
               {/* Illustration aquarelle — image décorative entre les sections */}
               <CeremonyCard isCard={isCard} accent={G}>
-                {i === 0 && <div id="first-ceremony" style={{ scrollMarginTop: 60 }} />}
+                {i === 0 && !(data.customPages ?? []).some(p => p.position === safeIdx) && <div id="first-content" style={{ scrollMarginTop: 60 }} />}
                 <section id={`ceremony-${safeIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : 48, paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : 48, paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: 'hidden', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: theme.fond } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
                   {hasFrame && frame.video ? (
                     <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
