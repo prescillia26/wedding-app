@@ -5885,7 +5885,7 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
         onMouseDown={editable ? (e) => { e.preventDefault(); startDrag(e.clientX, e.clientY) } : undefined}
         onTouchStart={editable ? (e) => { e.preventDefault(); startDrag(e.touches[0].clientX, e.touches[0].clientY) } : undefined}
         style={{
-          width: isPhoto ? '100%' : `${w}%`, maxHeight: isPhoto ? 280 : 250,
+          width: isPhoto ? '100%' : `${w}%`, maxHeight: isPhoto ? 280 : undefined,
           objectFit: isPhoto ? 'cover' : 'contain', display: 'inline-block',
           borderRadius: isPhoto ? 10 : 0,
           boxShadow: isPhoto ? '0 4px 20px rgba(0,0,0,0.12)' : 'none',
@@ -6776,7 +6776,7 @@ const firstDate = sorted[0]?.date
                         <div style={{ textAlign: 'center', marginBottom: 32, paddingBottom: 24, borderBottom: `1px solid ${G}22` }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: 16 }}>
                             <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
-                            <img src="https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1780077740/watercolors/jiflmnlcr0dr9clza2h2.png" alt="" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+                            <img src="https://res.cloudinary.com/dau96mui2/image/upload/e_background_removal/e_trim/v1780077740/watercolors/jiflmnlcr0dr9clza2h2.png" alt="" style={{ width: 50, height: 50, objectFit: 'contain' }} />
                             <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
                           </div>
                           {ceremony.penseesDefuntsIntro && (
