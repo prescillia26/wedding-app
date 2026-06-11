@@ -449,6 +449,7 @@ interface FormData {
   customLogoColor?: string // '' = original, ou hex color
   headerLogoColor?: string // couleur du logo dans la bannière sticky
   headerLogoSize?: number // taille du logo bannière (30-80, default 48)
+  headerLogoBold?: number // intensité du logo bannière (100-300, default 100)
   textOffsetY?: number // décalage vertical du texte en px (négatif = plus haut)
   petalsEnabled?: boolean // pétales/particules sur le faire-part (false par défaut)
   illustrationUrl?: string // aquarelle IA v1 (rétrocompat)
@@ -4927,7 +4928,7 @@ function AnimSection({ children, delay = 0, style, animStyle = 'slide-up', skipA
 }
 
 // ── Menu flottant pour naviguer entre les événements ──────────────────────────
-function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize = 48, firstDate, editable, onLogoChange }: { ceremonies: { type: string; customName?: string }[]; accent: string; theme: ThemeObj; logoUrl?: string; logoColor?: string; logoSize?: number; firstDate?: string; editable?: boolean; onLogoChange?: (d: Partial<FormData>) => void }) {
+function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize = 48, logoBold = 100, firstDate, editable, onLogoChange }: { ceremonies: { type: string; customName?: string }[]; accent: string; theme: ThemeObj; logoUrl?: string; logoColor?: string; logoSize?: number; logoBold?: number; firstDate?: string; editable?: boolean; onLogoChange?: (d: Partial<FormData>) => void }) {
   const [open, setOpen] = useState(false)
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
   const { t } = useT()
@@ -4995,7 +4996,7 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
         <div style={{ width: logoSize, height: logoSize, flexShrink: 0, cursor: editable ? 'pointer' : undefined }} onClick={editable ? () => setShowLogoEdit(!showLogoEdit) : undefined}>
           {logoSrc ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoSrc} alt="" style={{ width: logoSize, height: logoSize, objectFit: 'contain' }} />
+            <img src={logoSrc} alt="" style={{ width: logoSize, height: logoSize, objectFit: 'contain', filter: logoBold !== 100 ? `contrast(${logoBold}%) saturate(${Math.min(logoBold, 200)}%)` : undefined }} />
           ) : null}
         </div>
 
@@ -5053,6 +5054,11 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
           <div style={{ marginBottom: 10 }}>
             <label style={{ fontSize: 11, color: theme.texte, opacity: 0.7 }}>Taille : {logoSize}px</label>
             <input type="range" min={24} max={80} value={logoSize} onChange={e => onLogoChange?.({ headerLogoSize: +e.target.value })} style={{ width: '100%', accentColor: accent }} />
+          </div>
+          {/* Intensité */}
+          <div style={{ marginBottom: 10 }}>
+            <label style={{ fontSize: 11, color: theme.texte, opacity: 0.7 }}>Intensité : {logoBold}%</label>
+            <input type="range" min={100} max={300} value={logoBold} onChange={e => onLogoChange?.({ headerLogoBold: +e.target.value })} style={{ width: '100%', accentColor: accent }} />
           </div>
           {/* Couleur */}
           <div style={{ fontSize: 11, color: theme.texte, opacity: 0.7, marginBottom: 6 }}>Couleur</div>
@@ -6438,6 +6444,7 @@ const firstDate = sorted[0]?.date
         logoUrl={data.customLogoUrl || data.luxeMonogramUrl}
         logoColor={data.headerLogoColor || data.customLogoColor}
         logoSize={data.headerLogoSize ?? 48}
+        logoBold={data.headerLogoBold ?? 100}
         firstDate={sorted[0]?.date}
         editable={role !== 'guest' && !!onUpdate}
         onLogoChange={onUpdate}
