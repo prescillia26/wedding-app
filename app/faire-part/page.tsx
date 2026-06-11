@@ -5840,7 +5840,7 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
     'Henné': 'couples', 'Cocktail': 'couples', 'Soirée': 'couples', 'Boat Party': 'beach', 'Beach Party': 'beach', 'RSVP': 'rsvp', 'Autre': 'couples',
   }
   const category = typeToCategory[ceremonyType] || 'couples'
-  const w = Math.max(20, Math.min(200, size))
+  const w = Math.max(20, Math.min(400, size))
   const cx = localPos?.x ?? offsetX
   const cy = localPos?.y ?? offsetY
 
@@ -5903,7 +5903,7 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
             background: 'white', color: accent, fontSize: 18, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, cursor: 'pointer',
           }}>−</button>
           <span style={{ fontSize: 10, color: accent, fontWeight: 600, minWidth: 30, textAlign: 'center' }}>{w}%</span>
-          <button type="button" onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); onChangeSize(Math.min(200, w + 10)) }} style={{
+          <button type="button" onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); onChangeSize(Math.min(400, w + 10)) }} style={{
             ...BTN, width: 28, height: 28, borderRadius: '50%', border: `2px solid ${accent}`,
             background: 'white', color: accent, fontSize: 18, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, cursor: 'pointer',
           }}>+</button>
