@@ -2584,37 +2584,37 @@ function ItineraireButtons({ adresse, theme, compact = false }: {
     display: 'inline-flex',
     alignItems: 'center',
     gap: 8,
-    padding: compact ? '10px 20px' : '12px 26px',
+    padding: compact ? '10px 20px' : '14px 28px',
     background: theme.accent,
     color: 'white',
-    fontFamily: 'var(--font-playfair-display)',
+    fontFamily: 'var(--font-cormorant-garamond)',
     fontSize: compact ? 12 : 13,
-    fontWeight: 600,
-    letterSpacing: 2,
+    fontWeight: 500,
+    letterSpacing: '0.25em',
     textTransform: 'uppercase',
     textDecoration: 'none',
-    borderRadius: 2,
-    boxShadow: `0 4px 14px ${theme.accent}44`,
+    borderRadius: 4,
     border: `1px solid ${theme.accent}`,
-    transition: 'all 0.2s ease',
+    boxShadow: `0 0 0 4px transparent`,
+    transition: 'all 0.4s ease',
   }
-  
+
   const secondaryBtn: React.CSSProperties = {
     display: 'inline-flex',
     alignItems: 'center',
     gap: 8,
-    padding: compact ? '10px 20px' : '12px 26px',
+    padding: compact ? '10px 20px' : '14px 28px',
     background: 'transparent',
     color: theme.accent,
-    fontFamily: 'var(--font-playfair-display)',
+    fontFamily: 'var(--font-cormorant-garamond)',
     fontSize: compact ? 12 : 13,
-    fontWeight: 600,
-    letterSpacing: 2,
+    fontWeight: 500,
+    letterSpacing: '0.2em',
     textTransform: 'uppercase',
     textDecoration: 'none',
-    borderRadius: 2,
+    borderRadius: 4,
     border: `1px solid ${theme.accent}`,
-    transition: 'all 0.2s ease',
+    transition: 'all 0.4s ease',
   }
 
   return (
@@ -5720,7 +5720,7 @@ function InlineRSVP({ ceremonies, accent, textColor, shareId, mariee1, mariee2, 
     <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 16px' }}>
       {/* Titre */}
       <div style={{ textAlign: 'center', marginBottom: 24 }}>
-        <div style={{ fontFamily: FP, fontSize: 11, letterSpacing: 5, textTransform: 'uppercase', color: accent, marginBottom: 12 }}>
+        <div style={{ fontFamily: FP, fontSize: 'clamp(12px, 2.5vw, 16px)', fontWeight: 400, letterSpacing: '0.35em', textTransform: 'uppercase', color: accent, marginBottom: 12 }}>
           {locale === 'en' ? 'RSVP' : 'CARTON-RÉPONSE'}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 16 }}>
@@ -5756,20 +5756,20 @@ function InlineRSVP({ ceremonies, accent, textColor, shareId, mariee1, mariee2, 
             <div style={{ fontFamily: FP, fontSize: 16, color: textColor, fontWeight: 600, marginBottom: 12 }}>{getCeremonyName(c)}</div>
             <div style={{ display: 'flex', gap: 8 }}>
               <button type="button" onClick={() => togglePresent(idx, true)} style={{
-                flex: 1, padding: '11px 0', borderRadius: 8, fontFamily: FC, fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                flex: 1, padding: '14px 0', borderRadius: 4, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer',
                 border: `1.5px solid ${present === true ? accent : `${accent}33`}`,
                 background: present === true ? accent : 'white',
                 color: present === true ? 'white' : accent,
-                transition: 'all 0.2s',
+                transition: 'all 0.3s ease',
               }}>
                 {locale === 'en' ? 'Will attend' : 'Présent'}
               </button>
               <button type="button" onClick={() => togglePresent(idx, false)} style={{
-                flex: 1, padding: '11px 0', borderRadius: 8, fontFamily: FC, fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                flex: 1, padding: '14px 0', borderRadius: 4, fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer',
                 border: `1.5px solid ${present === false ? '#d45050' : `${accent}33`}`,
                 background: present === false ? '#d45050' : 'white',
                 color: present === false ? 'white' : '#d45050',
-                transition: 'all 0.2s',
+                transition: 'all 0.3s ease',
               }}>
                 {locale === 'en' ? 'Absent' : 'Absent'}
               </button>
@@ -5811,10 +5811,11 @@ function InlineRSVP({ ceremonies, accent, textColor, shareId, mariee1, mariee2, 
       {/* Bouton envoyer */}
       <div style={{ textAlign: 'center' }}>
         <button type="button" onClick={send} disabled={sending} style={{
-          fontFamily: FP, fontSize: 12, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase',
-          padding: '16px 48px', borderRadius: 2, border: 'none', cursor: sending ? 'not-allowed' : 'pointer',
-          background: `linear-gradient(135deg, ${accent}, ${accent}cc)`, color: 'white',
-          boxShadow: `0 4px 20px ${accent}44`, opacity: sending ? 0.7 : 1,
+          fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, fontWeight: 500, letterSpacing: '0.25em', textTransform: 'uppercase',
+          padding: '16px 48px', borderRadius: 4, border: `1px solid ${accent}`, cursor: sending ? 'not-allowed' : 'pointer',
+          background: accent, color: 'white',
+          boxShadow: `0 0 0 4px transparent`, opacity: sending ? 0.7 : 1,
+          transition: 'all 0.4s ease',
         }}>
           {sending ? '...' : (locale === 'en' ? 'SEND MY RESPONSE' : 'ENVOYER MA RÉPONSE')}
         </button>
@@ -6619,9 +6620,9 @@ const firstDate = sorted[0]?.date
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
               }}
               style={{
-                fontFamily: FP, fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase',
-                padding: '14px 32px', borderRadius: 0, border: `1.5px solid ${introTextColor}`,
-                background: 'transparent', color: introTextColor, cursor: 'pointer',
+                fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, fontWeight: 500, letterSpacing: '0.25em', textTransform: 'uppercase',
+                padding: '16px 36px', borderRadius: 4, border: `1px solid ${introTextColor}`,
+                background: 'transparent', color: introTextColor, cursor: 'pointer', transition: 'all 0.4s ease',
                 touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
                 textShadow: hasIntroPhoto ? '0 1px 4px rgba(0,0,0,0.5)' : goldShadow,
                 borderImage: isGold ? 'linear-gradient(135deg, #8b6914, #c9a84c, #f2d87a, #c9a84c, #8b6914) 1' : undefined,
@@ -6721,7 +6722,7 @@ const firstDate = sorted[0]?.date
                         defaultValue={title}
                         editable={canEdit}
                         onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_titre`]: v } })}
-                        style={applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: (ceremony.illustrationUrl || ceremony.ceremonyImage) ? 10 : 24, lineHeight: 1.4 }, 'titres', data.zoneStyles)}
+                        style={applyZoneStyle({ fontFamily: FP, fontSize: 'clamp(14px, 2.5vw, 18px)', fontWeight: 400, letterSpacing: '0.35em', textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: (ceremony.illustrationUrl || ceremony.ceremonyImage) ? 10 : 24, lineHeight: 1.4 }, 'titres', data.zoneStyles)}
                       />
                     </AnimSection></DraggableElement>
                     {/* Illustration aquarelle — après le titre, déplaçable par les mariés */}
@@ -6799,20 +6800,25 @@ const firstDate = sorted[0]?.date
                         </div>
                       </AnimSection></DraggableElement>
                     )}
-                    {hasGp && ceremony.type === 'Cérémonie religieuse / Houppa' && (
+                    {hasGp && ceremony.type === 'Cérémonie religieuse / Houppa' && (() => {
+                      const gpStyle = { fontFamily: FC, fontStyle: 'italic' as const, fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' as const }
+                      const hasLeft = !!(gpPa1 || gpMa1)
+                      const hasRight = !!(gpPa2 || gpMa2)
+                      const oneSideOnly = hasLeft !== hasRight
+                      return (
                       <DraggableElement id={pre+"gp"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 2, textAlign: 'center' }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {gpPa1 ? <InlineEdit value={ov.gpPa1 || ''} defaultValue={gpPa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa1: v } })} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }} /> : <div>&nbsp;</div>}
-                            {gpMa1 ? <InlineEdit value={ov.gpMa1 || ''} defaultValue={gpMa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa1: v } })} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }} /> : <div>&nbsp;</div>}
-                          </div>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {gpPa2 ? <InlineEdit value={ov.gpPa2 || ''} defaultValue={gpPa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa2: v } })} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }} /> : <div>&nbsp;</div>}
-                            {gpMa2 ? <InlineEdit value={ov.gpMa2 || ''} defaultValue={gpMa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa2: v } })} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }} /> : <div>&nbsp;</div>}
-                          </div>
+                        <div style={{ display: oneSideOnly ? 'flex' : 'grid', gridTemplateColumns: oneSideOnly ? undefined : '1fr 1fr', flexDirection: oneSideOnly ? 'column' : undefined, alignItems: oneSideOnly ? 'center' : undefined, gap: 6, marginBottom: 2, textAlign: 'center' }}>
+                          {hasLeft && <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {gpPa1 ? <InlineEdit value={ov.gpPa1 || ''} defaultValue={gpPa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa1: v } })} style={gpStyle} /> : <div>&nbsp;</div>}
+                            {gpMa1 ? <InlineEdit value={ov.gpMa1 || ''} defaultValue={gpMa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa1: v } })} style={gpStyle} /> : <div>&nbsp;</div>}
+                          </div>}
+                          {hasRight && <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {gpPa2 ? <InlineEdit value={ov.gpPa2 || ''} defaultValue={gpPa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa2: v } })} style={gpStyle} /> : <div>&nbsp;</div>}
+                            {gpMa2 ? <InlineEdit value={ov.gpMa2 || ''} defaultValue={gpMa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa2: v } })} style={gpStyle} /> : <div>&nbsp;</div>}
+                          </div>}
                         </div>
                       </AnimSection></DraggableElement>
-                    )}
+                    )})()}
                     {(parents1.length > 0 || parents2.length > 0) && ceremony.type === 'Cérémonie religieuse / Houppa' && (
                       <DraggableElement id={pre+"parents"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={150} skipAnim={canEdit}>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 6, textAlign: 'center' }}>
@@ -7161,8 +7167,10 @@ const firstDate = sorted[0]?.date
             {data.marie1Prenom} & {data.marie2Prenom}
           </div>
           <div style={{ color: G, fontSize: 12, marginBottom: 18, opacity: 0.45 }}>✦</div>
-          <a href="https://getlovit.fr" target="_blank" rel="noopener noreferrer" style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: G, textDecoration: 'none', opacity: 0.45 }}>
-            Créé avec ❤️ par Lov&apos;it
+          <a href="https://getlovit.fr" target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 11, letterSpacing: '0.2em', fontVariant: 'small-caps', color: G, textDecoration: 'none', opacity: 0.5, transition: 'opacity 0.3s ease' }}
+            onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
+            onMouseLeave={e => (e.currentTarget.style.opacity = '0.5')}>
+            créé avec <span style={{ fontSize: 10, verticalAlign: 'middle', margin: '0 4px' }}>♥</span> par Lov&apos;it
           </a>
         </AnimSection>
       </footer>
