@@ -4967,9 +4967,11 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
   let logoSrc = ''
   if (logoUrl?.includes('cloudinary.com')) {
     const hex = effectiveLogoColor.replace('#', '')
-    // Couleur appliquée via Cloudinary tint, intensité via CSS filter
-    const base = logoUrl.replace('/upload/', `/upload/e_background_removal/e_trim/e_grayscale/e_tint:100:${hex || '1a1a1a'}:0p/`)
-    logoSrc = `${base}${base.includes('?') ? '&' : '?'}c=${hex}`
+    // Couleur via Cloudinary tint, intensité via e_contrast Cloudinary
+    const boldVal = Math.round((logoBold - 100) * 2) // 0-400
+    const contrastPart = boldVal > 0 ? `/e_contrast:${boldVal}` : ''
+    const base = logoUrl.replace('/upload/', `/upload/e_background_removal/e_trim/e_grayscale/e_tint:100:${hex || '1a1a1a'}:0p${contrastPart}/`)
+    logoSrc = `${base}${base.includes('?') ? '&' : '?'}c=${hex}${boldVal}`
   } else if (logoUrl) {
     logoSrc = logoUrl
   }
@@ -4997,7 +4999,7 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
         <div style={{ width: logoSize, height: logoSize, flexShrink: 0, cursor: editable ? 'pointer' : undefined }} onClick={editable ? () => setShowLogoEdit(!showLogoEdit) : undefined}>
           {logoSrc ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoSrc} alt="" style={{ width: logoSize, height: logoSize, objectFit: 'contain', filter: logoBold !== 100 ? `brightness(${Math.max(200 - logoBold, 20)}%) contrast(${50 + logoBold}%)` : undefined }} />
+            <img src={logoSrc} alt="" style={{ width: logoSize, height: logoSize, objectFit: 'contain' }} />
           ) : null}
         </div>
 
