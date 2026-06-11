@@ -7898,6 +7898,9 @@ export default function FairePartPage() {
         const res = await fetch(`/api/check-access?code=${encodeURIComponent(code)}`)
         const d = await res.json()
         if (d.valid) {
+          // Nouveau faire-part — réinitialiser l'ancien shareId pour éviter de charger un ancien faire-part
+          setActiveShareId(null)
+          try { localStorage.removeItem('lovit_share_id') } catch { /* ignore */ }
           setAccessGranted(true)
           setIsPaid(true)
           if (d.pack === 'premium') setUserPack('premium')
@@ -7911,7 +7914,9 @@ export default function FairePartPage() {
           } catch { /* ignore */ }
 
           // 2) Si pas de brouillon local, charger le faire-part depuis le serveur via shareId
-          if (!hasLocalDraft) {
+          // ⚠️ UNIQUEMENT si on n'arrive PAS d'un nouveau paiement (code=) — sinon on pollue avec l'ancien faire-part
+          const isNewFromPayment = !!new URLSearchParams(window.location.search).get('code')
+          if (!hasLocalDraft && !isNewFromPayment) {
             try {
               const savedShareId = activeShareId || localStorage.getItem('lovit_share_id')
               if (savedShareId) {
