@@ -4966,9 +4966,9 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
   let logoSrc = ''
   if (logoUrl?.includes('cloudinary.com')) {
     const hex = effectiveLogoColor.replace('#', '')
-    logoSrc = hex
-      ? logoUrl.replace('/upload/', `/upload/e_background_removal/e_trim/e_grayscale/e_tint:100:${hex}:0p/`)
-      : logoUrl.replace('/upload/', '/upload/e_background_removal/e_trim/')
+    // Couleur appliquée via Cloudinary tint, intensité via CSS filter
+    const base = logoUrl.replace('/upload/', `/upload/e_background_removal/e_trim/e_grayscale/e_tint:100:${hex || '1a1a1a'}:0p/`)
+    logoSrc = `${base}${base.includes('?') ? '&' : '?'}c=${hex}`
   } else if (logoUrl) {
     logoSrc = logoUrl
   }
