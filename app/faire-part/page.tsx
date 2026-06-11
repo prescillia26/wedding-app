@@ -4960,7 +4960,7 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, firstDate
   // Logo affiché : custom logo ou monogramme initiales
   let logoSrc = ''
   if (logoUrl?.includes('cloudinary.com')) {
-    const hex = (logoColor || accent).replace('#', '')
+    const hex = accent.replace('#', '')
     logoSrc = hex
       ? logoUrl.replace('/upload/', `/upload/e_background_removal/e_trim/e_grayscale/e_tint:100:${hex}:0p/`)
       : logoUrl.replace('/upload/', '/upload/e_background_removal/e_trim/')
