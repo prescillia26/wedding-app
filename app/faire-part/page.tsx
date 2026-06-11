@@ -16,7 +16,7 @@ import { byId as visualById, VISUALS } from '@/lib/visuals'
 import type { VisualCategory } from '@/lib/visuals'
 
 
-type Theme = 'rose-fleuri' | 'ivoire-or' | 'bleu-floral' | 'champetre' | 'blanc-gris' | 'noir-blanc' | 'chocolat' | 'bordeaux' | 'bordeaux-nuit' | 'fuchsia' | 'marine-or' | 'menthe' | 'sable-dore' | 'terracotta' | 'lin-ecru' | 'vert-sauge' | 'rose-peche' | 'orange-terra' | 'bleu-nuit' | 'creme' | 'bleu-med' | 'blanc-imm' | 'jaune-ocre' | 'vert-celadon' | 'buttercup' | 'orange-sunset' | 'bleu-mer'
+type Theme = 'rose-fleuri' | 'ivoire-or' | 'bleu-floral' | 'champetre' | 'blanc-gris' | 'noir-blanc' | 'chocolat' | 'bordeaux' | 'bordeaux-nuit' | 'fuchsia' | 'marine-or' | 'menthe' | 'sable-dore' | 'terracotta' | 'lin-ecru' | 'vert-sauge' | 'rose-peche' | 'orange-terra' | 'bleu-nuit' | 'creme' | 'bleu-med' | 'blanc-imm' | 'jaune-ocre' | 'vert-celadon' | 'buttercup' | 'orange-sunset' | 'bleu-mer' | 'parme-ivoire'
 type PresentationStyle = 'page-unique' | 'cartes-scrollables' | 'cartes-separees'
 // ⚙️ Nombre max de photos uploadables par couple (carrousel de la section d'accueil)
 const MAX_PHOTOS = 3
@@ -86,6 +86,7 @@ const THEMES: Record<Theme, ThemeObj> = {
   'buttercup':     { fond: '#fefbf0', accent: '#D4A830', texte: '#3a3010', textSecondaire: '#8a7a40', nom: 'Jaune Buttercup' },
   'orange-sunset': { fond: '#fef6f0', accent: '#F4A165', texte: '#3a2010', textSecondaire: '#8a5a30', nom: 'Orange Sunset' },
   'bleu-mer':      { fond: '#f2f8fa', accent: '#5a9ab0', texte: '#1a2a34', textSecondaire: '#4a7a8a', nom: 'Bleu Mer' },
+  'parme-ivoire':  { fond: '#faf7f5', accent: '#9b72aa', texte: '#2a1a30', textSecondaire: '#7a5a8a', nom: 'Parme & Ivoire' },
 }
 
 const ORNEMENTS_LIBRARY: { id: string; url: string; nom: string }[] = [
@@ -312,6 +313,7 @@ const THEME_CARD_BG: Record<string, string> = {
   'blanc-imm':     '#fbf9f4',
   'jaune-ocre':    '#faf6e8',
   'vert-celadon':  '#f0f6f3',
+  'parme-ivoire':  '#faf7f5',
 }
 
 const CEREMONY_TYPES = ['Mairie', 'Cérémonie religieuse / Houppa', 'Shabbat Hatan', 'Henné', 'Cocktail', 'Soirée', 'Boat Party', 'Beach Party', 'Autre']
@@ -5111,6 +5113,7 @@ const ENV_STYLES: Record<string, { bg: string; bgDark: string; liner: string; se
   'champetre':     { bg: '#eef4e8', bgDark: '#d8e4c8', liner: '#e0ecd0', sealColor: '#7a9e6e', variant: 'seal' },
   'blanc-gris':    { bg: '#f2f2f2', bgDark: '#dcdcdc', liner: '#eaeaea', sealColor: '#888888', variant: 'seal' },
   'menthe':        { bg: '#e6f5ee', bgDark: '#c8e8d8', liner: '#d4f0e0', sealColor: '#2a9a6a', variant: 'seal' },
+  'parme-ivoire':  { bg: '#f0e8f5', bgDark: '#d8c8e8', liner: '#e8d8f0', sealColor: '#9b72aa', variant: 'ribbon', ribbonColor: '#b090c0' },
 }
 
 // Transition : fade-out élégant de l'enveloppe → fade-in du faire-part

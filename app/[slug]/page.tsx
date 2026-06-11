@@ -124,6 +124,7 @@ export async function generateMetadata(
     'champetre': '#f6faf4', 'blanc-gris': '#fafafa', 'noir-blanc': '#1a1a1a',
     'chocolat': '#2c1a0e', 'bordeaux': '#fdf5f5', 'bordeaux-nuit': '#1a0810',
     'fuchsia': '#fff5fc', 'marine-or': '#0a1628', 'menthe': '#f2fbf7',
+    'parme-ivoire': '#faf7f5',
   }
   const bgColor = THEME_BG[result.data.style || ''] || '#fdf8f0'
 
