@@ -6784,26 +6784,30 @@ const firstDate = sorted[0]?.date
                         {hasGp && (
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 8, textAlign: 'center' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap', visibility: gpPa1 ? 'visible' : 'hidden' }}>{gpPa1 || '\u00A0'}</div>
-                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap', visibility: gpMa1 ? 'visible' : 'hidden' }}>{gpMa1 || '\u00A0'}</div>
+                              {gpPa1 ? <InlineEdit value={ov.gpPa1 || ''} defaultValue={gpPa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa1: v } })} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }} /> : <div>&nbsp;</div>}
+                              {gpMa1 ? <InlineEdit value={ov.gpMa1 || ''} defaultValue={gpMa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa1: v } })} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }} /> : <div>&nbsp;</div>}
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap', visibility: gpPa2 ? 'visible' : 'hidden' }}>{gpPa2 || '\u00A0'}</div>
-                              <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap', visibility: gpMa2 ? 'visible' : 'hidden' }}>{gpMa2 || '\u00A0'}</div>
+                              {gpPa2 ? <InlineEdit value={ov.gpPa2 || ''} defaultValue={gpPa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa2: v } })} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }} /> : <div>&nbsp;</div>}
+                              {gpMa2 ? <InlineEdit value={ov.gpMa2 || ''} defaultValue={gpMa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa2: v } })} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }} /> : <div>&nbsp;</div>}
                             </div>
                           </div>
                         )}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12, textAlign: 'center' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {parents1.map((l,j)=><div key={j} style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles)}>{l}</div>)}
+                            {parents1.map((l,j)=><InlineEdit key={j} value={ov[`parents1_${j}`] || ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents1_${j}`]: v } })} style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles)} />)}
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {parents2.map((l,j)=><div key={j} style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles)}>{l}</div>)}
+                            {parents2.map((l,j)=><InlineEdit key={j} value={ov[`parents2_${j}`] || ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents2_${j}`]: v } })} style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles)} />)}
                           </div>
                         </div>
-                        <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 24, lineHeight: 1.9, opacity: 0.82 }, 'narratif', data.zoneStyles)}>
-                          {ov[`ceremony_${i}_joie`] || (hasGp ? t.fairepart.joyMessageGp : t.fairepart.joyMessage)}
-                        </div>
+                        <InlineEdit
+                          value={ov[`ceremony_${i}_joie`] || ''}
+                          defaultValue={hasGp ? t.fairepart.joyMessageGp : t.fairepart.joyMessage}
+                          editable={canEdit}
+                          onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_joie`]: v } })}
+                          style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 24, lineHeight: 1.9, opacity: 0.82 }, 'narratif', data.zoneStyles)}
+                        />
                       </AnimSection></DraggableElement>
                     )}
                     {(ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Mairie') && (
@@ -6854,17 +6858,25 @@ const firstDate = sorted[0]?.date
                         />
                       ) : ceremony.type === 'Shabbat Hatan' ? (
                         <div style={{ textAlign: 'center', marginTop: 32, marginBottom: 16, padding: '0 12px' }}>
-                          <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, lineHeight: 1.8, opacity: 0.85 }, 'narratif', data.zoneStyles)}>
-                            Les Familles
-                          </div>
+                          <InlineEdit
+                            value={ov[`ceremony_${i}_lesfamilles`] || ''}
+                            defaultValue="Les Familles"
+                            editable={canEdit}
+                            onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_lesfamilles`]: v } })}
+                            style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, lineHeight: 1.8, opacity: 0.85 }, 'narratif', data.zoneStyles)}
+                          />
                           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(6px,2vw,10px)', marginTop: 4, marginBottom: 4 }}>
-                            <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(24px,6vw,38px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)}>{data.famille1PereNom || data.marie1Nom || '...'}</div>
+                            <InlineEdit value={ov.shabbat_nom1 || ''} defaultValue={data.famille1PereNom || data.marie1Nom || '...'} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, shabbat_nom1: v } })} style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(24px,6vw,38px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)} />
                             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(14px,3vw,20px)', color: data.zoneStyles?.prenoms?.color || G, opacity: 0.5 }}>&</div>
-                            <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(24px,6vw,38px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)}>{data.famille2PereNom || data.marie2Nom || '...'}</div>
+                            <InlineEdit value={ov.shabbat_nom2 || ''} defaultValue={data.famille2PereNom || data.marie2Nom || '...'} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, shabbat_nom2: v } })} style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(24px,6vw,38px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)} />
                           </div>
-                          <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, lineHeight: 1.8, opacity: 0.85, marginBottom: 8 }, 'narratif', data.zoneStyles)}>
-                            sont ravies de vous convier au Shabbat Hatan de
-                          </div>
+                          <InlineEdit
+                            value={ov[`ceremony_${i}_ravies`] || ''}
+                            defaultValue="sont ravies de vous convier au Shabbat Hatan de"
+                            editable={canEdit}
+                            onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_ravies`]: v } })}
+                            style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, lineHeight: 1.8, opacity: 0.85, marginBottom: 8 }, 'narratif', data.zoneStyles)}
+                          />
                           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(6px,2vw,10px)', marginBottom: 8 }}>
                             <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,46px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom || 'Prénom'}</div>
                             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(16px,4vw,24px)', color: data.zoneStyles?.prenoms?.color || G, opacity: 0.5 }}>&</div>
