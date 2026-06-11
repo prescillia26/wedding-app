@@ -6776,7 +6776,7 @@ const firstDate = sorted[0]?.date
                         <div style={{ textAlign: 'center', marginBottom: 32, paddingBottom: 24, borderBottom: `1px solid ${G}22` }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: 16 }}>
                             <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
-                            <span style={{ fontSize: 16, color: G }}>🕊</span>
+                            <img src="https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1780077740/watercolors/jiflmnlcr0dr9clza2h2.png" alt="" style={{ width: 32, height: 32, objectFit: 'contain' }} />
                             <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
                           </div>
                           {ceremony.penseesDefuntsIntro && (
