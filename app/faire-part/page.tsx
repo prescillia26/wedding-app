@@ -450,6 +450,7 @@ interface FormData {
   headerLogoColor?: string // couleur du logo dans la bannière sticky
   headerLogoSize?: number // taille du logo bannière (30-80, default 48)
   headerLogoBold?: number // intensité du logo bannière (100-300, default 100)
+  hideAccueilLogo?: boolean // masquer le logo/monogramme sur la page d'accueil
   textOffsetY?: number // décalage vertical du texte en px (négatif = plus haut)
   petalsEnabled?: boolean // pétales/particules sur le faire-part (false par défaut)
   illustrationUrl?: string // aquarelle IA v1 (rétrocompat)
@@ -6513,13 +6514,15 @@ const firstDate = sorted[0]?.date
             </DraggableElement>
           )}
           <DraggableElement id="monogram" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
+          {!data.hideAccueilLogo && (
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>
             {(() => {
               const logoSz = data.illustrationCoupleId ? 80 : hasIntroPhoto ? 90 : 110
               return data.customLogoUrl ? <CustomLogo url={data.customLogoUrl} scale={data.customLogoSize} color={data.customLogoColor} size={logoSz} bgColor={theme.fond} /> : <MonogramByStyle initial1={i1} initial2={i2} color={monoColor} size={logoSz} style={data.monogrammeStyle || 'cercle'} />
             })()}
           </div>
-          {canEdit && (
+          )}
+          {canEdit && !data.hideAccueilLogo && (
             <div onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 6, maxWidth: 240, margin: '0 auto 6px' }}>
               {dedupColors.slice(0, 30).map(c => (
                 <button key={c.value} type="button" onClick={() => {
@@ -6531,6 +6534,13 @@ const firstDate = sorted[0]?.date
                   border: ((data.customLogoColor || data.monogrammeColor || '') === c.value) ? `2px solid ${G}` : '1px solid #d6d1cb',
                 }} />
               ))}
+            </div>
+          )}
+          {canEdit && (
+            <div onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ textAlign: 'center', marginBottom: 6 }}>
+              <button type="button" onClick={() => onUpdate?.({ hideAccueilLogo: !data.hideAccueilLogo })} style={{ ...BTN, fontSize: 10, padding: '4px 12px', borderRadius: 9999, border: `1px solid ${G}33`, color: G, opacity: 0.7 }}>
+                {data.hideAccueilLogo ? 'Afficher le logo' : 'Masquer le logo'}
+              </button>
             </div>
           )}
           </DraggableElement>
