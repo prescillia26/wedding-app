@@ -6722,7 +6722,7 @@ const firstDate = sorted[0]?.date
                         defaultValue={title}
                         editable={canEdit}
                         onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_titre`]: v } })}
-                        style={applyZoneStyle({ fontFamily: FP, fontSize: 'clamp(14px, 2.5vw, 18px)', fontWeight: 400, letterSpacing: '0.35em', textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: (ceremony.illustrationUrl || ceremony.ceremonyImage) ? 10 : 24, lineHeight: 1.4 }, 'titres', data.zoneStyles)}
+                        style={applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: (ceremony.illustrationUrl || ceremony.ceremonyImage) ? 10 : 24, lineHeight: 1.4 }, 'titres', data.zoneStyles)}
                       />
                     </AnimSection></DraggableElement>
                     {/* Illustration aquarelle — après le titre, déplaçable par les mariés */}
