@@ -6799,20 +6799,22 @@ const firstDate = sorted[0]?.date
                         </div>
                       </AnimSection></DraggableElement>
                     )}
+                    {hasGp && ceremony.type === 'Cérémonie religieuse / Houppa' && (
+                      <DraggableElement id={pre+"gp"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 2, textAlign: 'center' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {gpPa1 ? <InlineEdit value={ov.gpPa1 || ''} defaultValue={gpPa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa1: v } })} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }} /> : <div>&nbsp;</div>}
+                            {gpMa1 ? <InlineEdit value={ov.gpMa1 || ''} defaultValue={gpMa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa1: v } })} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }} /> : <div>&nbsp;</div>}
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {gpPa2 ? <InlineEdit value={ov.gpPa2 || ''} defaultValue={gpPa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa2: v } })} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }} /> : <div>&nbsp;</div>}
+                            {gpMa2 ? <InlineEdit value={ov.gpMa2 || ''} defaultValue={gpMa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa2: v } })} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }} /> : <div>&nbsp;</div>}
+                          </div>
+                        </div>
+                      </AnimSection></DraggableElement>
+                    )}
                     {(parents1.length > 0 || parents2.length > 0) && ceremony.type === 'Cérémonie religieuse / Houppa' && (
                       <DraggableElement id={pre+"parents"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={150} skipAnim={canEdit}>
-                        {hasGp && (
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 2, textAlign: 'center' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                              {gpPa1 ? <InlineEdit value={ov.gpPa1 || ''} defaultValue={gpPa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa1: v } })} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }} /> : <div>&nbsp;</div>}
-                              {gpMa1 ? <InlineEdit value={ov.gpMa1 || ''} defaultValue={gpMa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa1: v } })} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }} /> : <div>&nbsp;</div>}
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                              {gpPa2 ? <InlineEdit value={ov.gpPa2 || ''} defaultValue={gpPa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa2: v } })} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }} /> : <div>&nbsp;</div>}
-                              {gpMa2 ? <InlineEdit value={ov.gpMa2 || ''} defaultValue={gpMa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa2: v } })} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }} /> : <div>&nbsp;</div>}
-                            </div>
-                          </div>
-                        )}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 6, textAlign: 'center' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                             {parents1.map((l,j)=><InlineEdit key={j} value={ov[`parents1_${j}`] || ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents1_${j}`]: v } })} style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles)} />)}
@@ -6821,6 +6823,10 @@ const firstDate = sorted[0]?.date
                             {parents2.map((l,j)=><InlineEdit key={j} value={ov[`parents2_${j}`] || ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents2_${j}`]: v } })} style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles)} />)}
                           </div>
                         </div>
+                      </AnimSection></DraggableElement>
+                    )}
+                    {(parents1.length > 0 || parents2.length > 0 || hasGp) && ceremony.type === 'Cérémonie religieuse / Houppa' && (
+                      <DraggableElement id={pre+"joie"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={180} skipAnim={canEdit}>
                         <InlineEdit
                           value={ov[`ceremony_${i}_joie`] || ''}
                           defaultValue={hasGp ? t.fairepart.joyMessageGp : t.fairepart.joyMessage}
