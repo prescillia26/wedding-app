@@ -4996,7 +4996,7 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
         <div style={{ width: logoSize, height: logoSize, flexShrink: 0, cursor: editable ? 'pointer' : undefined }} onClick={editable ? () => setShowLogoEdit(!showLogoEdit) : undefined}>
           {logoSrc ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoSrc} alt="" style={{ width: logoSize, height: logoSize, objectFit: 'contain', filter: logoBold !== 100 ? `contrast(${logoBold}%) saturate(${Math.min(logoBold, 200)}%)` : undefined }} />
+            <img src={logoSrc} alt="" style={{ width: logoSize, height: logoSize, objectFit: 'contain', filter: logoBold !== 100 ? `brightness(${Math.max(200 - logoBold, 20)}%) contrast(${50 + logoBold}%)` : undefined }} />
           ) : null}
         </div>
 
@@ -5057,8 +5057,8 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
           </div>
           {/* Intensité */}
           <div style={{ marginBottom: 10 }}>
-            <label style={{ fontSize: 11, color: theme.texte, opacity: 0.7 }}>Intensité : {logoBold}%</label>
-            <input type="range" min={100} max={300} value={logoBold} onChange={e => onLogoChange?.({ headerLogoBold: +e.target.value })} style={{ width: '100%', accentColor: accent }} />
+            <label style={{ fontSize: 11, color: theme.texte, opacity: 0.7 }}>Intensité (+ foncé →)</label>
+            <input type="range" min={100} max={300} step={10} value={logoBold} onChange={e => onLogoChange?.({ headerLogoBold: +e.target.value })} style={{ width: '100%', accentColor: accent }} />
           </div>
           {/* Couleur */}
           <div style={{ fontSize: 11, color: theme.texte, opacity: 0.7, marginBottom: 6 }}>Couleur</div>
