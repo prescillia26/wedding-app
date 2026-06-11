@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Great_Vibes, Cormorant_Garamond, Playfair_Display, Bellefair } from "next/font/google";
+import { Geist, Geist_Mono, Great_Vibes, Cormorant_Garamond, Playfair_Display, Bellefair, Cinzel, Pinyon_Script } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
@@ -35,6 +35,18 @@ const bellefair = Bellefair({
   weight: "400",
   subsets: ["latin", "hebrew"],
   variable: "--font-bellefair",
+});
+
+const cinzel = Cinzel({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-cinzel",
+});
+
+const pinyonScript = Pinyon_Script({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-pinyon-script",
 });
 
 export const metadata: Metadata = {
@@ -96,7 +108,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${geistSans.variable} ${geistMono.variable} ${greatVibes.variable} ${cormorantGaramond.variable} ${playfairDisplay.variable} ${bellefair.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${greatVibes.variable} ${cormorantGaramond.variable} ${playfairDisplay.variable} ${bellefair.variable} ${cinzel.variable} ${pinyonScript.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
