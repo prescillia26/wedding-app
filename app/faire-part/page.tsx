@@ -447,6 +447,8 @@ interface FormData {
   customLogoUrl?: string
   customLogoSize?: number // 50-150, default 100
   customLogoColor?: string // '' = original, ou hex color
+  headerLogoColor?: string // couleur du logo dans la bannière sticky
+  headerLogoSize?: number // taille du logo bannière (30-80, default 48)
   textOffsetY?: number // décalage vertical du texte en px (négatif = plus haut)
   petalsEnabled?: boolean // pétales/particules sur le faire-part (false par défaut)
   illustrationUrl?: string // aquarelle IA v1 (rétrocompat)
@@ -4925,7 +4927,7 @@ function AnimSection({ children, delay = 0, style, animStyle = 'slide-up', skipA
 }
 
 // ── Menu flottant pour naviguer entre les événements ──────────────────────────
-function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, firstDate }: { ceremonies: { type: string; customName?: string }[]; accent: string; theme: ThemeObj; logoUrl?: string; logoColor?: string; firstDate?: string }) {
+function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize = 48, firstDate, editable, onLogoChange }: { ceremonies: { type: string; customName?: string }[]; accent: string; theme: ThemeObj; logoUrl?: string; logoColor?: string; logoSize?: number; firstDate?: string; editable?: boolean; onLogoChange?: (d: Partial<FormData>) => void }) {
   const [open, setOpen] = useState(false)
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
   const { t } = useT()
@@ -4957,10 +4959,12 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, firstDate
     'Boat Party': t.fairepart.cardTitles['Boat Party'],
   }
 
+  const [showLogoEdit, setShowLogoEdit] = useState(false)
   // Logo affiché : custom logo ou monogramme initiales
+  const effectiveLogoColor = logoColor || accent
   let logoSrc = ''
   if (logoUrl?.includes('cloudinary.com')) {
-    const hex = accent.replace('#', '')
+    const hex = effectiveLogoColor.replace('#', '')
     logoSrc = hex
       ? logoUrl.replace('/upload/', `/upload/e_background_removal/e_trim/e_grayscale/e_tint:100:${hex}:0p/`)
       : logoUrl.replace('/upload/', '/upload/e_background_removal/e_trim/')
@@ -4987,11 +4991,11 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, firstDate
         padding: '10px 14px', boxSizing: 'border-box',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       } as React.CSSProperties}>
-        {/* Logo — plus grand */}
-        <div style={{ width: 48, height: 48, flexShrink: 0 }}>
+        {/* Logo — taille ajustable */}
+        <div style={{ width: logoSize, height: logoSize, flexShrink: 0, cursor: editable ? 'pointer' : undefined }} onClick={editable ? () => setShowLogoEdit(!showLogoEdit) : undefined}>
           {logoSrc ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoSrc} alt="" style={{ width: 48, height: 48, objectFit: 'contain' }} />
+            <img src={logoSrc} alt="" style={{ width: logoSize, height: logoSize, objectFit: 'contain' }} />
           ) : null}
         </div>
 
@@ -5039,6 +5043,25 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, firstDate
           <button onClick={() => { setOpen(false); document.getElementById('rsvp-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} style={{ display: 'block', width: '100%', padding: '10px 20px', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', fontFamily: 'var(--font-playfair-display)', fontSize: 13, fontWeight: 600, color: accent, letterSpacing: 1, textTransform: 'uppercase' }}>
             RSVP
           </button>
+        </div>
+      )}
+      {/* Popup édition logo bannière */}
+      {editable && showLogoEdit && (
+        <div style={{ position: 'fixed', top: 60, left: 14, zIndex: 102, background: theme.dark ? 'rgba(20,20,20,0.97)' : '#fff', borderRadius: 12, border: `1px solid ${accent}33`, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', padding: '14px 16px', minWidth: 200 }}>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 12, fontWeight: 700, color: accent, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 10 }}>Logo bannière</div>
+          {/* Taille */}
+          <div style={{ marginBottom: 10 }}>
+            <label style={{ fontSize: 11, color: theme.texte, opacity: 0.7 }}>Taille : {logoSize}px</label>
+            <input type="range" min={24} max={80} value={logoSize} onChange={e => onLogoChange?.({ headerLogoSize: +e.target.value })} style={{ width: '100%', accentColor: accent }} />
+          </div>
+          {/* Couleur */}
+          <div style={{ fontSize: 11, color: theme.texte, opacity: 0.7, marginBottom: 6 }}>Couleur</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {[accent, '#1a1a1a', '#ffffff', '#C9A84C', '#8b6914', '#2c4a7c', '#8b1a2a', '#7a9e6e', '#d4006a', '#888888'].map(c => (
+              <button key={c} onClick={() => onLogoChange?.({ headerLogoColor: c })} style={{ width: 24, height: 24, borderRadius: '50%', background: c, border: effectiveLogoColor === c ? `2.5px solid ${accent}` : '1px solid #d6d1cb', cursor: 'pointer', padding: 0 }} />
+            ))}
+          </div>
+          <button onClick={() => setShowLogoEdit(false)} style={{ marginTop: 10, width: '100%', padding: '6px 0', background: 'transparent', border: `1px solid ${accent}33`, borderRadius: 8, fontSize: 11, color: accent, cursor: 'pointer' }}>Fermer</button>
         </div>
       )}
     </>
@@ -6413,8 +6436,11 @@ const firstDate = sorted[0]?.date
         accent={G}
         theme={theme}
         logoUrl={data.customLogoUrl || data.luxeMonogramUrl}
-        logoColor={data.customLogoColor}
+        logoColor={data.headerLogoColor || data.customLogoColor}
+        logoSize={data.headerLogoSize ?? 48}
         firstDate={sorted[0]?.date}
+        editable={role !== 'guest' && !!onUpdate}
+        onLogoChange={onUpdate}
       />
       <style>{`
         @keyframes sharedFadeIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
