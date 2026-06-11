@@ -6726,7 +6726,7 @@ const firstDate = sorted[0]?.date
                     </AnimSection></DraggableElement>
                     {/* Illustration aquarelle — après le titre, déplaçable par les mariés */}
                     {(ceremony.illustrationUrl || ceremony.ceremonyImage) ? (
-                      <EditableIllustration
+                      <AnimSection animStyle={anim} delay={200} skipAnim={canEdit}><EditableIllustration
                         url={ceremony.illustrationUrl || ceremony.ceremonyImage!}
                         size={ceremony.illustrationSize ?? (ceremony.ceremonyImage && !ceremony.illustrationUrl ? 100 : 80)}
                         offsetX={ceremony.illustrationOffsetX ?? 0}
@@ -6750,7 +6750,7 @@ const firstDate = sorted[0]?.date
                         onRemove={() => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationUrl: '', ceremonyImage: '', illustrationSize: 80, illustrationOffsetX: 0, illustrationOffsetY: 0 }; onUpdate?.({ ceremonies: u }) }}
                         darkBg={!!theme.dark}
                         isPhoto={!!ceremony.ceremonyImage && !ceremony.illustrationUrl}
-                      />
+                      /></AnimSection>
                     ) : (!hasFrame && canEdit) ? (
                       <IllustrationAdder ceremonyType={ceremony.type} accent={G} onSelect={(url) => {
                         const u = [...(data.ceremonies ?? [])]
@@ -6802,7 +6802,7 @@ const firstDate = sorted[0]?.date
                     {(parents1.length > 0 || parents2.length > 0) && ceremony.type === 'Cérémonie religieuse / Houppa' && (
                       <DraggableElement id={pre+"parents"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={150} skipAnim={canEdit}>
                         {hasGp && (
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 8, textAlign: 'center' }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 2, textAlign: 'center' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                               {gpPa1 ? <InlineEdit value={ov.gpPa1 || ''} defaultValue={gpPa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa1: v } })} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }} /> : <div>&nbsp;</div>}
                               {gpMa1 ? <InlineEdit value={ov.gpMa1 || ''} defaultValue={gpMa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa1: v } })} style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }} /> : <div>&nbsp;</div>}
@@ -6813,11 +6813,11 @@ const firstDate = sorted[0]?.date
                             </div>
                           </div>
                         )}
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12, textAlign: 'center' }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 6, textAlign: 'center' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                             {parents1.map((l,j)=><InlineEdit key={j} value={ov[`parents1_${j}`] || ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents1_${j}`]: v } })} style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles)} />)}
                           </div>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                             {parents2.map((l,j)=><InlineEdit key={j} value={ov[`parents2_${j}`] || ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents2_${j}`]: v } })} style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles)} />)}
                           </div>
                         </div>
