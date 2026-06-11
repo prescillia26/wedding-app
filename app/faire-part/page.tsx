@@ -3033,7 +3033,7 @@ function CustomLogo({ url, size, scale = 100, color }: { url: string; size: numb
   if (url.includes('cloudinary.com')) {
     if (color) {
       const hex = color.replace('#', '')
-      src = url.replace('/upload/', `/upload/e_background_removal/e_trim/e_grayscale/e_tint:100:${hex}:0p/`)
+      src = url.replace('/upload/', `/upload/e_background_removal/e_trim/e_colorize:100,co_rgb:${hex}/`)
     } else {
       src = url.replace('/upload/', '/upload/e_background_removal/e_trim/')
     }
