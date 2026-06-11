@@ -4967,11 +4967,9 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
   let logoSrc = ''
   if (logoUrl?.includes('cloudinary.com')) {
     const hex = effectiveLogoColor.replace('#', '')
-    // Couleur via Cloudinary tint, intensité via e_contrast Cloudinary
-    const boldVal = Math.round((logoBold - 100) * 2) // 0-400
-    const contrastPart = boldVal > 0 ? `/e_contrast:${boldVal}` : ''
-    const base = logoUrl.replace('/upload/', `/upload/e_background_removal/e_trim/e_grayscale/e_tint:100:${hex || '1a1a1a'}:0p${contrastPart}/`)
-    logoSrc = `${base}${base.includes('?') ? '&' : '?'}c=${hex}${boldVal}`
+    // e_colorize:100 = couleur solide, pas de rendu pâle
+    const base = logoUrl.replace('/upload/', `/upload/e_background_removal/e_trim/e_colorize:100,co_rgb:${hex || '1a1a1a'}/`)
+    logoSrc = `${base}${base.includes('?') ? '&' : '?'}c=${hex}`
   } else if (logoUrl) {
     logoSrc = logoUrl
   }
