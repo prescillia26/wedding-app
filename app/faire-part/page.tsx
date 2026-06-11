@@ -6961,8 +6961,13 @@ const firstDate = sorted[0]?.date
                       {ceremony.adresse && <div style={{ fontFamily: FC, fontSize: 14, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.65, marginBottom: 24, letterSpacing: 0.3 }}>{ceremony.adresse}</div>}
                       {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
                         <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(11px, 2.8vw, 14px)', color: TEXT, textAlign: 'center', marginBottom: 8, borderTop: `1px solid ${G}22`, paddingTop: 14, maxWidth: '90%', margin: '0 auto 8px', textWrap: 'balance' } as React.CSSProperties}>
-                          <div style={{ fontWeight: 700 }}>{t.fairepart.eventFollowedBy} {ceremony.evenementSuivantNom}</div>
-                          {ceremony.evenementSuivantAdresse && <div style={{ fontSize: 'clamp(10px, 2.5vw, 12px)', opacity: 0.75, marginTop: 4 }}>{ceremony.evenementSuivantAdresse}</div>}
+                          <InlineEdit
+                            value={ov[`ceremony_${i}_suivide`] || ''}
+                            defaultValue={`${t.fairepart.eventFollowedBy} ${ceremony.evenementSuivantNom}${ceremony.evenementSuivantAdresse ? '\n' + ceremony.evenementSuivantAdresse : ''}`}
+                            editable={canEdit}
+                            onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_suivide`]: v } })}
+                            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(11px, 2.8vw, 14px)', color: TEXT, textAlign: 'center', lineHeight: 1.7 }}
+                          />
                         </div>
                       )}
                     </AnimSection></DraggableElement>

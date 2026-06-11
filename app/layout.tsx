@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Great_Vibes, Cormorant_Garamond, Playfair_Display, Bellefair, Cinzel, Pinyon_Script } from "next/font/google";
+import { Geist, Geist_Mono, Great_Vibes, Cormorant_Garamond, Playfair_Display, Bellefair, Cinzel, Pinyon_Script, Alex_Brush, Tenor_Sans } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
@@ -47,6 +47,18 @@ const pinyonScript = Pinyon_Script({
   weight: "400",
   subsets: ["latin"],
   variable: "--font-pinyon-script",
+});
+
+const alexBrush = Alex_Brush({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-alex-brush",
+});
+
+const tenorSans = Tenor_Sans({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-tenor-sans",
 });
 
 export const metadata: Metadata = {
@@ -108,7 +120,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${geistSans.variable} ${geistMono.variable} ${greatVibes.variable} ${cormorantGaramond.variable} ${playfairDisplay.variable} ${bellefair.variable} ${cinzel.variable} ${pinyonScript.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${greatVibes.variable} ${cormorantGaramond.variable} ${playfairDisplay.variable} ${bellefair.variable} ${cinzel.variable} ${pinyonScript.variable} ${alexBrush.variable} ${tenorSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
