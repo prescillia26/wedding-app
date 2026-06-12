@@ -8005,6 +8005,14 @@ export default function FairePartPage() {
             setStep(1)
             setIsPaid(true)
           } else {
+            // Si l'utilisateur est connecté et propriétaire, upgrade vers role couple
+            if (r === 'guest' || !r) {
+              fetch('/api/auth/me').then(res => res.json()).then(me => {
+                if (me?.faireparts?.includes(id)) {
+                  setRole('couple')
+                }
+              }).catch(() => {})
+            }
             setShowCards(true)
           }
         })
