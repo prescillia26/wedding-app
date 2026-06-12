@@ -196,7 +196,7 @@ function FairepartCardComponent({ fp, locale, formatDate, t }: { fp: FairepartCa
 
   const shareUrl = fp.slug
     ? `/${fp.slug}`
-    : `/faire-part?share=${fp.shareId}&role=couple`
+    : `/faire-part?share=${fp.shareId}&role=guest`
 
   return (
     <div style={{
