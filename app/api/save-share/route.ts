@@ -21,56 +21,68 @@ export async function POST(request: Request) {
     // Vérifier la propriété si c'est une mise à jour (fixedId fourni)
     // Quiconque a le shareId peut modifier (il faut le shareId pour modifier)
     // L'ownerEmail est préservé — jamais écrasé
+    // ⚠️ FUSION : on merge les nouvelles données avec les existantes pour ne rien perdre
+    let mergedData = { ...shareData }
     if (fixedId) {
       const existing = await redis.get<Record<string, unknown>>(fixedId)
-      if (existing?.ownerEmail) {
-        shareData.ownerEmail = existing.ownerEmail as string
-      } else if (session?.email) {
-        shareData.ownerEmail = session.email
+      if (existing) {
+        // Fusionner : les données envoyées prennent le dessus sur les existantes
+        mergedData = { ...existing, ...shareData }
+        // Fusionner les objets imbriqués (textOverrides, zoneStyles, accueilLayout)
+        if (existing.textOverrides && shareData.textOverrides) {
+          mergedData.textOverrides = { ...(existing.textOverrides as Record<string, string>), ...shareData.textOverrides }
+        }
+        if (existing.zoneStyles && shareData.zoneStyles) {
+          mergedData.zoneStyles = { ...(existing.zoneStyles as Record<string, unknown>), ...shareData.zoneStyles }
+        }
+        if (existing.accueilLayout && shareData.accueilLayout) {
+          mergedData.accueilLayout = { ...(existing.accueilLayout as Record<string, unknown>), ...shareData.accueilLayout }
+        }
+        // Préserver l'ownerEmail
+        if (existing.ownerEmail) {
+          mergedData.ownerEmail = existing.ownerEmail as string
+        }
       }
     }
 
-    const size = new TextEncoder().encode(JSON.stringify(shareData)).length
+    if (session?.email) {
+      mergedData.ownerEmail = session.email
+    }
+
+    const size = new TextEncoder().encode(JSON.stringify(mergedData)).length
     if (size > MAX_BYTES) {
       return Response.json({ error: 'Données trop volumineuses.' }, { status: 413 })
     }
 
-    // Ajouter l'ownerEmail si connecté
-    if (session?.email) {
-      shareData.ownerEmail = session.email
-    }
-
     // Timestamp pour invalider le cache des previews WhatsApp/Facebook quand les photos changent
-    shareData.ogVersion = Date.now()
-    await redis.set(id, shareData, { ex: 31536000 })
+    mergedData.ogVersion = Date.now()
+    await redis.set(id, mergedData, { ex: 31536000 })
 
     // Sauvegarder un snapshot initial (uniquement à la première génération)
     const initialExists = await redis.exists(`${id}:initial`)
     if (!initialExists) {
-      await redis.set(`${id}:initial`, shareData, { ex: 31536000 })
+      await redis.set(`${id}:initial`, mergedData, { ex: 31536000 })
     }
 
-    if (shareData.emailMaries) {
-      await redis.set(`email:${id}`, shareData.emailMaries, { ex: 31536000 })
+    if (mergedData.emailMaries) {
+      await redis.set(`email:${id}`, mergedData.emailMaries as string, { ex: 31536000 })
     }
-    if (shareData.emailMaries2) {
-      await redis.set(`email2:${id}`, shareData.emailMaries2, { ex: 31536000 })
+    if (mergedData.emailMaries2) {
+      await redis.set(`email2:${id}`, mergedData.emailMaries2 as string, { ex: 31536000 })
     }
 
-    if (shareData.slug) {
-      const slug = shareData.slug.toLowerCase().replace(/[^a-z0-9-]/g, '')
+    if (mergedData.slug) {
+      const slug = (mergedData.slug as string).toLowerCase().replace(/[^a-z0-9-]/g, '')
       if (slug) {
         const existingSlugOwner = await redis.get<string>(`slug:${slug}`)
         if (existingSlugOwner && existingSlugOwner !== id) {
-          // Slug pris par un autre faire-part → toujours ajouter un suffixe
           const chars = 'abcdefghijkmnpqrstuvwxyz23456789'
           let suffix = ''
           for (let i = 0; i < 4; i++) suffix += chars[Math.floor(Math.random() * chars.length)]
           const newSlug = `${slug}-${suffix}`
-          shareData.slug = newSlug
+          mergedData.slug = newSlug
           await redis.set(`slug:${newSlug}`, id, { ex: 31536000 })
         } else {
-          // Slug libre ou déjà attribué à ce même id → garder
           await redis.set(`slug:${slug}`, id, { ex: 31536000 })
         }
       }
@@ -85,7 +97,7 @@ export async function POST(request: Request) {
       }
     }
 
-    return Response.json({ id, slug: shareData.slug || null })
+    return Response.json({ id, slug: mergedData.slug || null })
   } catch (err) {
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
   }
