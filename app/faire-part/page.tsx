@@ -734,8 +734,14 @@ function conjonctionLieu(lieu: string, locale = 'fr'): string {
 function getHebrewDate(dateStr: string): string {
   if (!dateStr) return ''
   try {
-    return new Intl.DateTimeFormat('he-IL-u-ca-hebrew', { year: 'numeric', month: 'long', day: 'numeric' })
-      .format(new Date(dateStr + 'T12:00:00'))
+    const d = new Date(dateStr + 'T12:00:00')
+    const parts = new Intl.DateTimeFormat('he-IL-u-ca-hebrew', { year: 'numeric', month: 'long', day: 'numeric' }).formatToParts(d)
+    const day = parts.find(p => p.type === 'day')?.value || ''
+    let month = parts.find(p => p.type === 'month')?.value || ''
+    const year = parts.find(p => p.type === 'year')?.value || ''
+    // Retirer le ב (be) au début du mois
+    if (month.startsWith('ב')) month = month.slice(1)
+    return `${day} ${month} ${year}`
   } catch { return '' }
 }
 
