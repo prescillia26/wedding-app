@@ -6774,7 +6774,13 @@ const firstDate = sorted[0]?.date
                     {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
                       <DraggableElement id={pre+"hebrewVerse"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={100} skipAnim={canEdit}>
                         <div style={{ padding: '0 20px', marginBottom: 22 }}>
-                          <div style={{ fontFamily: 'serif', fontSize: 'clamp(10px, 3.2vw, 17px)', color: G, direction: 'rtl', textAlign: 'center', whiteSpace: 'nowrap', lineHeight: 1.9 }}>קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה</div>
+                          <InlineEdit
+                            value={ov[`ceremony_${i}_hebrewVerse`] || ''}
+                            defaultValue="קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה"
+                            editable={canEdit}
+                            onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_hebrewVerse`]: v } })}
+                            style={{ fontFamily: 'serif', fontSize: 'clamp(10px, 3.2vw, 17px)', color: G, direction: 'rtl', textAlign: 'center', whiteSpace: 'nowrap', lineHeight: 1.9 }}
+                          />
                         </div>
                       </AnimSection></DraggableElement>
                     )}
@@ -6787,21 +6793,33 @@ const firstDate = sorted[0]?.date
                             <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
                           </div>
                           {ceremony.penseesDefuntsIntro && (
-                            <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, opacity: 0.85, marginBottom: 14, lineHeight: 1.6, padding: '0 12px' }}>
-                              {ceremony.penseesDefuntsIntro}
-                            </div>
+                            <InlineEdit
+                              value={ov[`ceremony_${i}_defuntsIntro`] || ''}
+                              defaultValue={ceremony.penseesDefuntsIntro}
+                              editable={canEdit}
+                              onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_defuntsIntro`]: v } })}
+                              style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, opacity: 0.85, marginBottom: 14, lineHeight: 1.6, padding: '0 12px', textAlign: 'center' }}
+                            />
                           )}
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: ceremony.penseesDefuntsFin ? 14 : 0 }}>
                             {ceremony.penseesDefuntsNoms.filter(n => n.trim()).map((nom, k) => (
-                              <div key={k} style={{ fontFamily: FP, fontSize: 16, color: TEXT, fontWeight: 500, lineHeight: 1.6 }}>
-                                {nom} <span style={{ color: G, fontSize: 14, fontFamily: 'serif' }}>ז״ל</span>
-                              </div>
+                              <InlineEdit key={k}
+                                value={ov[`ceremony_${i}_defunt_${k}`] || ''}
+                                defaultValue={`${nom} ז״ל`}
+                                editable={canEdit}
+                                onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_defunt_${k}`]: v } })}
+                                style={{ fontFamily: FP, fontSize: 16, color: TEXT, fontWeight: 500, lineHeight: 1.6, textAlign: 'center' }}
+                              />
                             ))}
                           </div>
                           {ceremony.penseesDefuntsFin && (
-                            <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, opacity: 0.75, lineHeight: 1.6, padding: '0 12px' }}>
-                              {ceremony.penseesDefuntsFin}
-                            </div>
+                            <InlineEdit
+                              value={ov[`ceremony_${i}_defuntsFin`] || ''}
+                              defaultValue={ceremony.penseesDefuntsFin}
+                              editable={canEdit}
+                              onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_defuntsFin`]: v } })}
+                              style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, opacity: 0.75, lineHeight: 1.6, padding: '0 12px', textAlign: 'center' }}
+                            />
                           )}
                         </div>
                       </AnimSection></DraggableElement>
@@ -6811,16 +6829,18 @@ const firstDate = sorted[0]?.date
                       const hasLeft = !!(gpPa1 || gpMa1)
                       const hasRight = !!(gpPa2 || gpMa2)
                       const oneSideOnly = hasLeft !== hasRight
+                      // Override seulement s'il diffère de la valeur calculée (sinon le formulaire prime)
+                      const ovIf = (key: string, def: string) => ov[key] && ov[key] !== def ? ov[key] : ''
                       return (
                       <DraggableElement id={pre+"gp"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
                         <div style={{ display: oneSideOnly ? 'flex' : 'grid', gridTemplateColumns: oneSideOnly ? undefined : '1fr 1fr', flexDirection: oneSideOnly ? 'column' : undefined, alignItems: oneSideOnly ? 'center' : undefined, gap: 6, marginBottom: 2, textAlign: 'center' }}>
                           {hasLeft && <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {gpPa1 ? <InlineEdit value={ov.gpPa1 || ''} defaultValue={gpPa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa1: v } })} style={gpStyle} /> : <div>&nbsp;</div>}
-                            {gpMa1 ? <InlineEdit value={ov.gpMa1 || ''} defaultValue={gpMa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa1: v } })} style={gpStyle} /> : <div>&nbsp;</div>}
+                            {gpPa1 ? <InlineEdit value={ovIf('gpPa1', gpPa1)} defaultValue={gpPa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa1: v } })} style={gpStyle} /> : <div>&nbsp;</div>}
+                            {gpMa1 ? <InlineEdit value={ovIf('gpMa1', gpMa1)} defaultValue={gpMa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa1: v } })} style={gpStyle} /> : <div>&nbsp;</div>}
                           </div>}
                           {hasRight && <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {gpPa2 ? <InlineEdit value={ov.gpPa2 || ''} defaultValue={gpPa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa2: v } })} style={gpStyle} /> : <div>&nbsp;</div>}
-                            {gpMa2 ? <InlineEdit value={ov.gpMa2 || ''} defaultValue={gpMa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa2: v } })} style={gpStyle} /> : <div>&nbsp;</div>}
+                            {gpPa2 ? <InlineEdit value={ovIf('gpPa2', gpPa2)} defaultValue={gpPa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa2: v } })} style={gpStyle} /> : <div>&nbsp;</div>}
+                            {gpMa2 ? <InlineEdit value={ovIf('gpMa2', gpMa2)} defaultValue={gpMa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa2: v } })} style={gpStyle} /> : <div>&nbsp;</div>}
                           </div>}
                         </div>
                       </AnimSection></DraggableElement>
@@ -6829,10 +6849,10 @@ const firstDate = sorted[0]?.date
                       <DraggableElement id={pre+"parents"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={150} skipAnim={canEdit}>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 6, textAlign: 'center' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                            {parents1.map((l,j)=><InlineEdit key={j} value={ov[`parents1_${j}`] || ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents1_${j}`]: v } })} style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles)} />)}
+                            {parents1.map((l,j)=><InlineEdit key={j} value={ov[`parents1_${j}`] && ov[`parents1_${j}`] !== l ? ov[`parents1_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents1_${j}`]: v } })} style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles)} />)}
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                            {parents2.map((l,j)=><InlineEdit key={j} value={ov[`parents2_${j}`] || ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents2_${j}`]: v } })} style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles)} />)}
+                            {parents2.map((l,j)=><InlineEdit key={j} value={ov[`parents2_${j}`] && ov[`parents2_${j}`] !== l ? ov[`parents2_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents2_${j}`]: v } })} style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles)} />)}
                           </div>
                         </div>
                       </AnimSection></DraggableElement>
@@ -6986,8 +7006,20 @@ const firstDate = sorted[0]?.date
                         )
                       })() : null}</AnimSection></DraggableElement>
                     <DraggableElement id={pre+"lieu"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={440} skipAnim={canEdit}>
-                      {(ov[`ceremony_${i}_lieu`] || ceremony.lieu) && <div style={applyZoneStyle({ fontFamily: FP, fontWeight: 700, fontSize: 19, color: TEXT, textAlign: 'center', lineHeight: 1.5, marginBottom: 8, letterSpacing: 0.5 }, 'lieu', data.zoneStyles)}>{ceremony.type === 'Mairie' ? conjonctionLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu, locale) : formatLieu(ov[`ceremony_${i}_lieu`] || ceremony.lieu, locale)}</div>}
-                      {ceremony.adresse && <div style={{ fontFamily: FC, fontSize: 14, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.65, marginBottom: 24, letterSpacing: 0.3 }}>{ceremony.adresse}</div>}
+                      {(ov[`ceremony_${i}_lieu`] || ceremony.lieu) && <InlineEdit
+                        value={ov[`ceremony_${i}_lieu`] || ''}
+                        defaultValue={ceremony.type === 'Mairie' ? conjonctionLieu(ceremony.lieu, locale) : formatLieu(ceremony.lieu, locale)}
+                        editable={canEdit}
+                        onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_lieu`]: v } })}
+                        style={applyZoneStyle({ fontFamily: FP, fontWeight: 700, fontSize: 19, color: TEXT, textAlign: 'center', lineHeight: 1.5, marginBottom: 8, letterSpacing: 0.5 }, 'lieu', data.zoneStyles)}
+                      />}
+                      {ceremony.adresse && <InlineEdit
+                        value={ov[`ceremony_${i}_adresse`] || ''}
+                        defaultValue={ceremony.adresse}
+                        editable={canEdit}
+                        onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_adresse`]: v } })}
+                        style={{ fontFamily: FC, fontSize: 14, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.65, marginBottom: 24, letterSpacing: 0.3 }}
+                      />}
                       {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
                         <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(11px, 2.8vw, 14px)', color: TEXT, textAlign: 'center', marginBottom: 8, borderTop: `1px solid ${G}22`, paddingTop: 14, maxWidth: '90%', margin: '0 auto 8px', textWrap: 'balance' } as React.CSSProperties}>
                           <InlineEdit
