@@ -7984,7 +7984,7 @@ export default function FairePartPage() {
       // Vue partagée — supprimer le brouillon local pour éviter tout mélange entre comptes
       try { localStorage.removeItem('wedding-draft') } catch { /* ignore */ }
       setIsShared(true)
-      setRole(r)
+      setRole(r || 'guest')
       setAccessGranted(true)
       setCheckingAccess(false)
       setLoadingShare(true)
@@ -8006,7 +8006,8 @@ export default function FairePartPage() {
             setIsPaid(true)
           } else {
             // Si l'utilisateur est connecté et propriétaire, upgrade vers role couple
-            if (r === 'guest' || !r) {
+            // ⚠️ Seulement si pas de role explicite dans l'URL (sinon le lien invité resterait en mode couple)
+            if (!r) {
               fetch('/api/auth/me').then(res => res.json()).then(me => {
                 if (me?.faireparts?.includes(id)) {
                   setRole('couple')
