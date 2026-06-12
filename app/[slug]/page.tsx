@@ -184,7 +184,7 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
   const photo = rawOg2 ? toCloudinaryOgUrl(rawOg2, result?.data?.ogVersion, bgC, !!userPhoto2) : ''
   const accent = '#C9A84C'
   const targetUrl = result?.shareId
-    ? `/faire-part?share=${result.shareId}`
+    ? `/faire-part?share=${result.shareId}&role=guest`
     : '/faire-part'
 
   return (
