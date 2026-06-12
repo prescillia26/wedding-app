@@ -7301,7 +7301,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
   })()
   const [rsvpOpen, setRsvpOpen] = useState(false)
   const [rsvpListOpen, setRsvpListOpen] = useState(false)
-  const [lastShareId, setLastShareId] = useState<string | null>(null)
+  const [lastShareId, setLastShareId] = useState<string | null>(parentShareId ?? null)
   const [ytMuted, setYtMuted] = useState(false)
   const ytIframeRef = useRef<HTMLIFrameElement | null>(null)
   const [textOverrides, setTextOverrides] = useState<Record<string, string>>({})
