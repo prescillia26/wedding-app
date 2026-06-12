@@ -267,7 +267,9 @@ function FairepartCardComponent({ fp, locale, formatDate, t }: { fp: FairepartCa
           </a>
           <button onClick={() => {
             const url = `${window.location.origin}${shareUrl}`
-            navigator.clipboard.writeText(url).then(() => showToast(t.linkCopied))
+            const date = firstCeremony?.date ? formatDate(firstCeremony.date) : ''
+            const msg = `✨ ${fp.marie1Prenom} & ${fp.marie2Prenom} ✨\n\nNous avons l'immense joie de vous convier à notre mariage${date ? ` le ${date}` : ''} !\n\nDécouvrez notre faire-part et confirmez votre présence :\n${url}`
+            navigator.clipboard.writeText(msg).then(() => showToast(t.linkCopied))
           }} style={{
             flex: 1, textAlign: 'center', padding: '10px 12px', borderRadius: 9999,
             background: 'transparent', border: `1px solid ${GOLD}`,
