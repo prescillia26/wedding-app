@@ -6079,7 +6079,27 @@ function IllustrationAdder({ ceremonyType, accent, onSelect }: { ceremonyType: s
   )
 }
 
+// ── Rendu texte avec **gras** (markdown simple) ──
+function renderRichText(text: string) {
+  // Sépare les lignes, puis dans chaque ligne gère **gras**
+  return text.split('\n').map((line, i) => {
+    const parts = line.split(/(\*\*[^*]+\*\*)/)
+    return (
+      <React.Fragment key={i}>
+        {i > 0 && <br />}
+        {parts.map((part, j) => {
+          if (part.startsWith('**') && part.endsWith('**')) {
+            return <strong key={j}>{part.slice(2, -2)}</strong>
+          }
+          return <React.Fragment key={j}>{part}</React.Fragment>
+        })}
+      </React.Fragment>
+    )
+  })
+}
+
 // ── Composant d'édition inline — clic pour modifier le texte directement ──
+// Supporte **gras** : entourez un mot de ** pour le mettre en gras
 function InlineEdit({ value, defaultValue, onChange, editable, style }: {
   value: string; defaultValue: string; onChange: (v: string) => void; editable: boolean
   style?: React.CSSProperties
@@ -6089,7 +6109,7 @@ function InlineEdit({ value, defaultValue, onChange, editable, style }: {
   const [editing, setEditing] = useState(false)
 
   if (!editable) {
-    return <div style={style}>{display.split('\n').map((line, i) => <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>)}</div>
+    return <div style={style}>{renderRichText(display)}</div>
   }
 
   if (!editing) {
@@ -6100,13 +6120,33 @@ function InlineEdit({ value, defaultValue, onChange, editable, style }: {
         onMouseDown={(e) => e.stopPropagation()}
         onTouchStart={(e) => e.stopPropagation()}
       >
-        {display.split('\n').map((line, i) => <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>)}
+        {renderRichText(display)}
         <span style={{ position: 'absolute', top: -8, right: -8, fontSize: 12, background: 'white', borderRadius: '50%', padding: 2, boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}>✏️</span>
       </div>
     )
   }
 
+  const toggleBold = () => {
+    const ta = ref.current as unknown as HTMLTextAreaElement | null
+    if (!ta) return
+    const start = ta.selectionStart
+    const end = ta.selectionEnd
+    const text = ta.value
+    if (start === end) return // pas de sélection
+    const selected = text.slice(start, end)
+    if (selected.startsWith('**') && selected.endsWith('**')) {
+      // Retirer le gras
+      ta.value = text.slice(0, start) + selected.slice(2, -2) + text.slice(end)
+    } else {
+      // Ajouter le gras
+      ta.value = text.slice(0, start) + '**' + selected + '**' + text.slice(end)
+    }
+    ta.focus()
+  }
+
   return (
+    <div style={{ position: 'relative' }}>
+      <button type="button" onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); toggleBold() }} style={{ position: 'absolute', top: -24, right: 0, fontSize: 11, fontWeight: 900, padding: '2px 8px', borderRadius: 4, border: '1px solid #ccc', background: 'white', cursor: 'pointer', zIndex: 5, fontFamily: 'serif' }}>B</button>
     <textarea
       ref={ref as unknown as React.RefObject<HTMLTextAreaElement>}
       autoFocus
@@ -6114,11 +6154,14 @@ function InlineEdit({ value, defaultValue, onChange, editable, style }: {
       onMouseDown={(e) => e.stopPropagation()}
       onTouchStart={(e) => e.stopPropagation()}
       onBlur={(e) => {
-        const text = e.currentTarget.value.trim()
-        setEditing(false)
-        if (text !== (value || defaultValue)) {
-          onChange(text)
-        }
+        // Délai pour laisser le bouton B fonctionner avant le blur
+        setTimeout(() => {
+          const text = e.target.value.trim()
+          setEditing(false)
+          if (text !== (value || defaultValue)) {
+            onChange(text)
+          }
+        }, 150)
       }}
       onKeyDown={(e) => {
         e.stopPropagation()
@@ -6133,6 +6176,7 @@ function InlineEdit({ value, defaultValue, onChange, editable, style }: {
         whiteSpace: 'pre-wrap',
       }}
     />
+    </div>
   )
 }
 
