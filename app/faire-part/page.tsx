@@ -6917,17 +6917,34 @@ const firstDate = sorted[0]?.date
                         </div>
                       ) : (
                         <div style={{ marginBottom: 28 }}>
-                          <InlineEdit
-                            value={ov[`ceremony_${i}_invitation`] || ''}
-                            defaultValue=""
-                            editable={canEdit}
-                            onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_invitation`]: v } })}
-                            style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', opacity: 0.85, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles)}
-                          />
-                          {!ov[`ceremony_${i}_invitation`] && !canEdit && (
-                            <div style={applyZoneStyle({ padding: '0 8px' }, 'narratif', data.zoneStyles)}>
-                              {renderInvitationPhrase(ceremony, data, G, TEXT, t.fairepart)}
-                            </div>
+                          {ov[`ceremony_${i}_invitation`] === ' ' ? (
+                            /* Phrase masquée — bouton pour la remettre (mariés uniquement) */
+                            canEdit && <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_invitation`]: '' } })} style={{ ...BTN, fontSize: 10, padding: '4px 12px', borderRadius: 9999, border: `1px solid ${G}33`, color: G, opacity: 0.5, display: 'block', margin: '0 auto' }}>Afficher la phrase d&apos;invitation</button>
+                          ) : ov[`ceremony_${i}_invitation`] ? (
+                            /* Phrase personnalisée */
+                            <>
+                              <InlineEdit
+                                value={ov[`ceremony_${i}_invitation`]}
+                                defaultValue=""
+                                editable={canEdit}
+                                onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_invitation`]: v } })}
+                                style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', opacity: 0.85, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles)}
+                              />
+                              {canEdit && <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_invitation`]: ' ' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4, display: 'block', margin: '4px auto 0' }}>Masquer</button>}
+                            </>
+                          ) : (
+                            /* Phrase par défaut */
+                            <>
+                              <div style={applyZoneStyle({ padding: '0 8px' }, 'narratif', data.zoneStyles)}>
+                                {renderInvitationPhrase(ceremony, data, G, TEXT, t.fairepart)}
+                              </div>
+                              {canEdit && (
+                                <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 4 }}>
+                                  <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_invitation`]: ' ' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4 }}>Masquer</button>
+                                  <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_invitation`]: 'ont le plaisir de vous convier à célébrer leur mariage' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4 }}>Modifier</button>
+                                </div>
+                              )}
+                            </>
                           )}
                         </div>
                       )}
