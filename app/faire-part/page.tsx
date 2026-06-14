@@ -7302,6 +7302,8 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
   const [rsvpOpen, setRsvpOpen] = useState(false)
   const [rsvpListOpen, setRsvpListOpen] = useState(false)
   const [lastShareId, setLastShareId] = useState<string | null>(parentShareId ?? null)
+  // Sync si parentShareId arrive après le mount (fetch async)
+  useEffect(() => { if (parentShareId && !lastShareId) setLastShareId(parentShareId) }, [parentShareId, lastShareId])
   const [ytMuted, setYtMuted] = useState(false)
   const ytIframeRef = useRef<HTMLIFrameElement | null>(null)
   const [textOverrides, setTextOverrides] = useState<Record<string, string>>({})
