@@ -3886,66 +3886,34 @@ function AudioPlayer({ musicUrl, accent, playRef }: { musicUrl: string; accent: 
   const [muted, setMuted] = useState(false)
   const [started, setStarted] = useState(false)
 
+  // playRef : appelé au clic sur "Découvrir" — joue l'audio DOM directement
   useEffect(() => {
-    const wasPreStarted = _pendingAudio !== null
-    const audio = _pendingAudio ?? new Audio(musicUrl)
-    if (_pendingAudio) _pendingAudio = null
-    audio.loop = true
-    audioRef.current = audio
-
     if (playRef) {
       playRef.current = () => {
-        // Essayer avec l'audio existant
-        audio.play().then(() => setStarted(true)).catch(() => {
-          // Android bloque si l'Audio a été créé hors du geste — on en crée un nouveau
-          const fresh = new Audio(musicUrl)
-          fresh.loop = true
-          audioRef.current = fresh
-          fresh.play().then(() => setStarted(true)).catch(() => {})
-        })
+        const el = audioRef.current
+        if (!el) return
+        el.play().then(() => setStarted(true)).catch(() => {})
       }
     }
-
-    if (wasPreStarted) {
-      if (!audio.paused) {
-        setStarted(true)
-      } else {
-        const onPlaying = () => setStarted(true)
-        audio.addEventListener('playing', onPlaying, { once: true })
-      }
-      return () => { if (playRef) playRef.current = null }
-    }
-
-    let cleanupListeners: (() => void) | null = null
-    audio.play().then(() => setStarted(true)).catch(() => {
-      const tryPlay = () => {
-        audio.play().then(() => setStarted(true)).catch(() => {})
-        document.removeEventListener('click', tryPlay, true)
-        document.removeEventListener('touchend', tryPlay, true)
-      }
-      document.addEventListener('click', tryPlay, true)
-      document.addEventListener('touchend', tryPlay, true)
-      cleanupListeners = () => {
-        document.removeEventListener('click', tryPlay, true)
-        document.removeEventListener('touchend', tryPlay, true)
-      }
-    })
-    return () => { cleanupListeners?.(); if (playRef) playRef.current = null }
-  }, [musicUrl, playRef])
+    return () => { if (playRef) playRef.current = null }
+  }, [playRef])
 
   const toggleMute = () => {
-    const audio = audioRef.current
-    if (!audio) return
+    const el = audioRef.current
+    if (!el) return
     if (!started) {
-      audio.play().then(() => setStarted(true)).catch(() => {})
+      el.play().then(() => setStarted(true)).catch(() => {})
       return
     }
-    audio.muted = !muted
+    el.muted = !muted
     setMuted(m => !m)
   }
 
   return (
     <>
+      {/* Audio DOM — plus fiable que new Audio() sur Android */}
+      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+      <audio ref={audioRef} src={musicUrl} loop preload="auto" playsInline style={{ display: 'none' }} />
       <button
         onClick={toggleMute}
         onTouchEnd={e => { e.preventDefault(); toggleMute() }}
