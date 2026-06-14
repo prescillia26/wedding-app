@@ -3894,7 +3894,16 @@ function AudioPlayer({ musicUrl, accent, playRef }: { musicUrl: string; accent: 
     audioRef.current = audio
 
     if (playRef) {
-      playRef.current = () => { audio.play().then(() => setStarted(true)).catch(() => {}) }
+      playRef.current = () => {
+        // Essayer avec l'audio existant
+        audio.play().then(() => setStarted(true)).catch(() => {
+          // Android bloque si l'Audio a été créé hors du geste — on en crée un nouveau
+          const fresh = new Audio(musicUrl)
+          fresh.loop = true
+          audioRef.current = fresh
+          fresh.play().then(() => setStarted(true)).catch(() => {})
+        })
+      }
     }
 
     if (wasPreStarted) {
