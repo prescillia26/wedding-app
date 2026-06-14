@@ -3578,7 +3578,7 @@ function RSVPModal({ accent, onClose, mariee1, mariee2, shareId, ceremonies }: {
     </div>
   )
 }
-function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: string; onClose: () => void; shareId: string | null; ceremonies: Ceremony[] }) {
+function RSVPListModal({ accent, onClose, shareId: propShareId, ceremonies }: { accent: string; onClose: () => void; shareId: string | null; ceremonies: Ceremony[] }) {
   const { t } = useT()
   const [entries, setEntries] = useState<RSVPEntry[]>([])
   const [loading, setLoading] = useState(true)
@@ -3587,6 +3587,9 @@ function RSVPListModal({ accent, onClose, shareId, ceremonies }: { accent: strin
   const findRep = (e: RSVPEntry, nomEvt: string, evtIdx: number) =>
     e.reponses?.find(r => r.ceremonie === nomEvt || (r as any).ceremonieIdx === evtIdx)
   const [views, setViews] = useState<{ timestamp: string; pays: string }[]>([])
+
+  // Bulletproof : shareId depuis prop, sinon URL, sinon rien
+  const shareId = propShareId || (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('share') : null)
 
   useEffect(() => {
     if (!shareId) { setLoading(false); return }
