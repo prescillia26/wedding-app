@@ -6491,6 +6491,15 @@ const firstDate = sorted[0]?.date
         .lovit-btn:hover{transform:translateY(-1px);filter:brightness(1.06);box-shadow:0 6px 24px rgba(0,0,0,0.12)}
         .lovit-btn:active{transform:translateY(0);filter:brightness(0.98)}
       `}</style>
+      {/* Bandeau WebView — invite à ouvrir dans le vrai navigateur pour la musique */}
+      {typeof navigator !== 'undefined' && /wv|WebView|FBAN|FBAV|Instagram|Line\/|Twitter/i.test(navigator.userAgent) && (
+        <div style={{ background: G, color: 'white', textAlign: 'center', padding: '10px 16px', fontSize: 12, fontFamily: FC }}>
+          Pour profiter de la musique et des animations,{' '}
+          <a href={typeof window !== 'undefined' ? window.location.href : '#'} target="_blank" rel="noopener noreferrer" style={{ color: 'white', fontWeight: 700, textDecoration: 'underline' }}>
+            ouvrez dans votre navigateur ↗
+          </a>
+        </div>
+      )}
 {/* Indicateur PAGE 1 — visible uniquement pour les mariés */}
       {role !== 'guest' && (
         <div style={{ textAlign: 'center', padding: '12px 0 4px', background: `${G}08`, borderBottom: `1px dashed ${G}30` }}>
