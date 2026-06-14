@@ -3913,11 +3913,11 @@ function AudioPlayer({ musicUrl, accent, playRef }: { musicUrl: string; accent: 
     <>
       {/* Audio DOM — plus fiable que new Audio() sur Android */}
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-      <audio ref={audioRef} src={musicUrl} loop preload="auto" playsInline style={{ display: 'none' }} />
+      <audio ref={audioRef} src={musicUrl} loop preload="metadata" playsInline crossOrigin="anonymous" style={{ position: 'absolute', width: 0, height: 0, opacity: 0 }} />
       <button
         onClick={toggleMute}
         onTouchEnd={e => { e.preventDefault(); toggleMute() }}
-        style={{ ...BTN, position: 'fixed', bottom: 24, right: 24, zIndex: 50, width: 40, height: 40, borderRadius: '50%', background: accent, color: 'white', border: 'none', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        style={{ ...BTN, position: 'fixed', bottom: 32, right: 16, zIndex: 999, width: 48, height: 48, borderRadius: '50%', background: accent, color: 'white', border: `2px solid white`, fontSize: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.3)' }}
       >
         {!started ? '▶️' : muted ? '🔇' : '🔊'}
       </button>
@@ -7264,8 +7264,9 @@ const firstDate = sorted[0]?.date
         </AnimSection>
       </footer>
 
-      {/* Musique */}
+      {/* Musique — déplacé en bas du DOM mais position:fixed donc visible partout */}
       {data.musicUrl && <AudioPlayer musicUrl={data.musicUrl} accent={G} playRef={audioPlayRef} />}
+      {/* Le bouton 🔊 est en position:fixed, visible sur toutes les pages */}
       {!data.musicUrl && ytIframeRef.current && (
         <button onClick={onToggleYtMute} onTouchEnd={e=>{e.preventDefault();onToggleYtMute()}}
           style={{ ...BTN, position: 'fixed', bottom: 24, right: 24, zIndex: 50, width: 44, height: 44, borderRadius: '50%', background: G, color: 'white', border: 'none', fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }}>
