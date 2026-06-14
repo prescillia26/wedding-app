@@ -6666,6 +6666,16 @@ const firstDate = sorted[0]?.date
             <button
               type="button"
               onClick={() => {
+                // Lancer la musique au clic (doit être dans le handler direct pour Android)
+                audioPlayRef.current?.()
+                onStartYoutube?.()
+                const el = document.getElementById('first-content')
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              }}
+              onTouchEnd={(e) => {
+                e.preventDefault()
+                audioPlayRef.current?.()
+                onStartYoutube?.()
                 const el = document.getElementById('first-content')
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
               }}
