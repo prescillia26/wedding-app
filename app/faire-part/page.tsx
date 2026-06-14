@@ -3899,7 +3899,8 @@ function AudioPlayer({ musicUrl, accent, playRef }: { musicUrl: string; accent: 
   }, [playRef])
 
   const toggleMute = () => {
-    const el = audioRef.current
+    // Accès DOM direct en fallback si ref pas prête
+    const el = audioRef.current || document.getElementById('lovit-audio') as HTMLAudioElement | null
     if (!el) return
     if (!started) {
       el.play().then(() => setStarted(true)).catch(() => {})
@@ -3913,7 +3914,7 @@ function AudioPlayer({ musicUrl, accent, playRef }: { musicUrl: string; accent: 
     <>
       {/* Audio DOM — plus fiable que new Audio() sur Android */}
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-      <audio ref={audioRef} src={musicUrl} loop preload="metadata" playsInline crossOrigin="anonymous" style={{ position: 'absolute', width: 0, height: 0, opacity: 0 }} />
+      <audio id="lovit-audio" ref={audioRef} src={musicUrl} loop preload="metadata" playsInline crossOrigin="anonymous" style={{ position: 'absolute', width: 0, height: 0, opacity: 0 }} />
       <button
         onClick={toggleMute}
         onTouchEnd={e => { e.preventDefault(); toggleMute() }}
@@ -6646,15 +6647,17 @@ const firstDate = sorted[0]?.date
             <button
               type="button"
               onClick={() => {
-                // Lancer la musique au clic (doit être dans le handler direct pour Android)
-                audioPlayRef.current?.()
+                // Lancer la musique — accès DOM direct, pas de ref, 100% fiable sur Android
+                const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null
+                if (audio) audio.play().catch(() => {})
                 onStartYoutube?.()
                 const el = document.getElementById('first-content')
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
               }}
               onTouchEnd={(e) => {
                 e.preventDefault()
-                audioPlayRef.current?.()
+                const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null
+                if (audio) audio.play().catch(() => {})
                 onStartYoutube?.()
                 const el = document.getElementById('first-content')
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
