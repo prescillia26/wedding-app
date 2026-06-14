@@ -3879,6 +3879,26 @@ function MusicUploader({ musicUrl, musicName, onChange }: { musicUrl: string; mu
   )
 }
 
+// ── WebView → force ouverture dans le vrai navigateur ────────────────────────
+function WebViewRedirect() {
+  useEffect(() => {
+    const ua = navigator.userAgent || ''
+    const isWebView = /wv|WebView|FBAN|FBAV|Instagram|Line\/|Twitter/i.test(ua)
+    if (!isWebView) return
+    const url = window.location.href
+    const isAndroid = /Android/i.test(ua)
+    if (isAndroid) {
+      // intent:// force Chrome sur Android
+      const intentUrl = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;end`
+      window.location.href = intentUrl
+    } else {
+      // iOS : window.open force Safari
+      window.open(url, '_system')
+    }
+  }, [])
+  return null
+}
+
 // ── AudioPlayer HTML5 ──────────────────────────────────────────────────────────
 
 function AudioPlayer({ musicUrl, accent, playRef }: { musicUrl: string; accent: string; playRef?: React.MutableRefObject<(() => void) | null> }) {
@@ -6491,15 +6511,8 @@ const firstDate = sorted[0]?.date
         .lovit-btn:hover{transform:translateY(-1px);filter:brightness(1.06);box-shadow:0 6px 24px rgba(0,0,0,0.12)}
         .lovit-btn:active{transform:translateY(0);filter:brightness(0.98)}
       `}</style>
-      {/* Bandeau WebView — invite à ouvrir dans le vrai navigateur pour la musique */}
-      {typeof navigator !== 'undefined' && /wv|WebView|FBAN|FBAV|Instagram|Line\/|Twitter/i.test(navigator.userAgent) && (
-        <div style={{ background: G, color: 'white', textAlign: 'center', padding: '10px 16px', fontSize: 12, fontFamily: FC }}>
-          Pour profiter de la musique et des animations,{' '}
-          <a href={typeof window !== 'undefined' ? window.location.href : '#'} target="_blank" rel="noopener noreferrer" style={{ color: 'white', fontWeight: 700, textDecoration: 'underline' }}>
-            ouvrez dans votre navigateur ↗
-          </a>
-        </div>
-      )}
+      {/* WebView → redirection automatique vers le vrai navigateur */}
+      <WebViewRedirect />
 {/* Indicateur PAGE 1 — visible uniquement pour les mariés */}
       {role !== 'guest' && (
         <div style={{ textAlign: 'center', padding: '12px 0 4px', background: `${G}08`, borderBottom: `1px dashed ${G}30` }}>
