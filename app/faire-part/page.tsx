@@ -5897,7 +5897,7 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
     <div style={{ textAlign: 'center', position: 'relative', margin: '0 0 4px', padding: 0, overflow: 'visible', lineHeight: 0 }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={isPhoto ? url : (url.includes('cloudinary.com') ? url.replace('/upload/', '/upload/e_trim/') : url)} alt="" draggable={false}
+        src={url} alt="" draggable={false}
         onMouseDown={editable ? (e) => { e.preventDefault(); startDrag(e.clientX, e.clientY) } : undefined}
         onTouchStart={editable ? (e) => { e.preventDefault(); startDrag(e.touches[0].clientX, e.touches[0].clientY) } : undefined}
         style={{
