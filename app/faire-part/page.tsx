@@ -447,6 +447,7 @@ interface FormData {
   videoAccueilId?: string // ID vidéo animée pour page d'accueil
   accueilLayout?: Record<string, { x: number; y: number; scale: number; color?: string; fontFamily?: string }>
   customLogoUrl?: string
+  customLogoOriginalUrl?: string // URL brute avant transformations (pour re-générer)
   customLogoSize?: number // 50-150, default 100
   customLogoColor?: string // '' = original, ou hex color
   headerLogoColor?: string // couleur du logo dans la bannière sticky
@@ -2107,22 +2108,36 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
     })
   }
 
+  // Pré-générer le logo transformé (bg removal + couleur) côté serveur
+  const pregenerateLogo = async (originalUrl: string, color: string) => {
+    try {
+      const res = await fetch('/api/pregenerate-logo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ logoUrl: originalUrl, color }),
+      })
+      const d = await res.json()
+      return d.url || null
+    } catch { return null }
+  }
+
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
     if (file.size > 5 * 1024 * 1024) { showToast(t.fairepart.errorFileTooLarge, 'error'); return }
     setUploading(true)
     try {
-      // Upload le fichier tel quel sur Cloudinary (la suppression de fond se fait via l'URL de transformation)
+      // 1. Upload le fichier brut sur Cloudinary
       const fd = new (globalThis.FormData)()
       fd.append('file', file)
       fd.append('upload_preset', 'wedding_music')
       const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
       const json = await res.json()
       if (json.secure_url) {
-        // Forcer le format PNG pour la transparence
         const pngUrl = json.secure_url.replace(/\.\w+$/, '.png')
-        onChange({ customLogoUrl: pngUrl })
+        // 2. Stocker l'URL brute pour référence ET pré-générer avec bg removal
+        const pregenUrl = await pregenerateLogo(pngUrl, logoColor)
+        onChange({ customLogoUrl: pregenUrl || pngUrl, customLogoOriginalUrl: pngUrl })
       }
     } catch { showToast(t.fairepart.errorUploadLogo, 'error') }
     finally { setUploading(false) }
@@ -2154,7 +2169,15 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
             {LOGO_COLORS.map(opt => {
               const sel = logoColor === opt.value
               return (
-                <button key={opt.label} type="button" onClick={() => onChange({ customLogoColor: opt.value })} style={{
+                <button key={opt.label} type="button" onClick={async () => {
+                  onChange({ customLogoColor: opt.value })
+                  // Pré-générer le logo avec la nouvelle couleur
+                  const originalUrl = (logoUrl?.includes('cloudinary.com') ? logoUrl : null)
+                  if (originalUrl) {
+                    const pregenUrl = await pregenerateLogo(originalUrl, opt.value)
+                    if (pregenUrl) onChange({ customLogoUrl: pregenUrl })
+                  }
+                }} style={{
                   cursor: 'pointer', padding: 0, borderRadius: 9999, border: 'none', background: 'none',
                 }}>
                   {opt.swatch ? (
