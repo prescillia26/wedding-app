@@ -266,13 +266,13 @@ function frameImgStyle(_ft: FrameType | undefined, opacity: number, size: number
 const FRAMES: { id: string; label: string; url: string | null; video?: boolean; frameType?: FrameType }[] = [
   // ── Floral corners : fleurs dans les coins, centre vide pour le texte ──
   { id: 'frame-55', label: '🌸 Bouquet Bleu', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781115458/55_l7xahl.png', frameType: 'floral-corners' },
-  { id: 'frame-69', label: '🌸 Roses Pâles', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1776857021/69_vko7to.png', frameType: 'floral-corners' },
-  { id: 'frame-70', label: '🌸 Fleurs Sauvages', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1776857021/70_skvaop.png', frameType: 'floral-corners' },
-  { id: 'frame-71', label: '🌸 Pivoine Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1776857022/71_ntcix8.png', frameType: 'floral-corners' },
-  { id: 'frame-96', label: '🌸 Bouquet Délicat', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1776878838/96_bauksw.png', frameType: 'floral-corners' },
-  { id: 'frame-97', label: '🌸 Floral Doux', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1776878845/97_dcccon.png', frameType: 'floral-corners' },
-  { id: 'frame-147', label: '🌿 Feuillage Vert', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1777896737/147_vmtvha.png', frameType: 'floral-corners' },
-  { id: 'frame-154', label: '🌿 Laurier', url: 'https://res.cloudinary.com/dau96mui2/image/upload/e_trim/v1777896718/154_pxirys.png', frameType: 'floral-corners' },
+  { id: 'frame-69', label: '🌸 Roses Pâles', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781685863/calgznugulyoc8ywwptq.png', frameType: 'floral-corners' },
+  { id: 'frame-70', label: '🌸 Fleurs Sauvages', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781685866/dpatdrrz0bikckoocsd7.png', frameType: 'floral-corners' },
+  { id: 'frame-71', label: '🌸 Pivoine Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781685869/yt7c9cm2gtlwdugh2pbb.png', frameType: 'floral-corners' },
+  { id: 'frame-96', label: '🌸 Bouquet Délicat', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781685872/tufhxphvbr2yk4gfglsu.png', frameType: 'floral-corners' },
+  { id: 'frame-97', label: '🌸 Floral Doux', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781685876/unxr2tthzlwq1ae9br1y.png', frameType: 'floral-corners' },
+  { id: 'frame-147', label: '🌿 Feuillage Vert', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781685883/qnajhywttdhhqrnczvlr.png', frameType: 'floral-corners' },
+  { id: 'frame-154', label: '🌿 Laurier', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781685885/nhrvz13kb6wht2x7fq5p.png', frameType: 'floral-corners' },
   // ── Full border : cadre complet autour de toute la section ──
   { id: 'frame-02', label: '🤍 Roses Crème', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/51_m9vx96.png', frameType: 'full-border' },
   { id: 'frame-03', label: '🌺 Cadre Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/53_ho1gq8.png', frameType: 'full-border' },
@@ -3035,15 +3035,8 @@ function renderCard(ceremony: Ceremony, data: FormData, theme: ThemeObj, photoId
 
 function CustomLogo({ url, size, scale = 100, color }: { url: string; size: number; scale?: number; color?: string; bgColor?: string }) {
   const s = size * (scale / 100)
-  let src = url
-  if (url.includes('cloudinary.com')) {
-    if (color) {
-      const hex = color.replace('#', '')
-      src = url.replace('/upload/', `/upload/e_background_removal/e_trim/e_colorize:100,co_rgb:${hex}/`)
-    } else {
-      src = url.replace('/upload/', '/upload/e_background_removal/e_trim/')
-    }
-  }
+  // Utiliser l'URL telle quelle — les transformations sont pré-appliquées au moment de l'upload/sauvegarde
+  const src = url
   // eslint-disable-next-line @next/next/no-img-element
   return <img src={src} alt="Logo" style={{ width: s, height: s, objectFit: 'contain' }} />
 }
@@ -4971,17 +4964,9 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
   }
 
   const [showLogoEdit, setShowLogoEdit] = useState(false)
-  // Logo affiché : custom logo ou monogramme initiales
+  // Logo affiché — URL utilisée telle quelle (transformations pré-appliquées)
   const effectiveLogoColor = logoColor || accent
-  let logoSrc = ''
-  if (logoUrl?.includes('cloudinary.com')) {
-    const hex = effectiveLogoColor.replace('#', '')
-    // e_colorize:100 = couleur solide, pas de rendu pâle
-    const base = logoUrl.replace('/upload/', `/upload/e_background_removal/e_trim/e_colorize:100,co_rgb:${hex || '1a1a1a'}/`)
-    logoSrc = `${base}${base.includes('?') ? '&' : '?'}c=${hex}`
-  } else if (logoUrl) {
-    logoSrc = logoUrl
-  }
+  const logoSrc = logoUrl || ''
 
   const PD = 'var(--font-playfair-display)'
   const countdownItems = [
@@ -5889,7 +5874,7 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
     <div style={{ textAlign: 'center', position: 'relative', margin: '0 0 4px', padding: 0, overflow: 'visible', lineHeight: 0 }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={isPhoto ? url : (url.includes('cloudinary.com') ? url.replace('/upload/', darkBg ? '/upload/e_background_removal/e_trim/' : '/upload/e_trim/') : url)} alt="" draggable={false}
+        src={isPhoto ? url : (url.includes('cloudinary.com') ? url.replace('/upload/', '/upload/e_trim/') : url)} alt="" draggable={false}
         onMouseDown={editable ? (e) => { e.preventDefault(); startDrag(e.clientX, e.clientY) } : undefined}
         onTouchStart={editable ? (e) => { e.preventDefault(); startDrag(e.touches[0].clientX, e.touches[0].clientY) } : undefined}
         style={{
@@ -6848,7 +6833,7 @@ const firstDate = sorted[0]?.date
                         <div style={{ textAlign: 'center', marginBottom: 32, paddingBottom: 24, borderBottom: `1px solid ${G}22` }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: 16 }}>
                             <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
-                            <img src="https://res.cloudinary.com/dau96mui2/image/upload/e_background_removal/e_trim/v1780077740/watercolors/jiflmnlcr0dr9clza2h2.png" alt="" style={{ width: 50, height: 50, objectFit: 'contain' }} />
+                            <img src="https://res.cloudinary.com/dau96mui2/image/upload/v1781685771/bnl1dqjjovgay8l4wmlu.png" alt="" style={{ width: 50, height: 50, objectFit: 'contain' }} />
                             <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
                           </div>
                           {ceremony.penseesDefuntsIntro && (
