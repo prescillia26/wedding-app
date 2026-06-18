@@ -426,7 +426,7 @@ interface FormData {
   ornamentId?: string
   fondCeremonie?: 'ornements' | 'photo'
   photoPosition?: 'top' | 'center' | 'bottom' | 'left' | 'right'
-  photosData?: { url: string; cropX: number; cropY: number; cropScale: number }[]
+  photosData?: { url: string; cropX: number; cropY: number; cropScale: number; faceCropUrl?: string }[]
   marie1PrenomHebreu?: string
   marie2PrenomHebreu?: string
   frameId?: string
@@ -676,6 +676,21 @@ function toCloudinaryFaceCrop(url: string, width = 800, height = 1200): string {
     return url.replace(/\/upload\/[^/]+\//, `/upload/w_${width},h_${height},c_fill,g_auto:faces,q_auto,f_auto/`)
   }
   return url.replace('/upload/', `/upload/w_${width},h_${height},c_fill,g_auto:faces,q_auto,f_auto/`)
+}
+// ── Logo display URL — pré-généré si dispo, sinon fallback transformations ───
+function getLogoDisplayUrl(data: { luxeMonogramUrl?: string; customLogoUrl?: string; customLogoOriginalUrl?: string; customLogoColor?: string }): string | undefined {
+  if (data.luxeMonogramUrl) return data.luxeMonogramUrl
+  if (!data.customLogoUrl) return undefined
+  // Si customLogoOriginalUrl existe, le logo est déjà pré-généré → utiliser directement
+  if (data.customLogoOriginalUrl) return data.customLogoUrl
+  // Ancien faire-part sans pré-génération → fallback sur transformations à la volée
+  if (data.customLogoUrl.includes('cloudinary.com')) {
+    const hex = (data.customLogoColor || '').replace('#', '')
+    return hex
+      ? data.customLogoUrl.replace('/upload/', `/upload/e_background_removal/e_trim/e_grayscale/e_tint:100:${hex}:0p/`)
+      : data.customLogoUrl.replace('/upload/', '/upload/e_background_removal/e_trim/')
+  }
+  return data.customLogoUrl
 }
 function getYouTubeId(url: string): string | null {
   const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)
@@ -1489,9 +1504,31 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
         if (json.secure_url) uploaded.push(json.secure_url)
       }
       const newPhotos = [...photos, ...uploaded].slice(0, 5)
-      const newData = [...photosData, ...uploaded.map(url => ({ url, cropX: 0, cropY: 0, cropScale: 1 }))].slice(0, 5)
+      const newData = [...photosData, ...uploaded.map(url => ({ url, cropX: 0, cropY: 0, cropScale: 1, faceCropUrl: undefined }))].slice(0, 5)
       onChange({ photosFond: newPhotos, photoFond: newPhotos[0] ?? '', photosData: newData, presentationStyle: 'page-unique' })
       setCropIdx(photos.length)
+      // Pré-générer les face crops en arrière-plan (0 transformation côté visiteur)
+      const pregenData = [...newData]
+      let pregenCount = 0
+      for (let idx = 0; idx < uploaded.length; idx++) {
+        const photoIdx = photos.length + idx
+        fetch('/api/pregenerate-photo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ photoUrl: uploaded[idx] }),
+        })
+          .then(r => r.json())
+          .then(d => {
+            if (d.url && pregenData[photoIdx]) {
+              pregenData[photoIdx] = { ...pregenData[photoIdx], faceCropUrl: d.url }
+              pregenCount++
+              if (pregenCount === uploaded.length) {
+                onChange({ photosData: pregenData })
+              }
+            }
+          })
+          .catch(() => {})
+      }
     } catch {
       showToast(t.fairepart.errorUploadPhoto, 'error')
     } finally {
@@ -2067,7 +2104,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
   )
 }
 
-function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, accent }: { logoUrl?: string; logoSize?: number; logoColor?: string; onChange: (d: Partial<FormData>) => void; accent: string }) {
+function CustomLogoUpload({ logoUrl, logoOriginalUrl, logoSize = 100, logoColor = '', onChange, accent }: { logoUrl?: string; logoOriginalUrl?: string; logoSize?: number; logoColor?: string; onChange: (d: Partial<FormData>) => void; accent: string }) {
   const { t } = useT()
   const [uploading, setUploading] = useState(false)
 
@@ -2150,11 +2187,8 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
       ...COLOR_OPTIONS.filter(c => c.value !== '').map(c => ({ value: c.value, label: c.label, swatch: c.swatch })),
     ]
     const previewSize = Math.min(220, 140 * (logoSize / 100))
-    const imgSrc = logoUrl?.includes('cloudinary.com')
-      ? logoColor
-        ? logoUrl!.replace('/upload/', `/upload/e_background_removal/e_trim/e_grayscale/e_tint:100:${logoColor.replace('#', '')}:0p/`)
-        : logoUrl!.replace('/upload/', '/upload/e_background_removal/e_trim/')
-      : logoUrl!
+    // Le logo est déjà pré-généré (bg removal + couleur) — utiliser directement
+    const imgSrc = logoUrl!
     return (
       <div style={{ textAlign: 'center' }}>
         {/* Preview — pas de cadre, fond propre */}
@@ -2171,10 +2205,10 @@ function CustomLogoUpload({ logoUrl, logoSize = 100, logoColor = '', onChange, a
               return (
                 <button key={opt.label} type="button" onClick={async () => {
                   onChange({ customLogoColor: opt.value })
-                  // Pré-générer le logo avec la nouvelle couleur
-                  const originalUrl = (logoUrl?.includes('cloudinary.com') ? logoUrl : null)
-                  if (originalUrl) {
-                    const pregenUrl = await pregenerateLogo(originalUrl, opt.value)
+                  // Pré-générer le logo avec la nouvelle couleur (depuis l'original)
+                  const srcUrl = logoOriginalUrl || (logoUrl?.includes('cloudinary.com') ? logoUrl : null)
+                  if (srcUrl) {
+                    const pregenUrl = await pregenerateLogo(srcUrl, opt.value)
                     if (pregenUrl) onChange({ customLogoUrl: pregenUrl })
                   }
                 }} style={{
@@ -2405,7 +2439,7 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
           <span style={{ fontSize: 11, color: '#9ca3af', fontStyle: 'italic' }}>{locale === 'en' ? 'or upload your logo' : 'ou importez votre logo'}</span>
           <div style={{ flex: 1, height: 1, background: '#e5d5c5' }} />
         </div>
-        <CustomLogoUpload logoUrl={data.customLogoUrl} logoSize={data.customLogoSize} logoColor={data.customLogoColor} onChange={onChange} accent={THEMES[data.style].accent} />
+        <CustomLogoUpload logoUrl={data.customLogoUrl} logoOriginalUrl={data.customLogoOriginalUrl} logoSize={data.customLogoSize} logoColor={data.customLogoColor} onChange={onChange} accent={THEMES[data.style].accent} />
       </AccordionSection>
 
       <AccordionSection title={locale === 'en' ? '🎵 Music & photos' : '🎵 Musique & photos'}>
@@ -4744,7 +4778,7 @@ const OrnementDentelleDore = ({ style = {} }: { style?: React.CSSProperties }) =
 
 // ── IntroCarousel : fond photo de la section d'accueil ────────────────────────
 
-type CropData = { url: string; cropX: number; cropY: number; cropScale: number }
+type CropData = { url: string; cropX: number; cropY: number; cropScale: number; faceCropUrl?: string }
 function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; themeAccent: string; photosData?: CropData[] }) {
   const valid = photos.filter(p => p && p.length > 0)
   const [activeIdx, setActiveIdx] = useState(0)
@@ -4765,7 +4799,7 @@ function IntroCarousel({ photos, themeAccent, photosData }: { photos: string[]; 
       {valid.map((photo, i) => {
         const crop = photosData?.[i]
         const hasCustomCrop = crop && (crop.cropX !== 0 || crop.cropY !== 0 || (crop.cropScale && crop.cropScale !== 1))
-        const photoSrc = hasCustomCrop ? photo : toCloudinaryFaceCrop(photo)
+        const photoSrc = hasCustomCrop ? photo : (crop?.faceCropUrl || toCloudinaryFaceCrop(photo))
         const isActive = i === activeIdx
 
         if (hasCustomCrop) {
@@ -7400,7 +7434,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
     setSaving(true)
     try {
       const mergedData = { ...data, textOverrides: { ...data.textOverrides, ...textOverrides }, zoneStyles }
-      const photosDataToSend = (data.photosData ?? []).map(({ cropX, cropY, cropScale }) => ({ cropX, cropY, cropScale }))
+      const photosDataToSend = (data.photosData ?? []).map(({ cropX, cropY, cropScale, faceCropUrl }) => ({ cropX, cropY, cropScale, faceCropUrl }))
       // Nettoyer les base64 des customPages et ceremonyImage avant envoi
       if (mergedData.customPages) {
         mergedData.customPages = mergedData.customPages.map(p => ({
@@ -7456,7 +7490,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
     try {
       const originalPhotos = data.photosFond ?? []
       let compressedPhotos: string[] = originalPhotos
-      const photosDataToSend = (data.photosData ?? []).map(({ cropX, cropY, cropScale }) => ({ cropX, cropY, cropScale }))
+      const photosDataToSend = (data.photosData ?? []).map(({ cropX, cropY, cropScale, faceCropUrl }) => ({ cropX, cropY, cropScale, faceCropUrl }))
       // Merger les modifications locales (textOverrides, zoneStyles) avec les données du formulaire
       const mergedData = { ...data, textOverrides: { ...data.textOverrides, ...textOverrides }, zoneStyles }
       // Nettoyer les base64 avant envoi
@@ -7531,7 +7565,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
             date={data.ceremonies?.[0]?.date}
             accent={theme.accent}
             fond={theme.fond}
-            logoUrl={data.luxeMonogramUrl || data.customLogoUrl}
+            logoUrl={getLogoDisplayUrl(data)}
             logoColor={data.customLogoColor}
             onOpen={() => setCoverOpen(true)}
             mariageJuif={data.mariageJuif}
@@ -7628,7 +7662,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
           date={data.ceremonies?.[0]?.date}
           accent={theme.accent}
           fond={theme.fond}
-          logoUrl={data.luxeMonogramUrl || data.customLogoUrl}
+          logoUrl={getLogoDisplayUrl(data)}
           logoColor={data.customLogoColor}
           onOpen={() => setCoverOpen(true)}
           mariageJuif={data.mariageJuif}

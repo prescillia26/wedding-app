@@ -12,7 +12,6 @@ export default function InvitationCover({
   accent,
   fond,
   logoUrl,
-  logoColor,
   onOpen,
   mariageJuif,
   illustrationUrl,
@@ -78,18 +77,10 @@ export default function InvitationCover({
 
         {/* Logo */}
         {logoUrl ? (() => {
-          const colorToUse = logoColor || accent.replace('#', '')
-          let displayUrl = logoUrl
-          if (logoUrl.includes('cloudinary.com')) {
-            const hex = colorToUse.replace('#', '')
-            displayUrl = hex
-              ? logoUrl.replace('/upload/', `/upload/e_background_removal/e_trim/e_grayscale/e_tint:100:${hex}:0p/`)
-              : logoUrl.replace('/upload/', '/upload/e_background_removal/e_trim/')
-          }
           return (
             <div style={{ marginBottom: 20 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={displayUrl} alt="" style={{ width: 140, height: 140, objectFit: 'contain', display: 'inline-block' }} />
+              <img src={logoUrl} alt="" style={{ width: 140, height: 140, objectFit: 'contain', display: 'inline-block' }} />
             </div>
           )
         })() : (
