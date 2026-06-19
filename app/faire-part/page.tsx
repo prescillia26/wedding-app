@@ -993,6 +993,9 @@ function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
     if (!editable) return
     if (toolbarRef.current?.contains(e.target as Node)) return
     if (panelRef.current?.contains(e.target as Node)) return
+    // Ne pas intercepter les clics sur les boutons enfants (✕, pastilles couleur, etc.)
+    const target = e.target as HTMLElement
+    if (target.closest('button, a, input, select, textarea, [role="button"]')) return
     e.preventDefault()
     e.stopPropagation()
     setSelected(true)
