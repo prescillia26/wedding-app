@@ -6683,6 +6683,7 @@ const firstDate = sorted[0]?.date
           </div>
           </DraggableElement>
           {(data.textOverrides?.['global_pleaseJoin'] !== '__hidden__') && (
+          <>
           <DraggableElement id="phrase" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <InlineEdit
             value={data.textOverrides?.['global_pleaseJoin'] || ''}
@@ -6691,21 +6692,22 @@ const firstDate = sorted[0]?.date
             onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, global_pleaseJoin: v } })}
             style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: data.phraseColor || introTextColor, marginBottom: 0, textAlign: 'center', lineHeight: 1.6, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : (goldShadow || readableShadow(theme)) }}
           />
+          </DraggableElement>
           {canEdit && (
-            <div onPointerDown={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ display: 'flex', gap: 4, justifyContent: 'center', marginTop: 4 }}>
+            <div style={{ display: 'flex', gap: 4, justifyContent: 'center', marginTop: 4 }}>
               {DRAG_COLORS.filter(c => c).slice(0, 12).map(c => (
                 <button key={c} type="button" onClick={() => onUpdate?.({ phraseColor: c })} style={{
                   ...BTN, width: 14, height: 14, borderRadius: '50%', padding: 0,
                   background: c, border: (data.phraseColor || '') === c ? `2px solid ${G}` : '1px solid #d6d1cb',
                 }} />
               ))}
-              <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, global_pleaseJoin: '__hidden__' } })} style={{
+              <button type="button" onClick={() => { onUpdate?.({ textOverrides: { ...data.textOverrides, global_pleaseJoin: '__hidden__' } }); onUpdate?.({ accueilLayout: { ...layout, phrase: { x: 0, y: 0, scale: 1 } } }) }} style={{
                 ...BTN, padding: '4px 10px', borderRadius: 9999, border: '1px solid #d4505030',
                 background: 'white', color: '#d45050', fontSize: 12, fontWeight: 600, minWidth: 28, minHeight: 28,
-              }}>✕</button>
+              }}>✕ Masquer</button>
             </div>
           )}
-          </DraggableElement>
+          </>
           )}
           {/* Compte à rebours déplacé dans le sticky header */}
           {/* Bouton "Découvrir" — draggable par les mariés */}
