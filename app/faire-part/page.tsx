@@ -5947,7 +5947,7 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
         }}
       />
       {editable && !showPicker && (
-        <div onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 2, lineHeight: 1, position: 'relative', zIndex: 10 }}>
+        <div onPointerDown={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 2, lineHeight: 1, position: 'relative', zIndex: 10 }}>
           <button type="button" onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); onChangeSize(Math.max(20, w - 10)) }} style={{
             ...BTN, width: 28, height: 28, borderRadius: '50%', border: `2px solid ${accent}`,
             background: 'white', color: accent, fontSize: 18, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, cursor: 'pointer',
@@ -6622,7 +6622,7 @@ const firstDate = sorted[0]?.date
           </div>
           )}
           {canEdit && !data.hideAccueilLogo && (
-            <div onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 6, maxWidth: 240, margin: '0 auto 6px' }}>
+            <div onPointerDown={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 6, maxWidth: 240, margin: '0 auto 6px' }}>
               {dedupColors.slice(0, 30).map(c => (
                 <button key={c.value} type="button" onClick={() => {
                   if (data.customLogoUrl) onUpdate?.({ customLogoColor: c.value })
@@ -6636,7 +6636,7 @@ const firstDate = sorted[0]?.date
             </div>
           )}
           {canEdit && (
-            <div onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ textAlign: 'center', marginBottom: 6 }}>
+            <div onPointerDown={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ textAlign: 'center', marginBottom: 6 }}>
               <button type="button" onClick={() => onUpdate?.({ hideAccueilLogo: !data.hideAccueilLogo })} style={{ ...BTN, fontSize: 10, padding: '4px 12px', borderRadius: 9999, border: `1px solid ${G}33`, color: G, opacity: 0.7 }}>
                 {data.hideAccueilLogo ? 'Afficher le logo' : 'Masquer le logo'}
               </button>
@@ -6689,7 +6689,7 @@ const firstDate = sorted[0]?.date
             style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: data.phraseColor || introTextColor, marginBottom: 0, textAlign: 'center', lineHeight: 1.6, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : (goldShadow || readableShadow(theme)) }}
           />
           {canEdit && (
-            <div onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ display: 'flex', gap: 4, justifyContent: 'center', marginTop: 4 }}>
+            <div onPointerDown={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ display: 'flex', gap: 4, justifyContent: 'center', marginTop: 4 }}>
               {DRAG_COLORS.filter(c => c).slice(0, 12).map(c => (
                 <button key={c} type="button" onClick={() => onUpdate?.({ phraseColor: c })} style={{
                   ...BTN, width: 14, height: 14, borderRadius: '50%', padding: 0,
