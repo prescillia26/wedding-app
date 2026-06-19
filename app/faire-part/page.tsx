@@ -6700,8 +6700,8 @@ const firstDate = sorted[0]?.date
                 }} />
               ))}
               <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, global_pleaseJoin: '__hidden__' } })} style={{
-                ...BTN, padding: '1px 6px', borderRadius: 9999, border: '1px solid #d4505030',
-                background: 'white', color: '#d45050', fontSize: 8, fontWeight: 600,
+                ...BTN, padding: '4px 10px', borderRadius: 9999, border: '1px solid #d4505030',
+                background: 'white', color: '#d45050', fontSize: 12, fontWeight: 600, minWidth: 28, minHeight: 28,
               }}>✕</button>
             </div>
           )}
