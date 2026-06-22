@@ -6304,13 +6304,41 @@ function renderRichText(text: string) {
 
 // ── Composant d'édition inline — clic pour modifier le texte directement ──
 // Supporte **gras** : entourez un mot de ** pour le mettre en gras
-function InlineEdit({ value, defaultValue, onChange, editable, style }: {
+// Toolbar flottant : couleur, police, taille, édition texte
+const INLINE_EDIT_COLORS = DRAG_COLORS.slice(0, 10)
+const INLINE_EDIT_FONTS = DRAG_FONTS
+
+function InlineEdit({ value, defaultValue, onChange, editable, style, onStyleChange }: {
   value: string; defaultValue: string; onChange: (v: string) => void; editable: boolean
   style?: React.CSSProperties
+  onStyleChange?: (patch: { color?: string; fontFamily?: string; fontSize?: string }) => void
 }) {
   const ref = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const toolbarRef = useRef<HTMLDivElement>(null)
   const display = value || defaultValue
   const [editing, setEditing] = useState(false)
+  const [selected, setSelected] = useState(false)
+  const [showColors, setShowColors] = useState(false)
+  const [showFonts, setShowFonts] = useState(false)
+
+  // Close toolbar on outside click
+  useEffect(() => {
+    if (!selected) return
+    const close = (e: PointerEvent) => {
+      if (containerRef.current?.contains(e.target as Node)) return
+      setSelected(false)
+      setShowColors(false)
+      setShowFonts(false)
+    }
+    const timer = setTimeout(() => document.addEventListener('pointerdown', close), 10)
+    return () => { clearTimeout(timer); document.removeEventListener('pointerdown', close) }
+  }, [selected])
+
+  // Current style values for highlighting active selections
+  const currentColor = style?.color ?? ''
+  const currentFont = style?.fontFamily ?? ''
+  const currentSize = typeof style?.fontSize === 'number' ? style.fontSize : (typeof style?.fontSize === 'string' ? parseInt(style.fontSize, 10) : 0)
 
   if (!editable) {
     return <div style={style}>{renderRichText(display)}</div>
@@ -6319,13 +6347,99 @@ function InlineEdit({ value, defaultValue, onChange, editable, style }: {
   if (!editing) {
     return (
       <div
+        ref={containerRef}
         style={{ ...style, cursor: 'text', position: 'relative' }}
-        onClick={(e) => { e.stopPropagation(); e.preventDefault(); setEditing(true) }}
+        onClick={(e) => {
+          e.stopPropagation()
+          e.preventDefault()
+          if (!selected) {
+            setSelected(true)
+          }
+        }}
         onMouseDown={(e) => e.stopPropagation()}
         onTouchStart={(e) => e.stopPropagation()}
       >
         {renderRichText(display)}
-        <span style={{ position: 'absolute', top: -8, right: -8, fontSize: 12, background: 'white', borderRadius: '50%', padding: 2, boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}>✏️</span>
+        {/* Pencil badge — always visible in edit mode */}
+        {!selected && (
+          <span style={{ position: 'absolute', top: -8, right: -8, fontSize: 12, background: 'white', borderRadius: '50%', padding: 2, boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}>✏️</span>
+        )}
+        {/* Floating style toolbar */}
+        {selected && (
+          <div
+            ref={toolbarRef}
+            onPointerDown={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            style={{
+              position: 'absolute', bottom: '100%', left: '50%', transform: 'translateX(-50%)',
+              marginBottom: 6, zIndex: 30, background: 'white', borderRadius: 10,
+              padding: '6px 8px', boxShadow: '0 4px 20px rgba(0,0,0,0.18)',
+              border: '1px solid #e0d5c8', minWidth: 180,
+            }}
+          >
+            {/* Main toolbar row */}
+            <div style={{ display: 'flex', gap: 3, alignItems: 'center', justifyContent: 'center' }}>
+              {/* Size controls */}
+              <button type="button" onClick={() => onStyleChange?.({ fontSize: `${Math.max(8, (currentSize || 14) - 1)}` })} style={{ ...BTN, width: 22, height: 22, borderRadius: 4, border: 'none', background: '#f5f0e8', color: '#C9A84C', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>−</button>
+              <div style={{ fontSize: 9, color: '#8a7e72', display: 'flex', alignItems: 'center', padding: '0 2px', fontWeight: 600, minWidth: 20, justifyContent: 'center' }}>{currentSize || '—'}</div>
+              <button type="button" onClick={() => onStyleChange?.({ fontSize: `${Math.min(72, (currentSize || 14) + 1)}` })} style={{ ...BTN, width: 22, height: 22, borderRadius: 4, border: 'none', background: '#f5f0e8', color: '#C9A84C', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>+</button>
+
+              <div style={{ width: 1, background: '#e0d5c8', margin: '2px 2px', alignSelf: 'stretch' }} />
+
+              {/* Color toggle */}
+              <button type="button" onClick={() => { setShowColors(p => !p); setShowFonts(false) }} style={{ ...BTN, width: 22, height: 22, borderRadius: 4, border: 'none', background: showColors ? '#C9A84C' : '#f5f0e8', color: showColors ? 'white' : '#C9A84C', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>🎨</button>
+
+              {/* Font toggle */}
+              <button type="button" onClick={() => { setShowFonts(p => !p); setShowColors(false) }} style={{ ...BTN, width: 22, height: 22, borderRadius: 4, border: 'none', background: showFonts ? '#C9A84C' : '#f5f0e8', color: showFonts ? 'white' : '#3a3330', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, fontFamily: 'serif' }}>Aa</button>
+
+              <div style={{ width: 1, background: '#e0d5c8', margin: '2px 2px', alignSelf: 'stretch' }} />
+
+              {/* Edit text button */}
+              <button type="button" onClick={() => { setSelected(false); setShowColors(false); setShowFonts(false); setEditing(true) }} style={{ ...BTN, width: 22, height: 22, borderRadius: 4, border: 'none', background: '#f5f0e8', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✏️</button>
+            </div>
+
+            {/* Color panel */}
+            {showColors && (
+              <div style={{ marginTop: 6, paddingTop: 6, borderTop: '1px solid #e0d5c8' }}>
+                <div style={{ fontSize: 9, color: '#8a7e72', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Couleur</div>
+                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                  {INLINE_EDIT_COLORS.map(c => (
+                    <button key={c || 'def'} type="button" onClick={() => onStyleChange?.({ color: c })} style={{
+                      ...BTN, width: 18, height: 18, borderRadius: '50%', padding: 0,
+                      background: c || 'linear-gradient(135deg, #ccc 25%, #fff 25%, #fff 50%, #ccc 50%, #ccc 75%, #fff 75%)',
+                      backgroundSize: c ? undefined : '6px 6px',
+                      border: currentColor === c ? '2px solid #C9A84C' : '1px solid #d6d1cb',
+                      boxShadow: currentColor === c ? '0 0 0 1px #C9A84C' : 'none',
+                    }} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Font panel */}
+            {showFonts && (
+              <div style={{ marginTop: 6, paddingTop: 6, borderTop: '1px solid #e0d5c8' }}>
+                <div style={{ fontSize: 9, color: '#8a7e72', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Police</div>
+                <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+                  {INLINE_EDIT_FONTS.map(f => (
+                    <button key={f.value || 'def'} type="button" onClick={() => onStyleChange?.({ fontFamily: f.value })} style={{
+                      ...BTN, padding: '3px 8px', borderRadius: 6, fontSize: 9, fontWeight: currentFont === f.value ? 700 : 400,
+                      border: `1px solid ${currentFont === f.value ? '#C9A84C' : '#e0d5c8'}`,
+                      background: currentFont === f.value ? '#faf5ea' : 'white',
+                      color: currentFont === f.value ? '#C9A84C' : '#3a3330',
+                      fontFamily: f.value || 'inherit',
+                    }}>{f.label}</button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        {/* Selection outline */}
+        {selected && (
+          <div style={{ position: 'absolute', inset: -3, border: '1.5px dashed rgba(201,168,76,0.5)', borderRadius: 6, pointerEvents: 'none' }} />
+        )}
       </div>
     )
   }
@@ -6337,13 +6451,13 @@ function InlineEdit({ value, defaultValue, onChange, editable, style }: {
     const end = ta.selectionEnd
     const text = ta.value
     if (start === end) return // pas de sélection
-    const selected = text.slice(start, end)
-    if (selected.startsWith('**') && selected.endsWith('**')) {
+    const sel = text.slice(start, end)
+    if (sel.startsWith('**') && sel.endsWith('**')) {
       // Retirer le gras
-      ta.value = text.slice(0, start) + selected.slice(2, -2) + text.slice(end)
+      ta.value = text.slice(0, start) + sel.slice(2, -2) + text.slice(end)
     } else {
       // Ajouter le gras
-      ta.value = text.slice(0, start) + '**' + selected + '**' + text.slice(end)
+      ta.value = text.slice(0, start) + '**' + sel + '**' + text.slice(end)
     }
     ta.focus()
   }
@@ -6633,6 +6747,16 @@ function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: 
   const goldShadow = isGold ? '0 1px 2px rgba(139,105,20,0.6), 0 0 8px rgba(201,168,76,0.3)' : ''
   const FC = 'var(--font-cormorant-garamond)'
   const ov = data.textOverrides ?? {}
+  const getInlineStyle = (key: string): React.CSSProperties => {
+    const raw = ov[`style_${key}`]
+    if (!raw) return {}
+    try { return JSON.parse(raw) } catch { return {} }
+  }
+  const setInlineStyle = (key: string, patch: { color?: string; fontFamily?: string; fontSize?: string }) => {
+    const existing = getInlineStyle(key)
+    const merged = { ...existing, ...patch }
+    onUpdate?.({ textOverrides: { ...data.textOverrides, [`style_${key}`]: JSON.stringify(merged) } })
+  }
   const i1 = (data.marie1Prenom || 'A')[0].toUpperCase()
   const i2 = (data.marie2Prenom || 'B')[0].toUpperCase()
   const monoColor = data.monogrammeColor || G
@@ -6865,7 +6989,8 @@ const firstDate = sorted[0]?.date
             defaultValue={t.fairepart.pleaseJoin}
             editable={canEdit}
             onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, global_pleaseJoin: v } })}
-            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: data.phraseColor || introTextColor, marginBottom: 0, textAlign: 'center', lineHeight: 1.6, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : (goldShadow || readableShadow(theme)) }}
+            onStyleChange={(patch) => setInlineStyle('global_pleaseJoin', patch)}
+            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: data.phraseColor || introTextColor, marginBottom: 0, textAlign: 'center', lineHeight: 1.6, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : (goldShadow || readableShadow(theme)), ...getInlineStyle('global_pleaseJoin') }}
           />
           </DraggableElement>
           {canEdit && (
@@ -7034,7 +7159,8 @@ const firstDate = sorted[0]?.date
                         defaultValue={title}
                         editable={canEdit}
                         onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_titre`]: v } })}
-                        style={applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: (ceremony.illustrationUrl || ceremony.ceremonyImage) ? 10 : 24, lineHeight: 1.4 }, 'titres', data.zoneStyles)}
+                        onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_titre`, patch)}
+                        style={{ ...applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: (ceremony.illustrationUrl || ceremony.ceremonyImage) ? 10 : 24, lineHeight: 1.4 }, 'titres', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_titre`) }}
                       />
                     </AnimSection></DraggableElement>
                     {/* Illustration aquarelle — après le titre, déplaçable par les mariés */}
@@ -7085,7 +7211,8 @@ const firstDate = sorted[0]?.date
                             defaultValue="קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה"
                             editable={canEdit}
                             onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_hebrewVerse`]: v } })}
-                            style={{ fontFamily: 'serif', fontSize: 'clamp(10px, 3.2vw, 17px)', color: G, direction: 'rtl', textAlign: 'center', whiteSpace: 'nowrap', lineHeight: 1.9 }}
+                            onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_hebrewVerse`, patch)}
+                            style={{ fontFamily: 'serif', fontSize: 'clamp(10px, 3.2vw, 17px)', color: G, direction: 'rtl', textAlign: 'center', whiteSpace: 'nowrap', lineHeight: 1.9, ...getInlineStyle(`ceremony_${safeIdx}_hebrewVerse`) }}
                           />
                         </div>
                       </AnimSection></DraggableElement>
@@ -7104,7 +7231,8 @@ const firstDate = sorted[0]?.date
                               defaultValue={ceremony.penseesDefuntsIntro}
                               editable={canEdit}
                               onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_defuntsIntro`]: v } })}
-                              style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, opacity: 0.85, marginBottom: 14, lineHeight: 1.6, padding: '0 12px', textAlign: 'center' }}
+                              onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_defuntsIntro`, patch)}
+                              style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, opacity: 0.85, marginBottom: 14, lineHeight: 1.6, padding: '0 12px', textAlign: 'center', ...getInlineStyle(`ceremony_${safeIdx}_defuntsIntro`) }}
                             />
                           )}
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: ceremony.penseesDefuntsFin ? 14 : 0 }}>
@@ -7114,7 +7242,8 @@ const firstDate = sorted[0]?.date
                                 defaultValue={`${nom} ז״ל`}
                                 editable={canEdit}
                                 onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_defunt_${k}`]: v } })}
-                                style={{ fontFamily: FP, fontSize: 16, color: TEXT, fontWeight: 500, lineHeight: 1.6, textAlign: 'center' }}
+                                onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_defunt_${k}`, patch)}
+                                style={{ fontFamily: FP, fontSize: 16, color: TEXT, fontWeight: 500, lineHeight: 1.6, textAlign: 'center', ...getInlineStyle(`ceremony_${safeIdx}_defunt_${k}`) }}
                               />
                             ))}
                           </div>
@@ -7124,7 +7253,8 @@ const firstDate = sorted[0]?.date
                               defaultValue={ceremony.penseesDefuntsFin}
                               editable={canEdit}
                               onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_defuntsFin`]: v } })}
-                              style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, opacity: 0.75, lineHeight: 1.6, padding: '0 12px', textAlign: 'center' }}
+                              onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_defuntsFin`, patch)}
+                              style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, opacity: 0.75, lineHeight: 1.6, padding: '0 12px', textAlign: 'center', ...getInlineStyle(`ceremony_${safeIdx}_defuntsFin`) }}
                             />
                           )}
                         </div>
@@ -7141,12 +7271,12 @@ const firstDate = sorted[0]?.date
                       <DraggableElement id={pre+"gp"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
                         <div style={{ display: oneSideOnly ? 'flex' : 'grid', gridTemplateColumns: oneSideOnly ? undefined : '1fr 1fr', flexDirection: oneSideOnly ? 'column' : undefined, alignItems: oneSideOnly ? 'center' : undefined, gap: 6, marginBottom: 2, textAlign: 'center' }}>
                           {hasLeft && <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {gpPa1 ? <InlineEdit value={ovIf('gpPa1', gpPa1)} defaultValue={gpPa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa1: v } })} style={gpStyle} /> : <div>&nbsp;</div>}
-                            {gpMa1 ? <InlineEdit value={ovIf('gpMa1', gpMa1)} defaultValue={gpMa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa1: v } })} style={gpStyle} /> : <div>&nbsp;</div>}
+                            {gpPa1 ? <InlineEdit value={ovIf('gpPa1', gpPa1)} defaultValue={gpPa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa1: v } })} onStyleChange={(patch) => setInlineStyle('gpPa1', patch)} style={{ ...gpStyle, ...getInlineStyle('gpPa1') }} /> : <div>&nbsp;</div>}
+                            {gpMa1 ? <InlineEdit value={ovIf('gpMa1', gpMa1)} defaultValue={gpMa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa1: v } })} onStyleChange={(patch) => setInlineStyle('gpMa1', patch)} style={{ ...gpStyle, ...getInlineStyle('gpMa1') }} /> : <div>&nbsp;</div>}
                           </div>}
                           {hasRight && <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {gpPa2 ? <InlineEdit value={ovIf('gpPa2', gpPa2)} defaultValue={gpPa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa2: v } })} style={gpStyle} /> : <div>&nbsp;</div>}
-                            {gpMa2 ? <InlineEdit value={ovIf('gpMa2', gpMa2)} defaultValue={gpMa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa2: v } })} style={gpStyle} /> : <div>&nbsp;</div>}
+                            {gpPa2 ? <InlineEdit value={ovIf('gpPa2', gpPa2)} defaultValue={gpPa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa2: v } })} onStyleChange={(patch) => setInlineStyle('gpPa2', patch)} style={{ ...gpStyle, ...getInlineStyle('gpPa2') }} /> : <div>&nbsp;</div>}
+                            {gpMa2 ? <InlineEdit value={ovIf('gpMa2', gpMa2)} defaultValue={gpMa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa2: v } })} onStyleChange={(patch) => setInlineStyle('gpMa2', patch)} style={{ ...gpStyle, ...getInlineStyle('gpMa2') }} /> : <div>&nbsp;</div>}
                           </div>}
                         </div>
                       </AnimSection></DraggableElement>
@@ -7155,10 +7285,10 @@ const firstDate = sorted[0]?.date
                       <DraggableElement id={pre+"parents"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={150} skipAnim={canEdit}>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 6, textAlign: 'center' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                            {parents1.map((l,j)=><InlineEdit key={j} value={ov[`parents1_${j}`] && ov[`parents1_${j}`] !== l ? ov[`parents1_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents1_${j}`]: v } })} style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles)} />)}
+                            {parents1.map((l,j)=><InlineEdit key={j} value={ov[`parents1_${j}`] && ov[`parents1_${j}`] !== l ? ov[`parents1_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents1_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents1_${j}`, patch)} style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles), ...getInlineStyle(`parents1_${j}`) }} />)}
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                            {parents2.map((l,j)=><InlineEdit key={j} value={ov[`parents2_${j}`] && ov[`parents2_${j}`] !== l ? ov[`parents2_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents2_${j}`]: v } })} style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles)} />)}
+                            {parents2.map((l,j)=><InlineEdit key={j} value={ov[`parents2_${j}`] && ov[`parents2_${j}`] !== l ? ov[`parents2_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents2_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents2_${j}`, patch)} style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles), ...getInlineStyle(`parents2_${j}`) }} />)}
                           </div>
                         </div>
                       </AnimSection></DraggableElement>
@@ -7170,7 +7300,8 @@ const firstDate = sorted[0]?.date
                           defaultValue={hasGp ? t.fairepart.joyMessageGp : t.fairepart.joyMessage}
                           editable={canEdit}
                           onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_joie`]: v } })}
-                          style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 24, lineHeight: 1.9, opacity: 0.82 }, 'narratif', data.zoneStyles)}
+                          onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_joie`, patch)}
+                          style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 24, lineHeight: 1.9, opacity: 0.82 }, 'narratif', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_joie`) }}
                         />
                       </AnimSection></DraggableElement>
                     )}
@@ -7207,7 +7338,8 @@ const firstDate = sorted[0]?.date
                             defaultValue={t.fairepart.cardSeDiront}
                             editable={canEdit}
                             onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_sediront`]: v } })}
-                            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78 }}
+                            onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_sediront`, patch)}
+                            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78, ...getInlineStyle(`ceremony_${safeIdx}_sediront`) }}
                           />
                           <div style={{ fontFamily: FS, fontSize: 'clamp(48px,12vw,80px)', color: G, textAlign: 'center', lineHeight: 1, marginBottom: 12 }}>{t.fairepart.cardOui}</div>
                           <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', opacity: 0.7, marginBottom: 16 }}>le</div>
@@ -7218,7 +7350,8 @@ const firstDate = sorted[0]?.date
                           defaultValue={t.fairepart.cardHonore}
                           editable={canEdit}
                           onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_honore`]: v } })}
-                          style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginTop: 16, marginBottom: 28, opacity: 0.78, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles)}
+                          onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_honore`, patch)}
+                          style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginTop: 16, marginBottom: 28, opacity: 0.78, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_honore`) }}
                         />
                       ) : ceremony.type === 'Shabbat Hatan' ? (
                         <div style={{ textAlign: 'center', marginTop: 32, marginBottom: 16, padding: '0 12px' }}>
@@ -7227,19 +7360,21 @@ const firstDate = sorted[0]?.date
                             defaultValue="Les Familles"
                             editable={canEdit}
                             onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_lesfamilles`]: v } })}
-                            style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, lineHeight: 1.8, opacity: 0.85 }, 'narratif', data.zoneStyles)}
+                            onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_lesfamilles`, patch)}
+                            style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, lineHeight: 1.8, opacity: 0.85 }, 'narratif', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_lesfamilles`) }}
                           />
                           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(6px,2vw,10px)', marginTop: 4, marginBottom: 4 }}>
-                            <InlineEdit value={ov.shabbat_nom1 || ''} defaultValue={data.famille1PereNom || data.marie1Nom || '...'} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, shabbat_nom1: v } })} style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(24px,6vw,38px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)} />
+                            <InlineEdit value={ov.shabbat_nom1 || ''} defaultValue={data.famille1PereNom || data.marie1Nom || '...'} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, shabbat_nom1: v } })} onStyleChange={(patch) => setInlineStyle('shabbat_nom1', patch)} style={{ ...applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(24px,6vw,38px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles), ...getInlineStyle('shabbat_nom1') }} />
                             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(14px,3vw,20px)', color: data.zoneStyles?.prenoms?.color || G, opacity: 0.5 }}>&</div>
-                            <InlineEdit value={ov.shabbat_nom2 || ''} defaultValue={data.famille2PereNom || data.marie2Nom || '...'} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, shabbat_nom2: v } })} style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(24px,6vw,38px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)} />
+                            <InlineEdit value={ov.shabbat_nom2 || ''} defaultValue={data.famille2PereNom || data.marie2Nom || '...'} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, shabbat_nom2: v } })} onStyleChange={(patch) => setInlineStyle('shabbat_nom2', patch)} style={{ ...applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(24px,6vw,38px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles), ...getInlineStyle('shabbat_nom2') }} />
                           </div>
                           <InlineEdit
                             value={ov[`ceremony_${safeIdx}_ravies`] || ''}
                             defaultValue="sont ravies de vous convier au Shabbat Hatan de"
                             editable={canEdit}
                             onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_ravies`]: v } })}
-                            style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, lineHeight: 1.8, opacity: 0.85, marginBottom: 8 }, 'narratif', data.zoneStyles)}
+                            onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_ravies`, patch)}
+                            style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, lineHeight: 1.8, opacity: 0.85, marginBottom: 8 }, 'narratif', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_ravies`) }}
                           />
                           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(6px,2vw,10px)', marginBottom: 8 }}>
                             <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,46px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom || 'Prénom'}</div>
@@ -7260,7 +7395,8 @@ const firstDate = sorted[0]?.date
                                 defaultValue=""
                                 editable={canEdit}
                                 onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: v } })}
-                                style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', opacity: 0.85, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles)}
+                                onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_invitation`, patch)}
+                                style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', opacity: 0.85, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_invitation`) }}
                               />
                               {canEdit && <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: ' ' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4, display: 'block', margin: '4px auto 0' }}>Masquer</button>}
                             </>
@@ -7317,14 +7453,16 @@ const firstDate = sorted[0]?.date
                         defaultValue={ceremony.type === 'Mairie' ? conjonctionLieu(ceremony.lieu, locale) : formatLieu(ceremony.lieu, locale)}
                         editable={canEdit}
                         onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_lieu`]: v } })}
-                        style={applyZoneStyle({ fontFamily: FP, fontWeight: 700, fontSize: 19, color: TEXT, textAlign: 'center', lineHeight: 1.5, marginBottom: 8, letterSpacing: 0.5 }, 'lieu', data.zoneStyles)}
+                        onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_lieu`, patch)}
+                        style={{ ...applyZoneStyle({ fontFamily: FP, fontWeight: 700, fontSize: 19, color: TEXT, textAlign: 'center', lineHeight: 1.5, marginBottom: 8, letterSpacing: 0.5 }, 'lieu', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_lieu`) }}
                       />}
                       {ceremony.adresse && <InlineEdit
                         value={ov[`ceremony_${safeIdx}_adresse`] || ''}
                         defaultValue={ceremony.adresse}
                         editable={canEdit}
                         onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_adresse`]: v } })}
-                        style={{ fontFamily: FC, fontSize: 14, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.65, marginBottom: 24, letterSpacing: 0.3 }}
+                        onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_adresse`, patch)}
+                        style={{ fontFamily: FC, fontSize: 14, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.65, marginBottom: 24, letterSpacing: 0.3, ...getInlineStyle(`ceremony_${safeIdx}_adresse`) }}
                       />}
                       {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
                         <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(11px, 2.8vw, 14px)', color: TEXT, textAlign: 'center', marginBottom: 8, borderTop: `1px solid ${G}22`, paddingTop: 14, maxWidth: '90%', margin: '0 auto 8px', textWrap: 'balance' } as React.CSSProperties}>
@@ -7333,7 +7471,8 @@ const firstDate = sorted[0]?.date
                             defaultValue={`${t.fairepart.eventFollowedBy} ${ceremony.evenementSuivantNom}${ceremony.evenementSuivantAdresse ? '\n' + ceremony.evenementSuivantAdresse : ''}`}
                             editable={canEdit}
                             onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_suivide`]: v } })}
-                            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(11px, 2.8vw, 14px)', color: TEXT, textAlign: 'center', lineHeight: 1.7 }}
+                            onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_suivide`, patch)}
+                            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(11px, 2.8vw, 14px)', color: TEXT, textAlign: 'center', lineHeight: 1.7, ...getInlineStyle(`ceremony_${safeIdx}_suivide`) }}
                           />
                         </div>
                       )}
