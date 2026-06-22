@@ -6315,7 +6315,7 @@ function renderRichText(text: string) {
 // ── Composant d'édition inline — clic pour modifier le texte directement ──
 // Supporte **gras** : entourez un mot de ** pour le mettre en gras
 // Toolbar flottant : couleur, police, taille, édition texte
-const INLINE_EDIT_COLORS = DRAG_COLORS.slice(0, 10)
+const INLINE_EDIT_COLORS = DRAG_COLORS.filter(c => c) // toutes les couleurs (sans vide)
 const INLINE_EDIT_FONTS = DRAG_FONTS
 
 function InlineEdit({ value, defaultValue, onChange, editable, style, onStyleChange }: {
@@ -6348,7 +6348,17 @@ function InlineEdit({ value, defaultValue, onChange, editable, style, onStyleCha
   // Current style values for highlighting active selections
   const currentColor = style?.color ?? ''
   const currentFont = style?.fontFamily ?? ''
-  const currentSize = typeof style?.fontSize === 'number' ? style.fontSize : (typeof style?.fontSize === 'string' ? parseInt(style.fontSize, 10) : 0)
+  // Parser le fontSize — gère number, "16px", "16", et "clamp(14px,4vw,22px)" (prend la valeur du milieu ou la première)
+  const currentSize = (() => {
+    const fs = style?.fontSize
+    if (typeof fs === 'number') return fs
+    if (typeof fs !== 'string') return 0
+    // clamp(min, preferred, max) → extraire la première valeur px
+    const clampMatch = fs.match(/clamp\((\d+)/)
+    if (clampMatch) return parseInt(clampMatch[1], 10)
+    const n = parseInt(fs, 10)
+    return isNaN(n) ? 0 : n
+  })()
 
   if (!editable) {
     return <div style={style}>{renderRichText(display)}</div>
@@ -6423,6 +6433,10 @@ function InlineEdit({ value, defaultValue, onChange, editable, style, onStyleCha
                       boxShadow: currentColor === c ? '0 0 0 1px #C9A84C' : 'none',
                     }} />
                   ))}
+                  {/* Custom color picker */}
+                  <label style={{ width: 18, height: 18, borderRadius: '50%', border: '1px solid #d6d1cb', overflow: 'hidden', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'conic-gradient(red, yellow, lime, aqua, blue, magenta, red)', flexShrink: 0 }}>
+                    <input type="color" value={currentColor || '#000000'} onChange={e => onStyleChange?.({ color: e.target.value })} style={{ opacity: 0, width: 0, height: 0, position: 'absolute' }} />
+                  </label>
                 </div>
               </div>
             )}
@@ -6760,7 +6774,15 @@ function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: 
   const getInlineStyle = (key: string): React.CSSProperties => {
     const raw = ov[`style_${key}`]
     if (!raw) return {}
-    try { return JSON.parse(raw) } catch { return {} }
+    try {
+      const parsed = JSON.parse(raw)
+      // Convertir fontSize string en number pour que React l'applique correctement
+      if (parsed.fontSize && typeof parsed.fontSize === 'string') {
+        const n = parseInt(parsed.fontSize, 10)
+        if (!isNaN(n)) parsed.fontSize = n
+      }
+      return parsed
+    } catch { return {} }
   }
   const setInlineStyle = (key: string, patch: { color?: string; fontFamily?: string; fontSize?: string }) => {
     const existing = getInlineStyle(key)
