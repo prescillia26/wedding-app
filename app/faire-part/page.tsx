@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { showToast } from '../components/Toast'
 import { useT } from '@/lib/i18n'
 import CeremonyWatercolorPanel from '../components/CeremonyWatercolorPanel'
@@ -8008,7 +8009,8 @@ function AccessGate({ onGranted }: { onGranted: () => void }) {
   )
 }
 
-export default function FairePartPage() {
+function FairePartPageInner() {
+  const searchParams = useSearchParams()
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState<FormData>(defaultFormData)
   const [showCards, setShowCards] = useState(false)
@@ -8040,14 +8042,18 @@ export default function FairePartPage() {
   // Prevents double-firing when both onTouchEnd and onClick trigger
   const lastTap = useRef(0)
 
+  // Utiliser searchParams de Next.js pour réagir aux changements d'URL (navigation soft)
+  const spShare = searchParams.get('share')
+  const spRole = searchParams.get('role')
+  const spCode = searchParams.get('code')
+
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const id = params.get('share')
-    const r = params.get('role')
-    const urlCode = params.get('code')
+    const id = spShare
+    const r = spRole
+    const urlCode = spCode
 
     // Mode dev : bypass code d'accès (uniquement en développement local)
-    if (params.get('dev') === 'true' && process.env.NODE_ENV === 'development') {
+    if (searchParams.get('dev') === 'true' && process.env.NODE_ENV === 'development') {
       setAccessGranted(true)
       setCheckingAccess(false)
       return
@@ -8110,7 +8116,7 @@ export default function FairePartPage() {
 
           // 2) Si pas de brouillon local, charger le faire-part depuis le serveur via shareId
           // ⚠️ UNIQUEMENT si on n'arrive PAS d'un nouveau paiement (code=) — sinon on pollue avec l'ancien faire-part
-          const isNewFromPayment = !!new URLSearchParams(window.location.search).get('code')
+          const isNewFromPayment = !!spCode
           if (!hasLocalDraft && !isNewFromPayment) {
             try {
               const savedShareId = activeShareId || localStorage.getItem('lovit_share_id')
@@ -8149,17 +8155,17 @@ export default function FairePartPage() {
       const draft = localStorage.getItem('wedding-draft')
       if (draft) setHasDraft(true)
     } catch { /* ignore */ }
-  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [spShare, spRole, spCode])
 
   // ✅ Vérifier l'authentification au chargement + charger brouillon serveur
   useEffect(() => {
     // ⚠️ En mode partagé (?share=XXX), ne JAMAIS charger le brouillon de l'utilisateur connecté
     // pour ne pas écraser le faire-part partagé avec les données de l'utilisateur B
-    const params = new URLSearchParams(window.location.search)
     // En mode share (guest ou edit), skip le chargement de brouillon
     // Le faire-part est déjà chargé via get-share dans le 1er useEffect
     // On vérifie juste l'auth pour setIsPaid
-    const isShareMode = !!params.get('share')
+    const isShareMode = !!spShare
 
     let cancelled = false
     async function checkAuth() {
@@ -8409,5 +8415,15 @@ export default function FairePartPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+import { Suspense } from 'react'
+
+export default function FairePartPage() {
+  return (
+    <Suspense>
+      <FairePartPageInner />
+    </Suspense>
   )
 }
