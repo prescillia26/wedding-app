@@ -479,6 +479,10 @@ interface FormData {
   // ── Couleur globale de tous les textes ──
   globalTextColor?: string
   phraseColor?: string // couleur de la phrase "ont le plaisir..."
+  // ── Mode Design Custom (upload images Canva/Etsy) ──
+  customDesignMode?: boolean // si true, affiche les images custom au lieu des cartes cérémonies
+  customDesignPages?: string[] // URLs des pages uploadées (ordre d'affichage)
+  customDesignCoverUrl?: string // image de couverture custom (remplace la cover getlovit)
   // ── Pages supplémentaires (libres, entre les cérémonies) ──
   customPages?: CustomPage[]
   // ── Position du bouton Découvrir (page d'accueil) ──
@@ -2285,12 +2289,154 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
   const { t, locale } = useT()
   const selectedLuxeColor = LUXE_COLORS.find(c => c.id === data.luxeColor) || LUXE_COLORS[0]
   const accent = THEMES[data.style].accent
+  const [customDesignUploading, setCustomDesignUploading] = useState(false)
+  const [customCoverUploading, setCustomCoverUploading] = useState(false)
+
+  const uploadToCloudinary = async (file: File): Promise<string | null> => {
+    const fd = new window.FormData()
+    fd.append('file', file)
+    fd.append('upload_preset', 'wedding_music')
+    try {
+      const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
+      const json = await res.json()
+      return json.secure_url || null
+    } catch {
+      return null
+    }
+  }
+
+  const handleCustomCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setCustomCoverUploading(true)
+    const url = await uploadToCloudinary(file)
+    if (url) onChange({ customDesignCoverUrl: url })
+    else showToast('Erreur lors de l\'upload', 'error')
+    setCustomCoverUploading(false)
+    e.target.value = ''
+  }
+
+  const handleCustomPagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files?.length) return
+    setCustomDesignUploading(true)
+    const urls: string[] = []
+    for (let i = 0; i < files.length; i++) {
+      const url = await uploadToCloudinary(files[i])
+      if (url) urls.push(url)
+    }
+    if (urls.length) {
+      onChange({ customDesignPages: [...(data.customDesignPages ?? []), ...urls] })
+    } else {
+      showToast('Erreur lors de l\'upload', 'error')
+    }
+    setCustomDesignUploading(false)
+    e.target.value = ''
+  }
+
+  const removeCustomPage = (idx: number) => {
+    const pages = [...(data.customDesignPages ?? [])]
+    pages.splice(idx, 1)
+    onChange({ customDesignPages: pages })
+  }
+
   return (
     <div>
       <h2 style={{ textAlign: 'center', fontFamily: 'var(--font-playfair-display)', fontSize: 20, fontWeight: 600, color: '#3a3330', marginBottom: 6 }}>{t.fairepart.step4Title}</h2>
       <p style={{ textAlign: 'center', fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#9a928a', marginBottom: 24 }}>
         {locale === 'en' ? 'Design your invitation' : 'Définissez le design de votre invitation'}
       </p>
+
+      {/* ── 0. Mode Design Custom (Canva / Etsy) ── */}
+      <AccordionSection title="📱 Mon design (Canva / Etsy)">
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+            <button type="button" onClick={() => onChange({ customDesignMode: !data.customDesignMode })} style={{
+              ...BTN, width: 44, height: 24, borderRadius: 12, border: 'none', padding: 0, position: 'relative',
+              background: data.customDesignMode ? accent : '#d1d5db', transition: 'background 0.2s',
+            }}>
+              <span style={{
+                position: 'absolute', top: 2, left: data.customDesignMode ? 22 : 2,
+                width: 20, height: 20, borderRadius: '50%', background: 'white',
+                transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+              }} />
+            </button>
+            <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 14, color: '#3a3330', fontWeight: 600 }}>
+              {locale === 'en' ? 'Use my custom design' : 'Utiliser mon propre design'}
+            </span>
+          </div>
+          <p style={{ fontSize: 11, color: '#9a928a', lineHeight: 1.5, marginBottom: 4 }}>
+            {locale === 'en'
+              ? 'Upload your wedding card images from Canva, Etsy or any design tool. Your pages will be displayed as-is with the opening animation, music and RSVP.'
+              : 'Uploadez vos images de faire-part depuis Canva, Etsy ou tout outil de design. Vos pages seront affichées telles quelles avec l\'animation d\'ouverture, la musique et le RSVP.'}
+          </p>
+        </div>
+
+        {data.customDesignMode && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {/* Couverture */}
+            <div>
+              <Label>{locale === 'en' ? 'Cover image (the 1st page)' : 'Image de couverture (la 1ère page)'}</Label>
+              {data.customDesignCoverUrl ? (
+                <div style={{ position: 'relative', display: 'inline-block', marginBottom: 8 }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={data.customDesignCoverUrl} alt="" style={{ width: 120, height: 160, objectFit: 'cover', borderRadius: 8, border: `2px solid ${accent}30` }} />
+                  <button type="button" onClick={() => onChange({ customDesignCoverUrl: undefined })} style={{
+                    ...BTN, position: 'absolute', top: -6, right: -6, width: 22, height: 22, borderRadius: '50%',
+                    background: '#ef4444', color: 'white', border: 'none', fontSize: 12, fontWeight: 700,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>x</button>
+                </div>
+              ) : (
+                <label style={{
+                  ...BTN, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  padding: '14px 20px', borderRadius: 10, border: `2px dashed ${accent}40`,
+                  background: `${accent}08`, color: accent, fontSize: 13, fontWeight: 600,
+                  fontFamily: 'var(--font-cormorant-garamond)',
+                }}>
+                  <span>{customCoverUploading ? (locale === 'en' ? 'Uploading...' : 'Upload en cours...') : (locale === 'en' ? '+ Upload cover' : '+ Uploader la couverture')}</span>
+                  <input type="file" accept="image/*" onChange={handleCustomCoverUpload} style={{ display: 'none' }} disabled={customCoverUploading} />
+                </label>
+              )}
+            </div>
+
+            {/* Pages de contenu */}
+            <div>
+              <Label>{locale === 'en' ? 'Content pages' : 'Pages de contenu'}</Label>
+              {(data.customDesignPages ?? []).length > 0 && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 12 }}>
+                  {(data.customDesignPages ?? []).map((url, idx) => (
+                    <div key={idx} style={{ position: 'relative' }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={url} alt={`Page ${idx + 1}`} style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', borderRadius: 8, border: `1px solid ${accent}20` }} />
+                      <button type="button" onClick={() => removeCustomPage(idx)} style={{
+                        ...BTN, position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: '50%',
+                        background: '#ef4444', color: 'white', border: 'none', fontSize: 10, fontWeight: 700,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>x</button>
+                      <div style={{ textAlign: 'center', fontSize: 9, color: '#9a928a', marginTop: 2 }}>Page {idx + 1}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <label style={{
+                ...BTN, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                padding: '14px 20px', borderRadius: 10, border: `2px dashed ${accent}40`,
+                background: `${accent}08`, color: accent, fontSize: 13, fontWeight: 600,
+                fontFamily: 'var(--font-cormorant-garamond)',
+              }}>
+                <span>{customDesignUploading ? (locale === 'en' ? 'Uploading...' : 'Upload en cours...') : (locale === 'en' ? '+ Add pages' : '+ Ajouter des pages')}</span>
+                <input type="file" accept="image/*" multiple onChange={handleCustomPagesUpload} style={{ display: 'none' }} disabled={customDesignUploading} />
+              </label>
+              <p style={{ fontSize: 10, color: '#9a928a', marginTop: 8, fontStyle: 'italic', lineHeight: 1.5 }}>
+                {locale === 'en'
+                  ? 'Upload multiple images at once. They will appear in the order you uploaded them.'
+                  : 'Uploadez plusieurs images en une fois. Elles apparaîtront dans l\'ordre d\'upload.'}
+              </p>
+            </div>
+          </div>
+        )}
+      </AccordionSection>
 
       {/* ── 1. Thème & couleurs ── */}
       <AccordionSection title={locale === 'en' ? '🎨 Theme & colors' : '🎨 Thème & couleurs'} defaultOpen>
@@ -6762,6 +6908,29 @@ const firstDate = sorted[0]?.date
       {/* CONTENU PRINCIPAL — directement les événements */}
       <div ref={contentRef} style={{ maxWidth: 480, margin: '0 auto', padding: '0 0 80px' }}>
 
+        {/* ── Mode Design Custom : affiche les pages uploadées au lieu des cérémonies ── */}
+        {data.customDesignMode && (data.customDesignPages?.length ?? 0) > 0 ? (
+          <>
+            <div id="first-content" style={{ scrollMarginTop: 60 }} />
+            <style>{`
+              @keyframes customPageFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+            `}</style>
+            {data.customDesignPages!.map((url, idx) => (
+              <div key={idx} style={{
+                animation: 'customPageFadeIn 0.8s ease both',
+                animationDelay: `${idx * 0.15}s`,
+              }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={url}
+                  alt={`Page ${idx + 1}`}
+                  style={{ width: '100%', height: 'auto', display: 'block' }}
+                />
+              </div>
+            ))}
+          </>
+        ) : (
+        <>
         {/* Cérémonies */}
         {(data.presentationStyle === 'cartes-separees' ? [sorted[currentCeremonyIdx]].filter(Boolean) : sorted).map((ceremony, i) => {
           const sortedIdx = data.presentationStyle === 'cartes-separees' ? currentCeremonyIdx : i
@@ -7279,6 +7448,9 @@ const firstDate = sorted[0]?.date
           </div>
         )}
 
+        </>
+        )}
+
         {/* Indicateur page RSVP — visible uniquement pour les mariés */}
         {role !== 'guest' && (
           <div style={{ textAlign: 'center', padding: '12px 0 4px', background: `${G}08`, borderTop: `1px dashed ${G}30`, borderBottom: `1px dashed ${G}30` }}>
@@ -7584,6 +7756,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
             onOpen={() => setCoverOpen(true)}
             mariageJuif={data.mariageJuif}
             illustrationUrl={data.illustrationCoupleId ? ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url : undefined}
+            customDesignCoverUrl={data.customDesignMode ? data.customDesignCoverUrl : undefined}
           />
         )}
         {data.petalsEnabled && <FloatingPetals accent={theme.accent} />}
@@ -7681,6 +7854,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
           onOpen={() => setCoverOpen(true)}
           mariageJuif={data.mariageJuif}
           illustrationUrl={data.illustrationCoupleId ? ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url : undefined}
+          customDesignCoverUrl={data.customDesignMode ? data.customDesignCoverUrl : undefined}
         />
       )}
       {!isPaid && (

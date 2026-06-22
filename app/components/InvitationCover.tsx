@@ -15,6 +15,7 @@ export default function InvitationCover({
   onOpen,
   mariageJuif,
   illustrationUrl,
+  customDesignCoverUrl,
 }: {
   prenom1: string
   prenom2: string
@@ -27,6 +28,7 @@ export default function InvitationCover({
   onOpen: () => void
   mariageJuif?: boolean
   illustrationUrl?: string
+  customDesignCoverUrl?: string
 }) {
   const [opened, setOpened] = useState(false)
 
@@ -62,6 +64,40 @@ export default function InvitationCover({
       `}</style>
 
       {/* Contenu centré verticalement avec min-height */}
+      {customDesignCoverUrl ? (
+        /* ── Mode design custom : affiche l'image de couverture uploadée ── */
+        <div style={{
+          flex: 1, display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          minHeight: '100vh', padding: 0,
+          animation: 'coverFadeIn 1.2s ease both',
+          boxSizing: 'border-box',
+          position: 'relative',
+        }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={customDesignCoverUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
+          {/* Bouton Découvrir superposé en bas */}
+          <div style={{ position: 'absolute', bottom: '8%', left: 0, right: 0, display: 'flex', justifyContent: 'center', zIndex: 1 }}>
+            <button
+              type="button"
+              onClick={handleOpen}
+              style={{
+                fontFamily: PD, fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase',
+                padding: '14px 32px', borderRadius: 0, border: `1.5px solid ${accent}`,
+                background: 'rgba(255,255,255,0.85)', color: accent, cursor: 'pointer',
+                animation: 'coverPulse 3s ease infinite',
+                transition: 'background 0.3s, color 0.3s',
+                touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
+                backdropFilter: 'blur(4px)',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = accent; e.currentTarget.style.color = fond }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.85)'; e.currentTarget.style.color = accent }}
+            >
+              Découvrir votre invitation
+            </button>
+          </div>
+        </div>
+      ) : (
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
@@ -129,6 +165,7 @@ export default function InvitationCover({
           Découvrir votre invitation
         </button>
       </div>
+      )}
     </div>
   )
 }
