@@ -6321,7 +6321,7 @@ const INLINE_EDIT_FONTS = DRAG_FONTS
 function InlineEdit({ value, defaultValue, onChange, editable, style, onStyleChange }: {
   value: string; defaultValue: string; onChange: (v: string) => void; editable: boolean
   style?: React.CSSProperties
-  onStyleChange?: (patch: { color?: string; fontFamily?: string; fontSize?: string }) => void
+  onStyleChange?: (patch: { color?: string; fontFamily?: string; fontSize?: string; textAlign?: string; letterSpacing?: string; paddingLeft?: string; paddingRight?: string }) => void
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -6412,6 +6412,26 @@ function InlineEdit({ value, defaultValue, onChange, editable, style, onStyleCha
 
               {/* Font toggle */}
               <button type="button" onClick={() => { setShowFonts(p => !p); setShowColors(false) }} style={{ ...BTN, width: 22, height: 22, borderRadius: 4, border: 'none', background: showFonts ? '#C9A84C' : '#f5f0e8', color: showFonts ? 'white' : '#3a3330', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, fontFamily: 'serif' }}>Aa</button>
+
+              <div style={{ width: 1, background: '#e0d5c8', margin: '2px 2px', alignSelf: 'stretch' }} />
+
+              {/* Alignment buttons */}
+              {(['left', 'center', 'right'] as const).map(align => (
+                <button key={align} type="button" onClick={() => onStyleChange?.({ textAlign: align })} style={{
+                  ...BTN, width: 22, height: 22, borderRadius: 4, border: 'none',
+                  background: (style?.textAlign || 'center') === align ? '#C9A84C' : '#f5f0e8',
+                  color: (style?.textAlign || 'center') === align ? 'white' : '#8a7e72',
+                  fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
+                }}>
+                  {align === 'left' ? '⫷' : align === 'center' ? '≡' : '⫸'}
+                </button>
+              ))}
+
+              <div style={{ width: 1, background: '#e0d5c8', margin: '2px 2px', alignSelf: 'stretch' }} />
+
+              {/* Spacing (letter-spacing) */}
+              <button type="button" onClick={() => { const cur = typeof style?.letterSpacing === 'number' ? style.letterSpacing : (parseInt(String(style?.letterSpacing || '0'), 10) || 0); onStyleChange?.({ letterSpacing: `${Math.max(0, cur - 1)}` }) }} style={{ ...BTN, width: 18, height: 22, borderRadius: 4, border: 'none', background: '#f5f0e8', color: '#8a7e72', fontSize: 8, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>A←</button>
+              <button type="button" onClick={() => { const cur = typeof style?.letterSpacing === 'number' ? style.letterSpacing : (parseInt(String(style?.letterSpacing || '0'), 10) || 0); onStyleChange?.({ letterSpacing: `${Math.min(20, cur + 1)}` }) }} style={{ ...BTN, width: 18, height: 22, borderRadius: 4, border: 'none', background: '#f5f0e8', color: '#8a7e72', fontSize: 8, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>A→</button>
 
               <div style={{ width: 1, background: '#e0d5c8', margin: '2px 2px', alignSelf: 'stretch' }} />
 
@@ -6776,10 +6796,14 @@ function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: 
     if (!raw) return {}
     try {
       const parsed = JSON.parse(raw)
-      // Convertir fontSize string en number pour que React l'applique correctement
+      // Convertir fontSize et letterSpacing string en number pour que React l'applique correctement
       if (parsed.fontSize && typeof parsed.fontSize === 'string') {
         const n = parseInt(parsed.fontSize, 10)
         if (!isNaN(n)) parsed.fontSize = n
+      }
+      if (parsed.letterSpacing && typeof parsed.letterSpacing === 'string') {
+        const n = parseInt(parsed.letterSpacing, 10)
+        if (!isNaN(n)) parsed.letterSpacing = n
       }
       return parsed
     } catch { return {} }
