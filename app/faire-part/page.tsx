@@ -8066,6 +8066,8 @@ function FairePartPageInner() {
       setRole(r ?? 'guest')
       setAccessGranted(true)
       setCheckingAccess(false)
+      // Lien couple = déjà partagé = déjà payé
+      if (r === 'couple') setIsPaid(true)
       setLoadingShare(true)
       fetch(`/api/get-share?id=${id}`)
         .then(res => res.json())
