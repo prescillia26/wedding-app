@@ -6786,9 +6786,25 @@ const firstDate = sorted[0]?.date
           {canEdit && !data.hideAccueilLogo && (
             <div onPointerDown={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 6, maxWidth: 240, margin: '0 auto 6px' }}>
               {dedupColors.slice(0, 30).map(c => (
-                <button key={c.value} type="button" onClick={() => {
-                  if (data.customLogoUrl) onUpdate?.({ customLogoColor: c.value })
-                  else onUpdate?.({ monogrammeColor: c.value })
+                <button key={c.value} type="button" onClick={async () => {
+                  if (data.customLogoUrl) {
+                    onUpdate?.({ customLogoColor: c.value })
+                    // Pré-générer le logo avec la nouvelle couleur
+                    const srcUrl = data.customLogoOriginalUrl || data.customLogoUrl
+                    if (srcUrl?.includes('cloudinary.com')) {
+                      try {
+                        const res = await fetch('/api/pregenerate-logo', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ logoUrl: srcUrl, color: c.value }),
+                        })
+                        const d = await res.json()
+                        if (d.url) onUpdate?.({ customLogoUrl: d.url })
+                      } catch { /* ignore */ }
+                    }
+                  } else {
+                    onUpdate?.({ monogrammeColor: c.value })
+                  }
                 }} style={{
                   ...BTN, width: 16, height: 16, borderRadius: '50%', padding: 0,
                   background: c.swatch,
