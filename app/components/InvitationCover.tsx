@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 const GV = 'var(--font-great-vibes)'
 const PD = 'var(--font-playfair-display)'
@@ -30,22 +30,179 @@ export default function InvitationCover({
   illustrationUrl?: string
   customDesignCoverUrl?: string
 }) {
-  const [opened, setOpened] = useState(false)
+  const [phase, setPhase] = useState(0) // 0=idle, 1=opening, 2=revealing, 3=done
+  const [sparkles, setSparkles] = useState<{ id: number; x: number; y: number; delay: number; size: number }[]>([])
 
   const handleOpen = () => {
-    setOpened(true)
-    // Scroll vers le premier événement après la transition
+    if (phase !== 0) return
+    // Générer des particules dorées
+    const newSparkles = Array.from({ length: 30 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      delay: Math.random() * 0.8,
+      size: Math.random() * 6 + 2,
+    }))
+    setSparkles(newSparkles)
+    setPhase(1)
+    // Phase 2 : révélation
+    setTimeout(() => setPhase(2), 900)
+    // Phase 3 : terminé — ouvrir le contenu
     setTimeout(() => {
+      setPhase(3)
       onOpen()
       setTimeout(() => {
         const el = document.getElementById('ceremony-0')
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
       }, 100)
-    }, 700)
+    }, 1600)
   }
+
+  // Pré-animation subtile sur l'image
+  const [shimmer, setShimmer] = useState(false)
+  useEffect(() => {
+    const t = setInterval(() => setShimmer(s => !s), 3000)
+    return () => clearInterval(t)
+  }, [])
 
   const p1 = prenom1 || 'Prénom'
   const p2 = prenom2 || 'Prénom'
+
+  if (customDesignCoverUrl) {
+    return (
+      <div style={{
+        position: 'fixed', inset: 0, zIndex: 300,
+        display: 'flex', flexDirection: 'column',
+        background: '#000',
+        opacity: phase === 3 ? 0 : 1,
+        transition: 'opacity 0.6s ease',
+        pointerEvents: phase === 3 ? 'none' : 'auto',
+        overflow: 'hidden',
+      }}>
+        <style>{`
+          @keyframes coverShimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+          }
+          @keyframes sparkleFloat {
+            0% { opacity: 0; transform: translateY(0) scale(0); }
+            20% { opacity: 1; transform: translateY(-20px) scale(1); }
+            100% { opacity: 0; transform: translateY(-120px) scale(0.3); }
+          }
+          @keyframes envelopeSlideUp {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-110%) scale(0.95); }
+          }
+          @keyframes envelopeFadeScale {
+            0% { opacity: 1; transform: scale(1); filter: brightness(1); }
+            40% { opacity: 1; transform: scale(1.03); filter: brightness(1.15); }
+            100% { opacity: 0; transform: scale(1.12); filter: brightness(1.4); }
+          }
+          @keyframes buttonGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255,255,255,0.1), 0 0 60px rgba(255,255,255,0); }
+            50% { box-shadow: 0 0 20px rgba(255,255,255,0.3), 0 0 60px rgba(255,255,255,0.1); }
+          }
+          @keyframes buttonAppear {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          @keyframes imageAppear {
+            from { opacity: 0; transform: scale(1.05); }
+            to { opacity: 1; transform: scale(1); }
+          }
+          @keyframes overlayShine {
+            0% { transform: translateX(-100%) rotate(25deg); }
+            100% { transform: translateX(200%) rotate(25deg); }
+          }
+        `}</style>
+
+        {/* Image de couverture */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          animation: phase >= 1
+            ? 'envelopeFadeScale 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards'
+            : 'imageAppear 1.5s ease both',
+        }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={customDesignCoverUrl}
+            alt=""
+            style={{
+              width: '100%', height: '100%', objectFit: 'cover',
+            }}
+          />
+
+          {/* Shimmer subtil qui passe sur l'image */}
+          {phase === 0 && (
+            <div style={{
+              position: 'absolute', inset: 0, pointerEvents: 'none',
+              background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.08) 45%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.08) 55%, transparent 60%)',
+              animation: 'overlayShine 4s ease-in-out infinite',
+              animationDelay: '1s',
+            }} />
+          )}
+        </div>
+
+        {/* Particules dorées à l'ouverture */}
+        {phase >= 1 && sparkles.map(s => (
+          <div key={s.id} style={{
+            position: 'absolute',
+            left: `${s.x}%`,
+            top: `${s.y}%`,
+            width: s.size,
+            height: s.size,
+            borderRadius: '50%',
+            background: `radial-gradient(circle, ${accent}, rgba(255,215,0,0.6))`,
+            animation: `sparkleFloat 1.5s ease-out forwards`,
+            animationDelay: `${s.delay}s`,
+            boxShadow: `0 0 ${s.size * 2}px ${accent}80`,
+            pointerEvents: 'none',
+            zIndex: 10,
+          }} />
+        ))}
+
+        {/* Bouton Découvrir */}
+        {phase === 0 && (
+          <div style={{
+            position: 'absolute', bottom: '8%', left: 0, right: 0,
+            display: 'flex', justifyContent: 'center', zIndex: 5,
+            animation: 'buttonAppear 1s ease 0.8s both',
+          }}>
+            <button
+              type="button"
+              onClick={handleOpen}
+              style={{
+                fontFamily: PD, fontSize: 12, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase',
+                padding: '16px 40px', borderRadius: 0,
+                border: `1px solid rgba(255,255,255,0.6)`,
+                background: 'rgba(255,255,255,0.12)',
+                color: 'white', cursor: 'pointer',
+                backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+                animation: 'buttonGlow 3s ease infinite',
+                transition: 'all 0.4s ease',
+                touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.25)'
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.9)'
+                e.currentTarget.style.transform = 'scale(1.05)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.12)'
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'
+                e.currentTarget.style.transform = 'scale(1)'
+              }}
+            >
+              Découvrir ✦
+            </button>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // ── Cover standard (sans design custom) ──
+  const opened = phase === 3
 
   return (
     <div style={{
@@ -63,41 +220,6 @@ export default function InvitationCover({
         @keyframes coverFadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
 
-      {/* Contenu centré verticalement avec min-height */}
-      {customDesignCoverUrl ? (
-        /* ── Mode design custom : affiche l'image de couverture uploadée ── */
-        <div style={{
-          flex: 1, display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center',
-          minHeight: '100vh', padding: 0,
-          animation: 'coverFadeIn 1.2s ease both',
-          boxSizing: 'border-box',
-          position: 'relative',
-        }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={customDesignCoverUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
-          {/* Bouton Découvrir superposé en bas */}
-          <div style={{ position: 'absolute', bottom: '8%', left: 0, right: 0, display: 'flex', justifyContent: 'center', zIndex: 1 }}>
-            <button
-              type="button"
-              onClick={handleOpen}
-              style={{
-                fontFamily: PD, fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase',
-                padding: '14px 32px', borderRadius: 0, border: `1.5px solid ${accent}`,
-                background: 'rgba(255,255,255,0.85)', color: accent, cursor: 'pointer',
-                animation: 'coverPulse 3s ease infinite',
-                transition: 'background 0.3s, color 0.3s',
-                touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
-                backdropFilter: 'blur(4px)',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.background = accent; e.currentTarget.style.color = fond }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.85)'; e.currentTarget.style.color = accent }}
-            >
-              Découvrir votre invitation
-            </button>
-          </div>
-        </div>
-      ) : (
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
@@ -150,7 +272,7 @@ export default function InvitationCover({
         {/* Bouton Découvrir */}
         <button
           type="button"
-          onClick={handleOpen}
+          onClick={() => { setPhase(3); setTimeout(() => { onOpen(); setTimeout(() => { const el = document.getElementById('ceremony-0'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }, 100) }, 700) }}
           style={{
             fontFamily: PD, fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase',
             padding: '14px 32px', borderRadius: 0, border: `1.5px solid ${accent}`,
@@ -165,7 +287,6 @@ export default function InvitationCover({
           Découvrir votre invitation
         </button>
       </div>
-      )}
     </div>
   )
 }
