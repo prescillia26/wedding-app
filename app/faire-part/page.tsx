@@ -7783,7 +7783,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
   const [sharing, setSharing] = useState(false)
   const [sharingStatus, setSharingStatus] = useState('')
   const [saving, setSaving] = useState(false)
-  const [coverOpen, setCoverOpen] = useState(true) // plus de cover overlay — toujours ouvert
+  const [coverOpen, setCoverOpen] = useState(!data.customDesignMode) // cover fermée si design custom (pour montrer la cover image)
 
   // Ouvrir directement le modal RSVP si ?rsvp=1 dans l'URL
   useEffect(() => {
