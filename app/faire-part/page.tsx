@@ -6938,9 +6938,10 @@ const firstDate = sorted[0]?.date
         {/* Cérémonies */}
         {(data.presentationStyle === 'cartes-separees' ? [sorted[currentCeremonyIdx]].filter(Boolean) : sorted).map((ceremony, i) => {
           const sortedIdx = data.presentationStyle === 'cartes-separees' ? currentCeremonyIdx : i
-          // Trouver l'index ORIGINAL dans data.ceremonies par type+date+lieu (pas par référence)
-          const displayIdx = (data.ceremonies ?? []).findIndex(c => c.type === ceremony.type && c.date === ceremony.date && c.lieu === ceremony.lieu)
-          const safeIdx = displayIdx >= 0 ? displayIdx : sortedIdx
+          // Trouver l'index dans allSorted (tableau trié complet, avant filtrage events=)
+          // C'est cet index qui est utilisé pour les textOverrides (ceremony_X_lieu, etc.)
+          const allSortedIdx = allSorted.indexOf(ceremony)
+          const safeIdx = allSortedIdx >= 0 ? allSortedIdx : sortedIdx
           const typeTitle: Record<string, string> = {
             'Mairie': t.fairepart.cardTitles['Mairie'], 'Cérémonie religieuse / Houppa': data.mariageJuif ? t.fairepart.cardTitles['Cérémonie religieuse / Houppa'] : t.fairepart.cardTitles['Cérémonie'],
             'Shabbat Hatan': t.fairepart.cardTitles['Shabbat Hatan'], 'Henné': t.fairepart.cardTitles['Henné'], 'Cocktail': t.fairepart.cardTitles['Cocktail'],
@@ -7012,10 +7013,10 @@ const firstDate = sorted[0]?.date
                     )}
                     <DraggableElement id={pre+"titre"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} skipAnim={canEdit}>
                       <InlineEdit
-                        value={ov[`ceremony_${i}_titre`] || ''}
+                        value={ov[`ceremony_${safeIdx}_titre`] || ''}
                         defaultValue={title}
                         editable={canEdit}
-                        onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_titre`]: v } })}
+                        onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_titre`]: v } })}
                         style={applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: (ceremony.illustrationUrl || ceremony.ceremonyImage) ? 10 : 24, lineHeight: 1.4 }, 'titres', data.zoneStyles)}
                       />
                     </AnimSection></DraggableElement>
@@ -7063,10 +7064,10 @@ const firstDate = sorted[0]?.date
                       <DraggableElement id={pre+"hebrewVerse"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={100} skipAnim={canEdit}>
                         <div style={{ padding: '0 20px', marginBottom: 22 }}>
                           <InlineEdit
-                            value={ov[`ceremony_${i}_hebrewVerse`] || ''}
+                            value={ov[`ceremony_${safeIdx}_hebrewVerse`] || ''}
                             defaultValue="קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה"
                             editable={canEdit}
-                            onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_hebrewVerse`]: v } })}
+                            onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_hebrewVerse`]: v } })}
                             style={{ fontFamily: 'serif', fontSize: 'clamp(10px, 3.2vw, 17px)', color: G, direction: 'rtl', textAlign: 'center', whiteSpace: 'nowrap', lineHeight: 1.9 }}
                           />
                         </div>
@@ -7082,30 +7083,30 @@ const firstDate = sorted[0]?.date
                           </div>
                           {ceremony.penseesDefuntsIntro && (
                             <InlineEdit
-                              value={ov[`ceremony_${i}_defuntsIntro`] || ''}
+                              value={ov[`ceremony_${safeIdx}_defuntsIntro`] || ''}
                               defaultValue={ceremony.penseesDefuntsIntro}
                               editable={canEdit}
-                              onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_defuntsIntro`]: v } })}
+                              onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_defuntsIntro`]: v } })}
                               style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: TEXT, opacity: 0.85, marginBottom: 14, lineHeight: 1.6, padding: '0 12px', textAlign: 'center' }}
                             />
                           )}
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: ceremony.penseesDefuntsFin ? 14 : 0 }}>
                             {ceremony.penseesDefuntsNoms.filter(n => n.trim()).map((nom, k) => (
                               <InlineEdit key={k}
-                                value={ov[`ceremony_${i}_defunt_${k}`] || ''}
+                                value={ov[`ceremony_${safeIdx}_defunt_${k}`] || ''}
                                 defaultValue={`${nom} ז״ל`}
                                 editable={canEdit}
-                                onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_defunt_${k}`]: v } })}
+                                onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_defunt_${k}`]: v } })}
                                 style={{ fontFamily: FP, fontSize: 16, color: TEXT, fontWeight: 500, lineHeight: 1.6, textAlign: 'center' }}
                               />
                             ))}
                           </div>
                           {ceremony.penseesDefuntsFin && (
                             <InlineEdit
-                              value={ov[`ceremony_${i}_defuntsFin`] || ''}
+                              value={ov[`ceremony_${safeIdx}_defuntsFin`] || ''}
                               defaultValue={ceremony.penseesDefuntsFin}
                               editable={canEdit}
-                              onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_defuntsFin`]: v } })}
+                              onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_defuntsFin`]: v } })}
                               style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, opacity: 0.75, lineHeight: 1.6, padding: '0 12px', textAlign: 'center' }}
                             />
                           )}
@@ -7148,10 +7149,10 @@ const firstDate = sorted[0]?.date
                     {(parents1.length > 0 || parents2.length > 0 || hasGp) && ceremony.type === 'Cérémonie religieuse / Houppa' && (
                       <DraggableElement id={pre+"joie"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={180} skipAnim={canEdit}>
                         <InlineEdit
-                          value={ov[`ceremony_${i}_joie`] || ''}
+                          value={ov[`ceremony_${safeIdx}_joie`] || ''}
                           defaultValue={hasGp ? t.fairepart.joyMessageGp : t.fairepart.joyMessage}
                           editable={canEdit}
-                          onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_joie`]: v } })}
+                          onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_joie`]: v } })}
                           style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 24, lineHeight: 1.9, opacity: 0.82 }, 'narratif', data.zoneStyles)}
                         />
                       </AnimSection></DraggableElement>
@@ -7185,10 +7186,10 @@ const firstDate = sorted[0]?.date
                       {ceremony.type === 'Mairie' ? (
                         <>
                           <InlineEdit
-                            value={ov[`ceremony_${i}_sediront`] || ''}
+                            value={ov[`ceremony_${safeIdx}_sediront`] || ''}
                             defaultValue={t.fairepart.cardSeDiront}
                             editable={canEdit}
-                            onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_sediront`]: v } })}
+                            onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_sediront`]: v } })}
                             style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78 }}
                           />
                           <div style={{ fontFamily: FS, fontSize: 'clamp(48px,12vw,80px)', color: G, textAlign: 'center', lineHeight: 1, marginBottom: 12 }}>{t.fairepart.cardOui}</div>
@@ -7196,19 +7197,19 @@ const firstDate = sorted[0]?.date
                         </>
                       ) : ceremony.type === 'Cérémonie religieuse / Houppa' ? (
                         <InlineEdit
-                          value={ov[`ceremony_${i}_honore`] || ''}
+                          value={ov[`ceremony_${safeIdx}_honore`] || ''}
                           defaultValue={t.fairepart.cardHonore}
                           editable={canEdit}
-                          onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_honore`]: v } })}
+                          onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_honore`]: v } })}
                           style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginTop: 16, marginBottom: 28, opacity: 0.78, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles)}
                         />
                       ) : ceremony.type === 'Shabbat Hatan' ? (
                         <div style={{ textAlign: 'center', marginTop: 32, marginBottom: 16, padding: '0 12px' }}>
                           <InlineEdit
-                            value={ov[`ceremony_${i}_lesfamilles`] || ''}
+                            value={ov[`ceremony_${safeIdx}_lesfamilles`] || ''}
                             defaultValue="Les Familles"
                             editable={canEdit}
-                            onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_lesfamilles`]: v } })}
+                            onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_lesfamilles`]: v } })}
                             style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, lineHeight: 1.8, opacity: 0.85 }, 'narratif', data.zoneStyles)}
                           />
                           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(6px,2vw,10px)', marginTop: 4, marginBottom: 4 }}>
@@ -7217,10 +7218,10 @@ const firstDate = sorted[0]?.date
                             <InlineEdit value={ov.shabbat_nom2 || ''} defaultValue={data.famille2PereNom || data.marie2Nom || '...'} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, shabbat_nom2: v } })} style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(24px,6vw,38px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)} />
                           </div>
                           <InlineEdit
-                            value={ov[`ceremony_${i}_ravies`] || ''}
+                            value={ov[`ceremony_${safeIdx}_ravies`] || ''}
                             defaultValue="sont ravies de vous convier au Shabbat Hatan de"
                             editable={canEdit}
-                            onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_ravies`]: v } })}
+                            onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_ravies`]: v } })}
                             style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, lineHeight: 1.8, opacity: 0.85, marginBottom: 8 }, 'narratif', data.zoneStyles)}
                           />
                           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(6px,2vw,10px)', marginBottom: 8 }}>
@@ -7231,20 +7232,20 @@ const firstDate = sorted[0]?.date
                         </div>
                       ) : (
                         <div style={{ marginBottom: 28 }}>
-                          {ov[`ceremony_${i}_invitation`] === ' ' ? (
+                          {ov[`ceremony_${safeIdx}_invitation`] === ' ' ? (
                             /* Phrase masquée — bouton pour la remettre (mariés uniquement) */
-                            canEdit && <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_invitation`]: '' } })} style={{ ...BTN, fontSize: 10, padding: '4px 12px', borderRadius: 9999, border: `1px solid ${G}33`, color: G, opacity: 0.5, display: 'block', margin: '0 auto' }}>Afficher la phrase d&apos;invitation</button>
-                          ) : ov[`ceremony_${i}_invitation`] ? (
+                            canEdit && <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: '' } })} style={{ ...BTN, fontSize: 10, padding: '4px 12px', borderRadius: 9999, border: `1px solid ${G}33`, color: G, opacity: 0.5, display: 'block', margin: '0 auto' }}>Afficher la phrase d&apos;invitation</button>
+                          ) : ov[`ceremony_${safeIdx}_invitation`] ? (
                             /* Phrase personnalisée */
                             <>
                               <InlineEdit
-                                value={ov[`ceremony_${i}_invitation`]}
+                                value={ov[`ceremony_${safeIdx}_invitation`]}
                                 defaultValue=""
                                 editable={canEdit}
-                                onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_invitation`]: v } })}
+                                onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: v } })}
                                 style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', opacity: 0.85, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles)}
                               />
-                              {canEdit && <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_invitation`]: ' ' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4, display: 'block', margin: '4px auto 0' }}>Masquer</button>}
+                              {canEdit && <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: ' ' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4, display: 'block', margin: '4px auto 0' }}>Masquer</button>}
                             </>
                           ) : (
                             /* Phrase par défaut */
@@ -7254,8 +7255,8 @@ const firstDate = sorted[0]?.date
                               </div>
                               {canEdit && (
                                 <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 4 }}>
-                                  <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_invitation`]: ' ' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4 }}>Masquer</button>
-                                  <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_invitation`]: 'ont le plaisir de vous convier à célébrer leur mariage' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4 }}>Modifier</button>
+                                  <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: ' ' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4 }}>Masquer</button>
+                                  <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: 'ont le plaisir de vous convier à célébrer leur mariage' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4 }}>Modifier</button>
                                 </div>
                               )}
                             </>
@@ -7294,27 +7295,27 @@ const firstDate = sorted[0]?.date
                         )
                       })() : null}</AnimSection></DraggableElement>
                     <DraggableElement id={pre+"lieu"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={440} skipAnim={canEdit}>
-                      {(ov[`ceremony_${i}_lieu`] || ceremony.lieu) && <InlineEdit
-                        value={ov[`ceremony_${i}_lieu`] || ''}
+                      {(ov[`ceremony_${safeIdx}_lieu`] || ceremony.lieu) && <InlineEdit
+                        value={ov[`ceremony_${safeIdx}_lieu`] || ''}
                         defaultValue={ceremony.type === 'Mairie' ? conjonctionLieu(ceremony.lieu, locale) : formatLieu(ceremony.lieu, locale)}
                         editable={canEdit}
-                        onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_lieu`]: v } })}
+                        onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_lieu`]: v } })}
                         style={applyZoneStyle({ fontFamily: FP, fontWeight: 700, fontSize: 19, color: TEXT, textAlign: 'center', lineHeight: 1.5, marginBottom: 8, letterSpacing: 0.5 }, 'lieu', data.zoneStyles)}
                       />}
                       {ceremony.adresse && <InlineEdit
-                        value={ov[`ceremony_${i}_adresse`] || ''}
+                        value={ov[`ceremony_${safeIdx}_adresse`] || ''}
                         defaultValue={ceremony.adresse}
                         editable={canEdit}
-                        onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_adresse`]: v } })}
+                        onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_adresse`]: v } })}
                         style={{ fontFamily: FC, fontSize: 14, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.65, marginBottom: 24, letterSpacing: 0.3 }}
                       />}
                       {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
                         <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(11px, 2.8vw, 14px)', color: TEXT, textAlign: 'center', marginBottom: 8, borderTop: `1px solid ${G}22`, paddingTop: 14, maxWidth: '90%', margin: '0 auto 8px', textWrap: 'balance' } as React.CSSProperties}>
                           <InlineEdit
-                            value={ov[`ceremony_${i}_suivide`] || ''}
+                            value={ov[`ceremony_${safeIdx}_suivide`] || ''}
                             defaultValue={`${t.fairepart.eventFollowedBy} ${ceremony.evenementSuivantNom}${ceremony.evenementSuivantAdresse ? '\n' + ceremony.evenementSuivantAdresse : ''}`}
                             editable={canEdit}
-                            onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${i}_suivide`]: v } })}
+                            onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_suivide`]: v } })}
                             style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(11px, 2.8vw, 14px)', color: TEXT, textAlign: 'center', lineHeight: 1.7 }}
                           />
                         </div>
