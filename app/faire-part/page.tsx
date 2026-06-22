@@ -6321,7 +6321,7 @@ const INLINE_EDIT_FONTS = DRAG_FONTS
 function InlineEdit({ value, defaultValue, onChange, editable, style, onStyleChange }: {
   value: string; defaultValue: string; onChange: (v: string) => void; editable: boolean
   style?: React.CSSProperties
-  onStyleChange?: (patch: { color?: string; fontFamily?: string; fontSize?: string; textAlign?: string; letterSpacing?: string; paddingLeft?: string; paddingRight?: string }) => void
+  onStyleChange?: (patch: { color?: string; fontFamily?: string; fontSize?: string; textAlign?: string; letterSpacing?: string; fontWeight?: string; fontStyle?: string }) => void
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -6404,6 +6404,14 @@ function InlineEdit({ value, defaultValue, onChange, editable, style, onStyleCha
               <button type="button" onClick={() => onStyleChange?.({ fontSize: `${Math.max(8, (currentSize || 14) - 1)}` })} style={{ ...BTN, width: 22, height: 22, borderRadius: 4, border: 'none', background: '#f5f0e8', color: '#C9A84C', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>−</button>
               <div style={{ fontSize: 9, color: '#8a7e72', display: 'flex', alignItems: 'center', padding: '0 2px', fontWeight: 600, minWidth: 20, justifyContent: 'center' }}>{currentSize || '—'}</div>
               <button type="button" onClick={() => onStyleChange?.({ fontSize: `${Math.min(72, (currentSize || 14) + 1)}` })} style={{ ...BTN, width: 22, height: 22, borderRadius: 4, border: 'none', background: '#f5f0e8', color: '#C9A84C', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>+</button>
+
+              <div style={{ width: 1, background: '#e0d5c8', margin: '2px 2px', alignSelf: 'stretch' }} />
+
+              {/* Bold toggle */}
+              <button type="button" onClick={() => onStyleChange?.({ fontWeight: style?.fontWeight === 700 || style?.fontWeight === 'bold' ? 'normal' : 'bold' })} style={{ ...BTN, width: 22, height: 22, borderRadius: 4, border: 'none', background: (style?.fontWeight === 700 || style?.fontWeight === 'bold') ? '#C9A84C' : '#f5f0e8', color: (style?.fontWeight === 700 || style?.fontWeight === 'bold') ? 'white' : '#3a3330', fontSize: 13, fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, fontFamily: 'serif' }}>B</button>
+
+              {/* Italic toggle */}
+              <button type="button" onClick={() => onStyleChange?.({ fontStyle: style?.fontStyle === 'italic' ? 'normal' : 'italic' })} style={{ ...BTN, width: 22, height: 22, borderRadius: 4, border: 'none', background: style?.fontStyle === 'italic' ? '#C9A84C' : '#f5f0e8', color: style?.fontStyle === 'italic' ? 'white' : '#3a3330', fontSize: 13, fontWeight: 700, fontStyle: 'italic', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, fontFamily: 'serif' }}>I</button>
 
               <div style={{ width: 1, background: '#e0d5c8', margin: '2px 2px', alignSelf: 'stretch' }} />
 
