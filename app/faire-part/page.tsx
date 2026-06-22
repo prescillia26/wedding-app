@@ -921,11 +921,14 @@ function Linkify({ text, color }: { text: string; color: string }) {
 }
 
 function sortByDate(ceremonies: Ceremony[]): Ceremony[] {
-  return [...ceremonies].sort((a, b) => {
-    if (!a.date) return 1
-    if (!b.date) return -1
-    return new Date(a.date).getTime() - new Date(b.date).getTime()
-  })
+  // Tri stable : par date, puis par index original en cas d'égalité
+  return ceremonies.map((c, i) => ({ c, i })).sort((a, b) => {
+    if (!a.c.date && !b.c.date) return a.i - b.i
+    if (!a.c.date) return 1
+    if (!b.c.date) return -1
+    const diff = new Date(a.c.date).getTime() - new Date(b.c.date).getTime()
+    return diff !== 0 ? diff : a.i - b.i
+  }).map(x => x.c)
 }
 function applyZoneStyle(baseStyle: React.CSSProperties, zone: TextZone, zoneStyles?: ZoneStyles): React.CSSProperties {
   const z = zoneStyles?.[zone]
@@ -4407,9 +4410,7 @@ function CopyTextRow({ text, accent }: { text: string; accent: string }) {
 function ShareModal({ accent, guestUrl, coupleUrl, onClose, data }: { accent: string; guestUrl: string; coupleUrl: string; onClose: () => void; data: FormData }) {
   const { t, locale } = useT()
   const [message, setMessage] = useState(() => buildWhatsAppMessage(data, guestUrl, t.fairepart, locale))
-  // Utiliser les indices du tableau ORIGINAL (non trié) pour que events= pointe toujours vers la bonne cérémonie
   const sorted = sortByDate(data.ceremonies)
-  const sortedWithOrigIdx = sorted.map(c => ({ ceremony: c, origIdx: data.ceremonies.indexOf(c) }))
   const [customLinks, setCustomLinks] = useState<{ name: string; events: number[] }[]>([])
   const [showCustom, setShowCustom] = useState(false)
 
@@ -4438,7 +4439,7 @@ function ShareModal({ accent, guestUrl, coupleUrl, onClose, data }: { accent: st
 
   const addCustomLink = () => {
     if (newLinkEvents.length === 0) return
-    setCustomLinks(prev => [...prev, { name: newLinkName || newLinkEvents.map(i => getCName(data.ceremonies[i])).join(' + '), events: newLinkEvents }])
+    setCustomLinks(prev => [...prev, { name: newLinkName || newLinkEvents.map(i => getCName(sorted[i])).join(' + '), events: newLinkEvents }])
     setNewLinkName('')
     setNewLinkEvents([])
   }
@@ -4510,9 +4511,9 @@ function ShareModal({ accent, guestUrl, coupleUrl, onClose, data }: { accent: st
                 <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 8 }}>
                   {locale === 'en' ? 'Select events to include:' : 'Sélectionner les événements à inclure :'}
                 </div>
-                {sortedWithOrigIdx.map(({ ceremony: c, origIdx }) => (
-                  <label key={origIdx} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', fontSize: 13, color: '#374151', cursor: 'pointer' }}>
-                    <input type="checkbox" checked={newLinkEvents.includes(origIdx)} onChange={e => { if (e.target.checked) setNewLinkEvents(prev => [...prev, origIdx]); else setNewLinkEvents(prev => prev.filter(x => x !== origIdx)) }} style={{ accentColor: accent }} />
+                {sorted.map((c, i) => (
+                  <label key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', fontSize: 13, color: '#374151', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={newLinkEvents.includes(i)} onChange={e => { if (e.target.checked) setNewLinkEvents(prev => [...prev, i]); else setNewLinkEvents(prev => prev.filter(x => x !== i)) }} style={{ accentColor: accent }} />
                     {getCName(c)}
                     {c.date && <span style={{ fontSize: 11, color: '#9ca3af', marginLeft: 4 }}>({new Date(c.date + 'T12:00:00').toLocaleDateString(locale === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'short' })})</span>}
                   </label>
@@ -6612,16 +6613,13 @@ function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: 
   const [, setContainerWidth] = useState(360)
 
   // Filtrage des cérémonies par paramètre URL ?events=0,2
-  // Les indices correspondent aux positions dans data.ceremonies (tableau original, non trié)
+  // Les indices correspondent aux positions dans allSorted (trié par date)
   const sorted = (() => {
     if (typeof window === 'undefined') return allSorted
     const eventsParam = new URLSearchParams(window.location.search).get('events')
     if (!eventsParam) return allSorted
-    const ceremonies = data.ceremonies ?? []
-    const indices = eventsParam.split(',').map(Number).filter(i => !isNaN(i) && i >= 0 && i < ceremonies.length)
-    if (indices.length === 0) return allSorted
-    const selected = indices.map(i => ceremonies[i])
-    return sortByDate(selected)
+    const indices = eventsParam.split(',').map(Number).filter(i => !isNaN(i) && i >= 0 && i < allSorted.length)
+    return indices.length > 0 ? indices.map(i => allSorted[i]) : allSorted
   })()
   const _gc = data.globalTextColor
   const G = _gc || theme.accent
@@ -7541,16 +7539,13 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
   const { t } = useT()
   const theme = THEMES[data.style]
   const allSorted = sortByDate(data.ceremonies)
-  // Filtrer par ?events= — les indices correspondent à data.ceremonies (tableau original)
+  // Filtrer par ?events= — les indices correspondent à allSorted (trié par date)
   const sorted = (() => {
     if (typeof window === 'undefined') return allSorted
     const eventsParam = new URLSearchParams(window.location.search).get('events')
     if (!eventsParam) return allSorted
-    const ceremonies = data.ceremonies ?? []
-    const indices = eventsParam.split(',').map(Number).filter(i => !isNaN(i) && i >= 0 && i < ceremonies.length)
-    if (indices.length === 0) return allSorted
-    const selected = indices.map(i => ceremonies[i])
-    return sortByDate(selected)
+    const indices = eventsParam.split(',').map(Number).filter(i => !isNaN(i) && i >= 0 && i < allSorted.length)
+    return indices.length > 0 ? indices.map(i => allSorted[i]) : allSorted
   })()
   const [rsvpOpen, setRsvpOpen] = useState(false)
   const [rsvpListOpen, setRsvpListOpen] = useState(false)
