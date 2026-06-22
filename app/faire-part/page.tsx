@@ -6938,10 +6938,11 @@ const firstDate = sorted[0]?.date
         {/* Cérémonies */}
         {(data.presentationStyle === 'cartes-separees' ? [sorted[currentCeremonyIdx]].filter(Boolean) : sorted).map((ceremony, i) => {
           const sortedIdx = data.presentationStyle === 'cartes-separees' ? currentCeremonyIdx : i
-          // Trouver l'index dans allSorted (tableau trié complet, avant filtrage events=)
-          // C'est cet index qui est utilisé pour les textOverrides (ceremony_X_lieu, etc.)
-          const allSortedIdx = allSorted.indexOf(ceremony)
-          const safeIdx = allSortedIdx >= 0 ? allSortedIdx : sortedIdx
+          // Trouver l'index dans le tri COMPLET (toutes les cérémonies, pas juste celles filtrées par events=)
+          // Les textOverrides sont stockés avec cet index (ceremony_X_lieu, etc.)
+          const fullSorted = sortByDate(data.ceremonies ?? [])
+          const fullSortedIdx = fullSorted.indexOf(ceremony)
+          const safeIdx = fullSortedIdx >= 0 ? fullSortedIdx : sortedIdx
           const typeTitle: Record<string, string> = {
             'Mairie': t.fairepart.cardTitles['Mairie'], 'Cérémonie religieuse / Houppa': data.mariageJuif ? t.fairepart.cardTitles['Cérémonie religieuse / Houppa'] : t.fairepart.cardTitles['Cérémonie'],
             'Shabbat Hatan': t.fairepart.cardTitles['Shabbat Hatan'], 'Henné': t.fairepart.cardTitles['Henné'], 'Cocktail': t.fairepart.cardTitles['Cocktail'],
