@@ -5208,8 +5208,18 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
         {/* Logo — taille ajustable */}
         <div style={{ width: logoSize, height: logoSize, flexShrink: 0, cursor: editable ? 'pointer' : undefined }} onClick={editable ? () => setShowLogoEdit(!showLogoEdit) : undefined}>
           {logoSrc ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoSrc} alt="" style={{ width: logoSize, height: logoSize, objectFit: 'contain' }} />
+            <div style={{
+              width: logoSize, height: logoSize,
+              backgroundColor: effectiveLogoColor,
+              WebkitMaskImage: `url(${logoSrc})`,
+              WebkitMaskSize: 'contain',
+              WebkitMaskRepeat: 'no-repeat',
+              WebkitMaskPosition: 'center',
+              maskImage: `url(${logoSrc})`,
+              maskSize: 'contain',
+              maskRepeat: 'no-repeat',
+              maskPosition: 'center',
+            } as React.CSSProperties} />
           ) : null}
         </div>
 
