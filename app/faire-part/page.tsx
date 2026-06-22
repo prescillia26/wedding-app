@@ -4275,8 +4275,16 @@ function ShareModal({ accent, guestUrl, coupleUrl, onClose, data }: { accent: st
   const getCName = (c: Ceremony) => typeTitle[c.type] || c.customName || c.type
 
   const buildCustomUrl = (events: number[]) => {
-    const sep = guestUrl.includes('?') ? '&' : '?'
-    return `${guestUrl}${sep}events=${events.join(',')}`
+    // Toujours utiliser le lien invité avec role=guest et les événements sélectionnés
+    const url = new URL(guestUrl, window.location.origin)
+    url.searchParams.set('events', events.join(','))
+    // S'assurer que role=guest est présent (même pour les liens avec slug)
+    if (!url.pathname.startsWith('/faire-part')) {
+      // Lien slug — events sera transmis par le RedirectClient
+      return url.toString()
+    }
+    url.searchParams.set('role', 'guest')
+    return url.toString()
   }
 
   const addCustomLink = () => {
