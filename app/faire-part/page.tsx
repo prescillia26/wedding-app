@@ -7328,34 +7328,44 @@ const firstDate = sorted[0]?.date
                       const gpStyle = { fontFamily: FC, fontStyle: 'italic' as const, fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' as const }
                       const hasLeft = !!(gpPa1 || gpMa1)
                       const hasRight = !!(gpPa2 || gpMa2)
-                      const oneSideOnly = hasLeft !== hasRight
-                      // Override seulement s'il diffère de la valeur calculée (sinon le formulaire prime)
                       const ovIf = (key: string, def: string) => ov[key] && ov[key] !== def ? ov[key] : ''
                       return (
-                      <DraggableElement id={pre+"gp"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
-                        <div style={{ display: oneSideOnly ? 'flex' : 'grid', gridTemplateColumns: oneSideOnly ? undefined : '1fr 1fr', flexDirection: oneSideOnly ? 'column' : undefined, alignItems: oneSideOnly ? 'center' : undefined, gap: 6, marginBottom: 2, textAlign: 'center' }}>
-                          {hasLeft && <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {gpPa1 ? <InlineEdit value={ovIf('gpPa1', gpPa1)} defaultValue={gpPa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa1: v } })} onStyleChange={(patch) => setInlineStyle('gpPa1', patch)} style={{ ...gpStyle, ...getInlineStyle('gpPa1') }} /> : <div>&nbsp;</div>}
-                            {gpMa1 ? <InlineEdit value={ovIf('gpMa1', gpMa1)} defaultValue={gpMa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa1: v } })} onStyleChange={(patch) => setInlineStyle('gpMa1', patch)} style={{ ...gpStyle, ...getInlineStyle('gpMa1') }} /> : <div>&nbsp;</div>}
-                          </div>}
-                          {hasRight && <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {gpPa2 ? <InlineEdit value={ovIf('gpPa2', gpPa2)} defaultValue={gpPa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa2: v } })} onStyleChange={(patch) => setInlineStyle('gpPa2', patch)} style={{ ...gpStyle, ...getInlineStyle('gpPa2') }} /> : <div>&nbsp;</div>}
-                            {gpMa2 ? <InlineEdit value={ovIf('gpMa2', gpMa2)} defaultValue={gpMa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa2: v } })} onStyleChange={(patch) => setInlineStyle('gpMa2', patch)} style={{ ...gpStyle, ...getInlineStyle('gpMa2') }} /> : <div>&nbsp;</div>}
-                          </div>}
+                      <AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 2, textAlign: 'center' }}>
+                          {hasLeft && <DraggableElement id={pre+"gp1"} layout={layout} onLayoutChange={setLayout} editable={canEdit}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                              {gpPa1 ? <InlineEdit value={ovIf('gpPa1', gpPa1)} defaultValue={gpPa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa1: v } })} onStyleChange={(patch) => setInlineStyle('gpPa1', patch)} style={{ ...gpStyle, ...getInlineStyle('gpPa1') }} /> : <div>&nbsp;</div>}
+                              {gpMa1 ? <InlineEdit value={ovIf('gpMa1', gpMa1)} defaultValue={gpMa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa1: v } })} onStyleChange={(patch) => setInlineStyle('gpMa1', patch)} style={{ ...gpStyle, ...getInlineStyle('gpMa1') }} /> : <div>&nbsp;</div>}
+                            </div>
+                          </DraggableElement>}
+                          {!hasLeft && <div />}
+                          {hasRight && <DraggableElement id={pre+"gp2"} layout={layout} onLayoutChange={setLayout} editable={canEdit}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                              {gpPa2 ? <InlineEdit value={ovIf('gpPa2', gpPa2)} defaultValue={gpPa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa2: v } })} onStyleChange={(patch) => setInlineStyle('gpPa2', patch)} style={{ ...gpStyle, ...getInlineStyle('gpPa2') }} /> : <div>&nbsp;</div>}
+                              {gpMa2 ? <InlineEdit value={ovIf('gpMa2', gpMa2)} defaultValue={gpMa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa2: v } })} onStyleChange={(patch) => setInlineStyle('gpMa2', patch)} style={{ ...gpStyle, ...getInlineStyle('gpMa2') }} /> : <div>&nbsp;</div>}
+                            </div>
+                          </DraggableElement>}
+                          {!hasRight && <div />}
                         </div>
-                      </AnimSection></DraggableElement>
+                      </AnimSection>
                     )})()}
                     {(parents1.length > 0 || parents2.length > 0) && ceremony.type === 'Cérémonie religieuse / Houppa' && (
-                      <DraggableElement id={pre+"parents"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={150} skipAnim={canEdit}>
+                      <AnimSection animStyle={anim} delay={150} skipAnim={canEdit}>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 6, textAlign: 'center' }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                            {parents1.map((l,j)=><InlineEdit key={j} value={ov[`parents1_${j}`] && ov[`parents1_${j}`] !== l ? ov[`parents1_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents1_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents1_${j}`, patch)} style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles), ...getInlineStyle(`parents1_${j}`) }} />)}
-                          </div>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                            {parents2.map((l,j)=><InlineEdit key={j} value={ov[`parents2_${j}`] && ov[`parents2_${j}`] !== l ? ov[`parents2_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents2_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents2_${j}`, patch)} style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles), ...getInlineStyle(`parents2_${j}`) }} />)}
-                          </div>
+                          {parents1.length > 0 && <DraggableElement id={pre+"parents1"} layout={layout} onLayoutChange={setLayout} editable={canEdit}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                              {parents1.map((l,j)=><InlineEdit key={j} value={ov[`parents1_${j}`] && ov[`parents1_${j}`] !== l ? ov[`parents1_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents1_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents1_${j}`, patch)} style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles), ...getInlineStyle(`parents1_${j}`) }} />)}
+                            </div>
+                          </DraggableElement>}
+                          {parents1.length === 0 && <div />}
+                          {parents2.length > 0 && <DraggableElement id={pre+"parents2"} layout={layout} onLayoutChange={setLayout} editable={canEdit}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                              {parents2.map((l,j)=><InlineEdit key={j} value={ov[`parents2_${j}`] && ov[`parents2_${j}`] !== l ? ov[`parents2_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents2_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents2_${j}`, patch)} style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles), ...getInlineStyle(`parents2_${j}`) }} />)}
+                            </div>
+                          </DraggableElement>}
+                          {parents2.length === 0 && <div />}
                         </div>
-                      </AnimSection></DraggableElement>
+                      </AnimSection>
                     )}
                     {(parents1.length > 0 || parents2.length > 0 || hasGp) && ceremony.type === 'Cérémonie religieuse / Houppa' && (
                       <DraggableElement id={pre+"joie"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={180} skipAnim={canEdit}>
