@@ -483,6 +483,7 @@ interface FormData {
   customDesignMode?: boolean // si true, affiche les images custom au lieu des cartes cérémonies
   customDesignPages?: string[] // URLs des pages uploadées (ordre d'affichage)
   customDesignCoverUrl?: string // image de couverture custom (remplace la cover getlovit)
+  customDesignCoverVideoUrl?: string // vidéo de couverture custom (ex: enveloppe Canva/Etsy)
   // ── Pages supplémentaires (libres, entre les cérémonies) ──
   customPages?: CustomPage[]
   // ── Position du bouton Découvrir (page d'accueil) ──
@@ -2296,6 +2297,7 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
   const accent = THEMES[data.style].accent
   const [customDesignUploading, setCustomDesignUploading] = useState(false)
   const [customCoverUploading, setCustomCoverUploading] = useState(false)
+  const [customCoverVideoUploading, setCustomCoverVideoUploading] = useState(false)
 
   const uploadToCloudinary = async (file: File): Promise<string | null> => {
     const fd = new window.FormData()
@@ -2318,6 +2320,30 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
     if (url) onChange({ customDesignCoverUrl: url })
     else showToast('Erreur lors de l\'upload', 'error')
     setCustomCoverUploading(false)
+    e.target.value = ''
+  }
+
+  const handleCustomCoverVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 50 * 1024 * 1024) {
+      showToast(locale === 'en' ? 'Video must be under 50MB' : 'La vidéo doit faire moins de 50 Mo', 'error')
+      return
+    }
+    setCustomCoverVideoUploading(true)
+    const fd = new window.FormData()
+    fd.append('file', file)
+    fd.append('upload_preset', 'wedding_music')
+    fd.append('resource_type', 'video')
+    try {
+      const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/video/upload', { method: 'POST', body: fd })
+      const json = await res.json()
+      if (json.secure_url) onChange({ customDesignCoverVideoUrl: json.secure_url })
+      else showToast('Erreur lors de l\'upload vidéo', 'error')
+    } catch {
+      showToast('Erreur lors de l\'upload vidéo', 'error')
+    }
+    setCustomCoverVideoUploading(false)
     e.target.value = ''
   }
 
@@ -2401,6 +2427,36 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
                 }}>
                   <span>{customCoverUploading ? (locale === 'en' ? 'Uploading...' : 'Upload en cours...') : (locale === 'en' ? '+ Upload cover' : '+ Uploader la couverture')}</span>
                   <input type="file" accept="image/*" onChange={handleCustomCoverUpload} style={{ display: 'none' }} disabled={customCoverUploading} />
+                </label>
+              )}
+            </div>
+
+            {/* Vidéo d'ouverture (enveloppe animée Canva/Etsy) */}
+            <div>
+              <Label>{locale === 'en' ? 'Opening video (envelope animation)' : 'Vidéo d\'ouverture (animation enveloppe)'}</Label>
+              <p style={{ fontSize: 11, color: '#9a928a', lineHeight: 1.5, marginBottom: 8 }}>
+                {locale === 'en'
+                  ? 'Upload a video (MP4, max 50MB) — e.g. an animated envelope from Canva/Etsy. It will play as intro before revealing your invitation.'
+                  : 'Uploadez une vidéo (MP4, max 50 Mo) — ex : une enveloppe animée Canva/Etsy. Elle sera jouée en intro avant de révéler votre faire-part.'}
+              </p>
+              {data.customDesignCoverVideoUrl ? (
+                <div style={{ position: 'relative', display: 'inline-block', marginBottom: 8 }}>
+                  <video src={data.customDesignCoverVideoUrl} style={{ width: 120, height: 213, objectFit: 'cover', borderRadius: 8, border: `2px solid ${accent}30` }} muted playsInline />
+                  <button type="button" onClick={() => onChange({ customDesignCoverVideoUrl: undefined })} style={{
+                    ...BTN, position: 'absolute', top: -6, right: -6, width: 22, height: 22, borderRadius: '50%',
+                    background: '#ef4444', color: 'white', border: 'none', fontSize: 12, fontWeight: 700,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>x</button>
+                </div>
+              ) : (
+                <label style={{
+                  ...BTN, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  padding: '14px 20px', borderRadius: 10, border: `2px dashed ${accent}40`,
+                  background: `${accent}08`, color: accent, fontSize: 13, fontWeight: 600,
+                  fontFamily: 'var(--font-cormorant-garamond)',
+                }}>
+                  <span>{customCoverVideoUploading ? (locale === 'en' ? 'Uploading video...' : 'Upload vidéo en cours...') : (locale === 'en' ? '+ Upload opening video' : '+ Uploader la vidéo d\'ouverture')}</span>
+                  <input type="file" accept="video/mp4,video/quicktime,video/webm" onChange={handleCustomCoverVideoUpload} style={{ display: 'none' }} disabled={customCoverVideoUploading} />
                 </label>
               )}
             </div>
@@ -8062,6 +8118,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
             mariageJuif={data.mariageJuif}
             illustrationUrl={data.illustrationCoupleId ? ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url : undefined}
             customDesignCoverUrl={data.customDesignMode ? data.customDesignCoverUrl : undefined}
+            customDesignCoverVideoUrl={data.customDesignMode ? data.customDesignCoverVideoUrl : undefined}
           />
         )}
         {data.petalsEnabled && <FloatingPetals accent={theme.accent} />}
