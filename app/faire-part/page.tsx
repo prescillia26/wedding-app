@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo, useId } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { showToast } from '../components/Toast'
 import { useT } from '@/lib/i18n'
@@ -487,6 +487,8 @@ interface FormData {
   customPages?: CustomPage[]
   // ── Position du bouton Découvrir (page d'accueil) ──
   decouvrirButtonPosition?: { x: number; y: number }
+  // ── Zones de texte personnalisées (ajoutées par les mariés) ──
+  customTextZones?: { id: string; text: string; x: number; y: number; style?: string }[]
 }
 
 type IllustrationKind = 'scene' | 'motif'
@@ -6332,6 +6334,22 @@ function InlineEdit({ value, defaultValue, onChange, editable, style, onStyleCha
   const [showColors, setShowColors] = useState(false)
   const [showFonts, setShowFonts] = useState(false)
 
+  // Unique class to override DraggableElement's !important styles
+  const uid = useId().replace(/:/g, '_')
+  const ieCls = `ie${uid}`
+  const hasOverrides = !!(style?.color || style?.fontFamily || style?.fontSize || style?.fontWeight || style?.fontStyle)
+  const ieStyleTag = hasOverrides ? (
+    <style>{`
+      .${ieCls} {
+        ${style?.color ? `color: ${style.color} !important;` : ''}
+        ${style?.fontFamily ? `font-family: ${style.fontFamily} !important;` : ''}
+        ${typeof style?.fontSize === 'number' ? `font-size: ${style.fontSize}px !important;` : typeof style?.fontSize === 'string' ? `font-size: ${style.fontSize} !important;` : ''}
+        ${style?.fontWeight ? `font-weight: ${style.fontWeight} !important;` : ''}
+        ${style?.fontStyle === 'italic' || style?.fontStyle === 'normal' ? `font-style: ${style.fontStyle} !important;` : ''}
+      }
+    `}</style>
+  ) : null
+
   // Close toolbar on outside click
   useEffect(() => {
     if (!selected) return
@@ -6361,13 +6379,14 @@ function InlineEdit({ value, defaultValue, onChange, editable, style, onStyleCha
   })()
 
   if (!editable) {
-    return <div style={style}>{renderRichText(display)}</div>
+    return <div className={ieCls} style={style}>{ieStyleTag}{renderRichText(display)}</div>
   }
 
   if (!editing) {
     return (
       <div
         ref={containerRef}
+        className={ieCls}
         style={{ ...style, cursor: 'text', position: 'relative' }}
         onClick={(e) => {
           e.stopPropagation()
@@ -6379,6 +6398,7 @@ function InlineEdit({ value, defaultValue, onChange, editable, style, onStyleCha
         onMouseDown={(e) => e.stopPropagation()}
         onTouchStart={(e) => e.stopPropagation()}
       >
+        {ieStyleTag}
         {renderRichText(display)}
         {/* Pencil badge — always visible in edit mode */}
         {!selected && (
@@ -7670,6 +7690,70 @@ const firstDate = sorted[0]?.date
         )}
 
         </>
+        )}
+
+        {/* ── Zones de texte personnalisées (ajoutées par les mariés) ── */}
+        {(data.customTextZones ?? []).map((zone) => {
+          const canEditZone = role !== 'guest' && !!onUpdate
+          const zLayout = data.accueilLayout ?? {}
+          const zSetLayout = (l: LayoutMap) => onUpdate?.({ accueilLayout: l })
+          const zoneInlineStyle = (() => {
+            if (!zone.style) return {}
+            try { return JSON.parse(zone.style) as React.CSSProperties } catch { return {} }
+          })()
+          return (
+            <div key={zone.id} style={{ position: 'relative', padding: '16px 24px', textAlign: 'center' }}>
+              {canEditZone && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onUpdate?.({ customTextZones: (data.customTextZones ?? []).filter(z => z.id !== zone.id) })
+                  }}
+                  style={{ ...BTN, position: 'absolute', top: 4, right: 4, zIndex: 20, width: 22, height: 22, borderRadius: '50%', border: '1px solid #e0d5c8', background: 'white', color: '#c9a84c', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, boxShadow: '0 1px 4px rgba(0,0,0,0.1)', cursor: 'pointer' }}
+                >
+                  ✕
+                </button>
+              )}
+              <DraggableElement id={`ctz-${zone.id}`} layout={zLayout} onLayoutChange={zSetLayout} editable={canEditZone}>
+                <InlineEdit
+                  value={zone.text}
+                  defaultValue="Votre texte ici"
+                  editable={canEditZone}
+                  onChange={(v) => {
+                    const zones = (data.customTextZones ?? []).map(z => z.id === zone.id ? { ...z, text: v } : z)
+                    onUpdate?.({ customTextZones: zones })
+                  }}
+                  onStyleChange={(patch) => {
+                    const existing = zoneInlineStyle
+                    const merged = { ...existing, ...patch }
+                    const zones = (data.customTextZones ?? []).map(z => z.id === zone.id ? { ...z, style: JSON.stringify(merged) } : z)
+                    onUpdate?.({ customTextZones: zones })
+                  }}
+                  style={{
+                    fontFamily: FC, fontSize: 16, color: TEXT, lineHeight: 1.7, textAlign: 'center' as const,
+                    ...zoneInlineStyle,
+                  }}
+                />
+              </DraggableElement>
+            </div>
+          )
+        })}
+        {/* Bouton ajout zone de texte — visible uniquement pour les mariés */}
+        {role !== 'guest' && !!onUpdate && (
+          <div style={{ textAlign: 'center', padding: '8px 0 16px' }}>
+            <button
+              type="button"
+              onClick={() => {
+                const newZone = { id: `tz-${Date.now()}`, text: 'Votre texte ici', x: 0, y: 0 }
+                onUpdate?.({ customTextZones: [...(data.customTextZones ?? []), newZone] })
+              }}
+              style={{ ...BTN, padding: '8px 20px', borderRadius: 9999, border: `1.5px dashed ${G}60`, background: 'transparent', color: G, fontSize: 12, fontWeight: 600, fontFamily: FC, cursor: 'pointer', opacity: 0.7, transition: 'opacity 0.2s' }}
+              onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+              onMouseLeave={e => (e.currentTarget.style.opacity = '0.7')}
+            >
+              + Ajouter un texte
+            </button>
+          </div>
         )}
 
         {/* Indicateur page RSVP — visible uniquement pour les mariés */}
