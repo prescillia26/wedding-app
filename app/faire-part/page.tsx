@@ -484,6 +484,13 @@ interface FormData {
   customDesignPages?: string[] // URLs des pages uploadées (ordre d'affichage)
   customDesignCoverUrl?: string // image de couverture custom (remplace la cover getlovit)
   customDesignCoverVideoUrl?: string // vidéo de couverture custom (ex: enveloppe Canva/Etsy)
+  // ── Overlay texte sur vidéo d'ouverture ──
+  videoOverlayText1?: string // ligne 1 (ex: prénoms)
+  videoOverlayText2?: string // ligne 2 (ex: "ont le plaisir de vous convier")
+  videoOverlayText3?: string // ligne 3 (ex: "à leur mariage")
+  videoOverlayShowBsd?: boolean // afficher בס״ד
+  videoOverlayTextColor?: string // couleur du texte overlay
+  videoOverlayBgColor?: string // couleur de fond après la vidéo
   // ── Pages supplémentaires (libres, entre les cérémonies) ──
   customPages?: CustomPage[]
   // ── Position du bouton Découvrir (page d'accueil) ──
@@ -2460,6 +2467,121 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
                 </label>
               )}
             </div>
+
+            {/* ── Personnalisation texte overlay (après la vidéo) ── */}
+            {data.customDesignCoverVideoUrl && (
+              <div style={{ background: `${accent}06`, borderRadius: 12, padding: 16, border: `1px solid ${accent}15` }}>
+                <Label>{locale === 'en' ? 'Text displayed after the video' : 'Texte affiché après la vidéo'}</Label>
+                <p style={{ fontSize: 11, color: '#9a928a', lineHeight: 1.5, marginBottom: 12 }}>
+                  {locale === 'en'
+                    ? 'Customize the elegant screen that appears after your envelope opens.'
+                    : 'Personnalisez l\'écran élégant qui apparaît après l\'ouverture de l\'enveloppe.'}
+                </p>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {/* Ligne 1 — Prénoms */}
+                  <div>
+                    <label style={{ fontSize: 11, color: '#6b6560', fontWeight: 600, marginBottom: 4, display: 'block' }}>
+                      {locale === 'en' ? 'Line 1 (names)' : 'Ligne 1 (prénoms)'}
+                    </label>
+                    <input
+                      type="text"
+                      value={data.videoOverlayText1 ?? ''}
+                      placeholder={`${data.marie1Prenom || 'Prénom'} & ${data.marie2Prenom || 'Prénom'}`}
+                      onChange={e => onChange({ videoOverlayText1: e.target.value || undefined })}
+                      style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #e0dbd6', fontSize: 14, fontFamily: 'var(--font-cormorant-garamond)', boxSizing: 'border-box' }}
+                    />
+                  </div>
+
+                  {/* Ligne 2 */}
+                  <div>
+                    <label style={{ fontSize: 11, color: '#6b6560', fontWeight: 600, marginBottom: 4, display: 'block' }}>
+                      {locale === 'en' ? 'Line 2' : 'Ligne 2'}
+                    </label>
+                    <input
+                      type="text"
+                      value={data.videoOverlayText2 ?? ''}
+                      placeholder="ont le plaisir de vous convier"
+                      onChange={e => onChange({ videoOverlayText2: e.target.value || undefined })}
+                      style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #e0dbd6', fontSize: 14, fontFamily: 'var(--font-cormorant-garamond)', boxSizing: 'border-box' }}
+                    />
+                  </div>
+
+                  {/* Ligne 3 */}
+                  <div>
+                    <label style={{ fontSize: 11, color: '#6b6560', fontWeight: 600, marginBottom: 4, display: 'block' }}>
+                      {locale === 'en' ? 'Line 3' : 'Ligne 3'}
+                    </label>
+                    <input
+                      type="text"
+                      value={data.videoOverlayText3 ?? ''}
+                      placeholder="à leur mariage"
+                      onChange={e => onChange({ videoOverlayText3: e.target.value || undefined })}
+                      style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #e0dbd6', fontSize: 14, fontFamily: 'var(--font-cormorant-garamond)', boxSizing: 'border-box' }}
+                    />
+                  </div>
+
+                  {/* בס״ד toggle */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <button type="button" onClick={() => onChange({ videoOverlayShowBsd: !(data.videoOverlayShowBsd !== false) })} style={{
+                      ...BTN, width: 38, height: 20, borderRadius: 10, border: 'none', padding: 0, position: 'relative',
+                      background: (data.videoOverlayShowBsd !== false) ? accent : '#d1d5db', transition: 'background 0.2s',
+                    }}>
+                      <span style={{
+                        position: 'absolute', top: 2, left: (data.videoOverlayShowBsd !== false) ? 20 : 2,
+                        width: 16, height: 16, borderRadius: '50%', background: 'white',
+                        transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                      }} />
+                    </button>
+                    <span style={{ fontSize: 13, color: '#3a3330' }}>בס״ד</span>
+                  </div>
+
+                  {/* Couleurs */}
+                  <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                    <div>
+                      <label style={{ fontSize: 11, color: '#6b6560', fontWeight: 600, marginBottom: 4, display: 'block' }}>
+                        {locale === 'en' ? 'Text color' : 'Couleur du texte'}
+                      </label>
+                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                        {[
+                          { id: '#1B2A4A', label: 'Bleu marine' },
+                          { id: '#C4784A', label: 'Terracotta' },
+                          { id: '#3a3330', label: 'Brun' },
+                          { id: '#2D4A3E', label: 'Vert sauge' },
+                          { id: '#8B6F47', label: 'Doré' },
+                          { id: '#FFFFFF', label: 'Blanc' },
+                        ].map(c => (
+                          <button key={c.id} type="button" title={c.label} onClick={() => onChange({ videoOverlayTextColor: c.id })} style={{
+                            ...BTN, width: 28, height: 28, borderRadius: '50%', border: (data.videoOverlayTextColor || '#1B2A4A') === c.id ? `3px solid ${accent}` : '2px solid #e0dbd6',
+                            background: c.id, boxShadow: c.id === '#FFFFFF' ? 'inset 0 0 0 1px #ccc' : undefined,
+                          }} />
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label style={{ fontSize: 11, color: '#6b6560', fontWeight: 600, marginBottom: 4, display: 'block' }}>
+                        {locale === 'en' ? 'Background color' : 'Couleur de fond'}
+                      </label>
+                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                        {[
+                          { id: '#F5F0EB', label: 'Ivoire' },
+                          { id: '#1B2A4A', label: 'Bleu marine' },
+                          { id: '#2D4A3E', label: 'Vert sauge' },
+                          { id: '#3a3330', label: 'Brun' },
+                          { id: '#F8F4F0', label: 'Crème' },
+                          { id: '#000000', label: 'Noir' },
+                        ].map(c => (
+                          <button key={c.id} type="button" title={c.label} onClick={() => onChange({ videoOverlayBgColor: c.id })} style={{
+                            ...BTN, width: 28, height: 28, borderRadius: '50%', border: (data.videoOverlayBgColor || '#F5F0EB') === c.id ? `3px solid ${accent}` : '2px solid #e0dbd6',
+                            background: c.id,
+                          }} />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Pages de contenu */}
             <div>
@@ -8119,6 +8241,12 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
             illustrationUrl={data.illustrationCoupleId ? ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url : undefined}
             customDesignCoverUrl={data.customDesignMode ? data.customDesignCoverUrl : undefined}
             customDesignCoverVideoUrl={data.customDesignMode ? data.customDesignCoverVideoUrl : undefined}
+            videoOverlayText1={data.videoOverlayText1}
+            videoOverlayText2={data.videoOverlayText2}
+            videoOverlayText3={data.videoOverlayText3}
+            videoOverlayShowBsd={data.videoOverlayShowBsd}
+            videoOverlayTextColor={data.videoOverlayTextColor}
+            videoOverlayBgColor={data.videoOverlayBgColor}
           />
         )}
         {data.petalsEnabled && <FloatingPetals accent={theme.accent} />}
