@@ -6882,9 +6882,9 @@ const firstDate = sorted[0]?.date
 }
 
   return (
-    <div style={{ backgroundColor: theme.fond, minHeight: '100vh' }}>
+    <div style={{ backgroundColor: theme.fond, minHeight: '100vh', overflowX: 'hidden' }}>
       {data.petalsEnabled && <PersistentParticles theme={theme} style={data.style} />}
-      <div style={{ backgroundColor: theme.fond, color: TEXT, minHeight: '100vh', maxWidth: 480, margin: '0 auto', boxShadow: '0 0 40px rgba(0,0,0,0.08)', paddingTop: 54 }}>
+      <div style={{ backgroundColor: theme.fond, color: TEXT, minHeight: '100vh', maxWidth: 480, margin: '0 auto', boxShadow: '0 0 40px rgba(0,0,0,0.08)', paddingTop: 54, overflowX: 'hidden' }}>
       <StickyHeader
         ceremonies={sorted}
         accent={G}
@@ -7962,7 +7962,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
 
   if (isShared) {
     return (
-      <div style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte }}>
+      <div style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte, overflowX: 'hidden' }}>
         {/* Cover page pour les invités */}
         {!coverOpen && (
           <InvitationCover
@@ -8060,7 +8060,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
   }
 
   return (
-    <div id="faire-part-preview-target" style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte, position: 'relative' }}>
+    <div id="faire-part-preview-target" style={{ backgroundColor: theme.fond, minHeight: '100vh', color: theme.texte, position: 'relative', overflowX: 'hidden' }}>
       {/* Cover page universelle — "Découvrir votre invitation" */}
       {!coverOpen && (
         <InvitationCover
