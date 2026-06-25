@@ -238,19 +238,8 @@ const LUXE_COLORS: { id: string; label: string; hex: string; palette: Palette }[
 ]
 
 
-// Vidéos animées pour page d'accueil et cadres
-const VIDEO_BACKGROUNDS: { id: string; label: string; url: string; textPosition: 'top' | 'center' | 'center-top'; needsOverlay: boolean; dark?: boolean }[] = [
-  { id: 'vid-178', label: '🏛️ Palais & fontaine', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1778511799/178_ngv1mw.mp4', textPosition: 'center', needsOverlay: false },
-  { id: 'vid-191', label: '🌙 Nuit étoilée', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1778511807/191_cvtes6.mp4', textPosition: 'center', needsOverlay: false, dark: true },
-  { id: 'vid-176', label: '🦢 Jardin romantique', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1778511791/176_xkqggp.mp4', textPosition: 'center-top', needsOverlay: false },
-  { id: 'vid-189', label: '🌸 Houppa fleurie', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1778511805/189_qyfzpf.mp4', textPosition: 'center-top', needsOverlay: false },
-  { id: 'vid-187', label: '🌿 Jardin escalier', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1778511807/187_utfk2j.mp4', textPosition: 'top', needsOverlay: false },
-  { id: 'vid-173', label: '💐 Arche florale', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1778511799/173_tof9lr.mp4', textPosition: 'center-top', needsOverlay: true },
-  { id: 'vid-177', label: '🌻 Tournesols', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1778511793/177_ahtttq.mp4', textPosition: 'center-top', needsOverlay: true },
-  { id: 'vid-180', label: '💕 Cœurs roses', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1778511798/180_kafbld.mp4', textPosition: 'top', needsOverlay: true },
-  { id: 'vid-190', label: '🎪 Mandap fleuri', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1778511806/190_uc4hem.mp4', textPosition: 'center', needsOverlay: true },
-  { id: 'vid-194', label: '🕯️ Nuit & chandeliers', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1778511813/194_kvvbyk.mp4', textPosition: 'center', needsOverlay: true, dark: true },
-]
+// Vidéos animées supprimées (inutilisées) — tableau vide pour rétrocompatibilité
+const VIDEO_BACKGROUNDS: { id: string; label: string; url: string; textPosition: 'top' | 'center' | 'center-top'; needsOverlay: boolean; dark?: boolean }[] = []
 
 const FRAMES_STRONG_BG = new Set(['frame-80', 'frame-107', 'frame-108'])
 // Padding personnalisé pour les cadres à bordure — top/bottom/h adaptés à chaque cadre
