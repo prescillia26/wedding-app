@@ -14,7 +14,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'File too large (max 50MB)' }, { status: 400 })
     }
 
-    const blob = await put(file.name, file, { access: 'public' })
+    const blob = await put(file.name, file, {
+      access: 'public',
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    })
 
     return NextResponse.json({ url: blob.url })
   } catch (e) {

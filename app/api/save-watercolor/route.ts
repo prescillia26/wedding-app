@@ -27,7 +27,7 @@ export async function POST(req: Request) {
 
     // Uploader sur Vercel Blob
     const filename = `watercolors/watercolor-${Date.now()}.png`
-    const blob = await put(filename, imageBuffer, { access: 'public' })
+    const blob = await put(filename, imageBuffer, { access: 'public', token: process.env.BLOB_READ_WRITE_TOKEN })
 
     return Response.json({ url: blob.url })
   } catch (err) {
