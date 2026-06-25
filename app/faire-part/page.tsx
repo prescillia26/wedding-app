@@ -91,15 +91,15 @@ const THEMES: Record<Theme, ThemeObj> = {
 }
 
 const ORNEMENTS_LIBRARY: { id: string; url: string; nom: string }[] = [
-  { id: 'orn1', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765484/1_ruabdh.png', nom: 'Floral 1' },
-  { id: 'orn2', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765486/2_xh3erh.png', nom: 'Floral 2' },
-  { id: 'orn3', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765487/3_zdnq1l.png', nom: 'Floral 3' },
-  { id: 'orn4', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765490/4_szuz80.png', nom: 'Floral 4' },
+  { id: 'orn1', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1776765484/1_ruabdh.png', nom: 'Floral 1' },
+  { id: 'orn2', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1776765486/2_xh3erh.png', nom: 'Floral 2' },
+  { id: 'orn3', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1776765487/3_zdnq1l.png', nom: 'Floral 3' },
+  { id: 'orn4', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1776765490/4_szuz80.png', nom: 'Floral 4' },
   { id: 'orn5', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765492/5_dgvzjn.png', nom: 'Floral 5' },
   { id: 'orn6', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765509/6_bbgeun.png', nom: 'Floral 6' },
   { id: 'orn7', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765511/7_h5mjjm.png', nom: 'Floral 7' },
-  { id: 'orn8', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765513/8_grn4zh.png', nom: 'Floral 8' },
-  { id: 'orn9', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776783658/Design_sans_titre_tzwipm.png', nom: 'Floral 9' },
+  { id: 'orn8', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1776765513/8_grn4zh.png', nom: 'Floral 8' },
+  { id: 'orn9', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1776783658/Design_sans_titre_tzwipm.png', nom: 'Floral 9' },
   { id: 'none', url: '', nom: 'Sans ornement' },
 ]
 
@@ -158,40 +158,40 @@ const ORNEMENTS_LIBRARY: { id: string; url: string; nom: string }[] = [
 // ── Illustrations aquarelles Canva ────────────────────────────────────────────
 
 const ILLUSTRATIONS_COUPLES = [
-  { id: 'couple-01', label: '💕 Couple classique avec voile', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878822/81_pzfb2j.png' },
-  { id: 'couple-02', label: '💕 Étreinte élégante', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878824/82_gbqs4r.png' },
-  { id: 'couple-03', label: '💕 Baiser avec bouquet', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878831/83_iw0wq9.png' },
-  { id: 'couple-04', label: '💕 Robe pailletée', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878834/88_e6oobi.png' },
-  { id: 'couple-05', label: '💕 Couple brun + brune', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878835/87_hejtki.png' },
-  { id: 'couple-06', label: '🌸 Arche florale rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878838/94_l7zjbv.png' },
-  { id: 'couple-07', label: '💕 Couple aquarelle', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498222/1_dpwtiu.png' },
-  { id: 'couple-08', label: '💕 Portail fleuri', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498299/56_wny8tt.png' },
-  { id: 'couple-09', label: '💕 Jardin romantique', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498296/55_oxmray.png' },
-  { id: 'couple-10', label: '💕 Arche végétale', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498291/49_iv6cle.png' },
-  { id: 'couple-11', label: '💕 Couple sous glycine', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498289/43_xziory.png' },
-  { id: 'couple-12', label: '💕 Allée fleurie', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498289/46_nqxkzg.png' },
-  { id: 'couple-13', label: '💕 Terrasse méditerranéenne', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498287/38_usomhj.png' },
-  { id: 'couple-14', label: '💕 Château aquarelle', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498283/34_wnjgyc.png' },
-  { id: 'couple-15', label: '💕 Domaine champêtre', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498279/24_yh2poc.png' },
-  { id: 'couple-16', label: '💕 Vignoble', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498272/21_uq53kw.png' },
-  { id: 'couple-17', label: '💕 Mas provençal', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498271/20_fsei03.png' },
-  { id: 'couple-18', label: '💕 Villa élégante', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780498230/13_vtlmbu.png' },
-  { id: 'couple-19', label: '🎨 Fond aquarelle 1', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780836630/watercolor_back_1_n62jqo.png' },
-  { id: 'couple-20', label: '🎨 Fond aquarelle 2', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780836663/watercolor_back_2_uj4ama.png' },
-  { id: 'couple-21', label: '🎨 Fond aquarelle 3', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780836667/watercolor_back_3_fjtbqm.png' },
+  { id: 'couple-01', label: '💕 Couple classique avec voile', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1776878822/81_pzfb2j.png' },
+  { id: 'couple-02', label: '💕 Étreinte élégante', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1776878824/82_gbqs4r.png' },
+  { id: 'couple-03', label: '💕 Baiser avec bouquet', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1776878831/83_iw0wq9.png' },
+  { id: 'couple-04', label: '💕 Robe pailletée', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1776878834/88_e6oobi.png' },
+  { id: 'couple-05', label: '💕 Couple brun + brune', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1776878835/87_hejtki.png' },
+  { id: 'couple-06', label: '🌸 Arche florale rose', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1776878838/94_l7zjbv.png' },
+  { id: 'couple-07', label: '💕 Couple aquarelle', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780498222/1_dpwtiu.png' },
+  { id: 'couple-08', label: '💕 Portail fleuri', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780498299/56_wny8tt.png' },
+  { id: 'couple-09', label: '💕 Jardin romantique', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780498296/55_oxmray.png' },
+  { id: 'couple-10', label: '💕 Arche végétale', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780498291/49_iv6cle.png' },
+  { id: 'couple-11', label: '💕 Couple sous glycine', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780498289/43_xziory.png' },
+  { id: 'couple-12', label: '💕 Allée fleurie', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780498289/46_nqxkzg.png' },
+  { id: 'couple-13', label: '💕 Terrasse méditerranéenne', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780498287/38_usomhj.png' },
+  { id: 'couple-14', label: '💕 Château aquarelle', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780498283/34_wnjgyc.png' },
+  { id: 'couple-15', label: '💕 Domaine champêtre', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780498279/24_yh2poc.png' },
+  { id: 'couple-16', label: '💕 Vignoble', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780498272/21_uq53kw.png' },
+  { id: 'couple-17', label: '💕 Mas provençal', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780498271/20_fsei03.png' },
+  { id: 'couple-18', label: '💕 Villa élégante', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780498230/13_vtlmbu.png' },
+  { id: 'couple-19', label: '🎨 Fond aquarelle 1', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780836630/watercolor_back_1_n62jqo.png' },
+  { id: 'couple-20', label: '🎨 Fond aquarelle 2', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780836663/watercolor_back_2_uj4ama.png' },
+  { id: 'couple-21', label: '🎨 Fond aquarelle 3', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780836667/watercolor_back_3_fjtbqm.png' },
 ] as const
 
 // ── Illustrations RSVP (boîte aux lettres, enveloppes, etc.) ──
 const ILLUSTRATIONS_RSVP = [
-  { id: 'rsvp-01', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679794/87_k4isjc.png' },
-  { id: 'rsvp-02', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679796/86_owvqqb.png' },
-  { id: 'rsvp-03', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679801/88_l3pukk.png' },
-  { id: 'rsvp-04', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679813/90_aicvrs.png' },
-  { id: 'rsvp-05', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679819/91_dvzxei.png' },
-  { id: 'rsvp-06', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679836/89_ms4ox1.png' },
-  { id: 'rsvp-07', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679848/92_slsvpe.png' },
-  { id: 'rsvp-08', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679848/93_kyhcqx.png' },
-  { id: 'rsvp-09', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1780679849/94_aogybr.png' },
+  { id: 'rsvp-01', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780679794/87_k4isjc.png' },
+  { id: 'rsvp-02', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780679796/86_owvqqb.png' },
+  { id: 'rsvp-03', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780679801/88_l3pukk.png' },
+  { id: 'rsvp-04', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780679813/90_aicvrs.png' },
+  { id: 'rsvp-05', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780679819/91_dvzxei.png' },
+  { id: 'rsvp-06', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780679836/89_ms4ox1.png' },
+  { id: 'rsvp-07', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780679848/92_slsvpe.png' },
+  { id: 'rsvp-08', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780679848/93_kyhcqx.png' },
+  { id: 'rsvp-09', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1780679849/94_aogybr.png' },
 ] as const
 
 // ── Couleurs Luxe Aquarelle ──
@@ -240,16 +240,16 @@ const LUXE_COLORS: { id: string; label: string; hex: string; palette: Palette }[
 
 // Vidéos animées pour page d'accueil et cadres
 const VIDEO_BACKGROUNDS: { id: string; label: string; url: string; textPosition: 'top' | 'center' | 'center-top'; needsOverlay: boolean; dark?: boolean }[] = [
-  { id: 'vid-178', label: '🏛️ Palais & fontaine', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511799/178_ngv1mw.mp4', textPosition: 'center', needsOverlay: false },
-  { id: 'vid-191', label: '🌙 Nuit étoilée', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511807/191_cvtes6.mp4', textPosition: 'center', needsOverlay: false, dark: true },
-  { id: 'vid-176', label: '🦢 Jardin romantique', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511791/176_xkqggp.mp4', textPosition: 'center-top', needsOverlay: false },
-  { id: 'vid-189', label: '🌸 Houppa fleurie', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511805/189_qyfzpf.mp4', textPosition: 'center-top', needsOverlay: false },
-  { id: 'vid-187', label: '🌿 Jardin escalier', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511807/187_utfk2j.mp4', textPosition: 'top', needsOverlay: false },
-  { id: 'vid-173', label: '💐 Arche florale', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511799/173_tof9lr.mp4', textPosition: 'center-top', needsOverlay: true },
-  { id: 'vid-177', label: '🌻 Tournesols', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511793/177_ahtttq.mp4', textPosition: 'center-top', needsOverlay: true },
-  { id: 'vid-180', label: '💕 Cœurs roses', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511798/180_kafbld.mp4', textPosition: 'top', needsOverlay: true },
-  { id: 'vid-190', label: '🎪 Mandap fleuri', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511806/190_uc4hem.mp4', textPosition: 'center', needsOverlay: true },
-  { id: 'vid-194', label: '🕯️ Nuit & chandeliers', url: 'https://res.cloudinary.com/dau96mui2/video/upload/v1778511813/194_kvvbyk.mp4', textPosition: 'center', needsOverlay: true, dark: true },
+  { id: 'vid-178', label: '🏛️ Palais & fontaine', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1778511799/178_ngv1mw.mp4', textPosition: 'center', needsOverlay: false },
+  { id: 'vid-191', label: '🌙 Nuit étoilée', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1778511807/191_cvtes6.mp4', textPosition: 'center', needsOverlay: false, dark: true },
+  { id: 'vid-176', label: '🦢 Jardin romantique', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1778511791/176_xkqggp.mp4', textPosition: 'center-top', needsOverlay: false },
+  { id: 'vid-189', label: '🌸 Houppa fleurie', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1778511805/189_qyfzpf.mp4', textPosition: 'center-top', needsOverlay: false },
+  { id: 'vid-187', label: '🌿 Jardin escalier', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1778511807/187_utfk2j.mp4', textPosition: 'top', needsOverlay: false },
+  { id: 'vid-173', label: '💐 Arche florale', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1778511799/173_tof9lr.mp4', textPosition: 'center-top', needsOverlay: true },
+  { id: 'vid-177', label: '🌻 Tournesols', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1778511793/177_ahtttq.mp4', textPosition: 'center-top', needsOverlay: true },
+  { id: 'vid-180', label: '💕 Cœurs roses', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1778511798/180_kafbld.mp4', textPosition: 'top', needsOverlay: true },
+  { id: 'vid-190', label: '🎪 Mandap fleuri', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1778511806/190_uc4hem.mp4', textPosition: 'center', needsOverlay: true },
+  { id: 'vid-194', label: '🕯️ Nuit & chandeliers', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1778511813/194_kvvbyk.mp4', textPosition: 'center', needsOverlay: true, dark: true },
 ]
 
 const FRAMES_STRONG_BG = new Set(['frame-80', 'frame-107', 'frame-108'])
@@ -266,23 +266,23 @@ function frameImgStyle(_ft: FrameType | undefined, opacity: number, size: number
 
 const FRAMES: { id: string; label: string; url: string | null; video?: boolean; frameType?: FrameType }[] = [
   // ── Floral corners : fleurs dans les coins, centre vide pour le texte ──
-  { id: 'frame-55', label: '🌸 Bouquet Bleu', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781115458/55_l7xahl.png', frameType: 'floral-corners' },
-  { id: 'frame-69', label: '🌸 Roses Pâles', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781685863/calgznugulyoc8ywwptq.png', frameType: 'floral-corners' },
-  { id: 'frame-70', label: '🌸 Fleurs Sauvages', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781685866/dpatdrrz0bikckoocsd7.png', frameType: 'floral-corners' },
-  { id: 'frame-71', label: '🌸 Pivoine Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781685869/yt7c9cm2gtlwdugh2pbb.png', frameType: 'floral-corners' },
-  { id: 'frame-96', label: '🌸 Bouquet Délicat', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781685872/tufhxphvbr2yk4gfglsu.png', frameType: 'floral-corners' },
-  { id: 'frame-97', label: '🌸 Floral Doux', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781685876/unxr2tthzlwq1ae9br1y.png', frameType: 'floral-corners' },
-  { id: 'frame-147', label: '🌿 Feuillage Vert', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781685883/qnajhywttdhhqrnczvlr.png', frameType: 'floral-corners' },
-  { id: 'frame-154', label: '🌿 Laurier', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1781685885/nhrvz13kb6wht2x7fq5p.png', frameType: 'floral-corners' },
+  { id: 'frame-55', label: '🌸 Bouquet Bleu', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1781115458/55_l7xahl.png', frameType: 'floral-corners' },
+  { id: 'frame-69', label: '🌸 Roses Pâles', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1781685863/calgznugulyoc8ywwptq.png', frameType: 'floral-corners' },
+  { id: 'frame-70', label: '🌸 Fleurs Sauvages', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1781685866/dpatdrrz0bikckoocsd7.png', frameType: 'floral-corners' },
+  { id: 'frame-71', label: '🌸 Pivoine Rose', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1781685869/yt7c9cm2gtlwdugh2pbb.png', frameType: 'floral-corners' },
+  { id: 'frame-96', label: '🌸 Bouquet Délicat', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1781685872/tufhxphvbr2yk4gfglsu.png', frameType: 'floral-corners' },
+  { id: 'frame-97', label: '🌸 Floral Doux', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1781685876/unxr2tthzlwq1ae9br1y.png', frameType: 'floral-corners' },
+  { id: 'frame-147', label: '🌿 Feuillage Vert', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1781685883/qnajhywttdhhqrnczvlr.png', frameType: 'floral-corners' },
+  { id: 'frame-154', label: '🌿 Laurier', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1781685885/nhrvz13kb6wht2x7fq5p.png', frameType: 'floral-corners' },
   // ── Full border : cadre complet autour de toute la section ──
-  { id: 'frame-02', label: '🤍 Roses Crème', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/51_m9vx96.png', frameType: 'full-border' },
-  { id: 'frame-03', label: '🌺 Cadre Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785419/53_ho1gq8.png', frameType: 'full-border' },
-  { id: 'frame-07', label: '🌷 Aquarelle Rose', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776785416/49_ewrr8v.png', frameType: 'full-border' },
-  { id: 'frame-34', label: '🌻 Floral Doré', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776778816/14_bzmmdm.png', frameType: 'full-border' },
+  { id: 'frame-02', label: '🤍 Roses Crème', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1776785419/51_m9vx96.png', frameType: 'full-border' },
+  { id: 'frame-03', label: '🌺 Cadre Rose', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1776785419/53_ho1gq8.png', frameType: 'full-border' },
+  { id: 'frame-07', label: '🌷 Aquarelle Rose', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1776785416/49_ewrr8v.png', frameType: 'full-border' },
+  { id: 'frame-34', label: '🌻 Floral Doré', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1776778816/14_bzmmdm.png', frameType: 'full-border' },
   { id: 'frame-61', label: '🌸 Couronne Florale', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776857014/61_nnkips.png', frameType: 'full-border' },
-  { id: 'frame-75', label: '🌸 Cadre Complet', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878823/75_qc4gsm.png', frameType: 'full-border' },
-  { id: 'frame-78', label: '🌸 Cadre Pêche', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878816/78_umvdax.png', frameType: 'full-border' },
-  { id: 'frame-79', label: '🌸 Cadre Pastel', url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776878824/79_msrbl6.png', frameType: 'full-border' },
+  { id: 'frame-75', label: '🌸 Cadre Complet', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1776878823/75_qc4gsm.png', frameType: 'full-border' },
+  { id: 'frame-78', label: '🌸 Cadre Pêche', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1776878816/78_umvdax.png', frameType: 'full-border' },
+  { id: 'frame-79', label: '🌸 Cadre Pastel', url: 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1776878824/79_msrbl6.png', frameType: 'full-border' },
   // ── Watermark : fond pâle en filigrane ──
   // ── Sans cadre ──
   { id: 'none', label: '⬜ Sans cadre', url: null },
@@ -7298,7 +7298,7 @@ const firstDate = sorted[0]?.date
                         <div style={{ textAlign: 'center', marginBottom: 32, paddingBottom: 24, borderBottom: `1px solid ${G}22` }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: 16 }}>
                             <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
-                            <img src="https://res.cloudinary.com/dau96mui2/image/upload/v1781685771/bnl1dqjjovgay8l4wmlu.png" alt="" style={{ width: 50, height: 50, objectFit: 'contain' }} />
+                            <img src="https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1781685771/bnl1dqjjovgay8l4wmlu.png" alt="" style={{ width: 50, height: 50, objectFit: 'contain' }} />
                             <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
                           </div>
                           {ceremony.penseesDefuntsIntro && (
