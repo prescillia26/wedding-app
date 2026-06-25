@@ -86,13 +86,6 @@ export default function InvitationCover({
 
   // ── Cover vidéo d'ouverture (enveloppe animée Canva/Etsy) ──
   if (customDesignCoverVideoUrl) {
-    const txtColor = videoOverlayTextColor || '#1B2A4A'
-    const bgColor = videoOverlayBgColor || '#F5F0EB'
-    const line1 = videoOverlayText1 || `${p1} & ${p2}`
-    const line2 = videoOverlayText2 || 'ont le plaisir de vous convier'
-    const line3 = videoOverlayText3 || 'à leur mariage'
-    const showBsd = videoOverlayShowBsd !== false
-
     const handleVideoPlay = () => {
       if (phase !== 0) return
       setPhase(1)
@@ -104,25 +97,17 @@ export default function InvitationCover({
 
     const handleVideoEnd = () => {
       setVideoEnded(true)
-      // Phase 2 : écran texte élégant
-      setTimeout(() => setPhase(2), 600)
-    }
-
-    const handleReveal = () => {
-      if (phase !== 2) return
-      setPhase(3)
-      onOpen()
       setTimeout(() => {
-        const el = document.getElementById('ceremony-0')
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }, 100)
+        setPhase(3)
+        onOpen()
+      }, 600)
     }
 
     return (
       <div style={{
         position: 'fixed', inset: 0, zIndex: 300,
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        background: phase >= 2 ? bgColor : '#000',
+        background: videoEnded ? '#F5F0EB' : '#000',
         opacity: phase === 3 ? 0 : 1,
         transition: 'opacity 0.8s ease, background 0.8s ease',
         pointerEvents: phase === 3 ? 'none' : 'auto',
@@ -140,22 +125,6 @@ export default function InvitationCover({
           @keyframes videoFadeOut {
             from { opacity: 1; }
             to { opacity: 0; }
-          }
-          @keyframes overlayTextFadeIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          @keyframes ornamentFadeIn {
-            from { opacity: 0; transform: scaleX(0.3); }
-            to { opacity: 0.5; transform: scaleX(1); }
-          }
-          @keyframes overlayBtnPulse {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 1; }
-          }
-          @keyframes bsdFadeIn {
-            from { opacity: 0; }
-            to { opacity: 0.7; }
           }
         `}</style>
 
@@ -231,98 +200,6 @@ export default function InvitationCover({
           </div>
         )}
 
-        {/* ── Phase 2 : Écran texte élégant après la vidéo ── */}
-        {phase === 2 && (
-          <div style={{
-            position: 'absolute', inset: 0,
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center',
-            padding: '60px 32px',
-            boxSizing: 'border-box',
-          }}>
-            {/* בס״ד */}
-            {showBsd && (
-              <div style={{
-                fontFamily: 'serif', fontSize: 22, color: txtColor, direction: 'rtl',
-                marginBottom: 40, fontWeight: 700,
-                animation: 'bsdFadeIn 1s ease 0.2s both',
-              }}>בס״ד</div>
-            )}
-
-            {/* Ornement haut */}
-            <div style={{
-              width: 180, height: 1, background: `linear-gradient(90deg, transparent, ${txtColor}40, transparent)`,
-              marginBottom: 40,
-              animation: 'ornamentFadeIn 1.2s ease 0.3s both',
-            }} />
-
-            {/* Ligne 1 — Prénoms en calligraphie */}
-            <div style={{
-              fontFamily: GV, fontSize: 'clamp(32px, 9vw, 52px)', color: txtColor,
-              textAlign: 'center', lineHeight: 1.2,
-              animation: 'overlayTextFadeIn 1s ease 0.4s both',
-            }}>
-              {line1}
-            </div>
-
-            {/* Ornement milieu */}
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 16, margin: '28px 0',
-              animation: 'ornamentFadeIn 1.2s ease 0.6s both',
-            }}>
-              <div style={{ width: 50, height: 1, background: `${txtColor}30` }} />
-              <span style={{ fontFamily: CG, fontSize: 20, color: `${txtColor}60`, fontStyle: 'italic' }}>✦</span>
-              <div style={{ width: 50, height: 1, background: `${txtColor}30` }} />
-            </div>
-
-            {/* Ligne 2 — phrase */}
-            <div style={{
-              fontFamily: CG, fontStyle: 'italic', fontSize: 'clamp(15px, 4vw, 20px)',
-              color: txtColor, textAlign: 'center', letterSpacing: 1.5, lineHeight: 1.8,
-              opacity: 0.8,
-              animation: 'overlayTextFadeIn 1s ease 0.7s both',
-            }}>
-              {line2}
-            </div>
-
-            {/* Ligne 3 */}
-            <div style={{
-              fontFamily: CG, fontStyle: 'italic', fontSize: 'clamp(15px, 4vw, 20px)',
-              color: txtColor, textAlign: 'center', letterSpacing: 1.5, lineHeight: 1.8,
-              opacity: 0.8,
-              animation: 'overlayTextFadeIn 1s ease 0.9s both',
-            }}>
-              {line3}
-            </div>
-
-            {/* Ornement bas */}
-            <div style={{
-              width: 180, height: 1, background: `linear-gradient(90deg, transparent, ${txtColor}40, transparent)`,
-              marginTop: 40,
-              animation: 'ornamentFadeIn 1.2s ease 1s both',
-            }} />
-
-            {/* Bouton découvrir */}
-            <button
-              type="button"
-              onClick={handleReveal}
-              style={{
-                fontFamily: PD, fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase',
-                padding: '16px 36px', borderRadius: 0,
-                border: `1.5px solid ${txtColor}`,
-                background: 'transparent', color: txtColor, cursor: 'pointer',
-                marginTop: 48,
-                animation: 'overlayBtnPulse 3s ease infinite, overlayTextFadeIn 1s ease 1.2s both',
-                transition: 'background 0.3s, color 0.3s',
-                touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.background = txtColor; e.currentTarget.style.color = bgColor }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = txtColor }}
-            >
-              Découvrir ✦
-            </button>
-          </div>
-        )}
       </div>
     )
   }
