@@ -1511,10 +1511,9 @@ function PhotoSection({ data, onChange }: { data: FormData; onChange: (d: Partia
       for (const file of toAdd) {
         const fd = new FormData()
         fd.append('file', file)
-        fd.append('upload_preset', 'wedding_music')
-        const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
+        const res = await fetch('/api/upload', { method: 'POST', body: fd })
         const json = await res.json()
-        if (json.secure_url) uploaded.push(json.secure_url)
+        if (json.url) uploaded.push(json.url)
       }
       const newPhotos = [...photos, ...uploaded].slice(0, 5)
       const newData = [...photosData, ...uploaded.map(url => ({ url, cropX: 0, cropY: 0, cropScale: 1, faceCropUrl: undefined }))].slice(0, 5)
@@ -1846,10 +1845,9 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                   try {
                     const fd = new (globalThis.FormData)()
                     fd.append('file', file)
-                    fd.append('upload_preset', 'wedding_music')
-                    const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
+                    const res = await fetch('/api/upload', { method: 'POST', body: fd })
                     const json = await res.json()
-                    if (json.secure_url) update(i, { ceremonyImage: json.secure_url, illustrationUrl: '' })
+                    if (json.url) update(i, { ceremonyImage: json.url, illustrationUrl: '' })
                   } catch { showToast('Erreur upload', 'error') }
                 }} />
               </label>
@@ -2066,10 +2064,9 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
                     try {
                       const fd = new (globalThis.FormData)()
                       fd.append('file', file)
-                      fd.append('upload_preset', 'wedding_music')
-                      const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
+                      const res = await fetch('/api/upload', { method: 'POST', body: fd })
                       const json = await res.json()
-                      if (json.secure_url) newImages.push({ url: json.secure_url })
+                      if (json.url) newImages.push({ url: json.url })
                     } catch { showToast('Erreur upload image', 'error') }
                   }
                   if (newImages.length > 0) {
@@ -2177,17 +2174,16 @@ function CustomLogoUpload({ logoUrl, logoOriginalUrl, logoSize = 100, logoColor 
     if (file.size > 5 * 1024 * 1024) { showToast(t.fairepart.errorFileTooLarge, 'error'); return }
     setUploading(true)
     try {
-      // 1. Upload le fichier brut sur Cloudinary
+      // 1. Upload le fichier sur Vercel Blob
       const fd = new (globalThis.FormData)()
       fd.append('file', file)
-      fd.append('upload_preset', 'wedding_music')
-      const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
+      const res = await fetch('/api/upload', { method: 'POST', body: fd })
       const json = await res.json()
-      if (json.secure_url) {
-        const pngUrl = json.secure_url.replace(/\.\w+$/, '.png')
+      if (json.url) {
+        const uploadedUrl = json.url
         // 2. Stocker l'URL brute pour référence ET pré-générer avec bg removal
-        const pregenUrl = await pregenerateLogo(pngUrl, logoColor)
-        onChange({ customLogoUrl: pregenUrl || pngUrl, customLogoOriginalUrl: pngUrl })
+        const pregenUrl = await pregenerateLogo(uploadedUrl, logoColor)
+        onChange({ customLogoUrl: pregenUrl || uploadedUrl, customLogoOriginalUrl: uploadedUrl })
       }
     } catch { showToast(t.fairepart.errorUploadLogo, 'error') }
     finally { setUploading(false) }
@@ -2300,11 +2296,10 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
   const uploadToCloudinary = async (file: File): Promise<string | null> => {
     const fd = new window.FormData()
     fd.append('file', file)
-    fd.append('upload_preset', 'wedding_music')
     try {
-      const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
+      const res = await fetch('/api/upload', { method: 'POST', body: fd })
       const json = await res.json()
-      return json.secure_url || null
+      return json.url || null
     } catch {
       return null
     }
@@ -4044,11 +4039,10 @@ function MusicUploader({ musicUrl, musicName, onChange }: { musicUrl: string; mu
     try {
       const fd = new FormData()
       fd.append('file', file)
-      fd.append('upload_preset', 'wedding_music')
-      const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
+      const res = await fetch('/api/upload', { method: 'POST', body: fd })
       const json = await res.json()
-      if (json.secure_url) {
-        onChange(json.secure_url, file.name)
+      if (json.url) {
+        onChange(json.url, file.name)
       } else {
         setError(t.fairepart.musicUploadError + " : " + (json.error?.message ?? 'inconnu'))
       }
@@ -6161,10 +6155,9 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
               try {
                 const fd = new (globalThis.FormData)()
                 fd.append('file', file)
-                fd.append('upload_preset', 'wedding_music')
-                const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
+                const res = await fetch('/api/upload', { method: 'POST', body: fd })
                 const json = await res.json()
-                if (json.secure_url) { onChangeUrl(json.secure_url); setShowPicker(false) }
+                if (json.url) { onChangeUrl(json.url); setShowPicker(false) }
               } catch { showToast('Erreur upload', 'error') }
             }} />
           </label>
@@ -6267,10 +6260,9 @@ function IllustrationAdder({ ceremonyType, accent, onSelect }: { ceremonyType: s
             try {
               const fd = new (globalThis.FormData)()
               fd.append('file', file)
-              fd.append('upload_preset', 'wedding_music')
-              const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/upload', { method: 'POST', body: fd })
+              const res = await fetch('/api/upload', { method: 'POST', body: fd })
               const json = await res.json()
-              if (json.secure_url) { onSelect(json.secure_url); setOpen(false) }
+              if (json.url) { onSelect(json.url); setOpen(false) }
             } catch { showToast('Erreur upload', 'error') }
           }} />
         </label>
