@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 const GV = 'var(--font-great-vibes)'
 const PD = 'var(--font-playfair-display)'
@@ -16,6 +16,13 @@ export default function InvitationCover({
   mariageJuif,
   illustrationUrl,
   customDesignCoverUrl,
+  customDesignCoverVideoUrl,
+  videoOverlayText1,
+  videoOverlayText2,
+  videoOverlayText3,
+  videoOverlayShowBsd,
+  videoOverlayTextColor,
+  videoOverlayBgColor,
 }: {
   prenom1: string
   prenom2: string
@@ -29,9 +36,18 @@ export default function InvitationCover({
   mariageJuif?: boolean
   illustrationUrl?: string
   customDesignCoverUrl?: string
+  customDesignCoverVideoUrl?: string
+  videoOverlayText1?: string
+  videoOverlayText2?: string
+  videoOverlayText3?: string
+  videoOverlayShowBsd?: boolean
+  videoOverlayTextColor?: string
+  videoOverlayBgColor?: string
 }) {
   const [phase, setPhase] = useState(0) // 0=idle, 1=opening, 2=revealing, 3=done
   const [sparkles, setSparkles] = useState<{ id: number; x: number; y: number; delay: number; size: number }[]>([])
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [videoEnded, setVideoEnded] = useState(false)
 
   const handleOpen = () => {
     if (phase !== 0) return
@@ -67,6 +83,126 @@ export default function InvitationCover({
 
   const p1 = prenom1 || 'Prénom'
   const p2 = prenom2 || 'Prénom'
+
+  // ── Cover vidéo d'ouverture (enveloppe animée Canva/Etsy) ──
+  if (customDesignCoverVideoUrl) {
+    const handleVideoPlay = () => {
+      if (phase !== 0) return
+      setPhase(1)
+      const vid = videoRef.current
+      if (vid) {
+        vid.play().catch(() => {})
+      }
+    }
+
+    const handleVideoEnd = () => {
+      setVideoEnded(true)
+      setTimeout(() => {
+        setPhase(3)
+        onOpen()
+      }, 600)
+    }
+
+    return (
+      <div style={{
+        position: 'fixed', inset: 0, zIndex: 300,
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        background: videoEnded ? '#F5F0EB' : '#000',
+        opacity: phase === 3 ? 0 : 1,
+        transition: 'opacity 0.8s ease, background 0.8s ease',
+        pointerEvents: phase === 3 ? 'none' : 'auto',
+        overflow: 'hidden',
+      }}>
+        <style>{`
+          @keyframes videoButtonGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255,255,255,0.1), 0 0 60px rgba(255,255,255,0); }
+            50% { box-shadow: 0 0 20px rgba(255,255,255,0.3), 0 0 60px rgba(255,255,255,0.1); }
+          }
+          @keyframes videoButtonAppear {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          @keyframes videoFadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+          }
+        `}</style>
+
+        {/* Vidéo plein écran */}
+        {phase < 2 && (
+          <video
+            ref={videoRef}
+            src={customDesignCoverVideoUrl}
+            playsInline
+            muted
+            preload="auto"
+            onEnded={handleVideoEnd}
+            style={{
+              position: 'absolute', inset: 0,
+              width: '100%', height: '100%', objectFit: 'cover',
+              animation: videoEnded ? 'videoFadeOut 0.6s ease forwards' : undefined,
+            }}
+          />
+        )}
+
+        {/* Bouton "Ouvrir" avant que la vidéo ne démarre */}
+        {phase === 0 && (
+          <div style={{
+            position: 'absolute', bottom: '10%', left: 0, right: 0,
+            display: 'flex', justifyContent: 'center', zIndex: 5,
+            animation: 'videoButtonAppear 1s ease 0.5s both',
+          }}>
+            <button
+              type="button"
+              onClick={handleVideoPlay}
+              style={{
+                fontFamily: PD, fontSize: 12, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase',
+                padding: '16px 40px', borderRadius: 0,
+                border: '1px solid rgba(255,255,255,0.6)',
+                background: 'rgba(255,255,255,0.12)',
+                color: 'white', cursor: 'pointer',
+                backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+                animation: 'videoButtonGlow 3s ease infinite',
+                transition: 'all 0.4s ease',
+                touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.25)'
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.9)'
+                e.currentTarget.style.transform = 'scale(1.05)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.12)'
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'
+                e.currentTarget.style.transform = 'scale(1)'
+              }}
+            >
+              Ouvrir l&apos;enveloppe ✦
+            </button>
+          </div>
+        )}
+
+        {/* Possibilité de skipper en tapant pendant la vidéo */}
+        {phase === 1 && !videoEnded && (
+          <div
+            onClick={handleVideoEnd}
+            style={{
+              position: 'absolute', bottom: '5%', left: 0, right: 0,
+              display: 'flex', justifyContent: 'center', zIndex: 5,
+            }}
+          >
+            <span style={{
+              fontFamily: CG, fontStyle: 'italic', fontSize: 12, color: 'rgba(255,255,255,0.5)',
+              letterSpacing: 1,
+            }}>
+              Tapez pour passer
+            </span>
+          </div>
+        )}
+
+      </div>
+    )
+  }
 
   if (customDesignCoverUrl) {
     return (
