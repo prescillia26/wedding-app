@@ -1,6 +1,5 @@
 import { NextRequest } from 'next/server'
-
-const CLOUD_NAME = 'dau96mui2'
+import { put } from '@vercel/blob'
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,6 +10,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Appliquer le face crop côté serveur (une seule transformation)
+    // (Cloudinary transformation URLs for reading are kept as-is)
     const transformedUrl = photoUrl.replace(
       '/upload/',
       `/upload/w_${width},h_${height},c_fill,g_auto:faces,q_auto,f_auto/`
@@ -21,24 +21,13 @@ export async function POST(request: NextRequest) {
     if (!imgRes.ok) {
       return Response.json({ error: 'Impossible de transformer la photo' }, { status: 500 })
     }
-    const blob = await imgRes.blob()
+    const imageBuffer = await imgRes.arrayBuffer()
 
-    // Re-uploader l'image pré-générée (sans transformation)
-    const fd = new FormData()
-    fd.append('file', blob, 'photo.jpg')
-    fd.append('upload_preset', 'wedding_music')
+    // Re-uploader l'image pré-générée sur Vercel Blob
+    const filename = `photos/photo-${Date.now()}.jpg`
+    const blob = await put(filename, imageBuffer, { access: 'public' })
 
-    const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
-      method: 'POST',
-      body: fd,
-    })
-    const uploadData = await uploadRes.json()
-
-    if (!uploadData.secure_url) {
-      return Response.json({ error: 'Upload échoué' }, { status: 500 })
-    }
-
-    return Response.json({ url: uploadData.secure_url })
+    return Response.json({ url: blob.url })
   } catch {
     return Response.json({ error: 'Erreur serveur' }, { status: 500 })
   }
