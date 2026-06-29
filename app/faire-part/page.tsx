@@ -7759,7 +7759,7 @@ const firstDate = sorted[0]?.date
                         {/* Prénoms sur la même ligne */}
                         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(8px,2vw,14px)', flexWrap: 'wrap', marginBottom: 4, overflow: 'visible' }}>
                           <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(32px,8vw,52px)', color: G, lineHeight: 1.5, whiteSpace: 'nowrap' as const, overflow: 'visible', paddingTop: 8, paddingBottom: 8 }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom}</div>
-                          <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(18px,4vw,28px)', color: data.zoneStyles?.prenoms?.color || G, opacity: 0.5 }}>&</div>
+                          <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: '0.65em', color: data.zoneStyles?.prenoms?.color || G, opacity: 0.55 }}>&</div>
                           <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(32px,8vw,52px)', color: G, lineHeight: 1.5, whiteSpace: 'nowrap' as const, overflow: 'visible', paddingTop: 8, paddingBottom: 8 }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom}</div>
                         </div>
                         {/* Prénoms hébraïques */}
@@ -7814,7 +7814,7 @@ const firstDate = sorted[0]?.date
                           />
                           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(6px,2vw,10px)', marginTop: 4, marginBottom: 4 }}>
                             <InlineEdit value={ov.shabbat_nom1 || ''} defaultValue={data.famille1PereNom || data.marie1Nom || '...'} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, shabbat_nom1: v } })} onStyleChange={(patch) => setInlineStyle('shabbat_nom1', patch)} style={{ ...applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(24px,6vw,38px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles), ...getInlineStyle('shabbat_nom1') }} />
-                            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(14px,3vw,20px)', color: data.zoneStyles?.prenoms?.color || G, opacity: 0.5 }}>&</div>
+                            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: '0.65em', color: data.zoneStyles?.prenoms?.color || G, opacity: 0.55 }}>&</div>
                             <InlineEdit value={ov.shabbat_nom2 || ''} defaultValue={data.famille2PereNom || data.marie2Nom || '...'} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, shabbat_nom2: v } })} onStyleChange={(patch) => setInlineStyle('shabbat_nom2', patch)} style={{ ...applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(24px,6vw,38px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles), ...getInlineStyle('shabbat_nom2') }} />
                           </div>
                           <InlineEdit
@@ -7827,7 +7827,7 @@ const firstDate = sorted[0]?.date
                           />
                           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(6px,2vw,10px)', marginBottom: 8 }}>
                             <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,46px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)}>{data.marie1Prenom || 'Prénom'}</div>
-                            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(16px,4vw,24px)', color: data.zoneStyles?.prenoms?.color || G, opacity: 0.5 }}>&</div>
+                            <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: '0.65em', color: data.zoneStyles?.prenoms?.color || G, opacity: 0.55 }}>&</div>
                             <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,46px)', color: G, lineHeight: 1.3, overflow: 'visible', paddingBottom: 4 }, 'prenoms', data.zoneStyles)}>{data.marie2Prenom || 'Prénom'}</div>
                           </div>
                         </div>
