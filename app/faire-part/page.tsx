@@ -7619,14 +7619,14 @@ const firstDate = sorted[0]?.date
                         <EditableIllustration
                           url={ceremony.illustrationUrl || ceremony.ceremonyImage!}
                           size={ceremony.illustrationSize ?? (ceremony.ceremonyImage && !ceremony.illustrationUrl ? 100 : 80)}
-                          offsetX={0}
-                          offsetY={0}
+                          offsetX={ceremony.illustrationOffsetX ?? 0}
+                          offsetY={ceremony.illustrationOffsetY ?? 0}
                           editable={canEdit}
                           accent={G}
                           ceremonyType={ceremony.type}
                           onChangeSize={(sz) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationSize: sz }; onUpdate?.({ ceremonies: u }) }}
-                          onChangeOffsetX={() => {}}
-                          onChangeOffsetY={() => {}}
+                          onChangeOffsetX={(x) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationOffsetX: x }; onUpdate?.({ ceremonies: u }) }}
+                          onChangeOffsetY={(y) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationOffsetY: y }; onUpdate?.({ ceremonies: u }) }}
                           onChangeUrl={(url) => {
                             const u = [...(data.ceremonies ?? [])]
                             const isFromLibrary = VISUALS.some(v => v.url === url)
