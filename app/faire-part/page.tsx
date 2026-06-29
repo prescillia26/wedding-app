@@ -7186,53 +7186,95 @@ const firstDate = sorted[0]?.date
       )}
 {/* SECTION 1 : Écran d'accueil */}
       {data.premiumCover && (
-      <div style={{
-        position: 'relative', maxWidth: 480, margin: '0 auto',
-        boxShadow: '0 8px 60px rgba(0,0,0,0.15)',
-        backgroundColor: '#F7F3EC',
-        backgroundImage: 'radial-gradient(ellipse at 20% 20%, rgba(201,162,100,0.06) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(27,42,94,0.04) 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, rgba(196,113,74,0.03) 0%, transparent 60%)',
-      }}>
-        <style>{`@keyframes premiumPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}`}</style>
-        {data.mariageJuif && (
-          <div style={{ textAlign: 'center', paddingTop: 16, fontFamily: 'serif', fontSize: 13, color: '#C9A264', direction: 'rtl', fontWeight: 700, letterSpacing: 6, opacity: 0.85 }}>בס״ד</div>
-        )}
-        {(() => {
-          const coupleUrl = data.illustrationCoupleId?.startsWith('http') ? data.illustrationCoupleId : ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url
-          return coupleUrl ? (
-            <div style={{ position: 'relative', width: '100%', minHeight: '65vh', overflow: 'hidden' }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={coupleUrl} alt="" style={{
-                width: '100%', height: '100%', minHeight: '65vh',
-                objectFit: 'cover', objectPosition: 'center 20%', display: 'block',
-                WebkitMaskImage: 'radial-gradient(ellipse 90% 85% at 50% 45%, black 40%, transparent 100%)',
-                maskImage: 'radial-gradient(ellipse 90% 85% at 50% 45%, black 40%, transparent 100%)',
-              }} />
-              <div style={{ position: 'absolute', bottom: '8%', left: 0, right: 0, textAlign: 'center', zIndex: 2 }}>
-                <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px,12vw,72px)', color: '#1B2A5E', lineHeight: 1.1, textShadow: '0 2px 30px rgba(250,247,240,0.8), 0 0 60px rgba(250,247,240,0.5)' }}>
-                  {data.marie1Prenom || 'Prénom'}
-                </div>
-                <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(24px,6vw,36px)', color: '#C9A264', lineHeight: 1, margin: '-4px 0', textShadow: '0 2px 20px rgba(250,247,240,0.6)' }}>{'&'}</div>
-                <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px,12vw,72px)', color: '#1B2A5E', lineHeight: 1.1, textShadow: '0 2px 30px rgba(250,247,240,0.8), 0 0 60px rgba(250,247,240,0.5)' }}>
-                  {data.marie2Prenom || 'Prénom'}
-                </div>
-              </div>
-            </div>
-          ) : null
-        })()}
-        <div style={{ textAlign: 'center', padding: '20px 32px 28px', position: 'relative', zIndex: 1 }}>
-          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: '#6B5A42', letterSpacing: '0.12em', lineHeight: 1.7, marginBottom: 20 }}>
-            {data.textOverrides?.['global_pleaseJoin'] !== '__hidden__' && (data.textOverrides?.['global_pleaseJoin'] || 'ont le plaisir de vous convier à leur mariage')}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 20 }}>
-            <div style={{ width: 60, height: 1, background: 'linear-gradient(90deg, transparent, #C9A264)' }} />
-            <span style={{ color: '#C9A264', fontSize: 8 }}>◆</span>
-            <div style={{ width: 60, height: 1, background: 'linear-gradient(90deg, #C9A264, transparent)' }} />
-          </div>
-          <button type="button" onClick={() => { const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null; if (audio) audio.play().catch(() => {}); const el = document.getElementById('first-content'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} onTouchEnd={(e) => { e.preventDefault(); const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null; if (audio) audio.play().catch(() => {}); const el = document.getElementById('first-content'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 11, fontWeight: 500, letterSpacing: '0.3em', textTransform: 'uppercase', padding: '16px 48px', borderRadius: 0, minWidth: 200, border: '1px solid #C9A264', background: 'transparent', color: '#1B2A5E', cursor: 'pointer', transition: 'all 0.4s ease', animation: 'premiumPulse 2.5s ease-in-out infinite', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}>
-            DÉCOUVRIR ◆
-          </button>
-        </div>
+<div style={{
+  position: 'relative', maxWidth: 480, margin: '0 auto',
+  boxShadow: '0 8px 60px rgba(0,0,0,0.15)',
+  backgroundColor: '#F7F3EC',
+  backgroundImage: 'radial-gradient(ellipse at 20% 20%, rgba(201,162,100,0.06) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(27,42,94,0.04) 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, rgba(196,113,74,0.03) 0%, transparent 60%)',
+}}>
+  <style>{`@keyframes premiumPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}`}</style>
+  {/* Ornement branches d'olivier */}
+  <div style={{ textAlign: 'center', paddingTop: 20 }}>
+    <svg width="160" height="30" viewBox="0 0 160 30" style={{ display: 'inline-block' }}>
+      <path d="M80 28 Q80 15 80 5" stroke="#C9A264" strokeWidth="0.8" fill="none"/>
+      <path d="M80 22 Q65 18 55 12" stroke="#C9A264" strokeWidth="0.8" fill="none"/>
+      <ellipse cx="52" cy="11" rx="7" ry="3" fill="#C9A264" opacity="0.5" transform="rotate(-30 52 11)"/>
+      <path d="M80 17 Q68 12 60 8" stroke="#C9A264" strokeWidth="0.8" fill="none"/>
+      <ellipse cx="57" cy="7" rx="6" ry="2.5" fill="#C9A264" opacity="0.4" transform="rotate(-25 57 7)"/>
+      <path d="M80 22 Q95 18 105 12" stroke="#C9A264" strokeWidth="0.8" fill="none"/>
+      <ellipse cx="108" cy="11" rx="7" ry="3" fill="#C9A264" opacity="0.5" transform="rotate(30 108 11)"/>
+      <path d="M80 17 Q92 12 100 8" stroke="#C9A264" strokeWidth="0.8" fill="none"/>
+      <ellipse cx="103" cy="7" rx="6" ry="2.5" fill="#C9A264" opacity="0.4" transform="rotate(25 103 7)"/>
+    </svg>
+  </div>
+  {/* בס״ד */}
+  {data.mariageJuif && (
+    <div style={{ textAlign: 'center', paddingTop: 4, fontFamily: 'serif', fontSize: 13, color: '#C9A264', direction: 'rtl', fontWeight: 700, letterSpacing: 6, opacity: 0.85 }}>בס״ד</div>
+  )}
+  {/* Prénoms — AU-DESSUS de l'illustration */}
+  <div style={{ textAlign: 'center', padding: '20px 24px 0' }}>
+    <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px,13vw,64px)', color: '#1B2A5E', letterSpacing: 2, lineHeight: 1.1 }}>
+      {data.marie1Prenom || 'Prénom'}
+    </div>
+    <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(24px,6vw,32px)', color: '#C9A264', letterSpacing: 8, lineHeight: 1, margin: '-8px 0', display: 'block' }}>
+      {'&'}
+    </div>
+    <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px,13vw,64px)', color: '#1B2A5E', letterSpacing: 2, lineHeight: 1.1 }}>
+      {data.marie2Prenom || 'Prénom'}
+    </div>
+  </div>
+  {/* "ont le plaisir..." */}
+  <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#6B5A42', letterSpacing: 3, textAlign: 'center', marginTop: 12, padding: '0 24px' }}>
+    {data.textOverrides?.['global_pleaseJoin'] !== '__hidden__' && (data.textOverrides?.['global_pleaseJoin'] || 'ont le plaisir de vous convier à leur mariage')}
+  </div>
+  {/* Séparateur or ——— ◆ ——— */}
+  <div style={{ textAlign: 'center', margin: '16px 0' }}>
+    <svg width="200" height="20" viewBox="0 0 200 20" style={{ display: 'inline-block' }}>
+      <line x1="0" y1="10" x2="85" y2="10" stroke="#C9A264" strokeWidth="0.5"/>
+      <polygon points="100,5 105,10 100,15 95,10" fill="#C9A264"/>
+      <line x1="115" y1="10" x2="200" y2="10" stroke="#C9A264" strokeWidth="0.5"/>
+    </svg>
+  </div>
+  {/* Illustration aquarelle plein écran avec masque fondu */}
+  {(() => {
+    const coupleUrl = data.illustrationCoupleId?.startsWith('http') ? data.illustrationCoupleId : ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url
+    return coupleUrl ? (
+      <div style={{ position: 'relative', width: '100%', minHeight: '55vh', overflow: 'hidden' }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={coupleUrl} alt="" style={{
+          width: '100%', height: '100%', minHeight: '55vh',
+          objectFit: 'cover', objectPosition: 'center 20%', display: 'block',
+          WebkitMaskImage: 'radial-gradient(ellipse 90% 85% at 50% 45%, black 40%, transparent 100%)',
+          maskImage: 'radial-gradient(ellipse 90% 85% at 50% 45%, black 40%, transparent 100%)',
+        } as React.CSSProperties} />
       </div>
+    ) : null
+  })()}
+  {/* Séparateur or ——— ◆ ——— */}
+  <div style={{ textAlign: 'center', margin: '16px 0' }}>
+    <svg width="200" height="20" viewBox="0 0 200 20" style={{ display: 'inline-block' }}>
+      <line x1="0" y1="10" x2="85" y2="10" stroke="#C9A264" strokeWidth="0.5"/>
+      <polygon points="100,5 105,10 100,15 95,10" fill="#C9A264"/>
+      <line x1="115" y1="10" x2="200" y2="10" stroke="#C9A264" strokeWidth="0.5"/>
+    </svg>
+  </div>
+  {/* Bouton DÉCOUVRIR */}
+  <div style={{ textAlign: 'center', paddingBottom: 8 }}>
+    <button type="button" onClick={() => { const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null; if (audio) audio.play().catch(() => {}); const el = document.getElementById('first-content'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} onTouchEnd={(e) => { e.preventDefault(); const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null; if (audio) audio.play().catch(() => {}); const el = document.getElementById('first-content'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} style={{ fontFamily: 'var(--font-tenor-sans)', fontSize: 11, fontWeight: 500, letterSpacing: '0.35em', textTransform: 'uppercase' as const, padding: '16px 52px', borderRadius: 0, minWidth: 200, border: '0.5px solid #C9A264', background: 'transparent', color: '#1B2A5E', cursor: 'pointer', transition: 'all 0.3s ease', animation: 'premiumPulse 2.5s ease-in-out infinite', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}>
+      DÉCOUVRIR ◆
+    </button>
+  </div>
+  {/* Ligne de dates */}
+  <div style={{ fontFamily: 'var(--font-tenor-sans)', fontWeight: 300, fontSize: 9, letterSpacing: 2, color: '#C9A264', textAlign: 'center', padding: '0 16px 24px' }}>
+    {(data.ceremonies || []).map((c: { date?: string; lieu?: string }, idx: number) => {
+      if (!c.date) return null
+      const d = new Date(c.date + 'T12:00:00')
+      const formatted = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`
+      const lieu = c.lieu || ''
+      return (idx > 0 ? '   ·   ' : '') + formatted + (lieu ? ' · ' + lieu : '')
+    }).filter(Boolean).join('')}
+  </div>
+</div>
       )}
       <div style={{ position: 'relative', minHeight: data.accueilCompact ? 'auto' : '100svh', display: data.premiumCover ? 'none' : 'flex', flexDirection: 'column', alignItems: 'center',
         justifyContent: data.accueilCompact ? 'flex-start' : 'center', gap: 0,
