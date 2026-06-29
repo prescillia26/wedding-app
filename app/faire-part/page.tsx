@@ -5444,7 +5444,7 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
         backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
         borderBottom: `1px solid ${accent}22`,
         padding: '6px 14px', boxSizing: 'border-box',
-        height: 48,
+        height: 48, overflow: 'hidden',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       } as React.CSSProperties}>
         {/* Logo — taille ajustable */}
