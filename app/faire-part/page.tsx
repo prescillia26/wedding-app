@@ -7360,7 +7360,39 @@ const firstDate = sorted[0]?.date
                   <span style={{ fontFamily: FP, fontSize: 10, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', color: G, opacity: 0.5 }}>— PAGE {pageNum} : {ceremonyLabel.toUpperCase()} —</span>
                 </div>
               )}
-              {/* Illustration aquarelle — image décorative entre les sections */}
+              {/* Illustration aquarelle — posée directement sur le fond du faire-part, hors carte */}
+              {(ceremony.illustrationUrl || ceremony.ceremonyImage) && (() => {
+                const canEditIllu = role !== 'guest' && !!onUpdate
+                return (
+                  <AnimSection animStyle={anim} delay={200} skipAnim={canEditIllu}>
+                    <EditableIllustration
+                      url={ceremony.illustrationUrl || ceremony.ceremonyImage!}
+                      size={ceremony.illustrationSize ?? (ceremony.ceremonyImage && !ceremony.illustrationUrl ? 100 : 80)}
+                      offsetX={ceremony.illustrationOffsetX ?? 0}
+                      offsetY={ceremony.illustrationOffsetY ?? 0}
+                      editable={canEditIllu}
+                      accent={G}
+                      ceremonyType={ceremony.type}
+                      onChangeSize={(sz) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationSize: sz }; onUpdate?.({ ceremonies: u }) }}
+                      onChangeOffsetX={(x) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationOffsetX: x }; onUpdate?.({ ceremonies: u }) }}
+                      onChangeOffsetY={(y) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationOffsetY: y }; onUpdate?.({ ceremonies: u }) }}
+                      onChangeUrl={(url) => {
+                        const u = [...(data.ceremonies ?? [])]
+                        const isFromLibrary = VISUALS.some(v => v.url === url)
+                        if (isFromLibrary) {
+                          u[safeIdx] = { ...u[safeIdx], illustrationUrl: url, ceremonyImage: '' }
+                        } else {
+                          u[safeIdx] = { ...u[safeIdx], ceremonyImage: url, illustrationUrl: '' }
+                        }
+                        onUpdate?.({ ceremonies: u })
+                      }}
+                      onRemove={() => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationUrl: '', ceremonyImage: '', illustrationSize: 80, illustrationOffsetX: 0, illustrationOffsetY: 0 }; onUpdate?.({ ceremonies: u }) }}
+                      darkBg={!!theme.dark}
+                      isPhoto={!!ceremony.ceremonyImage && !ceremony.illustrationUrl}
+                    />
+                  </AnimSection>
+                )
+              })()}
               <CeremonyCard isCard={isCard} accent={G} hasFrame={hasFrame}>
                 {i === 0 && !(data.customPages ?? []).some(p => p.position === safeIdx) && <div id="first-content" style={{ scrollMarginTop: 60 }} />}
                 <section id={`ceremony-${safeIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : 48, paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : 48, paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: hasFrame ? 'hidden' : 'visible', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: theme.fond } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
@@ -7404,34 +7436,8 @@ const firstDate = sorted[0]?.date
                         style={{ ...applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: (ceremony.illustrationUrl || ceremony.ceremonyImage) ? 10 : 24, lineHeight: 1.4 }, 'titres', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_titre`) }}
                       />
                     </AnimSection></DraggableElement>
-                    {/* Illustration aquarelle — après le titre, déplaçable par les mariés */}
-                    {(ceremony.illustrationUrl || ceremony.ceremonyImage) ? (
-                      <AnimSection animStyle={anim} delay={200} skipAnim={canEdit}><EditableIllustration
-                        url={ceremony.illustrationUrl || ceremony.ceremonyImage!}
-                        size={ceremony.illustrationSize ?? (ceremony.ceremonyImage && !ceremony.illustrationUrl ? 100 : 80)}
-                        offsetX={ceremony.illustrationOffsetX ?? 0}
-                        offsetY={ceremony.illustrationOffsetY ?? 0}
-                        editable={canEdit}
-                        accent={G}
-                        ceremonyType={ceremony.type}
-                        onChangeSize={(sz) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationSize: sz }; onUpdate?.({ ceremonies: u }) }}
-                        onChangeOffsetX={(x) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationOffsetX: x }; onUpdate?.({ ceremonies: u }) }}
-                        onChangeOffsetY={(y) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationOffsetY: y }; onUpdate?.({ ceremonies: u }) }}
-                        onChangeUrl={(url) => {
-                          const u = [...(data.ceremonies ?? [])]
-                          const isFromLibrary = VISUALS.some(v => v.url === url)
-                          if (isFromLibrary) {
-                            u[safeIdx] = { ...u[safeIdx], illustrationUrl: url, ceremonyImage: '' }
-                          } else {
-                            u[safeIdx] = { ...u[safeIdx], ceremonyImage: url, illustrationUrl: '' }
-                          }
-                          onUpdate?.({ ceremonies: u })
-                        }}
-                        onRemove={() => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationUrl: '', ceremonyImage: '', illustrationSize: 80, illustrationOffsetX: 0, illustrationOffsetY: 0 }; onUpdate?.({ ceremonies: u }) }}
-                        darkBg={!!theme.dark}
-                        isPhoto={!!ceremony.ceremonyImage && !ceremony.illustrationUrl}
-                      /></AnimSection>
-                    ) : (!hasFrame && canEdit) ? (
+                    {/* Illustration placeholder — illustration is now rendered OUTSIDE the card */}
+                    {!(ceremony.illustrationUrl || ceremony.ceremonyImage) && (!hasFrame && canEdit) ? (
                       <IllustrationAdder ceremonyType={ceremony.type} accent={G} onSelect={(url) => {
                         const u = [...(data.ceremonies ?? [])]
                         // Si c'est une URL Cloudinary d'un upload custom (pas dans notre bibliothèque), stocker comme ceremonyImage (photo)
