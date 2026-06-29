@@ -5443,7 +5443,8 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
         background: theme.dark ? 'rgba(20,20,20,0.95)' : 'rgba(255,255,255,0.95)',
         backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
         borderBottom: `1px solid ${accent}22`,
-        padding: '10px 14px', boxSizing: 'border-box',
+        padding: '6px 14px', boxSizing: 'border-box',
+        height: 48,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       } as React.CSSProperties}>
         {/* Logo — taille ajustable */}
@@ -7158,7 +7159,7 @@ const firstDate = sorted[0]?.date
   return (
     <div style={{ backgroundColor: theme.fond, minHeight: '100vh', overflowX: 'hidden' }}>
       {data.petalsEnabled && <PersistentParticles theme={theme} style={data.style} />}
-      <div style={{ backgroundColor: theme.fond, color: TEXT, minHeight: '100vh', maxWidth: 480, margin: '0 auto', boxShadow: '0 0 40px rgba(0,0,0,0.08)', paddingTop: 54, overflowX: 'hidden' }}>
+      <div style={{ backgroundColor: theme.fond, color: TEXT, minHeight: '100vh', maxWidth: 480, margin: '0 auto', boxShadow: '0 0 40px rgba(0,0,0,0.08)', paddingTop: 48, overflowX: 'hidden' }}>
       <StickyHeader
         ceremonies={sorted}
         accent={G}
