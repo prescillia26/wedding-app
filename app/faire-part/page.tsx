@@ -7751,7 +7751,7 @@ const firstDate = sorted[0]?.date
                         />
                       </AnimSection></DraggableElement>
                     )}
-                    {(ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Mairie') && (
+                    {!data.premiumCeremonyStyle && (ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Mairie') && (
                       <DraggableElement id={pre+"prenoms"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={250} skipAnim={canEdit}>
                         {/* Prénoms sur la même ligne */}
                         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 'clamp(8px,2vw,14px)', flexWrap: 'wrap', marginBottom: 4, overflow: 'visible' }}>
@@ -7776,6 +7776,7 @@ const firstDate = sorted[0]?.date
                         )}
                       </AnimSection></DraggableElement>
                     )}
+                    {!data.premiumCeremonyStyle && (
                     <DraggableElement id={pre+"narratif"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={280} skipAnim={canEdit}>
                       {ceremony.type === 'Mairie' ? (
                         <>
@@ -7863,6 +7864,7 @@ const firstDate = sorted[0]?.date
                         </div>
                       )}
                     </AnimSection></DraggableElement>
+                    )}
                     <div style={{ height: data.premiumCeremonyStyle ? 4 : 20 }} />
                     {/* Date + lieu : masqués si Shabbat Hatan avec multiJours (les moments ont leur propre date/lieu) */}
                     {!(ceremony.type === 'Shabbat Hatan' && ceremony.multiJours && ceremony.multiJours.length > 0) && (<>
