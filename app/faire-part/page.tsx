@@ -2839,7 +2839,7 @@ function CardFrameWrapper({ frameId, ornamentId, themeCardBg, frameOpacity = 1, 
   const isVideo = frame.video
   const ornUrl = hasFrame ? '' : (ORNEMENTS_LIBRARY.find(o => o.id === ornamentId)?.url ?? '')
   return (
-    <div style={{ position: 'relative', width: '100%', margin: 0, padding: 0, background: hasFrame ? '#ffffff' : themeCardBg, overflow: 'hidden' }}>
+    <div style={{ position: 'relative', width: '100%', margin: 0, padding: 0, background: hasFrame ? '#ffffff' : themeCardBg, overflow: hasFrame ? 'hidden' : 'visible' }}>
       {hasFrame && !isVideo && (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={frame.url!} alt="" style={{ ...frameImgStyle(frame.frameType, frameOpacity, frameSize), zIndex: 1 } as React.CSSProperties} />
