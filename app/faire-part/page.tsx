@@ -7414,7 +7414,7 @@ const firstDate = sorted[0]?.date
             )
           })()}
           <DraggableElement id="names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <div style={{ fontFamily: FS, fontSize: 'clamp(28px,7vw,42px)', color: introTextColor, marginBottom: 8, lineHeight: 1.15, textAlign: 'center', textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : (goldShadow || readableShadow(theme)) }}>
+          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,42px)', color: introTextColor, marginBottom: 8, lineHeight: 1.15, textAlign: 'center', textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : (goldShadow || readableShadow(theme)) }, 'prenoms', data.zoneStyles)}>
             {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
           </div>
           </DraggableElement>
@@ -7427,7 +7427,7 @@ const firstDate = sorted[0]?.date
             editable={canEdit}
             onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, global_pleaseJoin: v } })}
             onStyleChange={(patch) => setInlineStyle('global_pleaseJoin', patch)}
-            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: data.phraseColor || introTextColor, marginBottom: 0, textAlign: 'center', lineHeight: 1.6, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : (goldShadow || readableShadow(theme)), ...getInlineStyle('global_pleaseJoin') }}
+            style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: data.phraseColor || introTextColor, marginBottom: 0, textAlign: 'center', lineHeight: 1.6, textShadow: hasIntroPhoto ? '0 1px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2)' : (goldShadow || readableShadow(theme)) }, 'narratif', data.zoneStyles), ...getInlineStyle('global_pleaseJoin') }}
           />
           </DraggableElement>
           {canEdit && (
@@ -7788,10 +7788,10 @@ const firstDate = sorted[0]?.date
                             editable={canEdit}
                             onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_sediront`]: v } })}
                             onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_sediront`, patch)}
-                            style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78, ...getInlineStyle(`ceremony_${safeIdx}_sediront`) }}
+                            style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78 }, 'narratif', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_sediront`) }}
                           />
-                          <div style={{ fontFamily: FS, fontSize: 'clamp(48px,12vw,80px)', color: G, textAlign: 'center', lineHeight: 1, marginBottom: 12 }}>{t.fairepart.cardOui}</div>
-                          <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', opacity: 0.7, marginBottom: 16 }}>le</div>
+                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(48px,12vw,80px)', color: G, textAlign: 'center', lineHeight: 1, marginBottom: 12 }, 'prenoms', data.zoneStyles)}>{t.fairepart.cardOui}</div>
+                          <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', opacity: 0.7, marginBottom: 16 }, 'narratif', data.zoneStyles)}>le</div>
                         </>
                       ) : ceremony.type === 'Cérémonie religieuse / Houppa' ? (
                         <InlineEdit
@@ -7882,14 +7882,14 @@ const firstDate = sorted[0]?.date
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: data.premiumCeremonyStyle ? '8px 0 4px' : '24px 0 8px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
                               <div style={{ width: 80, textAlign: 'right' }}>
-                                <div style={{ fontFamily: FP, borderBottom: `1px solid ${G}44`, paddingBottom: 4, letterSpacing: 4, fontSize: 10, fontWeight: 600, color: G, display: 'inline-block', textTransform: 'uppercase' }}>{jourSemaine}</div>
+                                <div style={applyZoneStyle({ fontFamily: FP, borderBottom: `1px solid ${G}44`, paddingBottom: 4, letterSpacing: 4, fontSize: 10, fontWeight: 600, color: G, display: 'inline-block', textTransform: 'uppercase' }, 'dateHeure', data.zoneStyles)}>{jourSemaine}</div>
                               </div>
-                              <div style={{ border: `1.5px solid ${G}`, borderRadius: 4, padding: '10px 18px', fontSize: 40, fontFamily: FP, color: G, fontWeight: 700, minWidth: 64, textAlign: 'center', lineHeight: 1 }}>{jour}</div>
+                              <div style={applyZoneStyle({ border: `1.5px solid ${G}`, borderRadius: 4, padding: '10px 18px', fontSize: 40, fontFamily: FP, color: G, fontWeight: 700, minWidth: 64, textAlign: 'center', lineHeight: 1 }, 'dateHeure', data.zoneStyles)}>{jour}</div>
                               <div style={{ width: 80, textAlign: 'left' }}>
-                                <div style={{ fontFamily: FP, borderBottom: `1px solid ${G}44`, paddingBottom: 4, letterSpacing: 4, fontSize: 10, fontWeight: 600, color: G, display: 'inline-block', textTransform: 'uppercase' }}>{mois}</div>
+                                <div style={applyZoneStyle({ fontFamily: FP, borderBottom: `1px solid ${G}44`, paddingBottom: 4, letterSpacing: 4, fontSize: 10, fontWeight: 600, color: G, display: 'inline-block', textTransform: 'uppercase' }, 'dateHeure', data.zoneStyles)}>{mois}</div>
                               </div>
                             </div>
-                            <div style={{ fontFamily: FC, fontSize: 12, color: TEXT, letterSpacing: 3, marginTop: 8, opacity: 0.7 }}>{annee}</div>
+                            <div style={applyZoneStyle({ fontFamily: FC, fontSize: 12, color: TEXT, letterSpacing: 3, marginTop: 8, opacity: 0.7 }, 'dateHeure', data.zoneStyles)}>{annee}</div>
                           </div>
                           {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 15, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 8, opacity: 0.8 }}>{hebrewDate}</div>}
                           {ceremony.heure && <div style={applyZoneStyle({ fontFamily: FP, fontSize: 20, fontWeight: 600, color: G, textAlign: 'center', marginBottom: 24, letterSpacing: 3, lineHeight: 1.2 }, 'dateHeure', data.zoneStyles)}>{formatHeure(ceremony.heure, locale)}</div>}
