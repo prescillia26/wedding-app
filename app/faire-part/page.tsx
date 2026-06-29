@@ -816,11 +816,13 @@ function renderInvitationPhrase(
     lineHeight: 1.15,
   }, 'prenoms', data.zoneStyles)
 
-  // Style du "&" — même traitement que la page d'accueil
+  // Style du "&" — Cormorant Garamond italic, identique à la page d'accueil (InvitationCover)
   const ampStyle: React.CSSProperties = {
-    fontFamily: 'var(--font-great-vibes)',
-    fontSize: '0.65em',
-    opacity: 0.55,
+    fontFamily: 'var(--font-cormorant-garamond)',
+    fontStyle: 'italic',
+    fontSize: '0.45em',
+    opacity: 0.5,
+    margin: '0 8px',
   }
 
   // Noms de famille (Shabbat Hatan) gardent le style Playfair uppercase
