@@ -7215,49 +7215,37 @@ const firstDate = sorted[0]?.date
     <div style={{ width: '100%', minHeight: '85vh', backgroundColor: '#F7F3EC', backgroundImage: 'radial-gradient(ellipse at 20% 20%, rgba(201,162,100,0.06) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(27,42,94,0.04) 0%, transparent 50%)' }} />
   )}
   {/* Overlay — tout le texte par-dessus l'illustration */}
-  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '16px 24px 24px', zIndex: 2 }}>
-    {/* Ornement branches d'olivier */}
-    <svg width="160" height="30" viewBox="0 0 160 30" style={{ display: 'inline-block', marginBottom: 4, flexShrink: 0 }}>
-      <path d="M80 28 Q80 15 80 5" stroke="#C9A264" strokeWidth="0.8" fill="none"/>
-      <path d="M80 22 Q65 18 55 12" stroke="#C9A264" strokeWidth="0.8" fill="none"/>
-      <ellipse cx="52" cy="11" rx="7" ry="3" fill="#C9A264" opacity="0.5" transform="rotate(-30 52 11)"/>
-      <path d="M80 17 Q68 12 60 8" stroke="#C9A264" strokeWidth="0.8" fill="none"/>
-      <ellipse cx="57" cy="7" rx="6" ry="2.5" fill="#C9A264" opacity="0.4" transform="rotate(-25 57 7)"/>
-      <path d="M80 22 Q95 18 105 12" stroke="#C9A264" strokeWidth="0.8" fill="none"/>
-      <ellipse cx="108" cy="11" rx="7" ry="3" fill="#C9A264" opacity="0.5" transform="rotate(30 108 11)"/>
-      <path d="M80 17 Q92 12 100 8" stroke="#C9A264" strokeWidth="0.8" fill="none"/>
-      <ellipse cx="103" cy="7" rx="6" ry="2.5" fill="#C9A264" opacity="0.4" transform="rotate(25 103 7)"/>
-    </svg>
+  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '12px 24px 24px', zIndex: 2, gap: 4, pointerEvents: 'none' }}>
     {/* בס״ד — draggable */}
     {data.mariageJuif && (
-      <DraggableElement id="pc_bsd" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-        <div style={{ fontFamily: 'serif', fontSize: 13, color: '#C9A264', direction: 'rtl', fontWeight: 700, letterSpacing: 6, opacity: 0.85 }}>בס״ד</div>
-      </DraggableElement>
+      <div style={{ position: 'relative', zIndex: 10, pointerEvents: 'auto' }}>
+        <DraggableElement id="pc_bsd" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
+          <div style={{ fontFamily: 'serif', fontSize: 13, color: '#C9A264', direction: 'rtl', fontWeight: 700, letterSpacing: 6, opacity: 0.85 }}>בס״ד</div>
+        </DraggableElement>
+      </div>
     )}
     {/* Prénoms — draggable */}
-    <DraggableElement id="pc_names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-      <div style={{ textAlign: 'center', marginTop: 8 }}>
-        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px,13vw,64px)', color: '#1B2A5E', letterSpacing: 2, lineHeight: 1.1, textShadow: '0 2px 20px rgba(247,243,236,0.8)' }}>
-          {data.marie1Prenom || 'Prénom'}
+    <div style={{ position: 'relative', zIndex: 10, pointerEvents: 'auto' }}>
+      <DraggableElement id="pc_names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
+        <div style={{ textAlign: 'center', marginTop: 12 }}>
+          <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(36px,9vw,52px)', color: '#1B2A5E', letterSpacing: 1, lineHeight: 1.2, textShadow: '0 2px 20px rgba(247,243,236,0.9), 0 0 40px rgba(247,243,236,0.6)' }}>
+            {data.marie1Prenom || 'Prénom'} <span style={{ color: '#C9A264', fontSize: '0.7em' }}>{'&'}</span> {data.marie2Prenom || 'Prénom'}
+          </div>
         </div>
-        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(24px,6vw,32px)', color: '#C9A264', letterSpacing: 8, lineHeight: 1, margin: '-8px 0' }}>
-          {'&'}
-        </div>
-        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px,13vw,64px)', color: '#1B2A5E', letterSpacing: 2, lineHeight: 1.1, textShadow: '0 2px 20px rgba(247,243,236,0.8)' }}>
-          {data.marie2Prenom || 'Prénom'}
-        </div>
-      </div>
-    </DraggableElement>
+      </DraggableElement>
+    </div>
     {/* "ont le plaisir..." — draggable */}
-    <DraggableElement id="pc_phrase" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-      <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#6B5A42', letterSpacing: 3, textAlign: 'center', marginTop: 8, textShadow: '0 1px 10px rgba(247,243,236,0.6)' }}>
-        {data.textOverrides?.['global_pleaseJoin'] !== '__hidden__' && (data.textOverrides?.['global_pleaseJoin'] || 'ont le plaisir de vous convier à leur mariage')}
-      </div>
-    </DraggableElement>
+    <div style={{ position: 'relative', zIndex: 10, pointerEvents: 'auto' }}>
+      <DraggableElement id="pc_phrase" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#6B5A42', letterSpacing: 3, textAlign: 'center', marginTop: 8, textShadow: '0 1px 10px rgba(247,243,236,0.6)' }}>
+          {data.textOverrides?.['global_pleaseJoin'] !== '__hidden__' && (data.textOverrides?.['global_pleaseJoin'] || 'ont le plaisir de vous convier à leur mariage')}
+        </div>
+      </DraggableElement>
+    </div>
     {/* Spacer pour pousser le bouton vers le bas */}
     <div style={{ flex: 1 }} />
     {/* Séparateur or + bouton DÉCOUVRIR — en bas */}
-    <div style={{ textAlign: 'center', flexShrink: 0 }}>
+    <div style={{ textAlign: 'center', flexShrink: 0, pointerEvents: 'auto', position: 'relative', zIndex: 10 }}>
       <svg width="200" height="20" viewBox="0 0 200 20" style={{ display: 'inline-block', marginBottom: 12 }}>
         <line x1="0" y1="10" x2="85" y2="10" stroke="#C9A264" strokeWidth="0.5"/>
         <polygon points="100,5 105,10 100,15 95,10" fill="#C9A264"/>
