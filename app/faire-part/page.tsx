@@ -6283,14 +6283,15 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
       <img
         src={url} alt="" draggable={false}
         style={{
-          width: `${w}%`,
-          maxWidth: '100%',
-          objectFit: 'contain', display: 'inline-block',
-          borderRadius: 0,
-          verticalAlign: 'middle',
-          cursor: 'default',
-          transition: 'width 0.2s',
-          userSelect: 'none', margin: '0 auto', padding: 0,
+          width: isPhoto ? '100%' : `${w}%`, maxHeight: isPhoto ? 280 : undefined,
+          objectFit: isPhoto ? 'cover' : 'contain', display: 'inline-block',
+          borderRadius: isPhoto ? 10 : 0,
+          boxShadow: isPhoto ? '0 4px 20px rgba(0,0,0,0.12)' : 'none',
+          mixBlendMode: isPhoto ? undefined : (darkBg ? undefined : 'multiply'), verticalAlign: 'middle',
+          transform: `translate(${cx}px, ${cy}px)`,
+          cursor: editable ? (draggingRef.current ? 'grabbing' : 'grab') : 'default',
+          transition: draggingRef.current ? 'none' : 'width 0.2s',
+          userSelect: 'none', margin: 0, padding: 0,
         }}
       />
       {editable && !showPicker && (
