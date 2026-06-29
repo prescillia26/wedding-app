@@ -779,139 +779,80 @@ function getHebrewDate(dateStr: string): string {
 
 // ── Phrase d'invitation par défaut, mise en page élégante ─────────────────────
 // Retourne un JSX avec la structure : intro + NOMS en valeur + suite
-function renderInvitationPhrase(
+// Retourne les parties séparées de la phrase d'invitation :
+// before (texte narratif avant les prénoms), names (prénoms stylisés), after (texte narratif après)
+function getInvitationParts(
   ceremony: Ceremony,
   data: FormData,
-  accent: string,
-  textColor: string,
   dict?: import('@/lib/i18n/types').FairepartDict
-): React.ReactNode {
+): { before: React.ReactNode; names: 'couple' | React.ReactNode; after: React.ReactNode; familyLine?: React.ReactNode } | null {
   const p1 = data.marie1Prenom || 'Prénom'
   const p2 = data.marie2Prenom || 'Prénom'
   const nom1 = data.famille1PereNom || data.marie1Nom || ''
   const nom2 = data.famille2PereNom || data.marie2Nom || ''
 
-  const FC = 'var(--font-cormorant-garamond)'
-  const FS = 'var(--font-great-vibes)'
-
-  // Style des lignes "intro" et "fin de phrase" — respecte la zone 'narratif'
-  const introStyle: React.CSSProperties = applyZoneStyle({
-    fontFamily: FC,
-    fontStyle: 'italic',
-    fontSize: 16,
-    color: textColor,
-    textAlign: 'center',
-    lineHeight: 1.7,
-    opacity: 0.85,
-    margin: '0 0 10px',
-  }, 'narratif', data.zoneStyles)
-
-  // Style des PRÉNOMS — calligraphique, cohérent avec l'accueil et les cérémonies Mairie/Houppa
-  const nameStyle: React.CSSProperties = applyZoneStyle({
-    fontFamily: FS,
-    fontSize: 'clamp(28px,7vw,42px)',
-    color: accent,
-    textAlign: 'center',
-    margin: '6px 0 14px',
-    lineHeight: 1.15,
-  }, 'prenoms', data.zoneStyles)
-
-  // Style du "&" — Cormorant Garamond italic, identique à la page d'accueil (InvitationCover)
-  const ampStyle: React.CSSProperties = {
-    fontFamily: 'var(--font-cormorant-garamond)',
-    fontStyle: 'italic',
-    fontSize: '0.45em',
-    opacity: 0.5,
-    margin: '0 8px',
-  }
-
-  // Noms de famille (Shabbat Hatan) gardent le style Playfair uppercase
-  const familyHighlightStyle: React.CSSProperties = {
-    fontFamily: 'var(--font-playfair-display)',
-    fontSize: 'clamp(18px, 4.5vw, 22px)',
-    color: accent,
-    fontWeight: 700,
-    letterSpacing: 3,
-    textTransform: 'uppercase',
-    textAlign: 'center',
-    margin: '6px 0 14px',
-    whiteSpace: 'nowrap',
-    overflowWrap: 'normal',
-    wordBreak: 'keep-all',
-  }
-
-  // Rendu des prénoms avec "&" stylisé
-  const namesBlock = (
-    <div style={nameStyle}>
-      {p1} <span style={ampStyle}>&</span> {p2}
-    </div>
-  )
-
   switch (ceremony.type) {
     case 'Shabbat Hatan': {
       const familles = [nom1, nom2].filter(Boolean).join(' & ')
-      return (
-        <>
-          {familles && <div style={introStyle}>{dict?.inviteFamilies ?? 'Les familles'}</div>}
-          {familles && <div style={familyHighlightStyle}>{familles}</div>}
-          <div style={introStyle}>
-            {familles ? (dict?.inviteWillBeDelightedToInviteYou ?? 'seront ravies de vous convier au') : (dict?.inviteYouAreInvitedTo ?? 'Vous êtes conviés au')}
-          </div>
-          <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteShabbatHatanOf ?? 'Shabbat Hatan de'}</div>
-          {namesBlock}
-        </>
-      )
+      return {
+        familyLine: familles ? (
+          <>
+            <div>{dict?.inviteFamilies ?? 'Les familles'}</div>
+            <div>{familles}</div>
+          </>
+        ) : null,
+        before: (
+          <>
+            <div>{familles ? (dict?.inviteWillBeDelightedToInviteYou ?? 'seront ravies de vous convier au') : (dict?.inviteYouAreInvitedTo ?? 'Vous êtes conviés au')}</div>
+            <div>{dict?.inviteShabbatHatanOf ?? 'Shabbat Hatan de'}</div>
+          </>
+        ),
+        names: 'couple',
+        after: null,
+      }
     }
     case 'Henné':
-      return (
-        <>
-          <div style={introStyle}>{dict?.inviteHenneIntro ?? 'Vous êtes chaleureusement conviés à'}</div>
-          <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteHenneOf ?? 'la soirée du henné de'}</div>
-          {namesBlock}
-          <div style={introStyle}>{dict?.inviteHenneTradition ?? 'dans la tradition et la joie'}</div>
-        </>
-      )
+      return {
+        before: (
+          <>
+            <div>{dict?.inviteHenneIntro ?? 'Vous êtes chaleureusement conviés à'}</div>
+            <div>{dict?.inviteHenneOf ?? 'la soirée du henné de'}</div>
+          </>
+        ),
+        names: 'couple',
+        after: <div>{dict?.inviteHenneTradition ?? 'dans la tradition et la joie'}</div>,
+      }
     case 'Cocktail':
-      return (
-        <>
-          <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteCocktailIntro ?? 'Levons notre verre avec'}</div>
-          {namesBlock}
-          <div style={introStyle}>{(dict?.inviteCocktailCelebrate ?? 'pour célébrer ensemble\nle début de cette belle aventure').split('\n').map((line, i) => <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>)}</div>
-        </>
-      )
+      return {
+        before: <div>{dict?.inviteCocktailIntro ?? 'Levons notre verre avec'}</div>,
+        names: 'couple',
+        after: <div>{(dict?.inviteCocktailCelebrate ?? 'pour célébrer ensemble\nle début de cette belle aventure').split('\n').map((line, i) => <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>)}</div>,
+      }
     case 'Soirée':
-      return (
-        <>
-          <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteSoireeIntro ?? 'Dansez, riez et célébrez avec'}</div>
-          {namesBlock}
-          <div style={introStyle}>{dict?.inviteSoireeAllNight ?? "jusqu'au bout de la nuit"}</div>
-        </>
-      )
+      return {
+        before: <div>{dict?.inviteSoireeIntro ?? 'Dansez, riez et célébrez avec'}</div>,
+        names: 'couple',
+        after: <div>{dict?.inviteSoireeAllNight ?? "jusqu'au bout de la nuit"}</div>,
+      }
     case 'Boat Party':
-      return (
-        <>
-          <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteBoatPartyIntro ?? 'Embarquez avec'}</div>
-          {namesBlock}
-          <div style={introStyle}>{(dict?.inviteBoatPartySea ?? 'pour une soirée inoubliable,\nentre ciel et mer').split('\n').map((line, i) => <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>)}</div>
-        </>
-      )
+      return {
+        before: <div>{dict?.inviteBoatPartyIntro ?? 'Embarquez avec'}</div>,
+        names: 'couple',
+        after: <div>{(dict?.inviteBoatPartySea ?? 'pour une soirée inoubliable,\nentre ciel et mer').split('\n').map((line, i) => <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>)}</div>,
+      }
     case 'Beach Party':
-      return (
-        <>
-          <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteBeachPartyIntro ?? 'Retrouvez'}</div>
-          {namesBlock}
-          <div style={introStyle}>{(dict?.inviteBeachPartySea ?? 'les pieds dans le sable,\npour une fête inoubliable').split('\n').map((line, i) => <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>)}</div>
-        </>
-      )
+      return {
+        before: <div>{dict?.inviteBeachPartyIntro ?? 'Retrouvez'}</div>,
+        names: 'couple',
+        after: <div>{(dict?.inviteBeachPartySea ?? 'les pieds dans le sable,\npour une fête inoubliable').split('\n').map((line, i) => <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>)}</div>,
+      }
     case 'Autre': {
       const evt = ceremony.customName || (dict?.inviteAutreDefaultEvent ?? 'cet événement')
-      return (
-        <>
-          <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteAutreJoin ?? 'Rejoignez'}</div>
-          {namesBlock}
-          <div style={introStyle}>{dict?.inviteAutreFor ?? 'pour'} {evt}</div>
-        </>
-      )
+      return {
+        before: <div>{dict?.inviteAutreJoin ?? 'Rejoignez'}</div>,
+        names: 'couple',
+        after: <div>{dict?.inviteAutreFor ?? 'pour'} {evt}</div>,
+      }
     }
     default:
       return null
@@ -7872,18 +7813,32 @@ const firstDate = sorted[0]?.date
                               {canEdit && <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: ' ' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4, display: 'block', margin: '4px auto 0' }}>Masquer</button>}
                             </>
                           ) : (
-                            /* Phrase par défaut */
-                            <>
-                              <div style={{ padding: '0 8px' }}>
-                                {renderInvitationPhrase(ceremony, data, G, TEXT, t.fairepart)}
-                              </div>
-                              {canEdit && (
-                                <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 4 }}>
-                                  <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: ' ' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4 }}>Masquer</button>
-                                  <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: 'ont le plaisir de vous convier à célébrer leur mariage' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4 }}>Modifier</button>
-                                </div>
-                              )}
-                            </>
+                            /* Phrase par défaut — éléments séparés (narratif / prénoms / narratif) */
+                            (() => {
+                              const parts = getInvitationParts(ceremony, data, t.fairepart)
+                              if (!parts) return null
+                              const narratifStyle: React.CSSProperties = applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', lineHeight: 1.7, opacity: 0.85, padding: '0 8px' }, 'narratif', data.zoneStyles)
+                              const coupleNameStyle: React.CSSProperties = applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,42px)', color: G, textAlign: 'center', margin: '6px 0 14px', lineHeight: 1.15 }, 'prenoms', data.zoneStyles)
+                              const ampCeremonyStyle: React.CSSProperties = { fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: '0.45em', opacity: 0.5, margin: '0 8px' }
+                              return (
+                                <>
+                                  {parts.familyLine && <div style={{ ...narratifStyle, margin: '0 0 10px' }}>{parts.familyLine}</div>}
+                                  {parts.before && <div style={{ ...narratifStyle, margin: '0 0 4px' }}>{parts.before}</div>}
+                                  {parts.names === 'couple' && (
+                                    <div style={coupleNameStyle}>
+                                      {data.marie1Prenom || 'Prénom'} <span style={ampCeremonyStyle}>&</span> {data.marie2Prenom || 'Prénom'}
+                                    </div>
+                                  )}
+                                  {parts.after && <div style={narratifStyle}>{parts.after}</div>}
+                                  {canEdit && (
+                                    <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 4 }}>
+                                      <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: ' ' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4 }}>Masquer</button>
+                                      <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: 'ont le plaisir de vous convier à célébrer leur mariage' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4 }}>Modifier</button>
+                                    </div>
+                                  )}
+                                </>
+                              )
+                            })()
                           )}
                         </div>
                       )}
