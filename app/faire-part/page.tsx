@@ -6309,20 +6309,20 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
   const category = typeToCategory[ceremonyType] || 'couples'
   const w = Math.max(20, Math.min(400, size))
   const cx = localPos?.x ?? offsetX
-  const cy = localPos?.y ?? offsetY
+  const cy = Math.max(0, localPos?.y ?? offsetY)
 
   useEffect(() => {
     const mm = (e: MouseEvent) => {
       if (!draggingRef.current) return
       e.preventDefault()
       const nx = Math.max(-150, Math.min(150, dragOffset.current.x + e.clientX - dragStart.current.x))
-      const ny = Math.max(-200, Math.min(200, dragOffset.current.y + e.clientY - dragStart.current.y))
+      const ny = Math.max(0, Math.min(200, dragOffset.current.y + e.clientY - dragStart.current.y))
       setLocalPos({ x: nx, y: ny })
     }
     const tm = (e: TouchEvent) => {
       if (!draggingRef.current) return
       const nx = Math.max(-150, Math.min(150, dragOffset.current.x + e.touches[0].clientX - dragStart.current.x))
-      const ny = Math.max(-200, Math.min(200, dragOffset.current.y + e.touches[0].clientY - dragStart.current.y))
+      const ny = Math.max(0, Math.min(200, dragOffset.current.y + e.touches[0].clientY - dragStart.current.y))
       setLocalPos({ x: nx, y: ny })
     }
     const up = () => {
@@ -6345,11 +6345,13 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
   }
 
   return (
-    <div style={{ textAlign: 'center', position: 'relative', margin: '0 0 4px', padding: 0, overflow: 'visible', lineHeight: 0 }}>
+    <div style={{ textAlign: 'center', position: 'relative', margin: '0 0 4px', padding: 0, overflow: 'hidden', lineHeight: 0 }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={url} alt="" draggable={false}
+        onMouseDown={editable ? (e) => { e.preventDefault(); startDrag(e.clientX, e.clientY) } : undefined}
+        onTouchStart={editable ? (e) => { startDrag(e.touches[0].clientX, e.touches[0].clientY) } : undefined}
         style={{
           width: isPhoto ? '100%' : `${w}%`, maxHeight: isPhoto ? 280 : undefined,
           objectFit: isPhoto ? 'cover' : 'contain', display: 'inline-block',
@@ -7603,16 +7605,16 @@ const firstDate = sorted[0]?.date
                     {data.mariageJuif && (
                       <div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, opacity: 0.85, letterSpacing: 1, marginBottom: 8, paddingRight: 4, textShadow: goldShadow }}>בס״ד</div>
                     )}
-                    <DraggableElement id={pre+"titre"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} skipAnim={canEdit}>
+                    <div style={{ position: 'relative', zIndex: 2 }}><DraggableElement id={pre+"titre"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} skipAnim={canEdit}>
                       <InlineEdit
                         value={ov[`ceremony_${safeIdx}_titre`] || ''}
                         defaultValue={title}
                         editable={canEdit}
                         onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_titre`]: v } })}
                         onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_titre`, patch)}
-                        style={{ ...applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: (ceremony.illustrationUrl || ceremony.ceremonyImage) ? 10 : 24, lineHeight: 1.4 }, 'titres', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_titre`) }}
+                        style={{ ...applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 24, lineHeight: 1.4 }, 'titres', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_titre`) }}
                       />
-                    </AnimSection></DraggableElement>
+                    </AnimSection></DraggableElement></div>
                     {/* Illustration intégrée directement dans la carte */}
                     {(ceremony.illustrationUrl || ceremony.ceremonyImage) ? (
                       <AnimSection animStyle={anim} delay={200} skipAnim={canEdit}>
