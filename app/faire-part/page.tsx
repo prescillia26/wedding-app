@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useCallback, useMemo, useId } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo, useId, useLayoutEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useSearchParams } from 'next/navigation'
 import { showToast } from '../components/Toast'
 import { useT } from '@/lib/i18n'
@@ -963,10 +964,17 @@ const DRAG_COLORS = (() => {
 })()
 const DRAG_FONTS = [
   { value: '', label: 'Défaut' },
-  { value: 'var(--font-great-vibes)', label: 'Calligraphie' },
-  { value: 'var(--font-cormorant-garamond)', label: 'Élégant' },
-  { value: 'var(--font-playfair-display)', label: 'Serif' },
+  { value: 'var(--font-great-vibes)', label: 'Great Vibes' },
+  { value: 'var(--font-cormorant-garamond)', label: 'Cormorant' },
+  { value: 'var(--font-playfair-display)', label: 'Playfair' },
+  { value: 'var(--font-bellefair)', label: 'Bellefair' },
+  { value: 'var(--font-cinzel)', label: 'Cinzel' },
+  { value: 'var(--font-pinyon-script)', label: 'Pinyon Script' },
+  { value: 'var(--font-alex-brush)', label: 'Alex Brush' },
+  { value: 'var(--font-tenor-sans)', label: 'Tenor Sans' },
   { value: 'Georgia, serif', label: 'Georgia' },
+  { value: '"Times New Roman", serif', label: 'Times' },
+  { value: 'Helvetica, Arial, sans-serif', label: 'Helvetica' },
 ]
 
 function DraggableElement({ id, layout, onLayoutChange, editable, children }: {
@@ -5447,9 +5455,13 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
           {/* Couleur */}
           <div style={{ fontSize: 11, color: theme.texte, opacity: 0.7, marginBottom: 6 }}>Couleur</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {[accent, '#1a1a1a', '#ffffff', '#C9A84C', '#8b6914', '#2c4a7c', '#8b1a2a', '#7a9e6e', '#d4006a', '#888888'].map(c => (
+            {[accent, '#1a1a1a', '#ffffff', '#C9A84C', '#8b6914', '#2c4a7c', '#8b1a2a', '#7a9e6e', '#d4006a', '#888888', '#c4829a', '#d4a574', '#5a9a80', '#E07856', '#9b72aa', '#F4A165'].map(c => (
               <button key={c} onClick={() => onLogoChange?.({ headerLogoColor: c })} style={{ width: 24, height: 24, borderRadius: '50%', background: c, border: effectiveLogoColor === c ? `2.5px solid ${accent}` : '1px solid #d6d1cb', cursor: 'pointer', padding: 0 }} />
             ))}
+            {/* Custom color picker */}
+            <label style={{ width: 24, height: 24, borderRadius: '50%', border: '1px solid #d6d1cb', overflow: 'hidden', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'conic-gradient(red, yellow, lime, aqua, blue, magenta, red)', flexShrink: 0 }}>
+              <input type="color" value={effectiveLogoColor || '#000000'} onChange={e => onLogoChange?.({ headerLogoColor: e.target.value })} style={{ opacity: 0, width: 0, height: 0, position: 'absolute' }} />
+            </label>
           </div>
           <button onClick={() => setShowLogoEdit(false)} style={{ marginTop: 10, width: '100%', padding: '6px 0', background: 'transparent', border: `1px solid ${accent}33`, borderRadius: 8, fontSize: 11, color: accent, cursor: 'pointer' }}>Fermer</button>
         </div>
@@ -5463,7 +5475,7 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
 function CeremonyCard({ isCard, accent, hasFrame, children }: { isCard: boolean; accent: string; hasFrame?: boolean; children: React.ReactNode }) {
   if (!isCard) return <>{children}</>
   return (
-    <div style={{ margin: hasFrame ? '0' : '24px 0', borderRadius: hasFrame ? 0 : 16, overflow: 'hidden', boxShadow: hasFrame ? 'none' : '0 8px 32px rgba(0,0,0,0.13)', border: hasFrame ? 'none' : `1.5px solid ${accent}22` }}>
+    <div style={{ margin: hasFrame ? '0' : '24px 0', borderRadius: hasFrame ? 0 : 16, overflow: hasFrame ? 'hidden' : 'visible', boxShadow: hasFrame ? 'none' : '0 8px 32px rgba(0,0,0,0.13)', border: hasFrame ? 'none' : `1.5px solid ${accent}22` }}>
       {children}
     </div>
   )
@@ -6262,20 +6274,18 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
   return (
     <div style={{ textAlign: 'center', position: 'relative', margin: '0 0 4px', padding: 0, overflow: 'visible', lineHeight: 0 }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={url} alt="" draggable={false}
-        onMouseDown={editable ? (e) => { e.preventDefault(); startDrag(e.clientX, e.clientY) } : undefined}
-        onTouchStart={editable ? (e) => { e.preventDefault(); startDrag(e.touches[0].clientX, e.touches[0].clientY) } : undefined}
         style={{
-          width: isPhoto ? '100%' : `${w}%`, maxHeight: isPhoto ? 280 : undefined,
-          objectFit: isPhoto ? 'cover' : 'contain', display: 'inline-block',
-          borderRadius: isPhoto ? 10 : 0,
-          boxShadow: isPhoto ? '0 4px 20px rgba(0,0,0,0.12)' : 'none',
-          mixBlendMode: isPhoto ? undefined : (darkBg ? undefined : 'multiply'), verticalAlign: 'middle',
-          transform: `translate(${cx}px, ${cy}px)`,
-          cursor: editable ? (draggingRef.current ? 'grabbing' : 'grab') : 'default',
-          transition: draggingRef.current ? 'none' : 'width 0.2s',
-          userSelect: 'none', margin: 0, padding: 0,
+          width: `${w}%`,
+          maxWidth: '100%',
+          objectFit: 'contain', display: 'inline-block',
+          borderRadius: 0,
+          verticalAlign: 'middle',
+          cursor: 'default',
+          transition: 'width 0.2s',
+          userSelect: 'none', margin: '0 auto', padding: 0,
         }}
       />
       {editable && !showPicker && (
@@ -6490,6 +6500,20 @@ function InlineEdit({ value, defaultValue, onChange, editable, style, onStyleCha
   const [selected, setSelected] = useState(false)
   const [showColors, setShowColors] = useState(false)
   const [showFonts, setShowFonts] = useState(false)
+  const [toolbarPos, setToolbarPos] = useState<{ top: number; left: number } | null>(null)
+
+  // Recalculate toolbar fixed position when selected
+  useEffect(() => {
+    if (!selected || !containerRef.current) { setToolbarPos(null); return }
+    const update = () => {
+      const rect = containerRef.current?.getBoundingClientRect()
+      if (rect) setToolbarPos({ top: rect.top, left: rect.left + rect.width / 2 })
+    }
+    update()
+    window.addEventListener('scroll', update, true)
+    window.addEventListener('resize', update)
+    return () => { window.removeEventListener('scroll', update, true); window.removeEventListener('resize', update) }
+  }, [selected, showColors, showFonts])
 
   // Unique class to override DraggableElement's !important styles
   const uid = useId().replace(/:/g, '_')
@@ -6561,18 +6585,18 @@ function InlineEdit({ value, defaultValue, onChange, editable, style, onStyleCha
         {!selected && (
           <span style={{ position: 'absolute', top: -8, right: -8, fontSize: 12, background: 'white', borderRadius: '50%', padding: 2, boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}>✏️</span>
         )}
-        {/* Floating style toolbar */}
-        {selected && (
+        {/* Floating style toolbar — rendered via portal to escape overflow:hidden */}
+        {selected && toolbarPos && typeof document !== 'undefined' && createPortal(
           <div
             ref={toolbarRef}
             onPointerDown={(e) => e.stopPropagation()}
             onMouseDown={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
             style={{
-              position: 'absolute', bottom: '100%', left: '50%', transform: 'translateX(-50%)',
-              marginBottom: 6, zIndex: 30, background: 'white', borderRadius: 10,
+              position: 'fixed', top: toolbarPos.top - 6, left: toolbarPos.left, transform: 'translate(-50%, -100%)',
+              zIndex: 9999, background: 'white', borderRadius: 10,
               padding: '6px 8px', boxShadow: '0 4px 20px rgba(0,0,0,0.18)',
-              border: '1px solid #e0d5c8', minWidth: 180,
+              border: '1px solid #e0d5c8', minWidth: 180, maxWidth: 'calc(100vw - 16px)',
             }}
           >
             {/* Main toolbar row */}
@@ -6664,7 +6688,7 @@ function InlineEdit({ value, defaultValue, onChange, editable, style, onStyleCha
               </div>
             )}
           </div>
-        )}
+        , document.body)}
         {/* Selection outline */}
         {selected && (
           <div style={{ position: 'absolute', inset: -3, border: '1.5px dashed rgba(201,168,76,0.5)', borderRadius: 6, pointerEvents: 'none' }} />
@@ -7360,39 +7384,7 @@ const firstDate = sorted[0]?.date
                   <span style={{ fontFamily: FP, fontSize: 10, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', color: G, opacity: 0.5 }}>— PAGE {pageNum} : {ceremonyLabel.toUpperCase()} —</span>
                 </div>
               )}
-              {/* Illustration aquarelle — posée directement sur le fond du faire-part, hors carte */}
-              {(ceremony.illustrationUrl || ceremony.ceremonyImage) && (() => {
-                const canEditIllu = role !== 'guest' && !!onUpdate
-                return (
-                  <AnimSection animStyle={anim} delay={200} skipAnim={canEditIllu}>
-                    <EditableIllustration
-                      url={ceremony.illustrationUrl || ceremony.ceremonyImage!}
-                      size={ceremony.illustrationSize ?? (ceremony.ceremonyImage && !ceremony.illustrationUrl ? 100 : 80)}
-                      offsetX={ceremony.illustrationOffsetX ?? 0}
-                      offsetY={ceremony.illustrationOffsetY ?? 0}
-                      editable={canEditIllu}
-                      accent={G}
-                      ceremonyType={ceremony.type}
-                      onChangeSize={(sz) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationSize: sz }; onUpdate?.({ ceremonies: u }) }}
-                      onChangeOffsetX={(x) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationOffsetX: x }; onUpdate?.({ ceremonies: u }) }}
-                      onChangeOffsetY={(y) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationOffsetY: y }; onUpdate?.({ ceremonies: u }) }}
-                      onChangeUrl={(url) => {
-                        const u = [...(data.ceremonies ?? [])]
-                        const isFromLibrary = VISUALS.some(v => v.url === url)
-                        if (isFromLibrary) {
-                          u[safeIdx] = { ...u[safeIdx], illustrationUrl: url, ceremonyImage: '' }
-                        } else {
-                          u[safeIdx] = { ...u[safeIdx], ceremonyImage: url, illustrationUrl: '' }
-                        }
-                        onUpdate?.({ ceremonies: u })
-                      }}
-                      onRemove={() => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationUrl: '', ceremonyImage: '', illustrationSize: 80, illustrationOffsetX: 0, illustrationOffsetY: 0 }; onUpdate?.({ ceremonies: u }) }}
-                      darkBg={!!theme.dark}
-                      isPhoto={!!ceremony.ceremonyImage && !ceremony.illustrationUrl}
-                    />
-                  </AnimSection>
-                )
-              })()}
+              {/* Illustration aquarelle — rendue à l'intérieur de la carte (voir ci-dessous) */}
               <CeremonyCard isCard={isCard} accent={G} hasFrame={hasFrame}>
                 {i === 0 && !(data.customPages ?? []).some(p => p.position === safeIdx) && <div id="first-content" style={{ scrollMarginTop: 60 }} />}
                 <section id={`ceremony-${safeIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : 48, paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : 48, paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: hasFrame ? 'hidden' : 'visible', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: theme.fond } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
@@ -7436,11 +7428,38 @@ const firstDate = sorted[0]?.date
                         style={{ ...applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: (ceremony.illustrationUrl || ceremony.ceremonyImage) ? 10 : 24, lineHeight: 1.4 }, 'titres', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_titre`) }}
                       />
                     </AnimSection></DraggableElement>
-                    {/* Illustration placeholder — illustration is now rendered OUTSIDE the card */}
-                    {!(ceremony.illustrationUrl || ceremony.ceremonyImage) && (!hasFrame && canEdit) ? (
+                    {/* Illustration intégrée directement dans la carte */}
+                    {(ceremony.illustrationUrl || ceremony.ceremonyImage) ? (
+                      <AnimSection animStyle={anim} delay={200} skipAnim={canEdit}>
+                        <EditableIllustration
+                          url={ceremony.illustrationUrl || ceremony.ceremonyImage!}
+                          size={ceremony.illustrationSize ?? (ceremony.ceremonyImage && !ceremony.illustrationUrl ? 100 : 80)}
+                          offsetX={0}
+                          offsetY={0}
+                          editable={canEdit}
+                          accent={G}
+                          ceremonyType={ceremony.type}
+                          onChangeSize={(sz) => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationSize: sz }; onUpdate?.({ ceremonies: u }) }}
+                          onChangeOffsetX={() => {}}
+                          onChangeOffsetY={() => {}}
+                          onChangeUrl={(url) => {
+                            const u = [...(data.ceremonies ?? [])]
+                            const isFromLibrary = VISUALS.some(v => v.url === url)
+                            if (isFromLibrary) {
+                              u[safeIdx] = { ...u[safeIdx], illustrationUrl: url, ceremonyImage: '' }
+                            } else {
+                              u[safeIdx] = { ...u[safeIdx], ceremonyImage: url, illustrationUrl: '' }
+                            }
+                            onUpdate?.({ ceremonies: u })
+                          }}
+                          onRemove={() => { const u = [...(data.ceremonies ?? [])]; u[safeIdx] = { ...u[safeIdx], illustrationUrl: '', ceremonyImage: '', illustrationSize: 80, illustrationOffsetX: 0, illustrationOffsetY: 0 }; onUpdate?.({ ceremonies: u }) }}
+                          darkBg={!!theme.dark}
+                          isPhoto={!!ceremony.ceremonyImage && !ceremony.illustrationUrl}
+                        />
+                      </AnimSection>
+                    ) : canEdit ? (
                       <IllustrationAdder ceremonyType={ceremony.type} accent={G} onSelect={(url) => {
                         const u = [...(data.ceremonies ?? [])]
-                        // Si c'est une URL Cloudinary d'un upload custom (pas dans notre bibliothèque), stocker comme ceremonyImage (photo)
                         const isFromLibrary = VISUALS.some(v => v.url === url)
                         if (isFromLibrary) {
                           u[safeIdx] = { ...u[safeIdx], illustrationUrl: url }
