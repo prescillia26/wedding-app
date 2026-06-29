@@ -7795,54 +7795,62 @@ const firstDate = sorted[0]?.date
                           </div>
                         </div>
                       ) : (
-                        <div style={{ marginBottom: 28 }}>
-                          {ov[`ceremony_${safeIdx}_invitation`] === ' ' ? (
-                            /* Phrase masquée — bouton pour la remettre (mariés uniquement) */
-                            canEdit && <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: '' } })} style={{ ...BTN, fontSize: 10, padding: '4px 12px', borderRadius: 9999, border: `1px solid ${G}33`, color: G, opacity: 0.5, display: 'block', margin: '0 auto' }}>Afficher la phrase d&apos;invitation</button>
-                          ) : ov[`ceremony_${safeIdx}_invitation`] ? (
-                            /* Phrase personnalisée */
-                            <>
-                              <InlineEdit
-                                value={ov[`ceremony_${safeIdx}_invitation`]}
-                                defaultValue=""
-                                editable={canEdit}
-                                onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: v } })}
-                                onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_invitation`, patch)}
-                                style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', opacity: 0.85, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_invitation`) }}
-                              />
-                              {canEdit && <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: ' ' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4, display: 'block', margin: '4px auto 0' }}>Masquer</button>}
-                            </>
-                          ) : (
-                            /* Phrase par défaut — éléments séparés (narratif / prénoms / narratif) */
-                            (() => {
-                              const parts = getInvitationParts(ceremony, data, t.fairepart)
-                              if (!parts) return null
-                              const narratifStyle: React.CSSProperties = applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', lineHeight: 1.7, opacity: 0.85, padding: '0 8px' }, 'narratif', data.zoneStyles)
-                              const coupleNameStyle: React.CSSProperties = applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,42px)', color: G, textAlign: 'center', margin: '6px 0 14px', lineHeight: 1.15 }, 'prenoms', data.zoneStyles)
-                              const ampCeremonyStyle: React.CSSProperties = { fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: '0.45em', opacity: 0.5, margin: '0 8px' }
-                              return (
-                                <>
-                                  {parts.familyLine && <div style={{ ...narratifStyle, margin: '0 0 10px' }}>{parts.familyLine}</div>}
-                                  {parts.before && <div style={{ ...narratifStyle, margin: '0 0 4px' }}>{parts.before}</div>}
-                                  {parts.names === 'couple' && (
-                                    <div style={coupleNameStyle}>
-                                      {data.marie1Prenom || 'Prénom'} <span style={ampCeremonyStyle}>&</span> {data.marie2Prenom || 'Prénom'}
-                                    </div>
-                                  )}
-                                  {parts.after && <div style={narratifStyle}>{parts.after}</div>}
-                                  {canEdit && (
-                                    <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 4 }}>
-                                      <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: ' ' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4 }}>Masquer</button>
-                                      <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: 'ont le plaisir de vous convier à célébrer leur mariage' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4 }}>Modifier</button>
-                                    </div>
-                                  )}
-                                </>
-                              )
-                            })()
-                          )}
-                        </div>
+                        /* Autres cérémonies (Henné, Cocktail, etc.) — phrase masquée ou personnalisée */
+                        ov[`ceremony_${safeIdx}_invitation`] === ' ' ? (
+                          canEdit && <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: '' } })} style={{ ...BTN, fontSize: 10, padding: '4px 12px', borderRadius: 9999, border: `1px solid ${G}33`, color: G, opacity: 0.5, display: 'block', margin: '0 auto' }}>Afficher la phrase d&apos;invitation</button>
+                        ) : ov[`ceremony_${safeIdx}_invitation`] ? (
+                          <>
+                            <InlineEdit
+                              value={ov[`ceremony_${safeIdx}_invitation`]}
+                              defaultValue=""
+                              editable={canEdit}
+                              onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: v } })}
+                              onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_invitation`, patch)}
+                              style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', opacity: 0.85, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_invitation`) }}
+                            />
+                            {canEdit && <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: ' ' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4, display: 'block', margin: '4px auto 0' }}>Masquer</button>}
+                          </>
+                        ) : (
+                          /* Phrase par défaut — texte narratif AVANT les prénoms */
+                          (() => {
+                            const parts = getInvitationParts(ceremony, data, t.fairepart)
+                            if (!parts) return null
+                            const narratifStyle: React.CSSProperties = applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', lineHeight: 1.7, opacity: 0.85, padding: '0 8px' }, 'narratif', data.zoneStyles)
+                            return (
+                              <>
+                                {parts.familyLine && <div style={{ ...narratifStyle, margin: '0 0 10px' }}>{parts.familyLine}</div>}
+                                {parts.before && <div style={{ ...narratifStyle, margin: '0 0 4px' }}>{parts.before}</div>}
+                              </>
+                            )
+                          })()
+                        )
                       )}
                     </AnimSection></DraggableElement>
+                    {/* Prénoms séparés pour Henné/Cocktail/etc. — bloc indépendant du narratif */}
+                    {ceremony.type !== 'Cérémonie religieuse / Houppa' && ceremony.type !== 'Mairie' && ceremony.type !== 'Shabbat Hatan' && !ov[`ceremony_${safeIdx}_invitation`] && ov[`ceremony_${safeIdx}_invitation`] !== ' ' && (
+                      <DraggableElement id={pre+"prenoms"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={260} skipAnim={canEdit}>
+                        <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,42px)', color: G, marginBottom: 8, lineHeight: 1.15, textAlign: 'center' }, 'prenoms', data.zoneStyles)}>
+                          {data.marie1Prenom || 'Prénom'} <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: '0.45em', opacity: 0.5, margin: '0 8px' }}>&</span> {data.marie2Prenom || 'Prénom'}
+                        </div>
+                      </AnimSection></DraggableElement>
+                    )}
+                    {/* Texte narratif APRÈS les prénoms (Henné/Cocktail/etc.) */}
+                    {ceremony.type !== 'Cérémonie religieuse / Houppa' && ceremony.type !== 'Mairie' && ceremony.type !== 'Shabbat Hatan' && !ov[`ceremony_${safeIdx}_invitation`] && ov[`ceremony_${safeIdx}_invitation`] !== ' ' && (() => {
+                      const parts = getInvitationParts(ceremony, data, t.fairepart)
+                      if (!parts?.after) return null
+                      const narratifStyle: React.CSSProperties = applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', lineHeight: 1.7, opacity: 0.85, padding: '0 8px', marginBottom: 8 }, 'narratif', data.zoneStyles)
+                      return (
+                        <DraggableElement id={pre+"narratifAfter"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={300} skipAnim={canEdit}>
+                          <div style={narratifStyle}>{parts.after}</div>
+                          {canEdit && (
+                            <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 4 }}>
+                              <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: ' ' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4 }}>Masquer</button>
+                              <button type="button" onClick={() => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_invitation`]: 'ont le plaisir de vous convier à célébrer leur mariage' } })} style={{ ...BTN, fontSize: 9, padding: '2px 10px', borderRadius: 9999, border: `1px solid ${G}22`, color: G, opacity: 0.4 }}>Modifier</button>
+                            </div>
+                          )}
+                        </AnimSection></DraggableElement>
+                      )
+                    })()}
                     <div style={{ height: data.premiumCeremonyStyle ? 4 : 20 }} />
                     {/* Date + lieu : masqués si Shabbat Hatan avec multiJours (les moments ont leur propre date/lieu) */}
                     {!(ceremony.type === 'Shabbat Hatan' && ceremony.multiJours && ceremony.multiJours.length > 0) && (<>
