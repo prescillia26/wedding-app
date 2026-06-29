@@ -496,6 +496,7 @@ interface FormData {
   logoWatermarkColor?: string // couleur du filigrane (hex, '' = utiliser le logo tel quel)
   // ── Layout accueil compact ──
   accueilCompact?: boolean // si true, pas de minHeight 100svh sur la couverture
+  premiumCover?: boolean
 }
 
 type IllustrationKind = 'scene' | 'motif'
@@ -7184,7 +7185,56 @@ const firstDate = sorted[0]?.date
         </div>
       )}
 {/* SECTION 1 : Écran d'accueil */}
-      <div style={{ position: 'relative', minHeight: data.accueilCompact ? 'auto' : '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center',
+      {data.premiumCover && (
+      <div style={{
+        position: 'relative', maxWidth: 480, margin: '0 auto',
+        boxShadow: '0 8px 60px rgba(0,0,0,0.15)',
+        backgroundColor: '#F7F3EC',
+        backgroundImage: 'radial-gradient(ellipse at 20% 20%, rgba(201,162,100,0.06) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(27,42,94,0.04) 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, rgba(196,113,74,0.03) 0%, transparent 60%)',
+      }}>
+        <style>{`@keyframes premiumPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}`}</style>
+        {data.mariageJuif && (
+          <div style={{ textAlign: 'center', paddingTop: 16, fontFamily: 'serif', fontSize: 13, color: '#C9A264', direction: 'rtl', fontWeight: 700, letterSpacing: 6, opacity: 0.85 }}>בס״ד</div>
+        )}
+        {(() => {
+          const coupleUrl = data.illustrationCoupleId?.startsWith('http') ? data.illustrationCoupleId : ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url
+          return coupleUrl ? (
+            <div style={{ position: 'relative', width: '100%', minHeight: '65vh', overflow: 'hidden' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={coupleUrl} alt="" style={{
+                width: '100%', height: '100%', minHeight: '65vh',
+                objectFit: 'cover', objectPosition: 'center 20%', display: 'block',
+                WebkitMaskImage: 'radial-gradient(ellipse 90% 85% at 50% 45%, black 40%, transparent 100%)',
+                maskImage: 'radial-gradient(ellipse 90% 85% at 50% 45%, black 40%, transparent 100%)',
+              }} />
+              <div style={{ position: 'absolute', bottom: '8%', left: 0, right: 0, textAlign: 'center', zIndex: 2 }}>
+                <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px,12vw,72px)', color: '#1B2A5E', lineHeight: 1.1, textShadow: '0 2px 30px rgba(250,247,240,0.8), 0 0 60px rgba(250,247,240,0.5)' }}>
+                  {data.marie1Prenom || 'Prénom'}
+                </div>
+                <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(24px,6vw,36px)', color: '#C9A264', lineHeight: 1, margin: '-4px 0', textShadow: '0 2px 20px rgba(250,247,240,0.6)' }}>{'&'}</div>
+                <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px,12vw,72px)', color: '#1B2A5E', lineHeight: 1.1, textShadow: '0 2px 30px rgba(250,247,240,0.8), 0 0 60px rgba(250,247,240,0.5)' }}>
+                  {data.marie2Prenom || 'Prénom'}
+                </div>
+              </div>
+            </div>
+          ) : null
+        })()}
+        <div style={{ textAlign: 'center', padding: '20px 32px 28px', position: 'relative', zIndex: 1 }}>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: '#6B5A42', letterSpacing: '0.12em', lineHeight: 1.7, marginBottom: 20 }}>
+            {data.textOverrides?.['global_pleaseJoin'] !== '__hidden__' && (data.textOverrides?.['global_pleaseJoin'] || 'ont le plaisir de vous convier à leur mariage')}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 20 }}>
+            <div style={{ width: 60, height: 1, background: 'linear-gradient(90deg, transparent, #C9A264)' }} />
+            <span style={{ color: '#C9A264', fontSize: 8 }}>◆</span>
+            <div style={{ width: 60, height: 1, background: 'linear-gradient(90deg, #C9A264, transparent)' }} />
+          </div>
+          <button type="button" onClick={() => { const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null; if (audio) audio.play().catch(() => {}); const el = document.getElementById('first-content'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} onTouchEnd={(e) => { e.preventDefault(); const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null; if (audio) audio.play().catch(() => {}); const el = document.getElementById('first-content'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 11, fontWeight: 500, letterSpacing: '0.3em', textTransform: 'uppercase', padding: '16px 48px', borderRadius: 0, minWidth: 200, border: '1px solid #C9A264', background: 'transparent', color: '#1B2A5E', cursor: 'pointer', transition: 'all 0.4s ease', animation: 'premiumPulse 2.5s ease-in-out infinite', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}>
+            DÉCOUVRIR ◆
+          </button>
+        </div>
+      </div>
+      )}
+      <div style={{ position: 'relative', minHeight: data.accueilCompact ? 'auto' : '100svh', display: data.premiumCover ? 'none' : 'flex', flexDirection: 'column', alignItems: 'center',
         justifyContent: data.accueilCompact ? 'flex-start' : 'center', gap: 0,
         paddingTop: data.styleAccueil === 'video' ? (() => { const v = VIDEO_BACKGROUNDS.find(x => x.id === data.videoAccueilId); return v?.textPosition === 'top' ? '4%' : v?.textPosition === 'center-top' ? '8%' : '12%' })() : (data.accueilCompact ? 32 : 24),
         paddingBottom: data.accueilCompact ? 32 : 24,
