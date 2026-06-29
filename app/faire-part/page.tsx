@@ -7185,17 +7185,39 @@ const firstDate = sorted[0]?.date
         </div>
       )}
 {/* SECTION 1 : Écran d'accueil */}
-      {data.premiumCover && (
+      {data.premiumCover && (() => {
+  const canEdit = role !== 'guest' && !!onUpdate
+  const layout = data.accueilLayout ?? {}
+  const setLayout = (l: Record<string, { x: number; y: number; scale: number; color?: string; fontFamily?: string }>) => onUpdate?.({ accueilLayout: l })
+  const coupleUrl = data.illustrationCoupleId?.startsWith('http') ? data.illustrationCoupleId : ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url
+  return (
 <div style={{
   position: 'relative', maxWidth: 480, margin: '0 auto',
   boxShadow: '0 8px 60px rgba(0,0,0,0.15)',
-  backgroundColor: '#F7F3EC',
-  backgroundImage: 'radial-gradient(ellipse at 20% 20%, rgba(201,162,100,0.06) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(27,42,94,0.04) 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, rgba(196,113,74,0.03) 0%, transparent 60%)',
+  overflow: 'hidden',
 }}>
   <style>{`@keyframes premiumPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}`}</style>
-  {/* Ornement branches d'olivier */}
-  <div style={{ textAlign: 'center', paddingTop: 20 }}>
-    <svg width="160" height="30" viewBox="0 0 160 30" style={{ display: 'inline-block' }}>
+  {/* Illustration aquarelle — fond principal */}
+  {coupleUrl && (
+    <div style={{ position: 'relative', width: '100%', minHeight: '85vh' }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={coupleUrl} alt="" style={{
+        width: '100%', height: '100%', minHeight: '85vh',
+        objectFit: 'cover', objectPosition: 'center 20%', display: 'block',
+      }} />
+      {/* Voile de lisibilité en haut */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '45%', background: 'linear-gradient(to bottom, rgba(247,243,236,0.85) 0%, rgba(247,243,236,0.6) 50%, transparent 100%)', pointerEvents: 'none' }} />
+      {/* Voile léger en bas */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '20%', background: 'linear-gradient(to top, rgba(247,243,236,0.7) 0%, transparent 100%)', pointerEvents: 'none' }} />
+    </div>
+  )}
+  {!coupleUrl && (
+    <div style={{ width: '100%', minHeight: '85vh', backgroundColor: '#F7F3EC', backgroundImage: 'radial-gradient(ellipse at 20% 20%, rgba(201,162,100,0.06) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(27,42,94,0.04) 0%, transparent 50%)' }} />
+  )}
+  {/* Overlay — tout le texte par-dessus l'illustration */}
+  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '16px 24px 24px', zIndex: 2 }}>
+    {/* Ornement branches d'olivier */}
+    <svg width="160" height="30" viewBox="0 0 160 30" style={{ display: 'inline-block', marginBottom: 4, flexShrink: 0 }}>
       <path d="M80 28 Q80 15 80 5" stroke="#C9A264" strokeWidth="0.8" fill="none"/>
       <path d="M80 22 Q65 18 55 12" stroke="#C9A264" strokeWidth="0.8" fill="none"/>
       <ellipse cx="52" cy="11" rx="7" ry="3" fill="#C9A264" opacity="0.5" transform="rotate(-30 52 11)"/>
@@ -7206,76 +7228,61 @@ const firstDate = sorted[0]?.date
       <path d="M80 17 Q92 12 100 8" stroke="#C9A264" strokeWidth="0.8" fill="none"/>
       <ellipse cx="103" cy="7" rx="6" ry="2.5" fill="#C9A264" opacity="0.4" transform="rotate(25 103 7)"/>
     </svg>
-  </div>
-  {/* בס״ד */}
-  {data.mariageJuif && (
-    <div style={{ textAlign: 'center', paddingTop: 4, fontFamily: 'serif', fontSize: 13, color: '#C9A264', direction: 'rtl', fontWeight: 700, letterSpacing: 6, opacity: 0.85 }}>בס״ד</div>
-  )}
-  {/* Prénoms — AU-DESSUS de l'illustration */}
-  <div style={{ textAlign: 'center', padding: '20px 24px 0' }}>
-    <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px,13vw,64px)', color: '#1B2A5E', letterSpacing: 2, lineHeight: 1.1 }}>
-      {data.marie1Prenom || 'Prénom'}
-    </div>
-    <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(24px,6vw,32px)', color: '#C9A264', letterSpacing: 8, lineHeight: 1, margin: '-8px 0', display: 'block' }}>
-      {'&'}
-    </div>
-    <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px,13vw,64px)', color: '#1B2A5E', letterSpacing: 2, lineHeight: 1.1 }}>
-      {data.marie2Prenom || 'Prénom'}
-    </div>
-  </div>
-  {/* "ont le plaisir..." */}
-  <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#6B5A42', letterSpacing: 3, textAlign: 'center', marginTop: 12, padding: '0 24px' }}>
-    {data.textOverrides?.['global_pleaseJoin'] !== '__hidden__' && (data.textOverrides?.['global_pleaseJoin'] || 'ont le plaisir de vous convier à leur mariage')}
-  </div>
-  {/* Séparateur or ——— ◆ ——— */}
-  <div style={{ textAlign: 'center', margin: '16px 0' }}>
-    <svg width="200" height="20" viewBox="0 0 200 20" style={{ display: 'inline-block' }}>
-      <line x1="0" y1="10" x2="85" y2="10" stroke="#C9A264" strokeWidth="0.5"/>
-      <polygon points="100,5 105,10 100,15 95,10" fill="#C9A264"/>
-      <line x1="115" y1="10" x2="200" y2="10" stroke="#C9A264" strokeWidth="0.5"/>
-    </svg>
-  </div>
-  {/* Illustration aquarelle plein écran avec masque fondu */}
-  {(() => {
-    const coupleUrl = data.illustrationCoupleId?.startsWith('http') ? data.illustrationCoupleId : ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url
-    return coupleUrl ? (
-      <div style={{ position: 'relative', width: '100%', minHeight: '55vh', overflow: 'hidden' }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={coupleUrl} alt="" style={{
-          width: '100%', height: '100%', minHeight: '55vh',
-          objectFit: 'cover', objectPosition: 'center 20%', display: 'block',
-          WebkitMaskImage: 'radial-gradient(ellipse 90% 85% at 50% 45%, black 40%, transparent 100%)',
-          maskImage: 'radial-gradient(ellipse 90% 85% at 50% 45%, black 40%, transparent 100%)',
-        } as React.CSSProperties} />
+    {/* בס״ד — draggable */}
+    {data.mariageJuif && (
+      <DraggableElement id="pc_bsd" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
+        <div style={{ fontFamily: 'serif', fontSize: 13, color: '#C9A264', direction: 'rtl', fontWeight: 700, letterSpacing: 6, opacity: 0.85 }}>בס״ד</div>
+      </DraggableElement>
+    )}
+    {/* Prénoms — draggable */}
+    <DraggableElement id="pc_names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
+      <div style={{ textAlign: 'center', marginTop: 8 }}>
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px,13vw,64px)', color: '#1B2A5E', letterSpacing: 2, lineHeight: 1.1, textShadow: '0 2px 20px rgba(247,243,236,0.8)' }}>
+          {data.marie1Prenom || 'Prénom'}
+        </div>
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(24px,6vw,32px)', color: '#C9A264', letterSpacing: 8, lineHeight: 1, margin: '-8px 0' }}>
+          {'&'}
+        </div>
+        <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px,13vw,64px)', color: '#1B2A5E', letterSpacing: 2, lineHeight: 1.1, textShadow: '0 2px 20px rgba(247,243,236,0.8)' }}>
+          {data.marie2Prenom || 'Prénom'}
+        </div>
       </div>
-    ) : null
-  })()}
-  {/* Séparateur or ——— ◆ ——— */}
-  <div style={{ textAlign: 'center', margin: '16px 0' }}>
-    <svg width="200" height="20" viewBox="0 0 200 20" style={{ display: 'inline-block' }}>
-      <line x1="0" y1="10" x2="85" y2="10" stroke="#C9A264" strokeWidth="0.5"/>
-      <polygon points="100,5 105,10 100,15 95,10" fill="#C9A264"/>
-      <line x1="115" y1="10" x2="200" y2="10" stroke="#C9A264" strokeWidth="0.5"/>
-    </svg>
-  </div>
-  {/* Bouton DÉCOUVRIR */}
-  <div style={{ textAlign: 'center', paddingBottom: 8 }}>
-    <button type="button" onClick={() => { const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null; if (audio) audio.play().catch(() => {}); const el = document.getElementById('first-content'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} onTouchEnd={(e) => { e.preventDefault(); const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null; if (audio) audio.play().catch(() => {}); const el = document.getElementById('first-content'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} style={{ fontFamily: 'var(--font-tenor-sans)', fontSize: 11, fontWeight: 500, letterSpacing: '0.35em', textTransform: 'uppercase' as const, padding: '16px 52px', borderRadius: 0, minWidth: 200, border: '0.5px solid #C9A264', background: 'transparent', color: '#1B2A5E', cursor: 'pointer', transition: 'all 0.3s ease', animation: 'premiumPulse 2.5s ease-in-out infinite', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}>
-      DÉCOUVRIR ◆
-    </button>
-  </div>
-  {/* Ligne de dates */}
-  <div style={{ fontFamily: 'var(--font-tenor-sans)', fontWeight: 300, fontSize: 9, letterSpacing: 2, color: '#C9A264', textAlign: 'center', padding: '0 16px 24px' }}>
-    {(data.ceremonies || []).map((c: { date?: string; lieu?: string }, idx: number) => {
-      if (!c.date) return null
-      const d = new Date(c.date + 'T12:00:00')
-      const formatted = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`
-      const lieu = c.lieu || ''
-      return (idx > 0 ? '   ·   ' : '') + formatted + (lieu ? ' · ' + lieu : '')
-    }).filter(Boolean).join('')}
+    </DraggableElement>
+    {/* "ont le plaisir..." — draggable */}
+    <DraggableElement id="pc_phrase" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
+      <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#6B5A42', letterSpacing: 3, textAlign: 'center', marginTop: 8, textShadow: '0 1px 10px rgba(247,243,236,0.6)' }}>
+        {data.textOverrides?.['global_pleaseJoin'] !== '__hidden__' && (data.textOverrides?.['global_pleaseJoin'] || 'ont le plaisir de vous convier à leur mariage')}
+      </div>
+    </DraggableElement>
+    {/* Spacer pour pousser le bouton vers le bas */}
+    <div style={{ flex: 1 }} />
+    {/* Séparateur or + bouton DÉCOUVRIR — en bas */}
+    <div style={{ textAlign: 'center', flexShrink: 0 }}>
+      <svg width="200" height="20" viewBox="0 0 200 20" style={{ display: 'inline-block', marginBottom: 12 }}>
+        <line x1="0" y1="10" x2="85" y2="10" stroke="#C9A264" strokeWidth="0.5"/>
+        <polygon points="100,5 105,10 100,15 95,10" fill="#C9A264"/>
+        <line x1="115" y1="10" x2="200" y2="10" stroke="#C9A264" strokeWidth="0.5"/>
+      </svg>
+      <div>
+        <button type="button" onClick={() => { const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null; if (audio) audio.play().catch(() => {}); onStartYoutube?.(); const el = document.getElementById('first-content'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} onTouchEnd={(e) => { e.preventDefault(); const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null; if (audio) audio.play().catch(() => {}); onStartYoutube?.(); const el = document.getElementById('first-content'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} style={{ fontFamily: 'var(--font-tenor-sans)', fontSize: 11, fontWeight: 500, letterSpacing: '0.35em', textTransform: 'uppercase' as const, padding: '16px 52px', borderRadius: 0, minWidth: 200, border: '0.5px solid #C9A264', background: 'rgba(247,243,236,0.6)', color: '#1B2A5E', cursor: 'pointer', transition: 'all 0.3s ease', animation: 'premiumPulse 2.5s ease-in-out infinite', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', backdropFilter: 'blur(4px)' }}>
+          DÉCOUVRIR ◆
+        </button>
+      </div>
+      {/* Ligne de dates */}
+      <div style={{ fontFamily: 'var(--font-tenor-sans)', fontWeight: 300, fontSize: 9, letterSpacing: 2, color: '#C9A264', textAlign: 'center', marginTop: 12, textShadow: '0 1px 8px rgba(247,243,236,0.8)' }}>
+        {(data.ceremonies || []).map((c: { date?: string; lieu?: string }, idx: number) => {
+          if (!c.date) return null
+          const d = new Date(c.date + 'T12:00:00')
+          const formatted = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`
+          const lieu = c.lieu || ''
+          return (idx > 0 ? '   ·   ' : '') + formatted + (lieu ? ' · ' + lieu : '')
+        }).filter(Boolean).join('')}
+      </div>
+    </div>
   </div>
 </div>
-      )}
+  )
+})()}
       <div style={{ position: 'relative', minHeight: data.accueilCompact ? 'auto' : '100svh', display: data.premiumCover ? 'none' : 'flex', flexDirection: 'column', alignItems: 'center',
         justifyContent: data.accueilCompact ? 'flex-start' : 'center', gap: 0,
         paddingTop: data.styleAccueil === 'video' ? (() => { const v = VIDEO_BACKGROUNDS.find(x => x.id === data.videoAccueilId); return v?.textPosition === 'top' ? '4%' : v?.textPosition === 'center-top' ? '8%' : '12%' })() : (data.accueilCompact ? 32 : 24),
