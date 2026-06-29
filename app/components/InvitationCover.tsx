@@ -107,7 +107,7 @@ export default function InvitationCover({
       <div style={{
         position: 'fixed', inset: 0, zIndex: 300,
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        background: videoEnded ? '#F5F0EB' : '#000',
+        background: '#F5F0EB',
         opacity: phase === 3 ? 0 : 1,
         transition: 'opacity 0.8s ease, background 0.8s ease',
         pointerEvents: phase === 3 ? 'none' : 'auto',
@@ -139,7 +139,7 @@ export default function InvitationCover({
             onEnded={handleVideoEnd}
             style={{
               position: 'absolute', inset: 0,
-              width: '100%', height: '100%', objectFit: 'cover',
+              width: '100%', height: '100%', objectFit: 'contain',
               animation: videoEnded ? 'videoFadeOut 0.6s ease forwards' : undefined,
             }}
           />
