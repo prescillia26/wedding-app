@@ -6267,7 +6267,7 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
         onMouseDown={editable ? (e) => { e.preventDefault(); startDrag(e.clientX, e.clientY) } : undefined}
         onTouchStart={editable ? (e) => { e.preventDefault(); startDrag(e.touches[0].clientX, e.touches[0].clientY) } : undefined}
         style={{
-          width: isPhoto ? '100%' : `${w}%`, maxHeight: isPhoto ? 280 : 400,
+          width: isPhoto ? '100%' : `${w}%`, maxHeight: isPhoto ? 280 : undefined,
           objectFit: isPhoto ? 'cover' : 'contain', display: 'inline-block',
           borderRadius: isPhoto ? 10 : 0,
           boxShadow: isPhoto ? '0 4px 20px rgba(0,0,0,0.12)' : 'none',
