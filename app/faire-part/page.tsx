@@ -7579,7 +7579,7 @@ const firstDate = sorted[0]?.date
                         editable={canEdit}
                         onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_titre`]: v } })}
                         onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_titre`, patch)}
-                        style={{ ...applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 24, lineHeight: 1.4 }, 'titres', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_titre`) }}
+                        style={{ ...applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: (ceremony.illustrationUrl || ceremony.ceremonyImage) ? 8 : 24, lineHeight: 1.4 }, 'titres', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_titre`) }}
                       />
                     </AnimSection></DraggableElement></div>
                     {/* Illustration intégrée directement dans la carte */}
