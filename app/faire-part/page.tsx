@@ -7616,24 +7616,6 @@ const firstDate = sorted[0]?.date
                         style={{ ...applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: (ceremony.illustrationUrl || ceremony.ceremonyImage) ? 10 : 24, lineHeight: 1.4 }, 'titres', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_titre`) }}
                       />
                     </AnimSection></DraggableElement>
-                    {data.premiumCeremonyStyle && ceremony.date && (
-                      <div style={{ margin: '12px auto 16px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-                          <div style={{ fontFamily: 'var(--font-tenor-sans)', fontSize: 10, letterSpacing: 3, color: G, textTransform: 'uppercase' as const, borderBottom: `0.5px solid ${G}40`, paddingBottom: 4 }}>
-                            {new Date(ceremony.date + 'T12:00:00').toLocaleDateString(locale === 'en' ? 'en-US' : 'fr-FR', { weekday: 'long' })}
-                          </div>
-                          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 56, color: G, fontStyle: 'italic', lineHeight: 1, border: `0.5px solid ${G}40`, padding: '6px 14px' }}>
-                            {new Date(ceremony.date + 'T12:00:00').getDate()}
-                          </div>
-                          <div style={{ fontFamily: 'var(--font-tenor-sans)', fontSize: 10, letterSpacing: 3, color: G, textTransform: 'uppercase' as const, borderBottom: `0.5px solid ${G}40`, paddingBottom: 4 }}>
-                            {new Date(ceremony.date + 'T12:00:00').toLocaleDateString(locale === 'en' ? 'en-US' : 'fr-FR', { month: 'long' })}
-                          </div>
-                        </div>
-                        <div style={{ fontFamily: 'var(--font-tenor-sans)', fontSize: 12, color: G, letterSpacing: 3, textAlign: 'center', marginTop: 6 }}>
-                          {new Date(ceremony.date + 'T12:00:00').getFullYear()}
-                        </div>
-                      </div>
-                    )}
                     {/* Illustration intégrée directement dans la carte */}
                     {(ceremony.illustrationUrl || ceremony.ceremonyImage) ? (
                       <AnimSection animStyle={anim} delay={200} skipAnim={canEdit}>
@@ -7885,7 +7867,7 @@ const firstDate = sorted[0]?.date
                         </div>
                       )}
                     </AnimSection></DraggableElement>
-                    <div style={{ height: 20 }} />
+                    <div style={{ height: data.premiumCeremonyStyle ? 4 : 20 }} />
                     {/* Date + lieu : masqués si Shabbat Hatan avec multiJours (les moments ont leur propre date/lieu) */}
                     {!(ceremony.type === 'Shabbat Hatan' && ceremony.multiJours && ceremony.multiJours.length > 0) && (<>
                     <DraggableElement id={pre+"date"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={400} skipAnim={canEdit}>{ceremony.date ? (() => {
@@ -7898,7 +7880,7 @@ const firstDate = sorted[0]?.date
                         const annee = parts.find(p => p.type === 'year')?.value || ''
                         return (
                           <>
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '24px 0 8px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: data.premiumCeremonyStyle ? '8px 0 4px' : '24px 0 8px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
                               <div style={{ width: 80, textAlign: 'right' }}>
                                 <div style={{ fontFamily: FP, borderBottom: `1px solid ${G}44`, paddingBottom: 4, letterSpacing: 4, fontSize: 10, fontWeight: 600, color: G, display: 'inline-block', textTransform: 'uppercase' }}>{jourSemaine}</div>
