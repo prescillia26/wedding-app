@@ -7195,57 +7195,75 @@ const firstDate = sorted[0]?.date
   position: 'relative', maxWidth: 480, margin: '0 auto',
   boxShadow: '0 8px 60px rgba(0,0,0,0.15)',
   overflow: 'hidden',
+  backgroundColor: '#F7F3EC',
+  backgroundImage: 'radial-gradient(ellipse at 15% 15%, rgba(201,162,100,0.07) 0%, transparent 50%), radial-gradient(ellipse at 85% 85%, rgba(27,42,94,0.05) 0%, transparent 50%), radial-gradient(ellipse at 85% 15%, rgba(196,113,74,0.04) 0%, transparent 40%), radial-gradient(ellipse at 15% 85%, rgba(201,162,100,0.04) 0%, transparent 40%)',
 }}>
   <style>{`@keyframes premiumPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}`}</style>
   {/* Illustration aquarelle — fond principal */}
   {coupleUrl && (
-    <div style={{ position: 'relative', width: '100%', minHeight: '85vh' }}>
+    <div style={{ position: 'relative', width: '100%', minHeight: '70vh' }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={coupleUrl} alt="" style={{
-        width: '100%', height: '100%', minHeight: '85vh',
+        width: '100%', height: '100%', minHeight: '70vh',
         objectFit: 'cover', objectPosition: 'center 20%', display: 'block',
-      }} />
-      {/* Voile de lisibilité en haut */}
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '45%', background: 'linear-gradient(to bottom, rgba(247,243,236,0.85) 0%, rgba(247,243,236,0.6) 50%, transparent 100%)', pointerEvents: 'none' }} />
-      {/* Voile léger en bas */}
-      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '20%', background: 'linear-gradient(to top, rgba(247,243,236,0.7) 0%, transparent 100%)', pointerEvents: 'none' }} />
+        WebkitMaskImage: 'radial-gradient(ellipse 90% 85% at 50% 50%, black 30%, transparent 100%)',
+        maskImage: 'radial-gradient(ellipse 90% 85% at 50% 50%, black 30%, transparent 100%)',
+      } as React.CSSProperties} />
     </div>
   )}
   {!coupleUrl && (
-    <div style={{ width: '100%', minHeight: '85vh', backgroundColor: '#F7F3EC', backgroundImage: 'radial-gradient(ellipse at 20% 20%, rgba(201,162,100,0.06) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(27,42,94,0.04) 0%, transparent 50%)' }} />
+    <div style={{ width: '100%', minHeight: '70vh' }} />
   )}
   {/* Overlay — tout le texte par-dessus l'illustration */}
-  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '12px 24px 24px', zIndex: 2, gap: 4, pointerEvents: 'none' }}>
-    {/* בס״ד — draggable */}
+  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '12px 24px 24px', zIndex: 2, pointerEvents: 'none' }}>
+    {/* בס״ד avec ornements — draggable */}
     {data.mariageJuif && (
-      <div style={{ position: 'relative', zIndex: 10, pointerEvents: 'auto' }}>
+      <div style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10 }}>
         <DraggableElement id="pc_bsd" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <div style={{ fontFamily: 'serif', fontSize: 13, color: '#C9A264', direction: 'rtl', fontWeight: 700, letterSpacing: 6, opacity: 0.85 }}>בס״ד</div>
+          <div style={{ textAlign: 'center', marginBottom: 12 }}>
+            <svg width="180" height="24" viewBox="0 0 180 24" style={{ display: 'inline-block' }}>
+              <line x1="0" y1="12" x2="72" y2="12" stroke="#C9A264" strokeWidth="0.5"/>
+              <polygon points="80,7 85,12 80,17 75,12" fill="#C9A264" opacity="0.7"/>
+              <line x1="95" y1="12" x2="180" y2="12" stroke="#C9A264" strokeWidth="0.5"/>
+            </svg>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: '#C9A264', letterSpacing: 6, margin: '6px 0', direction: 'rtl' }}>בס״ד</div>
+            <svg width="180" height="24" viewBox="0 0 180 24" style={{ display: 'inline-block' }}>
+              <line x1="0" y1="12" x2="72" y2="12" stroke="#C9A264" strokeWidth="0.5"/>
+              <polygon points="80,7 85,12 80,17 75,12" fill="#C9A264" opacity="0.7"/>
+              <line x1="95" y1="12" x2="180" y2="12" stroke="#C9A264" strokeWidth="0.5"/>
+            </svg>
+          </div>
         </DraggableElement>
       </div>
     )}
-    {/* Prénoms — draggable */}
-    <div style={{ position: 'relative', zIndex: 10, pointerEvents: 'auto' }}>
+    {/* Prénoms — 3 lignes, avec halo — draggable */}
+    <div style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10 }}>
       <DraggableElement id="pc_names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-        <div style={{ textAlign: 'center', marginTop: 12 }}>
-          <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(36px,9vw,52px)', color: '#1B2A5E', letterSpacing: 1, lineHeight: 1.2, textShadow: '0 2px 20px rgba(247,243,236,0.9), 0 0 40px rgba(247,243,236,0.6)' }}>
-            {data.marie1Prenom || 'Prénom'} <span style={{ color: '#C9A264', fontSize: '0.7em' }}>{'&'}</span> {data.marie2Prenom || 'Prénom'}
+        <div style={{ textAlign: 'center', lineHeight: 1, padding: '10px 20px', background: 'radial-gradient(ellipse 80% 100% at 50% 50%, rgba(247,243,236,0.6) 0%, transparent 100%)', position: 'relative', zIndex: 2, marginTop: 12 }}>
+          <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px, 8vw, 68px)', color: '#1B2A5E', lineHeight: 1.15, textShadow: '0 2px 20px rgba(247,243,236,0.9)' }}>
+            {data.marie1Prenom || 'Prénom'}
+          </div>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 22, color: '#C9A264', letterSpacing: 10, margin: '4px 0', lineHeight: 1 }}>
+            {'&'}
+          </div>
+          <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(48px, 8vw, 68px)', color: '#1B2A5E', lineHeight: 1.15, textShadow: '0 2px 20px rgba(247,243,236,0.9)' }}>
+            {data.marie2Prenom || 'Prénom'}
           </div>
         </div>
       </DraggableElement>
     </div>
     {/* "ont le plaisir..." — draggable */}
-    <div style={{ position: 'relative', zIndex: 10, pointerEvents: 'auto' }}>
+    <div style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10 }}>
       <DraggableElement id="pc_phrase" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#6B5A42', letterSpacing: 3, textAlign: 'center', marginTop: 8, textShadow: '0 1px 10px rgba(247,243,236,0.6)' }}>
+        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#6B5A42', letterSpacing: 3, textAlign: 'center', marginTop: 14, textShadow: '0 1px 10px rgba(247,243,236,0.8)' }}>
           {data.textOverrides?.['global_pleaseJoin'] !== '__hidden__' && (data.textOverrides?.['global_pleaseJoin'] || 'ont le plaisir de vous convier à leur mariage')}
         </div>
       </DraggableElement>
     </div>
-    {/* Spacer pour pousser le bouton vers le bas */}
+    {/* Spacer */}
     <div style={{ flex: 1 }} />
-    {/* Séparateur or + bouton DÉCOUVRIR — en bas */}
-    <div style={{ textAlign: 'center', flexShrink: 0, pointerEvents: 'auto', position: 'relative', zIndex: 10 }}>
+    {/* Séparateur + bouton DÉCOUVRIR + dates — en bas */}
+    <div style={{ textAlign: 'center', flexShrink: 0, pointerEvents: 'auto', marginTop: -20 }}>
       <svg width="200" height="20" viewBox="0 0 200 20" style={{ display: 'inline-block', marginBottom: 12 }}>
         <line x1="0" y1="10" x2="85" y2="10" stroke="#C9A264" strokeWidth="0.5"/>
         <polygon points="100,5 105,10 100,15 95,10" fill="#C9A264"/>
@@ -7256,15 +7274,22 @@ const firstDate = sorted[0]?.date
           DÉCOUVRIR ◆
         </button>
       </div>
-      {/* Ligne de dates */}
-      <div style={{ fontFamily: 'var(--font-tenor-sans)', fontWeight: 300, fontSize: 9, letterSpacing: 2, color: '#C9A264', textAlign: 'center', marginTop: 12, textShadow: '0 1px 8px rgba(247,243,236,0.8)' }}>
+      {/* Dates élégantes */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 12, alignItems: 'center', marginTop: 14, flexWrap: 'wrap' }}>
         {(data.ceremonies || []).map((c: { date?: string; lieu?: string }, idx: number) => {
           if (!c.date) return null
           const d = new Date(c.date + 'T12:00:00')
-          const formatted = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`
+          const formatted = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}`
           const lieu = c.lieu || ''
-          return (idx > 0 ? '   ·   ' : '') + formatted + (lieu ? ' · ' + lieu : '')
-        }).filter(Boolean).join('')}
+          return (
+            <span key={idx} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              {idx > 0 && <span style={{ color: '#C9A264', fontSize: 6 }}>◆</span>}
+              <span style={{ fontFamily: 'var(--font-tenor-sans)', fontWeight: 300, fontSize: 8, letterSpacing: 2, color: '#C9A264' }}>
+                {formatted}{lieu ? ' · ' + lieu : ''}
+              </span>
+            </span>
+          )
+        })}
       </div>
     </div>
   </div>
