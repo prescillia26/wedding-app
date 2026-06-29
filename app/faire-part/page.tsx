@@ -7221,18 +7221,10 @@ const firstDate = sorted[0]?.date
     {data.mariageJuif && (
       <div style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10 }}>
         <DraggableElement id="pc_bsd" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-          <div style={{ textAlign: 'center', marginBottom: 12 }}>
-            <svg width="180" height="24" viewBox="0 0 180 24" style={{ display: 'inline-block' }}>
-              <line x1="0" y1="12" x2="72" y2="12" stroke="#C9A264" strokeWidth="0.5"/>
-              <polygon points="80,7 85,12 80,17 75,12" fill="#C9A264" opacity="0.7"/>
-              <line x1="95" y1="12" x2="180" y2="12" stroke="#C9A264" strokeWidth="0.5"/>
-            </svg>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: '#C9A264', letterSpacing: 6, margin: '6px 0', direction: 'rtl' }}>בס״ד</div>
-            <svg width="180" height="24" viewBox="0 0 180 24" style={{ display: 'inline-block' }}>
-              <line x1="0" y1="12" x2="72" y2="12" stroke="#C9A264" strokeWidth="0.5"/>
-              <polygon points="80,7 85,12 80,17 75,12" fill="#C9A264" opacity="0.7"/>
-              <line x1="95" y1="12" x2="180" y2="12" stroke="#C9A264" strokeWidth="0.5"/>
-            </svg>
+          <div style={{ textAlign: 'center', marginBottom: 8 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="https://gsihevihnthjsm8z.public.blob.vercel-storage.com/8-m1qRmlxuohr4uM00k8cFNWcigTbJO5.png" alt="" style={{ width: 100, height: 'auto', objectFit: 'contain', display: 'inline-block', opacity: 0.6 }} />
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: '#C9A264', letterSpacing: 6, margin: '4px 0', direction: 'rtl' }}>בס״ד</div>
           </div>
         </DraggableElement>
       </div>
@@ -7265,11 +7257,8 @@ const firstDate = sorted[0]?.date
     <div style={{ flex: 1 }} />
     {/* Séparateur + bouton DÉCOUVRIR + dates — en bas */}
     <div style={{ textAlign: 'center', flexShrink: 0, pointerEvents: 'auto', marginTop: -20 }}>
-      <svg width="200" height="20" viewBox="0 0 200 20" style={{ display: 'inline-block', marginBottom: 12 }}>
-        <line x1="0" y1="10" x2="85" y2="10" stroke="#C9A264" strokeWidth="0.5"/>
-        <polygon points="100,5 105,10 100,15 95,10" fill="#C9A264"/>
-        <line x1="115" y1="10" x2="200" y2="10" stroke="#C9A264" strokeWidth="0.5"/>
-      </svg>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="https://gsihevihnthjsm8z.public.blob.vercel-storage.com/8-m1qRmlxuohr4uM00k8cFNWcigTbJO5.png" alt="" style={{ width: 140, height: 'auto', objectFit: 'contain', display: 'inline-block', marginBottom: 12, opacity: 0.8 }} />
       <div>
         <button type="button" onClick={() => { const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null; if (audio) audio.play().catch(() => {}); onStartYoutube?.(); const el = document.getElementById('first-content'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} onTouchEnd={(e) => { e.preventDefault(); const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null; if (audio) audio.play().catch(() => {}); onStartYoutube?.(); const el = document.getElementById('first-content'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} style={{ fontFamily: 'var(--font-tenor-sans)', fontSize: 11, fontWeight: 500, letterSpacing: '0.35em', textTransform: 'uppercase' as const, padding: '16px 52px', borderRadius: 0, minWidth: 200, border: '0.5px solid #C9A264', background: 'rgba(247,243,236,0.6)', color: '#1B2A5E', cursor: 'pointer', transition: 'all 0.3s ease', animation: 'premiumPulse 2.5s ease-in-out infinite', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', backdropFilter: 'blur(4px)' }}>
           DÉCOUVRIR ◆
@@ -8048,17 +8037,9 @@ const firstDate = sorted[0]?.date
                 </section>
               </CeremonyCard>
               {data.premiumCeremonyStyle && i < sorted.length - 1 && (
-                <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                  <svg width="220" height="40" viewBox="0 0 220 40" style={{ display: 'inline-block' }}>
-                    <line x1="0" y1="20" x2="88" y2="20" stroke={G} strokeWidth="0.5"/>
-                    <circle cx="95" cy="20" r="3" fill="none" stroke={G} strokeWidth="0.5"/>
-                    <circle cx="110" cy="20" r="5" fill={G} opacity="0.3"/>
-                    <circle cx="110" cy="20" r="2.5" fill={G}/>
-                    <circle cx="125" cy="20" r="3" fill="none" stroke={G} strokeWidth="0.5"/>
-                    <line x1="132" y1="20" x2="220" y2="20" stroke={G} strokeWidth="0.5"/>
-                    <ellipse cx="75" cy="16" rx="8" ry="3" fill={G} opacity="0.2" transform="rotate(-20 75 16)"/>
-                    <ellipse cx="145" cy="16" rx="8" ry="3" fill={G} opacity="0.2" transform="rotate(20 145 16)"/>
-                  </svg>
+                <div style={{ textAlign: 'center', padding: '12px 0' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="https://gsihevihnthjsm8z.public.blob.vercel-storage.com/8-m1qRmlxuohr4uM00k8cFNWcigTbJO5.png" alt="" style={{ width: 180, height: 'auto', objectFit: 'contain', display: 'inline-block', opacity: 0.85 }} />
                 </div>
               )}
               {/* Séparateur entre cérémonies retiré — les indicateurs de page suffisent */}
