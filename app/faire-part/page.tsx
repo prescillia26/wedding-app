@@ -7415,7 +7415,7 @@ const firstDate = sorted[0]?.date
           })()}
           <DraggableElement id="names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,42px)', color: introTextColor, marginBottom: 8, lineHeight: 1.15, textAlign: 'center', textShadow: hasIntroPhoto ? '0 2px 12px rgba(0,0,0,0.7), 0 0 24px rgba(0,0,0,0.5), 0 0 48px rgba(0,0,0,0.3)' : (goldShadow || readableShadow(theme)) }, 'prenoms', data.zoneStyles)}>
-            {data.marie1Prenom || 'Prénom'} & {data.marie2Prenom || 'Prénom'}
+            {data.marie1Prenom || 'Prénom'} <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: '0.65em', opacity: 0.55 }}>&</span> {data.marie2Prenom || 'Prénom'}
           </div>
           </DraggableElement>
           {(data.textOverrides?.['global_pleaseJoin'] !== '__hidden__') && (
