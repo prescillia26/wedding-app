@@ -792,7 +792,7 @@ function renderInvitationPhrase(
   const nom2 = data.famille2PereNom || data.marie2Nom || ''
 
   const FC = 'var(--font-cormorant-garamond)'
-  const FP = 'var(--font-playfair-display)'
+  const FS = 'var(--font-great-vibes)'
 
   // Style des lignes "intro" et "fin de phrase"
   const introStyle: React.CSSProperties = {
@@ -806,9 +806,26 @@ function renderInvitationPhrase(
     margin: '0 0 10px',
   }
 
-  // Style des NOMS et PRÉNOMS mis en avant
-  const highlightStyle: React.CSSProperties = {
-    fontFamily: FP,
+  // Style des PRÉNOMS — calligraphique, cohérent avec l'accueil et les cérémonies Mairie/Houppa
+  const nameStyle: React.CSSProperties = applyZoneStyle({
+    fontFamily: FS,
+    fontSize: 'clamp(28px,7vw,42px)',
+    color: accent,
+    textAlign: 'center',
+    margin: '6px 0 14px',
+    lineHeight: 1.15,
+  }, 'prenoms', data.zoneStyles)
+
+  // Style du "&" — même traitement que la page d'accueil
+  const ampStyle: React.CSSProperties = {
+    fontFamily: 'var(--font-great-vibes)',
+    fontSize: '0.65em',
+    opacity: 0.55,
+  }
+
+  // Noms de famille (Shabbat Hatan) gardent le style Playfair uppercase
+  const familyHighlightStyle: React.CSSProperties = {
+    fontFamily: 'var(--font-playfair-display)',
     fontSize: 'clamp(18px, 4.5vw, 22px)',
     color: accent,
     fontWeight: 700,
@@ -816,10 +833,17 @@ function renderInvitationPhrase(
     textTransform: 'uppercase',
     textAlign: 'center',
     margin: '6px 0 14px',
-    whiteSpace: 'nowrap',          // ← NOMS jamais coupés
+    whiteSpace: 'nowrap',
     overflowWrap: 'normal',
     wordBreak: 'keep-all',
   }
+
+  // Rendu des prénoms avec "&" stylisé
+  const namesBlock = (
+    <div style={nameStyle}>
+      {p1} <span style={ampStyle}>&</span> {p2}
+    </div>
+  )
 
   switch (ceremony.type) {
     case 'Shabbat Hatan': {
@@ -827,12 +851,12 @@ function renderInvitationPhrase(
       return (
         <>
           {familles && <div style={introStyle}>{dict?.inviteFamilies ?? 'Les familles'}</div>}
-          {familles && <div style={highlightStyle}>{familles}</div>}
+          {familles && <div style={familyHighlightStyle}>{familles}</div>}
           <div style={introStyle}>
             {familles ? (dict?.inviteWillBeDelightedToInviteYou ?? 'seront ravies de vous convier au') : (dict?.inviteYouAreInvitedTo ?? 'Vous êtes conviés au')}
           </div>
           <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteShabbatHatanOf ?? 'Shabbat Hatan de'}</div>
-          <div style={highlightStyle}>{p1} &amp; {p2}</div>
+          {namesBlock}
         </>
       )
     }
@@ -841,7 +865,7 @@ function renderInvitationPhrase(
         <>
           <div style={introStyle}>{dict?.inviteHenneIntro ?? 'Vous êtes chaleureusement conviés à'}</div>
           <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteHenneOf ?? 'la soirée du henné de'}</div>
-          <div style={highlightStyle}>{p1} &amp; {p2}</div>
+          {namesBlock}
           <div style={introStyle}>{dict?.inviteHenneTradition ?? 'dans la tradition et la joie'}</div>
         </>
       )
@@ -849,7 +873,7 @@ function renderInvitationPhrase(
       return (
         <>
           <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteCocktailIntro ?? 'Levons notre verre avec'}</div>
-          <div style={highlightStyle}>{p1} &amp; {p2}</div>
+          {namesBlock}
           <div style={introStyle}>{(dict?.inviteCocktailCelebrate ?? 'pour célébrer ensemble\nle début de cette belle aventure').split('\n').map((line, i) => <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>)}</div>
         </>
       )
@@ -857,7 +881,7 @@ function renderInvitationPhrase(
       return (
         <>
           <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteSoireeIntro ?? 'Dansez, riez et célébrez avec'}</div>
-          <div style={highlightStyle}>{p1} &amp; {p2}</div>
+          {namesBlock}
           <div style={introStyle}>{dict?.inviteSoireeAllNight ?? "jusqu'au bout de la nuit"}</div>
         </>
       )
@@ -865,7 +889,7 @@ function renderInvitationPhrase(
       return (
         <>
           <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteBoatPartyIntro ?? 'Embarquez avec'}</div>
-          <div style={highlightStyle}>{p1} &amp; {p2}</div>
+          {namesBlock}
           <div style={introStyle}>{(dict?.inviteBoatPartySea ?? 'pour une soirée inoubliable,\nentre ciel et mer').split('\n').map((line, i) => <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>)}</div>
         </>
       )
@@ -873,7 +897,7 @@ function renderInvitationPhrase(
       return (
         <>
           <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteBeachPartyIntro ?? 'Retrouvez'}</div>
-          <div style={highlightStyle}>{p1} &amp; {p2}</div>
+          {namesBlock}
           <div style={introStyle}>{(dict?.inviteBeachPartySea ?? 'les pieds dans le sable,\npour une fête inoubliable').split('\n').map((line, i) => <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>)}</div>
         </>
       )
@@ -882,7 +906,7 @@ function renderInvitationPhrase(
       return (
         <>
           <div style={{ ...introStyle, margin: '0 0 4px' }}>{dict?.inviteAutreJoin ?? 'Rejoignez'}</div>
-          <div style={highlightStyle}>{p1} &amp; {p2}</div>
+          {namesBlock}
           <div style={introStyle}>{dict?.inviteAutreFor ?? 'pour'} {evt}</div>
         </>
       )
