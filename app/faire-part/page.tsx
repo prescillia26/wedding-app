@@ -794,8 +794,8 @@ function renderInvitationPhrase(
   const FC = 'var(--font-cormorant-garamond)'
   const FS = 'var(--font-great-vibes)'
 
-  // Style des lignes "intro" et "fin de phrase"
-  const introStyle: React.CSSProperties = {
+  // Style des lignes "intro" et "fin de phrase" — respecte la zone 'narratif'
+  const introStyle: React.CSSProperties = applyZoneStyle({
     fontFamily: FC,
     fontStyle: 'italic',
     fontSize: 16,
@@ -804,7 +804,7 @@ function renderInvitationPhrase(
     lineHeight: 1.7,
     opacity: 0.85,
     margin: '0 0 10px',
-  }
+  }, 'narratif', data.zoneStyles)
 
   // Style des PRÉNOMS — calligraphique, cohérent avec l'accueil et les cérémonies Mairie/Houppa
   const nameStyle: React.CSSProperties = applyZoneStyle({
@@ -7874,7 +7874,7 @@ const firstDate = sorted[0]?.date
                           ) : (
                             /* Phrase par défaut */
                             <>
-                              <div style={applyZoneStyle({ padding: '0 8px' }, 'narratif', data.zoneStyles)}>
+                              <div style={{ padding: '0 8px' }}>
                                 {renderInvitationPhrase(ceremony, data, G, TEXT, t.fairepart)}
                               </div>
                               {canEdit && (
