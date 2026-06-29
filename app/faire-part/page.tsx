@@ -7410,10 +7410,10 @@ const firstDate = sorted[0]?.date
                       {i % 2 === 0 ? <><OrnTR /><OrnBL /></> : <><OrnTL /><OrnBR /></>}
                     </>
                   )}
-                  {/* Logo en filigrane (watermark) */}
+                  {/* Logo en filigrane (watermark) — positionné derrière le titre */}
                   {data.logoWatermark && data.customLogoUrl && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={data.customLogoUrl} alt="" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '60%', height: '60%', objectFit: 'contain', opacity: data.logoWatermarkOpacity ?? 0.04, pointerEvents: 'none', zIndex: 0 }} />
+                    <img src={data.customLogoUrl} alt="" style={{ position: 'absolute', top: hasFrame ? '15%' : 20, left: '50%', transform: 'translateX(-50%)', width: 180, height: 180, objectFit: 'contain', opacity: data.logoWatermarkOpacity ?? 0.06, pointerEvents: 'none', zIndex: 0 }} />
                   )}
                   {hasFrame && FRAMES_STRONG_BG.has(data.frameId ?? '') && (
                     <div style={{ position: 'absolute', inset: '12% 18%', background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: 0 }} />
