@@ -491,7 +491,9 @@ interface FormData {
   customTextZones?: { id: string; text: string; x: number; y: number; style?: string }[]
   // ── Logo en filigrane (watermark) derrière le contenu ──
   logoWatermark?: boolean // afficher le logo en filigrane derrière chaque cérémonie
-  logoWatermarkOpacity?: number // 0-1, default 0.04
+  logoWatermarkOpacity?: number // 0-1, default 0.06
+  logoWatermarkSize?: number // taille en px (80-400, default 180)
+  logoWatermarkColor?: string // couleur du filigrane (hex, '' = utiliser le logo tel quel)
 }
 
 type IllustrationKind = 'scene' | 'motif'
@@ -2768,6 +2770,67 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
           <div style={{ flex: 1, height: 1, background: '#e5d5c5' }} />
         </div>
         <CustomLogoUpload logoUrl={data.customLogoUrl} logoOriginalUrl={data.customLogoOriginalUrl} logoSize={data.customLogoSize} logoColor={data.customLogoColor} onChange={onChange} accent={THEMES[data.style].accent} />
+
+        {/* ── Filigrane (watermark) ── */}
+        {data.customLogoUrl && (
+          <div style={{ marginTop: 20, padding: '16px 12px', background: '#faf8f5', borderRadius: 12, border: '1px solid #e8ddd0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#3a3330', fontFamily: 'var(--font-playfair-display)' }}>✨ Logo en filigrane</span>
+              <button type="button" onClick={() => onChange({ logoWatermark: !data.logoWatermark })} style={{
+                cursor: 'pointer', padding: '4px 12px', borderRadius: 9999, border: 'none',
+                background: data.logoWatermark ? THEMES[data.style].accent : '#e0d5c8',
+                color: data.logoWatermark ? 'white' : '#6a6560', fontSize: 11, fontWeight: 600,
+              }}>{data.logoWatermark ? 'Activé' : 'Désactivé'}</button>
+            </div>
+            {data.logoWatermark && (
+              <>
+                <div style={{ marginBottom: 10 }}>
+                  <span style={{ fontSize: 10, color: '#9ca3af', fontWeight: 600 }}>Taille</span>
+                  <input type="range" min={80} max={400} step={10} value={data.logoWatermarkSize ?? 180}
+                    onChange={e => onChange({ logoWatermarkSize: Number(e.target.value) })}
+                    style={{ width: '100%', accentColor: THEMES[data.style].accent }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9, color: '#9ca3af' }}>
+                    <span>Petit</span><span>{data.logoWatermarkSize ?? 180}px</span><span>Grand</span>
+                  </div>
+                </div>
+                <div style={{ marginBottom: 10 }}>
+                  <span style={{ fontSize: 10, color: '#9ca3af', fontWeight: 600 }}>Opacité</span>
+                  <input type="range" min={2} max={20} step={1} value={Math.round((data.logoWatermarkOpacity ?? 0.06) * 100)}
+                    onChange={e => onChange({ logoWatermarkOpacity: Number(e.target.value) / 100 })}
+                    style={{ width: '100%', accentColor: THEMES[data.style].accent }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9, color: '#9ca3af' }}>
+                    <span>Subtil</span><span>{Math.round((data.logoWatermarkOpacity ?? 0.06) * 100)}%</span><span>Visible</span>
+                  </div>
+                </div>
+                <div>
+                  <span style={{ fontSize: 10, color: '#9ca3af', fontWeight: 600, display: 'block', marginBottom: 4 }}>Couleur du filigrane</span>
+                  <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+                    {[
+                      { value: '', label: 'Original', swatch: '' },
+                      { value: THEMES[data.style].accent, label: 'Accent', swatch: THEMES[data.style].accent },
+                      { value: '#1B3A5C', label: 'Marine', swatch: '#1B3A5C' },
+                      { value: '#C9A84C', label: 'Doré', swatch: '#C9A84C' },
+                      { value: '#9ca3af', label: 'Gris', swatch: '#9ca3af' },
+                    ].map(opt => {
+                      const sel = (data.logoWatermarkColor ?? '') === opt.value
+                      return (
+                        <button key={opt.label} type="button" onClick={() => onChange({ logoWatermarkColor: opt.value })} style={{
+                          cursor: 'pointer', padding: '4px 10px', borderRadius: 9999, fontSize: 10, fontWeight: sel ? 700 : 400,
+                          border: sel ? `2px solid ${THEMES[data.style].accent}` : '1px solid #e0d5c8',
+                          background: sel ? `${THEMES[data.style].accent}15` : 'white',
+                          color: '#3a3330', display: 'flex', alignItems: 'center', gap: 4,
+                        }}>
+                          {opt.swatch ? <div style={{ width: 12, height: 12, borderRadius: '50%', background: opt.swatch }} /> : <div style={{ width: 12, height: 12, borderRadius: '50%', background: 'conic-gradient(#f87171, #facc15, #34d399, #60a5fa, #a78bfa, #f87171)' }} />}
+                          {opt.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </AccordionSection>
 
       <AccordionSection title={locale === 'en' ? '🎵 Music & photos' : '🎵 Musique & photos'}>
@@ -7411,10 +7474,20 @@ const firstDate = sorted[0]?.date
                     </>
                   )}
                   {/* Logo en filigrane (watermark) — positionné derrière le titre */}
-                  {data.logoWatermark && data.customLogoUrl && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={data.customLogoUrl} alt="" style={{ position: 'absolute', top: hasFrame ? '15%' : 20, left: '50%', transform: 'translateX(-50%)', width: 180, height: 180, objectFit: 'contain', opacity: data.logoWatermarkOpacity ?? 0.06, pointerEvents: 'none', zIndex: 0 }} />
-                  )}
+                  {data.logoWatermark && data.customLogoUrl && (() => {
+                    const wmSize = data.logoWatermarkSize ?? 180
+                    const wmColor = data.logoWatermarkColor ?? ''
+                    if (wmColor) {
+                      // Utiliser le logo comme mask-image pour appliquer une couleur CSS
+                      return (
+                        <div style={{ position: 'absolute', top: hasFrame ? '15%' : 20, left: '50%', transform: 'translateX(-50%)', width: wmSize, height: wmSize, backgroundColor: wmColor, WebkitMaskImage: `url(${data.customLogoUrl})`, WebkitMaskSize: 'contain', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center', maskImage: `url(${data.customLogoUrl})`, maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', opacity: data.logoWatermarkOpacity ?? 0.06, pointerEvents: 'none', zIndex: 0 } as React.CSSProperties} />
+                      )
+                    }
+                    return (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={data.customLogoUrl} alt="" style={{ position: 'absolute', top: hasFrame ? '15%' : 20, left: '50%', transform: 'translateX(-50%)', width: wmSize, height: wmSize, objectFit: 'contain', opacity: data.logoWatermarkOpacity ?? 0.06, pointerEvents: 'none', zIndex: 0 }} />
+                    )
+                  })()}
                   {hasFrame && FRAMES_STRONG_BG.has(data.frameId ?? '') && (
                     <div style={{ position: 'absolute', inset: '12% 18%', background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: 0 }} />
                   )}
