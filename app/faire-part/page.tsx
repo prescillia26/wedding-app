@@ -6309,7 +6309,7 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
   const category = typeToCategory[ceremonyType] || 'couples'
   const w = Math.max(20, Math.min(400, size))
   const cx = localPos?.x ?? offsetX
-  const cy = Math.max(0, localPos?.y ?? offsetY)
+  const cy = localPos?.y ?? offsetY
 
   useEffect(() => {
     const mm = (e: MouseEvent) => {
