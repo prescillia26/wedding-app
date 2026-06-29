@@ -368,6 +368,8 @@ interface Ceremony {
   // ── Photo de fond du lieu ──
   ceremonyImage?: string
   ceremonyImageOpacity?: number // 0-100, default 30
+  // ── Fond personnalisé par cérémonie ──
+  bgColor?: string // couleur de fond custom (ex: '#EBF2FA' bleu clair)
 }
 interface FormData {
   marie1Prenom: string
@@ -487,6 +489,9 @@ interface FormData {
   decouvrirButtonPosition?: { x: number; y: number }
   // ── Zones de texte personnalisées (ajoutées par les mariés) ──
   customTextZones?: { id: string; text: string; x: number; y: number; style?: string }[]
+  // ── Logo en filigrane (watermark) derrière le contenu ──
+  logoWatermark?: boolean // afficher le logo en filigrane derrière chaque cérémonie
+  logoWatermarkOpacity?: number // 0-1, default 0.04
 }
 
 type IllustrationKind = 'scene' | 'motif'
@@ -7387,7 +7392,7 @@ const firstDate = sorted[0]?.date
               {/* Illustration aquarelle — rendue à l'intérieur de la carte (voir ci-dessous) */}
               <CeremonyCard isCard={isCard} accent={G} hasFrame={hasFrame}>
                 {i === 0 && !(data.customPages ?? []).some(p => p.position === safeIdx) && <div id="first-content" style={{ scrollMarginTop: 60 }} />}
-                <section id={`ceremony-${safeIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : 48, paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : 48, paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: hasFrame ? 'hidden' : 'visible', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: theme.fond } : { background: hasFrame ? '#ffffff' : theme.fond }) }}>
+                <section id={`ceremony-${safeIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : 48, paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : 48, paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: hasFrame ? 'hidden' : 'visible', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: ceremony.bgColor || theme.fond } : { background: hasFrame ? '#ffffff' : (ceremony.bgColor || theme.fond) }) }}>
                   {hasFrame && frame.video ? (
                     <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
                   ) : hasFrame ? (
@@ -7403,6 +7408,11 @@ const firstDate = sorted[0]?.date
                     <>
                       {i % 2 === 0 ? <><OrnTR /><OrnBL /></> : <><OrnTL /><OrnBR /></>}
                     </>
+                  )}
+                  {/* Logo en filigrane (watermark) */}
+                  {data.logoWatermark && data.customLogoUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={data.customLogoUrl} alt="" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '60%', height: '60%', objectFit: 'contain', opacity: data.logoWatermarkOpacity ?? 0.04, pointerEvents: 'none', zIndex: 0 }} />
                   )}
                   {hasFrame && FRAMES_STRONG_BG.has(data.frameId ?? '') && (
                     <div style={{ position: 'absolute', inset: '12% 18%', background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none', zIndex: 0 }} />
