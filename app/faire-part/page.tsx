@@ -494,6 +494,8 @@ interface FormData {
   logoWatermarkOpacity?: number // 0-1, default 0.06
   logoWatermarkSize?: number // taille en px (80-400, default 180)
   logoWatermarkColor?: string // couleur du filigrane (hex, '' = utiliser le logo tel quel)
+  // ── Layout accueil compact ──
+  accueilCompact?: boolean // si true, pas de minHeight 100svh sur la couverture
 }
 
 type IllustrationKind = 'scene' | 'motif'
@@ -7182,10 +7184,10 @@ const firstDate = sorted[0]?.date
         </div>
       )}
 {/* SECTION 1 : Écran d'accueil */}
-      <div style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center',
-        justifyContent: 'center', gap: 0,
-        paddingTop: data.styleAccueil === 'video' ? (() => { const v = VIDEO_BACKGROUNDS.find(x => x.id === data.videoAccueilId); return v?.textPosition === 'top' ? '4%' : v?.textPosition === 'center-top' ? '8%' : '12%' })() : 24,
-        paddingBottom: 24,
+      <div style={{ position: 'relative', minHeight: data.accueilCompact ? 'auto' : '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: data.accueilCompact ? 'flex-start' : 'center', gap: 0,
+        paddingTop: data.styleAccueil === 'video' ? (() => { const v = VIDEO_BACKGROUNDS.find(x => x.id === data.videoAccueilId); return v?.textPosition === 'top' ? '4%' : v?.textPosition === 'center-top' ? '8%' : '12%' })() : (data.accueilCompact ? 32 : 24),
+        paddingBottom: data.accueilCompact ? 32 : 24,
         maxWidth: 480, margin: '0 auto', boxShadow: '0 8px 60px rgba(0,0,0,0.15)' }}>
         {/* Voile de lisibilité sur les photos de fond */}
         {(data.styleAccueil === 'photo' || (!data.styleAccueil)) && (data.photosFond?.length || data.photoFond) && (
@@ -7283,7 +7285,7 @@ const firstDate = sorted[0]?.date
             const coupleUrl = ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url || (data.illustrationCoupleId.startsWith('http') ? data.illustrationCoupleId : '')
             if (!coupleUrl) return null
             return (
-              <div style={{ marginBottom: 14 }}>
+              <div style={{ marginBottom: 4 }}>
                 <EditableIllustration
                   url={coupleUrl}
                   size={data.illustrationCoupleSize ?? (hasIntroPhoto ? 50 : 70)}
