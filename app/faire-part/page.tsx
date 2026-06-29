@@ -497,6 +497,7 @@ interface FormData {
   // ── Layout accueil compact ──
   accueilCompact?: boolean // si true, pas de minHeight 100svh sur la couverture
   premiumCover?: boolean
+  premiumCeremonyStyle?: boolean // if true, premium date format + tighter spacing + SVG separators
 }
 
 type IllustrationKind = 'scene' | 'motif'
@@ -7570,7 +7571,7 @@ const firstDate = sorted[0]?.date
               {/* Illustration aquarelle — rendue à l'intérieur de la carte (voir ci-dessous) */}
               <CeremonyCard isCard={isCard} accent={G} hasFrame={hasFrame}>
                 {i === 0 && !(data.customPages ?? []).some(p => p.position === safeIdx) && <div id="first-content" style={{ scrollMarginTop: 60 }} />}
-                <section id={`ceremony-${safeIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : 48, paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : 48, paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: hasFrame ? 'hidden' : 'visible', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: ceremony.bgColor || theme.fond } : { background: hasFrame ? '#ffffff' : (ceremony.bgColor || theme.fond) }) }}>
+                <section id={`ceremony-${safeIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : (data.premiumCeremonyStyle ? 32 : 48), paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : (data.premiumCeremonyStyle ? 32 : 48), paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: hasFrame ? 'hidden' : 'visible', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: ceremony.bgColor || theme.fond } : { background: hasFrame ? '#ffffff' : (ceremony.bgColor || theme.fond) }) }}>
                   {hasFrame && frame.video ? (
                     <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
                   ) : hasFrame ? (
@@ -7626,6 +7627,24 @@ const firstDate = sorted[0]?.date
                         style={{ ...applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: (ceremony.illustrationUrl || ceremony.ceremonyImage) ? 10 : 24, lineHeight: 1.4 }, 'titres', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_titre`) }}
                       />
                     </AnimSection></DraggableElement>
+                    {data.premiumCeremonyStyle && ceremony.date && (
+                      <div style={{ margin: '12px auto 16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+                          <div style={{ fontFamily: 'var(--font-tenor-sans)', fontSize: 10, letterSpacing: 3, color: G, textTransform: 'uppercase' as const, borderBottom: `0.5px solid ${G}40`, paddingBottom: 4 }}>
+                            {new Date(ceremony.date + 'T12:00:00').toLocaleDateString(locale === 'en' ? 'en-US' : 'fr-FR', { weekday: 'long' })}
+                          </div>
+                          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 56, color: G, fontStyle: 'italic', lineHeight: 1, border: `0.5px solid ${G}40`, padding: '6px 14px' }}>
+                            {new Date(ceremony.date + 'T12:00:00').getDate()}
+                          </div>
+                          <div style={{ fontFamily: 'var(--font-tenor-sans)', fontSize: 10, letterSpacing: 3, color: G, textTransform: 'uppercase' as const, borderBottom: `0.5px solid ${G}40`, paddingBottom: 4 }}>
+                            {new Date(ceremony.date + 'T12:00:00').toLocaleDateString(locale === 'en' ? 'en-US' : 'fr-FR', { month: 'long' })}
+                          </div>
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-tenor-sans)', fontSize: 12, color: G, letterSpacing: 3, textAlign: 'center', marginTop: 6 }}>
+                          {new Date(ceremony.date + 'T12:00:00').getFullYear()}
+                        </div>
+                      </div>
+                    )}
                     {/* Illustration intégrée directement dans la carte */}
                     {(ceremony.illustrationUrl || ceremony.ceremonyImage) ? (
                       <AnimSection animStyle={anim} delay={200} skipAnim={canEdit}>
@@ -8028,6 +8047,20 @@ const firstDate = sorted[0]?.date
                   })()}
                 </section>
               </CeremonyCard>
+              {data.premiumCeremonyStyle && i < sorted.length - 1 && (
+                <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                  <svg width="220" height="40" viewBox="0 0 220 40" style={{ display: 'inline-block' }}>
+                    <line x1="0" y1="20" x2="88" y2="20" stroke={G} strokeWidth="0.5"/>
+                    <circle cx="95" cy="20" r="3" fill="none" stroke={G} strokeWidth="0.5"/>
+                    <circle cx="110" cy="20" r="5" fill={G} opacity="0.3"/>
+                    <circle cx="110" cy="20" r="2.5" fill={G}/>
+                    <circle cx="125" cy="20" r="3" fill="none" stroke={G} strokeWidth="0.5"/>
+                    <line x1="132" y1="20" x2="220" y2="20" stroke={G} strokeWidth="0.5"/>
+                    <ellipse cx="75" cy="16" rx="8" ry="3" fill={G} opacity="0.2" transform="rotate(-20 75 16)"/>
+                    <ellipse cx="145" cy="16" rx="8" ry="3" fill={G} opacity="0.2" transform="rotate(20 145 16)"/>
+                  </svg>
+                </div>
+              )}
               {/* Séparateur entre cérémonies retiré — les indicateurs de page suffisent */}
               {/* Pages supplémentaires rendues AVANT chaque cérémonie (voir plus haut) */}
             </React.Fragment>
