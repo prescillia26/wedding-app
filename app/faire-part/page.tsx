@@ -2324,12 +2324,10 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
     setCustomCoverVideoUploading(true)
     const fd = new window.FormData()
     fd.append('file', file)
-    fd.append('upload_preset', 'wedding_music')
-    fd.append('resource_type', 'video')
     try {
-      const res = await fetch('https://api.cloudinary.com/v1_1/dau96mui2/video/upload', { method: 'POST', body: fd })
+      const res = await fetch('/api/upload', { method: 'POST', body: fd })
       const json = await res.json()
-      if (json.secure_url) onChange({ customDesignCoverVideoUrl: json.secure_url })
+      if (json.url) onChange({ customDesignCoverVideoUrl: json.url })
       else showToast('Erreur lors de l\'upload vidéo', 'error')
     } catch {
       showToast('Erreur lors de l\'upload vidéo', 'error')
@@ -6282,12 +6280,12 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
       />
       {editable && !showPicker && (
         <div onPointerDown={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 2, lineHeight: 1, position: 'relative', zIndex: 10 }}>
-          <button type="button" onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); onChangeSize(Math.max(20, w - 10)) }} style={{
+          <button type="button" onClick={(e) => { e.stopPropagation(); onChangeSize(Math.max(20, w - 10)) }} style={{
             ...BTN, width: 28, height: 28, borderRadius: '50%', border: `2px solid ${accent}`,
             background: 'white', color: accent, fontSize: 18, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, cursor: 'pointer',
           }}>−</button>
           <span style={{ fontSize: 10, color: accent, fontWeight: 600, minWidth: 30, textAlign: 'center' }}>{w}%</span>
-          <button type="button" onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); onChangeSize(Math.min(400, w + 10)) }} style={{
+          <button type="button" onClick={(e) => { e.stopPropagation(); onChangeSize(Math.min(400, w + 10)) }} style={{
             ...BTN, width: 28, height: 28, borderRadius: '50%', border: `2px solid ${accent}`,
             background: 'white', color: accent, fontSize: 18, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, cursor: 'pointer',
           }}>+</button>
@@ -8326,6 +8324,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
           mariageJuif={data.mariageJuif}
           illustrationUrl={data.illustrationCoupleId ? ILLUSTRATIONS_COUPLES.find(ic => ic.id === data.illustrationCoupleId)?.url : undefined}
           customDesignCoverUrl={data.customDesignMode ? data.customDesignCoverUrl : undefined}
+          customDesignCoverVideoUrl={data.customDesignMode ? data.customDesignCoverVideoUrl : undefined}
         />
       )}
       {!isPaid && (
