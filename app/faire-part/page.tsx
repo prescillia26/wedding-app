@@ -958,7 +958,7 @@ function applyZoneStyle(baseStyle: React.CSSProperties, zone: TextZone, zoneStyl
       // On garde le clamp mais on peut jouer sur transform
       result.transform = `scale(${z.sizeScale})`
       result.transformOrigin = 'center'
-      result.display = 'inline-block'
+      result.display = 'block'
     }
   }
   return result
@@ -7601,7 +7601,7 @@ const firstDate = sorted[0]?.date
                     const setLayout = (l: LayoutMap) => onUpdate?.({ accueilLayout: l })
                     const pre = `c${safeIdx}_`
                     return (
-                  <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame), transform: data.textOffsetY ? `translateY(${data.textOffsetY}px)` : undefined }}>
+                  <div style={{ position: 'relative', zIndex: 1, opacity: data.textOpacity ?? 1, textShadow: readableShadow(theme, usePhotoBg, hasFrame), transform: data.textOffsetY ? `translateY(${data.textOffsetY}px)` : undefined }}>
                     {data.mariageJuif && (
                       <div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, opacity: 0.85, letterSpacing: 1, marginBottom: 8, paddingRight: 4, textShadow: goldShadow }}>בס״ד</div>
                     )}
