@@ -23,6 +23,7 @@ export default function InvitationCover({
   videoOverlayShowBsd,
   videoOverlayTextColor,
   videoOverlayBgColor,
+  videoPosterUrl,
 }: {
   prenom1: string
   prenom2: string
@@ -43,6 +44,7 @@ export default function InvitationCover({
   videoOverlayShowBsd?: boolean
   videoOverlayTextColor?: string
   videoOverlayBgColor?: string
+  videoPosterUrl?: string
 }) {
   const [phase, setPhase] = useState(0) // 0=idle, 1=opening, 2=revealing, 3=done
   const [sparkles, setSparkles] = useState<{ id: number; x: number; y: number; delay: number; size: number }[]>([])
@@ -135,7 +137,7 @@ export default function InvitationCover({
       <div style={{
         position: 'fixed', inset: 0, zIndex: 300,
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        background: videoOverlayBgColor || '#F7F3EC',
+        background: videoPosterUrl ? `url(${videoPosterUrl}) center/cover no-repeat ${videoOverlayBgColor || '#F7F3EC'}` : (videoOverlayBgColor || '#F7F3EC'),
         opacity: phase === 3 ? 0 : 1,
         transition: 'opacity 0.8s ease, background 0.8s ease',
         pointerEvents: phase === 3 ? 'none' : 'auto',
@@ -161,6 +163,7 @@ export default function InvitationCover({
           <video
             ref={videoRef}
             src={customDesignCoverVideoUrl}
+            poster={videoPosterUrl}
             playsInline
             muted
             preload="auto"
