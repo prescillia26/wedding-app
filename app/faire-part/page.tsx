@@ -5415,7 +5415,7 @@ function AnimSection({ children, delay = 0, style, animStyle = 'slide-up', skipA
 }
 
 // ── Menu flottant pour naviguer entre les événements ──────────────────────────
-function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize = 48, logoBold = 100, firstDate, editable, onLogoChange }: { ceremonies: { type: string; customName?: string }[]; accent: string; theme: ThemeObj; logoUrl?: string; logoColor?: string; logoSize?: number; logoBold?: number; firstDate?: string; editable?: boolean; onLogoChange?: (d: Partial<FormData>) => void }) {
+function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize = 48, logoBold = 100, firstDate, editable, onLogoChange, premiumStyle }: { ceremonies: { type: string; customName?: string }[]; accent: string; theme: ThemeObj; logoUrl?: string; logoColor?: string; logoSize?: number; logoBold?: number; firstDate?: string; editable?: boolean; onLogoChange?: (d: Partial<FormData>) => void; premiumStyle?: boolean }) {
   const [open, setOpen] = useState(false)
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
   const { t } = useT()
@@ -5460,9 +5460,26 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
     { value: countdown.seconds, label: 'Secondes' },
   ]
 
+  const CG = 'var(--font-cormorant-garamond)'
+  const premiumCountdownItems = [
+    { value: countdown.days, label: 'Jours' },
+    { value: countdown.hours, label: 'Heures' },
+    { value: countdown.minutes, label: 'Min' },
+    { value: countdown.seconds, label: 'Sec' },
+  ]
+  const separatorLine = <div style={{ width: 0.5, height: 28, background: 'rgba(201,162,100,0.3)', flexShrink: 0 }} />
+
   return (
     <>
-      <div style={{
+      <div style={premiumStyle ? {
+        position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
+        width: '100%', maxWidth: 480, zIndex: 100,
+        background: 'rgba(247,243,236,0.97)',
+        backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+        borderBottom: '0.5px solid rgba(201,162,100,0.2)',
+        height: 68, padding: '0 16px', boxSizing: 'border-box',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      } as React.CSSProperties : {
         position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
         width: '100%', maxWidth: 480, zIndex: 100,
         background: theme.dark ? 'rgba(20,20,20,0.95)' : 'rgba(255,255,255,0.95)',
@@ -5472,11 +5489,11 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
         height: 48, overflow: 'hidden',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       } as React.CSSProperties}>
-        {/* Logo — taille ajustable */}
-        <div style={{ width: logoSize, height: logoSize, flexShrink: 0, cursor: editable ? 'pointer' : undefined }} onClick={editable ? () => setShowLogoEdit(!showLogoEdit) : undefined}>
+        {/* Logo */}
+        <div style={{ width: premiumStyle ? logoSize * 1.15 : logoSize, height: premiumStyle ? logoSize * 1.15 : logoSize, flexShrink: 0, cursor: editable ? 'pointer' : undefined, transformOrigin: 'left center' }} onClick={editable ? () => setShowLogoEdit(!showLogoEdit) : undefined}>
           {logoSrc ? (
             <div style={{
-              width: logoSize, height: logoSize,
+              width: premiumStyle ? logoSize * 1.15 : logoSize, height: premiumStyle ? logoSize * 1.15 : logoSize,
               backgroundColor: effectiveLogoColor,
               WebkitMaskImage: `url(${logoSrc})`,
               WebkitMaskSize: 'contain',
@@ -5490,8 +5507,26 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
           ) : null}
         </div>
 
-        {/* Countdown — style bloc comme la référence */}
-        {firstDate && (
+        {premiumStyle && separatorLine}
+
+        {/* Countdown */}
+        {firstDate && premiumStyle ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1, justifyContent: 'center' }}>
+            {premiumCountdownItems.map((item, idx) => (
+              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <div style={{ textAlign: 'center', minWidth: 32 }}>
+                  <div style={{ fontFamily: CG, fontStyle: 'italic', fontSize: 24, color: '#1B2A5E', lineHeight: 1, fontWeight: 300 }}>
+                    {String(item.value).padStart(2, '0')}
+                  </div>
+                  <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 5, letterSpacing: 1.5, color: '#C9A264', textTransform: 'uppercase', marginTop: 2 }}>
+                    {item.label}
+                  </div>
+                </div>
+                {idx < 3 && <div style={{ color: '#C9A264', fontSize: 6, marginBottom: 10, opacity: 0.6, flexShrink: 0 }}>◆</div>}
+              </div>
+            ))}
+          </div>
+        ) : firstDate ? (
           <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             {countdownItems.map((item, idx) => (
               <div key={idx} style={{ textAlign: 'center' }}>
@@ -5504,16 +5539,32 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
               </div>
             ))}
           </div>
-        )}
+        ) : null}
+
+        {premiumStyle && separatorLine}
 
         {/* Menu burger */}
-        <button onClick={() => setOpen(!open)} style={{
-          width: 36, height: 36, borderRadius: '50%', border: `1.5px solid ${accent}44`,
-          background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          cursor: 'pointer', color: accent, fontSize: 18, padding: 0, flexShrink: 0,
-        }}>
-          {open ? '✕' : '☰'}
-        </button>
+        {premiumStyle ? (
+          <div onClick={() => setOpen(!open)} style={{
+            width: 34, height: 34, border: '0.5px solid rgba(201,162,100,0.5)', borderRadius: '50%',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            gap: 4, cursor: 'pointer', flexShrink: 0,
+          }}>
+            {open ? <span style={{ color: '#1B2A5E', fontSize: 14, lineHeight: 1 }}>✕</span> : <>
+              <div style={{ width: 13, height: 0.5, background: '#1B2A5E' }} />
+              <div style={{ width: 13, height: 0.5, background: '#1B2A5E' }} />
+              <div style={{ width: 13, height: 0.5, background: '#1B2A5E' }} />
+            </>}
+          </div>
+        ) : (
+          <button onClick={() => setOpen(!open)} style={{
+            width: 36, height: 36, borderRadius: '50%', border: `1.5px solid ${accent}44`,
+            background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', color: accent, fontSize: 18, padding: 0, flexShrink: 0,
+          }}>
+            {open ? '✕' : '☰'}
+          </button>
+        )}
       </div>
 
       {/* Menu déroulant */}
@@ -7186,7 +7237,7 @@ const firstDate = sorted[0]?.date
   return (
     <div style={{ backgroundColor: theme.fond, minHeight: '100vh', overflowX: 'hidden' }}>
       {data.petalsEnabled && <PersistentParticles theme={theme} style={data.style} />}
-      <div style={{ backgroundColor: theme.fond, color: TEXT, minHeight: '100vh', maxWidth: 480, margin: '0 auto', boxShadow: '0 0 40px rgba(0,0,0,0.08)', paddingTop: 48, overflowX: 'hidden' }}>
+      <div style={{ backgroundColor: theme.fond, color: TEXT, minHeight: '100vh', maxWidth: 480, margin: '0 auto', boxShadow: '0 0 40px rgba(0,0,0,0.08)', paddingTop: data.premiumCover ? 68 : 48, overflowX: 'hidden' }}>
       <StickyHeader
         ceremonies={sorted}
         accent={G}
@@ -7198,6 +7249,7 @@ const firstDate = sorted[0]?.date
         firstDate={sorted[0]?.date}
         editable={role !== 'guest' && !!onUpdate}
         onLogoChange={onUpdate}
+        premiumStyle={data.premiumCover}
       />
       <style>{`
         @keyframes sharedFadeIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
