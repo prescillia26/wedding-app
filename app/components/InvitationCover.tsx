@@ -133,7 +133,7 @@ export default function InvitationCover({
       <div style={{
         position: 'fixed', inset: 0, zIndex: 300,
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        background: videoPosterUrl ? `url(${videoPosterUrl}) center/cover no-repeat ${videoOverlayBgColor || '#F7F3EC'}` : (videoOverlayBgColor || '#F7F3EC'),
+        background: videoPosterUrl ? `url(${videoPosterUrl}) center/contain no-repeat ${videoOverlayBgColor || '#F7F3EC'}` : (videoOverlayBgColor || '#F7F3EC'),
         opacity: phase === 3 ? 0 : 1,
         transition: 'opacity 0.8s ease, background 0.8s ease',
         pointerEvents: phase === 3 ? 'none' : 'auto',
@@ -165,8 +165,10 @@ export default function InvitationCover({
             preload="auto"
             onEnded={handleVideoEnd}
             style={{
-              position: 'absolute', inset: 0,
-              width: '100%', height: '100%', objectFit: 'cover',
+              position: 'absolute',
+              top: '50%', left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '90%', height: '90%', objectFit: 'contain',
             }}
           />
         )}
