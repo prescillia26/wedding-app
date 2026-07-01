@@ -5490,10 +5490,10 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       } as React.CSSProperties}>
         {/* Logo */}
-        <div style={{ width: premiumStyle ? logoSize * 1.15 : logoSize, height: premiumStyle ? logoSize * 1.15 : logoSize, flexShrink: 0, cursor: editable ? 'pointer' : undefined, transformOrigin: 'left center' }} onClick={editable ? () => setShowLogoEdit(!showLogoEdit) : undefined}>
+        <div style={{ width: premiumStyle ? logoSize * 1.4 : logoSize, height: premiumStyle ? logoSize * 1.4 : logoSize, flexShrink: 0, cursor: editable ? 'pointer' : undefined, transformOrigin: 'left center' }} onClick={editable ? () => setShowLogoEdit(!showLogoEdit) : undefined}>
           {logoSrc ? (
             <div style={{
-              width: premiumStyle ? logoSize * 1.15 : logoSize, height: premiumStyle ? logoSize * 1.15 : logoSize,
+              width: premiumStyle ? logoSize * 1.4 : logoSize, height: premiumStyle ? logoSize * 1.4 : logoSize,
               backgroundColor: effectiveLogoColor,
               WebkitMaskImage: `url(${logoSrc})`,
               WebkitMaskSize: 'contain',
@@ -7335,7 +7335,7 @@ const firstDate = sorted[0]?.date
     {/* Spacer */}
     <div style={{ flex: 1 }} />
     {/* Séparateur + bouton DÉCOUVRIR + dates — en bas */}
-    <div style={{ textAlign: 'center', flexShrink: 0, pointerEvents: 'auto', marginTop: -20 }}>
+    <div style={{ textAlign: 'center', flexShrink: 0, pointerEvents: 'auto', marginTop: -60 }}>
       <div>
         <button type="button" onClick={() => { const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null; if (audio) audio.play().catch(() => {}); onStartYoutube?.(); const el = document.getElementById('first-content'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} onTouchEnd={(e) => { e.preventDefault(); const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null; if (audio) audio.play().catch(() => {}); onStartYoutube?.(); const el = document.getElementById('first-content'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} style={{ fontFamily: 'var(--font-tenor-sans)', fontSize: 11, fontWeight: 500, letterSpacing: '0.35em', textTransform: 'uppercase' as const, padding: '16px 52px', borderRadius: 0, minWidth: 200, border: '0.5px solid #C9A264', background: 'rgba(247,243,236,0.6)', color: '#1B2A5E', cursor: 'pointer', transition: 'all 0.3s ease', animation: 'premiumPulse 2.5s ease-in-out infinite', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', backdropFilter: 'blur(4px)' }}>
           DÉCOUVRIR ◆
