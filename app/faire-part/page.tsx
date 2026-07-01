@@ -7794,45 +7794,39 @@ const firstDate = sorted[0]?.date
                       const familyStyle: React.CSSProperties = { ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic' as const, fontSize: 'clamp(12px, 3.2vw, 14px)', color: TEXT, lineHeight: 1.7, fontVariant: 'normal' as const, textAlign: 'center' as const }, 'parents', data.zoneStyles) }
                       const ovIf = (key: string, def: string) => ov[key] && ov[key] !== def ? ov[key] : ''
 
-                      // ── Premium layout: texte centré, pas d'InlineEdit/Draggable ──
+                      // ── Premium layout: 2 colonnes famille mariée (gauche) / marié (droite) ──
                       if (data.premiumCover) {
-                        const nameStyle: React.CSSProperties = { fontFamily: 'var(--font-playfair-display)', fontStyle: 'italic', fontSize: 13, color: '#1B2A5E', lineHeight: 1.8 }
+                        const PF = 'var(--font-playfair-display)'
+                        const nameStyle: React.CSSProperties = { fontFamily: PF, fontStyle: 'italic', fontSize: 13, color: '#1B2A5E', lineHeight: 1.8, textAlign: 'center' }
                         return (
                         <AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
-                          <div style={{ textAlign: 'center', padding: '20px 24px', overflow: 'hidden' }}>
-                            {/* Grands-parents — centré */}
-                            {hasGp && (
-                              <div style={{ marginBottom: 6 }}>
+                          <div style={{ padding: '20px 16px', overflow: 'hidden' }}>
+                            {/* 2 colonnes : famille 1 (gauche) — famille 2 (droite) */}
+                            <div style={{ display: 'flex', justifyContent: 'center', gap: 24 }}>
+                              {/* Colonne gauche — Famille Prescillia */}
+                              <div style={{ flex: 1, maxWidth: 200, textAlign: 'center' }}>
                                 {gpPa1 && <div style={nameStyle}>{ov.gpPa1 || gpPa1}</div>}
                                 {gpMa1 && <div style={nameStyle}>{ov.gpMa1 || gpMa1}</div>}
+                                {hasGp && parents1.length > 0 && <div style={{ width: 40, height: 0.5, background: '#C9A264', opacity: 0.3, margin: '8px auto' }} />}
+                                {parents1.map((l,j) => <div key={`p1_${j}`} style={nameStyle}>{ov[`parents1_${j}`] || l}</div>)}
+                              </div>
+                              {/* Colonne droite — Famille Jonas */}
+                              <div style={{ flex: 1, maxWidth: 200, textAlign: 'center' }}>
                                 {gpPa2 && <div style={nameStyle}>{ov.gpPa2 || gpPa2}</div>}
                                 {gpMa2 && <div style={nameStyle}>{ov.gpMa2 || gpMa2}</div>}
-                              </div>
-                            )}
-                            {/* Séparateur */}
-                            {hasGp && (parents1.length > 0 || parents2.length > 0) && (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '12px auto', maxWidth: 280 }}>
-                                <div style={{ flex: 1, height: 0.5, background: '#C9A264', opacity: 0.3 }} />
-                                <span style={{ fontFamily: 'var(--font-playfair-display)', fontStyle: 'italic', fontSize: 11, color: '#C9A264', flexShrink: 0 }}>et</span>
-                                <div style={{ flex: 1, height: 0.5, background: '#C9A264', opacity: 0.3 }} />
-                              </div>
-                            )}
-                            {/* Parents — centré */}
-                            {(parents1.length > 0 || parents2.length > 0) && (
-                              <div style={{ marginBottom: 20 }}>
-                                {parents1.map((l,j) => <div key={`p1_${j}`} style={nameStyle}>{ov[`parents1_${j}`] || l}</div>)}
+                                {hasGp && parents2.length > 0 && <div style={{ width: 40, height: 0.5, background: '#C9A264', opacity: 0.3, margin: '8px auto' }} />}
                                 {parents2.map((l,j) => <div key={`p2_${j}`} style={nameStyle}>{ov[`parents2_${j}`] || l}</div>)}
                               </div>
-                            )}
-                            {/* Texte invitation */}
-                            <div style={{ fontFamily: 'var(--font-playfair-display)', fontStyle: 'italic', fontSize: 14, color: '#1B2A5E', lineHeight: 1.7, marginBottom: 24 }}>
+                            </div>
+                            {/* Texte invitation centré */}
+                            <div style={{ textAlign: 'center', marginTop: 24, fontFamily: PF, fontStyle: 'italic', fontSize: 14, color: '#1B2A5E', lineHeight: 1.7, marginBottom: 24 }}>
                               <InlineEdit
                                 value={ov[`ceremony_${safeIdx}_joie`] || ''}
                                 defaultValue={hasGp ? t.fairepart.joyMessageGp : t.fairepart.joyMessage}
                                 editable={canEdit}
                                 onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_joie`]: v } })}
                                 onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_joie`, patch)}
-                                style={{ fontFamily: 'var(--font-playfair-display)', fontStyle: 'italic', fontSize: 14, color: '#1B2A5E', textAlign: 'center', lineHeight: 1.7 }}
+                                style={{ fontFamily: PF, fontStyle: 'italic', fontSize: 14, color: '#1B2A5E', textAlign: 'center', lineHeight: 1.7 }}
                               />
                             </div>
                           </div>
