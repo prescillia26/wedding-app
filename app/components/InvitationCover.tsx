@@ -133,7 +133,7 @@ export default function InvitationCover({
       <div style={{
         position: 'fixed', inset: 0, zIndex: 300,
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        background: videoPosterUrl ? `url(${videoPosterUrl}) center/contain no-repeat ${videoOverlayBgColor || '#F7F3EC'}` : (videoOverlayBgColor || '#F7F3EC'),
+        background: '#F7F3EC',
         opacity: phase === 3 ? 0 : 1,
         transition: 'opacity 0.8s ease, background 0.8s ease',
         pointerEvents: phase === 3 ? 'none' : 'auto',
