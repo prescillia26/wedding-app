@@ -7934,7 +7934,7 @@ const firstDate = sorted[0]?.date
                           style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginTop: data.premiumCover ? 16 : 16, marginBottom: data.premiumCover ? 20 : 28, opacity: 0.78, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_honore`) }}
                         />
                       ) : ceremony.type === 'Shabbat Hatan' ? (
-                        <div style={{ textAlign: 'center', marginTop: data.premiumCover ? 20 : 32, marginBottom: data.premiumCover ? 16 : 16, padding: '0 12px' }}>
+                        <div style={{ textAlign: 'center', marginTop: data.premiumCover ? 0 : 32, marginBottom: data.premiumCover ? 0 : 16, padding: '0 12px' }}>
                           <InlineEdit
                             value={ov[`ceremony_${safeIdx}_lesfamilles`] || ''}
                             defaultValue="Les Familles"
