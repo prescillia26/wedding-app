@@ -7791,7 +7791,7 @@ const firstDate = sorted[0]?.date
                       </AnimSection></DraggableElement>
                     )}
                     {(hasGp || parents1.length > 0 || parents2.length > 0) && ceremony.type === 'Cérémonie religieuse / Houppa' && (() => {
-                      const familyStyle: React.CSSProperties = { ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic' as const, fontSize: 'clamp(12px, 3.2vw, 14px)', color: TEXT, lineHeight: 1.7, fontVariant: 'normal' as const, textAlign: 'center' as const }, 'parents', data.zoneStyles) }
+                      const familyStyle: React.CSSProperties = { ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic' as const, fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' as const }, 'parents', data.zoneStyles) }
                       const ovIf = (key: string, def: string) => ov[key] && ov[key] !== def ? ov[key] : ''
 
                       // ── Premium layout: 2 colonnes famille mariée (gauche) / marié (droite) ──
