@@ -498,6 +498,7 @@ interface FormData {
   accueilCompact?: boolean // si true, pas de minHeight 100svh sur la couverture
   premiumCover?: boolean
   premiumCeremonyStyle?: boolean // if true, premium date format + tighter spacing + SVG separators
+  continuousLayout?: boolean // if true, minimal spacing between ceremonies (per-invitation flag)
 }
 
 type IllustrationKind = 'scene' | 'motif'
@@ -2877,6 +2878,17 @@ function Step4({ data, onChange, pack = 'essentiel' }: { data: FormData; onChang
           <Label>Date limite de confirmation</Label>
           <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>Les invités verront cette date sur la section de confirmation de présence</p>
           <input type="date" value={data.rsvpDeadline ?? ''} onChange={e => onChange({ rsvpDeadline: e.target.value })} style={S.input} />
+        </div>
+        <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <Label>Événements enchaînés</Label>
+            <p style={{ fontSize: 11, color: '#9ca3af', margin: 0 }}>Supprime les espaces entre les cérémonies</p>
+          </div>
+          <button type="button" onClick={() => onChange({ continuousLayout: !data.continuousLayout })} style={{
+            cursor: 'pointer', padding: '4px 12px', borderRadius: 9999, border: 'none',
+            background: data.continuousLayout ? THEMES[data.style].accent : '#e0d5c8',
+            color: data.continuousLayout ? 'white' : '#6a6560', fontSize: 11, fontWeight: 600,
+          }}>{data.continuousLayout ? 'Activé' : 'Désactivé'}</button>
         </div>
       </AccordionSection>
     </div>
@@ -7563,7 +7575,7 @@ const firstDate = sorted[0]?.date
                 </div>
               ))}
               {/* Indicateur de page — visible uniquement pour les mariés */}
-              {role !== 'guest' && (
+              {role !== 'guest' && !data.continuousLayout && (
                 <div style={{ textAlign: 'center', padding: '12px 0 4px', background: `${G}08`, borderTop: `1px dashed ${G}30`, borderBottom: `1px dashed ${G}30` }}>
                   <span style={{ fontFamily: FP, fontSize: 10, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', color: G, opacity: 0.5 }}>— PAGE {pageNum} : {ceremonyLabel.toUpperCase()} —</span>
                 </div>
@@ -7571,7 +7583,7 @@ const firstDate = sorted[0]?.date
               {/* Illustration aquarelle — rendue à l'intérieur de la carte (voir ci-dessous) */}
               <CeremonyCard isCard={isCard} accent={G} hasFrame={hasFrame}>
                 {i === 0 && !(data.customPages ?? []).some(p => p.position === safeIdx) && <div id="first-content" style={{ scrollMarginTop: 60 }} />}
-                <section id={`ceremony-${safeIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : (data.premiumCeremonyStyle ? 32 : 48), paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : (data.premiumCeremonyStyle ? 32 : 48), paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: hasFrame ? 'hidden' : 'visible', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: `1px solid ${G}1a`, background: ceremony.bgColor || theme.fond } : { background: hasFrame ? '#ffffff' : (ceremony.bgColor || theme.fond) }) }}>
+                <section id={`ceremony-${safeIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : (data.continuousLayout ? 0 : data.premiumCeremonyStyle ? 32 : 48), paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : (data.continuousLayout ? 0 : data.premiumCeremonyStyle ? 32 : 48), paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: hasFrame ? 'hidden' : 'visible', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: data.continuousLayout ? 'none' : `1px solid ${G}1a`, background: ceremony.bgColor || theme.fond } : { background: hasFrame ? '#ffffff' : (ceremony.bgColor || theme.fond) }) }}>
                   {hasFrame && frame.video ? (
                     <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
                   ) : hasFrame ? (
@@ -7583,7 +7595,7 @@ const firstDate = sorted[0]?.date
                       <img src={firstPhoto} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', pointerEvents: 'none', zIndex: 0 }} />
                       <div style={{ position: 'absolute', inset: 0, background: theme.dark ? `${theme.fond}e0` : 'rgba(255,255,255,0.82)', pointerEvents: 'none', zIndex: 0 }} />
                     </>
-                  ) : (
+                  ) : data.continuousLayout ? null : (
                     <>
                       {i % 2 === 0 ? <><OrnTR /><OrnBL /></> : <><OrnTL /><OrnBR /></>}
                     </>
@@ -7874,7 +7886,7 @@ const firstDate = sorted[0]?.date
                         </div>
                       )}
                     </AnimSection></DraggableElement>
-                    <div style={{ height: data.premiumCeremonyStyle ? 4 : 20 }} />
+                    <div style={{ height: data.continuousLayout ? 4 : data.premiumCeremonyStyle ? 4 : 20 }} />
                     {/* Date + lieu : masqués si Shabbat Hatan avec multiJours (les moments ont leur propre date/lieu) */}
                     {!(ceremony.type === 'Shabbat Hatan' && ceremony.multiJours && ceremony.multiJours.length > 0) && (<>
                     <DraggableElement id={pre+"date"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={400} skipAnim={canEdit}>{ceremony.date ? (() => {
@@ -7887,7 +7899,7 @@ const firstDate = sorted[0]?.date
                         const annee = parts.find(p => p.type === 'year')?.value || ''
                         return (
                           <>
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: data.premiumCeremonyStyle ? '8px 0 4px' : '24px 0 8px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: data.continuousLayout ? '4px 0 4px' : data.premiumCeremonyStyle ? '8px 0 4px' : '24px 0 8px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
                               <div style={{ width: 80, textAlign: 'right' }}>
                                 <div style={applyZoneStyle({ fontFamily: FP, borderBottom: `1px solid ${G}44`, paddingBottom: 4, letterSpacing: 4, fontSize: 10, fontWeight: 600, color: G, display: 'inline-block', textTransform: 'uppercase' }, 'dateHeure', data.zoneStyles)}>{jourSemaine}</div>
@@ -7900,7 +7912,7 @@ const firstDate = sorted[0]?.date
                             <div style={applyZoneStyle({ fontFamily: FC, fontSize: 12, color: TEXT, letterSpacing: 3, marginTop: 8, opacity: 0.7 }, 'dateHeure', data.zoneStyles)}>{annee}</div>
                           </div>
                           {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 15, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 8, opacity: 0.8 }}>{hebrewDate}</div>}
-                          {ceremony.heure && <div style={applyZoneStyle({ fontFamily: FP, fontSize: 20, fontWeight: 600, color: G, textAlign: 'center', marginBottom: 24, letterSpacing: 3, lineHeight: 1.2 }, 'dateHeure', data.zoneStyles)}>{formatHeure(ceremony.heure, locale)}</div>}
+                          {ceremony.heure && <div style={applyZoneStyle({ fontFamily: FP, fontSize: 20, fontWeight: 600, color: G, textAlign: 'center', marginBottom: data.continuousLayout ? 8 : 24, letterSpacing: 3, lineHeight: 1.2 }, 'dateHeure', data.zoneStyles)}>{formatHeure(ceremony.heure, locale)}</div>}
                           </>
                         )
                       })() : null}</AnimSection></DraggableElement>
@@ -7990,7 +8002,7 @@ const firstDate = sorted[0]?.date
                       <DraggableElement id={pre+"note"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={460} skipAnim={canEdit}><div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: theme.textSecondaire, textAlign: 'center', marginBottom: 16, padding: '12px 0', borderTop: `1px solid ${G}18` }}>{ceremony.note}</div></AnimSection></DraggableElement>
                     )}
                     {ceremony.adresse && (
-                      <DraggableElement id={pre+"itineraire"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={480} skipAnim={canEdit}><div style={{ marginTop: 32 }}>
+                      <DraggableElement id={pre+"itineraire"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={480} skipAnim={canEdit}><div style={{ marginTop: data.continuousLayout ? 12 : 32 }}>
                           <div style={{ textAlign: 'center' }}>
                             <div style={{ width: 60, height: 0.5, background: `linear-gradient(to right, transparent, ${G}30, transparent)`, margin: '0 auto 16px' }} />
                             <div style={{ fontFamily: FP, fontSize: 10, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, marginBottom: 16, opacity: 0.6 }}>
@@ -8001,7 +8013,7 @@ const firstDate = sorted[0]?.date
                       </div></AnimSection></DraggableElement>
                     )}
                     {(ceremony.transport || ceremony.hebergement) && (
-                      <DraggableElement id={pre+"infos"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={500} skipAnim={canEdit}><div style={{ marginTop: 32, paddingTop: 24 }}>
+                      <DraggableElement id={pre+"infos"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={500} skipAnim={canEdit}><div style={{ marginTop: data.continuousLayout ? 12 : 32, paddingTop: data.continuousLayout ? 8 : 24 }}>
                           <div style={{ width: 60, height: 0.5, background: `linear-gradient(to right, transparent, ${G}30, transparent)`, margin: '0 auto 16px' }} />
                           <div style={{ fontFamily: FP, fontSize: 10, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: 20, opacity: 0.6 }}>
                             {t.fairepart.infoPratiques}
@@ -8025,7 +8037,7 @@ const firstDate = sorted[0]?.date
                   })()}
                 </section>
               </CeremonyCard>
-              {data.premiumCeremonyStyle && i < sorted.length - 1 && (
+              {data.premiumCeremonyStyle && !data.continuousLayout && i < sorted.length - 1 && (
                 <div style={{ textAlign: 'center', padding: '12px 0' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="https://gsihevihnthjsm8z.public.blob.vercel-storage.com/8-m1qRmlxuohr4uM00k8cFNWcigTbJO5.png" alt="" style={{ width: 180, height: 'auto', objectFit: 'contain', display: 'inline-block', opacity: 0.85 }} />
