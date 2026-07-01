@@ -7995,7 +7995,7 @@ const firstDate = sorted[0]?.date
                         </div>
                       )}
                     </AnimSection></DraggableElement>
-                    <div style={{ height: data.continuousLayout ? 4 : data.premiumCeremonyStyle ? 4 : 20 }} />
+                    <div style={{ height: data.premiumCover ? 0 : data.continuousLayout ? 4 : data.premiumCeremonyStyle ? 4 : 20 }} />
                     {/* Date + lieu : masqués si Shabbat Hatan avec multiJours (les moments ont leur propre date/lieu) */}
                     {!(ceremony.type === 'Shabbat Hatan' && ceremony.multiJours && ceremony.multiJours.length > 0) && (<>
                     <DraggableElement id={pre+"date"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={400} skipAnim={canEdit}>{ceremony.date ? (() => {
@@ -8071,7 +8071,7 @@ const firstDate = sorted[0]?.date
                           const showGlobalLieu = !!globalLieu && (sameLieu || !allLieux.length)
 
                           return (
-                          <div style={{ marginTop: 8 }}>
+                          <div style={{ marginTop: data.premiumCover ? 0 : 8 }}>
                             {/* Lieu commun affiché une seule fois au-dessus */}
                             {showGlobalLieu && (
                               <div style={{ textAlign: 'center', marginBottom: 20 }}>
