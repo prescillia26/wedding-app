@@ -53,7 +53,13 @@ export default function InvitationCover({
   useEffect(() => {
     const vid = videoRef.current
     if (vid && customDesignCoverVideoUrl) {
-      vid.currentTime = 0.001
+      const showFirstFrame = () => { vid.currentTime = 0.001 }
+      if (vid.readyState >= 2) {
+        showFirstFrame()
+      } else {
+        vid.addEventListener('loadeddata', showFirstFrame, { once: true })
+        return () => vid.removeEventListener('loadeddata', showFirstFrame)
+      }
     }
   }, [customDesignCoverVideoUrl])
 
@@ -120,7 +126,7 @@ export default function InvitationCover({
       <div style={{
         position: 'fixed', inset: 0, zIndex: 300,
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        background: videoOverlayBgColor || '#F5F0EB',
+        background: videoOverlayBgColor || '#000',
         opacity: phase === 3 ? 0 : 1,
         transition: 'opacity 0.8s ease, background 0.8s ease',
         pointerEvents: phase === 3 ? 'none' : 'auto',
