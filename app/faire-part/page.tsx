@@ -7245,7 +7245,7 @@ const firstDate = sorted[0]?.date
     <div style={{ width: '100%', minHeight: '100svh' }} />
   )}
   {/* Overlay — tout le texte par-dessus l'illustration */}
-  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '12px 24px 24px', zIndex: 2, pointerEvents: 'none' }}>
+  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '12px 24px 8px', zIndex: 2, pointerEvents: 'none' }}>
     {/* בס״ד avec ornements — draggable */}
     {data.mariageJuif && (
       <div style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10 }}>
@@ -7292,15 +7292,14 @@ const firstDate = sorted[0]?.date
       {/* Dates élégantes */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: 12, alignItems: 'center', marginTop: 14, flexWrap: 'wrap' }}>
         {(data.ceremonies || []).map((c: { date?: string; lieu?: string }, idx: number) => {
-          if (!c.date) return null
-          const d = new Date(c.date + 'T12:00:00')
-          const formatted = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}`
+          if (!c.date && !c.lieu) return null
+          const formatted = c.date ? (() => { const d = new Date(c.date + 'T12:00:00'); return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}` })() : ''
           const lieu = c.lieu || ''
           return (
             <span key={idx} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               {idx > 0 && <span style={{ color: '#C9A264', fontSize: 6 }}>◆</span>}
               <span style={{ fontFamily: 'var(--font-tenor-sans)', fontWeight: 300, fontSize: 8, letterSpacing: 2, color: '#C9A264' }}>
-                {formatted}{lieu ? ' · ' + lieu : ''}
+                {formatted}{formatted && lieu ? ' · ' : ''}{lieu}
               </span>
             </span>
           )
