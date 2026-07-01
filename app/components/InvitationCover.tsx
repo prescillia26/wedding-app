@@ -93,6 +93,9 @@ export default function InvitationCover({
       if (vid) {
         vid.play().catch(() => {})
       }
+      // Start music when user taps (user gesture needed for autoplay)
+      const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null
+      if (audio) audio.play().catch(() => {})
     }
 
     const handleVideoEnd = () => {
@@ -160,9 +163,9 @@ export default function InvitationCover({
               style={{
                 fontFamily: PD, fontSize: 12, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase',
                 padding: '16px 40px', borderRadius: 0,
-                border: '1px solid rgba(255,255,255,0.6)',
-                background: 'rgba(255,255,255,0.12)',
-                color: 'white', cursor: 'pointer',
+                border: `1px solid ${videoOverlayTextColor ? videoOverlayTextColor + '99' : 'rgba(255,255,255,0.6)'}`,
+                background: videoOverlayTextColor ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.12)',
+                color: videoOverlayTextColor || 'white', cursor: 'pointer',
                 backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
                 animation: 'videoButtonGlow 3s ease infinite',
                 transition: 'all 0.4s ease',
@@ -179,7 +182,7 @@ export default function InvitationCover({
                 e.currentTarget.style.transform = 'scale(1)'
               }}
             >
-              Ouvrir l&apos;enveloppe ✦
+              {videoOverlayText1 || 'Ouvrir l\u0027enveloppe'} ✦
             </button>
           </div>
         )}

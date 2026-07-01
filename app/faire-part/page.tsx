@@ -7738,7 +7738,7 @@ const firstDate = sorted[0]?.date
                       </AnimSection></DraggableElement>
                     )}
                     {hasGp && ceremony.type === 'Cérémonie religieuse / Houppa' && (() => {
-                      const gpStyle = { fontFamily: FC, fontStyle: 'italic' as const, fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' as const }
+                      const gpStyle = applyZoneStyle({ fontFamily: FC, fontStyle: 'italic' as const, fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' as const }, 'parents', data.zoneStyles)
                       const ovIf = (key: string, def: string) => ov[key] && ov[key] !== def ? ov[key] : ''
                       return (
                       <AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
