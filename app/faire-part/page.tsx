@@ -7303,7 +7303,7 @@ const firstDate = sorted[0]?.date
       <div style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10 }}>
         <DraggableElement id="pc_bsd" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <div style={{ textAlign: 'center', marginBottom: 8 }}>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: '#C9A264', letterSpacing: 6, margin: '4px 0', direction: 'rtl' }}>בס״ד</div>
+            <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 13, color: '#C9A264', letterSpacing: 6, margin: '4px 0', direction: 'rtl' }}>בס״ד</div>
           </div>
         </DraggableElement>
       </div>
@@ -7315,7 +7315,7 @@ const firstDate = sorted[0]?.date
           <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(32px,7.5vw,52px)', color: '#1B2A5E', lineHeight: 1.15, textShadow: '0 2px 20px rgba(247,243,236,0.9)' }}>
             {data.marie1Prenom || 'Prénom'}
           </span>
-          <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(18px,4vw,26px)', color: '#C9A264', letterSpacing: 6, margin: '0 6px', verticalAlign: 'middle' }}>
+          <span style={{ fontFamily: 'var(--font-playfair-display)', fontStyle: 'italic', fontSize: 'clamp(18px,4vw,26px)', color: '#C9A264', letterSpacing: 6, margin: '0 6px', verticalAlign: 'middle' }}>
             {'&'}
           </span>
           <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(32px,7.5vw,52px)', color: '#1B2A5E', lineHeight: 1.15, textShadow: '0 2px 20px rgba(247,243,236,0.9)' }}>
@@ -7327,7 +7327,7 @@ const firstDate = sorted[0]?.date
     {/* "ont le plaisir..." — draggable */}
     <div style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10 }}>
       <DraggableElement id="pc_phrase" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-        <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#6B5A42', letterSpacing: 3, textAlign: 'center', marginTop: 14, textShadow: '0 1px 10px rgba(247,243,236,0.8)' }}>
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontStyle: 'italic', fontSize: 15, color: '#1B2A5E', letterSpacing: 3, textAlign: 'center', marginTop: 14, textShadow: '0 1px 10px rgba(247,243,236,0.8)' }}>
           {data.textOverrides?.['global_pleaseJoin'] !== '__hidden__' && (data.textOverrides?.['global_pleaseJoin'] || 'ont le plaisir de vous convier à leur mariage')}
         </div>
       </DraggableElement>
@@ -7796,7 +7796,7 @@ const firstDate = sorted[0]?.date
 
                       // ── Premium layout: texte centré, pas d'InlineEdit/Draggable ──
                       if (data.premiumCover) {
-                        const nameStyle: React.CSSProperties = { fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: '#6B5A42', lineHeight: 1.8 }
+                        const nameStyle: React.CSSProperties = { fontFamily: 'var(--font-playfair-display)', fontStyle: 'italic', fontSize: 13, color: '#1B2A5E', lineHeight: 1.8 }
                         return (
                         <AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
                           <div style={{ textAlign: 'center', padding: '20px 24px', overflow: 'hidden' }}>
@@ -7813,7 +7813,7 @@ const firstDate = sorted[0]?.date
                             {hasGp && (parents1.length > 0 || parents2.length > 0) && (
                               <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '12px auto', maxWidth: 280 }}>
                                 <div style={{ flex: 1, height: 0.5, background: '#C9A264', opacity: 0.3 }} />
-                                <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: '#C9A264', flexShrink: 0 }}>et</span>
+                                <span style={{ fontFamily: 'var(--font-playfair-display)', fontStyle: 'italic', fontSize: 11, color: '#C9A264', flexShrink: 0 }}>et</span>
                                 <div style={{ flex: 1, height: 0.5, background: '#C9A264', opacity: 0.3 }} />
                               </div>
                             )}
@@ -7825,14 +7825,14 @@ const firstDate = sorted[0]?.date
                               </div>
                             )}
                             {/* Texte invitation */}
-                            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#1B2A5E', lineHeight: 1.7, marginBottom: 24 }}>
+                            <div style={{ fontFamily: 'var(--font-playfair-display)', fontStyle: 'italic', fontSize: 14, color: '#1B2A5E', lineHeight: 1.7, marginBottom: 24 }}>
                               <InlineEdit
                                 value={ov[`ceremony_${safeIdx}_joie`] || ''}
                                 defaultValue={hasGp ? t.fairepart.joyMessageGp : t.fairepart.joyMessage}
                                 editable={canEdit}
                                 onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_joie`]: v } })}
                                 onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_joie`, patch)}
-                                style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#1B2A5E', textAlign: 'center', lineHeight: 1.7 }}
+                                style={{ fontFamily: 'var(--font-playfair-display)', fontStyle: 'italic', fontSize: 14, color: '#1B2A5E', textAlign: 'center', lineHeight: 1.7 }}
                               />
                             </div>
                           </div>
