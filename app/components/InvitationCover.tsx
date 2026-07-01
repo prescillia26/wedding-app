@@ -124,13 +124,9 @@ export default function InvitationCover({
     }
 
     const handleVideoEnd = () => {
-      setVideoEnded(true)
-      setTimeout(() => {
-        setPhase(3)
-        onOpen()
-        // Scroll to top so the user lands on the accueil page
-        window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
-      }, 600)
+      setPhase(3)
+      onOpen()
+      window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
     }
 
     return (
@@ -159,7 +155,7 @@ export default function InvitationCover({
         `}</style>
 
         {/* Vidéo plein écran */}
-        {phase < 2 && (
+        {phase < 3 && (
           <video
             ref={videoRef}
             src={customDesignCoverVideoUrl}
@@ -171,7 +167,6 @@ export default function InvitationCover({
             style={{
               position: 'absolute', inset: 0,
               width: '100%', height: '100%', objectFit: 'cover',
-              animation: videoEnded ? 'videoFadeOut 0.6s ease forwards' : undefined,
             }}
           />
         )}
