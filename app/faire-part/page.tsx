@@ -7842,12 +7842,12 @@ const firstDate = sorted[0]?.date
                           {hasGp && (
                             <>
                               <div style={labelStyle}>Nos grands-parents</div>
-                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 16px', marginBottom: 12 }}>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 16px', marginBottom: 12, textAlign: 'center' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, justifyContent: 'center' }}>
                                   {gpPa1 && <DraggableElement id={pre+"gpPa1"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ovIf('gpPa1', gpPa1)} defaultValue={gpPa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa1: v } })} onStyleChange={(patch) => setInlineStyle('gpPa1', patch)} style={{ ...familyStyle, ...getInlineStyle('gpPa1') }} /></DraggableElement>}
                                   {gpMa1 && <DraggableElement id={pre+"gpMa1"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ovIf('gpMa1', gpMa1)} defaultValue={gpMa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa1: v } })} onStyleChange={(patch) => setInlineStyle('gpMa1', patch)} style={{ ...familyStyle, ...getInlineStyle('gpMa1') }} /></DraggableElement>}
                                 </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, justifyContent: 'center' }}>
                                   {gpPa2 && <DraggableElement id={pre+"gpPa2"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ovIf('gpPa2', gpPa2)} defaultValue={gpPa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa2: v } })} onStyleChange={(patch) => setInlineStyle('gpPa2', patch)} style={{ ...familyStyle, ...getInlineStyle('gpPa2') }} /></DraggableElement>}
                                   {gpMa2 && <DraggableElement id={pre+"gpMa2"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ovIf('gpMa2', gpMa2)} defaultValue={gpMa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa2: v } })} onStyleChange={(patch) => setInlineStyle('gpMa2', patch)} style={{ ...familyStyle, ...getInlineStyle('gpMa2') }} /></DraggableElement>}
                                 </div>
@@ -7862,14 +7862,21 @@ const firstDate = sorted[0]?.date
                           {(parents1.length > 0 || parents2.length > 0) && (
                             <>
                               <div style={labelStyle}>Nos parents</div>
-                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 16px', marginBottom: 8 }}>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                  {parents1.map((l,j)=><DraggableElement key={j} id={pre+`p1_${j}`} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ov[`parents1_${j}`] && ov[`parents1_${j}`] !== l ? ov[`parents1_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents1_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents1_${j}`, patch)} style={{ ...familyStyle, ...getInlineStyle(`parents1_${j}`) }} /></DraggableElement>)}
+                              {parents1.length > 0 && parents2.length > 0 ? (
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 16px', marginBottom: 8, textAlign: 'center' }}>
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2, justifyContent: 'center' }}>
+                                    {parents1.map((l,j)=><DraggableElement key={j} id={pre+`p1_${j}`} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ov[`parents1_${j}`] && ov[`parents1_${j}`] !== l ? ov[`parents1_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents1_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents1_${j}`, patch)} style={{ ...familyStyle, ...getInlineStyle(`parents1_${j}`) }} /></DraggableElement>)}
+                                  </div>
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2, justifyContent: 'center' }}>
+                                    {parents2.map((l,j)=><DraggableElement key={j} id={pre+`p2_${j}`} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ov[`parents2_${j}`] && ov[`parents2_${j}`] !== l ? ov[`parents2_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents2_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents2_${j}`, patch)} style={{ ...familyStyle, ...getInlineStyle(`parents2_${j}`) }} /></DraggableElement>)}
+                                  </div>
                                 </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                              ) : (
+                                <div style={{ textAlign: 'center', marginBottom: 8 }}>
+                                  {parents1.map((l,j)=><DraggableElement key={j} id={pre+`p1_${j}`} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ov[`parents1_${j}`] && ov[`parents1_${j}`] !== l ? ov[`parents1_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents1_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents1_${j}`, patch)} style={{ ...familyStyle, ...getInlineStyle(`parents1_${j}`) }} /></DraggableElement>)}
                                   {parents2.map((l,j)=><DraggableElement key={j} id={pre+`p2_${j}`} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ov[`parents2_${j}`] && ov[`parents2_${j}`] !== l ? ov[`parents2_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents2_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents2_${j}`, patch)} style={{ ...familyStyle, ...getInlineStyle(`parents2_${j}`) }} /></DraggableElement>)}
                                 </div>
-                              </div>
+                              )}
                             </>
                           )}
                         </div>
