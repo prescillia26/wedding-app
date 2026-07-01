@@ -7794,53 +7794,45 @@ const firstDate = sorted[0]?.date
                       const familyStyle: React.CSSProperties = { ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic' as const, fontSize: 'clamp(12px, 3.2vw, 14px)', color: TEXT, lineHeight: 1.7, fontVariant: 'normal' as const, textAlign: 'center' as const }, 'parents', data.zoneStyles) }
                       const ovIf = (key: string, def: string) => ov[key] && ov[key] !== def ? ov[key] : ''
 
-                      // ── Premium layout: flexbox 48%/48% ──
+                      // ── Premium layout: texte centré, pas d'InlineEdit/Draggable ──
                       if (data.premiumCover) {
-                        const colStyle: React.CSSProperties = { width: '48%', fontFamily: FC, fontStyle: 'italic', fontSize: 12, color: '#6B5A42', lineHeight: 1.8, wordBreak: 'break-word' as const }
+                        const nameStyle: React.CSSProperties = { fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: '#6B5A42', lineHeight: 1.8 }
                         return (
                         <AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
-                          <div style={{ width: '100%', maxWidth: '100%', overflow: 'hidden', padding: '20px 16px', boxSizing: 'border-box' as const }}>
-                            {/* Grands-parents */}
+                          <div style={{ textAlign: 'center', padding: '20px 24px', overflow: 'hidden' }}>
+                            {/* Grands-parents — centré */}
                             {hasGp && (
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', marginBottom: 6 }}>
-                                <div style={{ ...colStyle, textAlign: 'left' }}>
-                                  {gpPa1 && <DraggableElement id={pre+"gpPa1"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ovIf('gpPa1', gpPa1)} defaultValue={gpPa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa1: v } })} onStyleChange={(patch) => setInlineStyle('gpPa1', patch)} style={{ ...colStyle, textAlign: 'left', ...getInlineStyle('gpPa1') }} /></DraggableElement>}
-                                  {gpMa1 && <DraggableElement id={pre+"gpMa1"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ovIf('gpMa1', gpMa1)} defaultValue={gpMa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa1: v } })} onStyleChange={(patch) => setInlineStyle('gpMa1', patch)} style={{ ...colStyle, textAlign: 'left', ...getInlineStyle('gpMa1') }} /></DraggableElement>}
-                                </div>
-                                <div style={{ ...colStyle, textAlign: 'right' }}>
-                                  {gpPa2 && <DraggableElement id={pre+"gpPa2"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ovIf('gpPa2', gpPa2)} defaultValue={gpPa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa2: v } })} onStyleChange={(patch) => setInlineStyle('gpPa2', patch)} style={{ ...colStyle, textAlign: 'right', ...getInlineStyle('gpPa2') }} /></DraggableElement>}
-                                  {gpMa2 && <DraggableElement id={pre+"gpMa2"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ovIf('gpMa2', gpMa2)} defaultValue={gpMa2} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa2: v } })} onStyleChange={(patch) => setInlineStyle('gpMa2', patch)} style={{ ...colStyle, textAlign: 'right', ...getInlineStyle('gpMa2') }} /></DraggableElement>}
-                                </div>
+                              <div style={{ marginBottom: 6 }}>
+                                {gpPa1 && <div style={nameStyle}>{ov.gpPa1 || gpPa1}</div>}
+                                {gpMa1 && <div style={nameStyle}>{ov.gpMa1 || gpMa1}</div>}
+                                {gpPa2 && <div style={nameStyle}>{ov.gpPa2 || gpPa2}</div>}
+                                {gpMa2 && <div style={nameStyle}>{ov.gpMa2 || gpMa2}</div>}
                               </div>
                             )}
                             {/* Séparateur */}
                             {hasGp && (parents1.length > 0 || parents2.length > 0) && (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '12px 0' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '12px auto', maxWidth: 280 }}>
                                 <div style={{ flex: 1, height: 0.5, background: '#C9A264', opacity: 0.3 }} />
-                                <span style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 11, color: '#C9A264', flexShrink: 0 }}>et</span>
+                                <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 11, color: '#C9A264', flexShrink: 0 }}>et</span>
                                 <div style={{ flex: 1, height: 0.5, background: '#C9A264', opacity: 0.3 }} />
                               </div>
                             )}
-                            {/* Parents */}
+                            {/* Parents — centré */}
                             {(parents1.length > 0 || parents2.length > 0) && (
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', marginBottom: 20 }}>
-                                <div style={{ ...colStyle, textAlign: 'left' }}>
-                                  {parents1.map((l,j)=><DraggableElement key={j} id={pre+`p1_${j}`} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ov[`parents1_${j}`] && ov[`parents1_${j}`] !== l ? ov[`parents1_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents1_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents1_${j}`, patch)} style={{ ...colStyle, textAlign: 'left', ...getInlineStyle(`parents1_${j}`) }} /></DraggableElement>)}
-                                </div>
-                                <div style={{ ...colStyle, textAlign: 'right' }}>
-                                  {parents2.map((l,j)=><DraggableElement key={j} id={pre+`p2_${j}`} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ov[`parents2_${j}`] && ov[`parents2_${j}`] !== l ? ov[`parents2_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents2_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents2_${j}`, patch)} style={{ ...colStyle, textAlign: 'right', ...getInlineStyle(`parents2_${j}`) }} /></DraggableElement>)}
-                                </div>
+                              <div style={{ marginBottom: 20 }}>
+                                {parents1.map((l,j) => <div key={`p1_${j}`} style={nameStyle}>{ov[`parents1_${j}`] || l}</div>)}
+                                {parents2.map((l,j) => <div key={`p2_${j}`} style={nameStyle}>{ov[`parents2_${j}`] || l}</div>)}
                               </div>
                             )}
-                            {/* Texte central */}
-                            <div style={{ textAlign: 'center', fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: '#1B2A5E', lineHeight: 1.7 }}>
+                            {/* Texte invitation */}
+                            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#1B2A5E', lineHeight: 1.7, marginBottom: 24 }}>
                               <InlineEdit
                                 value={ov[`ceremony_${safeIdx}_joie`] || ''}
                                 defaultValue={hasGp ? t.fairepart.joyMessageGp : t.fairepart.joyMessage}
                                 editable={canEdit}
                                 onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_joie`]: v } })}
                                 onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_joie`, patch)}
-                                style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 14, color: '#1B2A5E', textAlign: 'center', marginBottom: 24, lineHeight: 1.7 }, 'narratif', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_joie`) }}
+                                style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#1B2A5E', textAlign: 'center', lineHeight: 1.7 }}
                               />
                             </div>
                           </div>
