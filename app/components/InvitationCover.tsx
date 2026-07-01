@@ -49,18 +49,27 @@ export default function InvitationCover({
   const videoRef = useRef<HTMLVideoElement>(null)
   const [videoEnded, setVideoEnded] = useState(false)
 
-  // Show first frame of video on load
+  // Show first frame of video on load — retry until video element is ready
+  const [videoReady, setVideoReady] = useState(false)
   useEffect(() => {
-    const vid = videoRef.current
-    if (vid && customDesignCoverVideoUrl) {
-      const showFirstFrame = () => { vid.currentTime = 0.001 }
+    if (!customDesignCoverVideoUrl) return
+    const tryShow = () => {
+      const vid = videoRef.current
+      if (!vid) return
+      const show = () => {
+        vid.currentTime = 0.001
+        setVideoReady(true)
+      }
       if (vid.readyState >= 2) {
-        showFirstFrame()
+        show()
       } else {
-        vid.addEventListener('loadeddata', showFirstFrame, { once: true })
-        return () => vid.removeEventListener('loadeddata', showFirstFrame)
+        vid.addEventListener('loadeddata', show, { once: true })
       }
     }
+    // Try immediately + after a short delay (video element may not be mounted yet)
+    tryShow()
+    const t = setTimeout(tryShow, 100)
+    return () => clearTimeout(t)
   }, [customDesignCoverVideoUrl])
 
   const handleOpen = () => {
@@ -126,7 +135,7 @@ export default function InvitationCover({
       <div style={{
         position: 'fixed', inset: 0, zIndex: 300,
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        background: videoOverlayBgColor || '#000',
+        background: videoOverlayBgColor || '#F7F3EC',
         opacity: phase === 3 ? 0 : 1,
         transition: 'opacity 0.8s ease, background 0.8s ease',
         pointerEvents: phase === 3 ? 'none' : 'auto',
@@ -158,7 +167,7 @@ export default function InvitationCover({
             onEnded={handleVideoEnd}
             style={{
               position: 'absolute', inset: 0,
-              width: '100%', height: '100%', objectFit: 'contain',
+              width: '100%', height: '100%', objectFit: 'cover',
               animation: videoEnded ? 'videoFadeOut 0.6s ease forwards' : undefined,
             }}
           />
