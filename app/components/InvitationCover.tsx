@@ -100,6 +100,8 @@ export default function InvitationCover({
       setTimeout(() => {
         setPhase(3)
         onOpen()
+        // Scroll to top so the user lands on the accueil page
+        window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
       }, 600)
     }
 
