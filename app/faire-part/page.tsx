@@ -7639,7 +7639,7 @@ const firstDate = sorted[0]?.date
               {/* Illustration aquarelle — rendue à l'intérieur de la carte (voir ci-dessous) */}
               <CeremonyCard isCard={isCard} accent={G} hasFrame={hasFrame}>
                 {i === 0 && !(data.customPages ?? []).some(p => p.position === safeIdx) && <div id="first-content" style={{ scrollMarginTop: 60 }} />}
-                <section id={`ceremony-${safeIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : (data.premiumCover ? 48 : data.continuousLayout ? 0 : data.premiumCeremonyStyle ? 32 : 48), paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : (data.premiumCover ? 48 : data.continuousLayout ? 0 : data.premiumCeremonyStyle ? 32 : 48), paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: hasFrame ? 'hidden' : 'visible', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: data.continuousLayout ? 'none' : `1px solid ${G}1a`, background: ceremony.bgColor || theme.fond } : { background: hasFrame ? '#ffffff' : (ceremony.bgColor || theme.fond) }) }}>
+                <section id={`ceremony-${safeIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : (data.premiumCover ? 40 : data.continuousLayout ? 0 : data.premiumCeremonyStyle ? 32 : 48), paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : (data.premiumCover ? 40 : data.continuousLayout ? 0 : data.premiumCeremonyStyle ? 32 : 48), paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: hasFrame ? 'hidden' : 'visible', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: data.continuousLayout ? 'none' : `1px solid ${G}1a`, background: ceremony.bgColor || theme.fond } : { background: hasFrame ? '#ffffff' : (ceremony.bgColor || theme.fond) }) }}>
                   {hasFrame && frame.video ? (
                     <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
                   ) : hasFrame ? (
@@ -7692,7 +7692,7 @@ const firstDate = sorted[0]?.date
                         editable={canEdit}
                         onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_titre`]: v } })}
                         onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_titre`, patch)}
-                        style={{ ...applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: data.premiumCover ? 12 : 24, lineHeight: 1.4 }, 'titres', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_titre`) }}
+                        style={{ ...applyZoneStyle({ fontFamily: FP, fontSize: 13, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, textAlign: 'center', marginBottom: data.premiumCover ? 20 : 24, lineHeight: 1.4 }, 'titres', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_titre`) }}
                       />
                     </AnimSection></DraggableElement></div>
                     {/* Illustration intégrée directement dans la carte */}
@@ -7738,7 +7738,7 @@ const firstDate = sorted[0]?.date
                     ) : null}
                     {ceremony.type === 'Cérémonie religieuse / Houppa' && data.mariageJuif && (
                       <DraggableElement id={pre+"hebrewVerse"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={100} skipAnim={canEdit}>
-                        <div style={{ padding: '0 20px', marginBottom: data.premiumCover ? 12 : 22 }}>
+                        <div style={{ padding: '0 20px', marginBottom: data.premiumCover ? 24 : 22 }}>
                           <InlineEdit
                             value={ov[`ceremony_${safeIdx}_hebrewVerse`] || ''}
                             defaultValue="קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה"
@@ -7752,8 +7752,8 @@ const firstDate = sorted[0]?.date
                     )}
                     {ceremony.type === 'Cérémonie religieuse / Houppa' && ceremony.penseesDefuntsActif && ceremony.penseesDefuntsNoms.filter(n => n.trim()).length > 0 && (
                       <DraggableElement id={pre+"defunts"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
-                        <div style={{ textAlign: 'center', marginBottom: data.premiumCover ? 16 : 32, paddingBottom: data.premiumCover ? 12 : 24, borderBottom: `1px solid ${G}22` }}>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: data.premiumCover ? 10 : 16 }}>
+                        <div style={{ textAlign: 'center', marginBottom: data.premiumCover ? 28 : 32, paddingBottom: data.premiumCover ? 16 : 24, borderBottom: `1px solid ${G}22` }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: data.premiumCover ? 12 : 16 }}>
                             <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
                             <img src="https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1781685771/bnl1dqjjovgay8l4wmlu.png" alt="" style={{ width: 50, height: 50, objectFit: 'contain' }} />
                             <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
@@ -7802,7 +7802,7 @@ const firstDate = sorted[0]?.date
                         const nameStyle: React.CSSProperties = { fontFamily: PF, fontStyle: 'italic', fontSize: 13, color: '#1B2A5E', lineHeight: 1.8, textAlign: 'center' }
                         return (
                         <AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
-                          <div style={{ padding: '0 24px', overflow: 'hidden' }}>
+                          <div style={{ padding: '0 24px 24px', overflow: 'hidden' }}>
                             {/* 2 colonnes : famille 1 (gauche) — famille 2 (droite) */}
                             <div style={{ display: 'flex', justifyContent: 'center', gap: 24 }}>
                               {/* Colonne gauche — Famille Prescillia */}
@@ -7821,7 +7821,7 @@ const firstDate = sorted[0]?.date
                               </div>
                             </div>
                             {/* Texte invitation centré */}
-                            <div style={{ textAlign: 'center', marginTop: 20, fontFamily: PF, fontStyle: 'italic', fontSize: 14, color: '#1B2A5E', lineHeight: 1.7, marginBottom: 10 }}>
+                            <div style={{ textAlign: 'center', marginTop: 24, fontFamily: PF, fontStyle: 'italic', fontSize: 14, color: '#1B2A5E', lineHeight: 1.7, marginBottom: 20 }}>
                               <InlineEdit
                                 value={ov[`ceremony_${safeIdx}_joie`] || ''}
                                 defaultValue={hasGp ? t.fairepart.joyMessageGp : t.fairepart.joyMessage}
@@ -7913,7 +7913,7 @@ const firstDate = sorted[0]?.date
                             style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 18, color: TEXT, textAlign: 'center', marginBottom: 8, opacity: 0.78 }, 'narratif', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_sediront`) }}
                           />
                           <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(48px,12vw,80px)', color: G, textAlign: 'center', lineHeight: 1, marginBottom: 12 }, 'prenoms', data.zoneStyles)}>{t.fairepart.cardOui}</div>
-                          <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', opacity: 0.7, marginBottom: 16 }, 'narratif', data.zoneStyles)}>le</div>
+                          {!data.premiumCover && <div style={applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, textAlign: 'center', opacity: 0.7, marginBottom: 16 }, 'narratif', data.zoneStyles)}>le</div>}
                         </>
                       ) : ceremony.type === 'Cérémonie religieuse / Houppa' ? (
                         <InlineEdit
@@ -7922,7 +7922,7 @@ const firstDate = sorted[0]?.date
                           editable={canEdit}
                           onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_honore`]: v } })}
                           onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_honore`, patch)}
-                          style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginTop: data.premiumCover ? 10 : 16, marginBottom: data.premiumCover ? 10 : 28, opacity: 0.78, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_honore`) }}
+                          style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginTop: data.premiumCover ? 20 : 16, marginBottom: data.premiumCover ? 24 : 28, opacity: 0.78, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_honore`) }}
                         />
                       ) : ceremony.type === 'Henné' ? (
                         <InlineEdit
@@ -7931,10 +7931,10 @@ const firstDate = sorted[0]?.date
                           editable={canEdit}
                           onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_honore`]: v } })}
                           onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_honore`, patch)}
-                          style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginTop: data.premiumCover ? 10 : 16, marginBottom: data.premiumCover ? 10 : 28, opacity: 0.78, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_honore`) }}
+                          style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginTop: data.premiumCover ? 16 : 16, marginBottom: data.premiumCover ? 20 : 28, opacity: 0.78, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_honore`) }}
                         />
                       ) : ceremony.type === 'Shabbat Hatan' ? (
-                        <div style={{ textAlign: 'center', marginTop: data.premiumCover ? 10 : 32, marginBottom: data.premiumCover ? 10 : 16, padding: '0 12px' }}>
+                        <div style={{ textAlign: 'center', marginTop: data.premiumCover ? 20 : 32, marginBottom: data.premiumCover ? 16 : 16, padding: '0 12px' }}>
                           <InlineEdit
                             value={ov[`ceremony_${safeIdx}_lesfamilles`] || ''}
                             defaultValue="Les Familles"
@@ -8040,7 +8040,7 @@ const firstDate = sorted[0]?.date
                         editable={canEdit}
                         onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_adresse`]: v } })}
                         onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_adresse`, patch)}
-                        style={{ fontFamily: FC, fontSize: 14, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.65, marginBottom: data.premiumCover ? 6 : 24, letterSpacing: 0.3, ...getInlineStyle(`ceremony_${safeIdx}_adresse`) }}
+                        style={{ fontFamily: FC, fontSize: 14, color: theme.textSecondaire, textAlign: 'center', lineHeight: 1.65, marginBottom: data.premiumCover ? 8 : 24, letterSpacing: 0.3, ...getInlineStyle(`ceremony_${safeIdx}_adresse`) }}
                       />}
                       {ceremony.suiviDAutre && ceremony.evenementSuivantNom && (
                         <div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(11px, 2.8vw, 14px)', color: TEXT, textAlign: 'center', marginBottom: 8, borderTop: `1px solid ${G}22`, paddingTop: 14, maxWidth: '90%', margin: '0 auto 8px', textWrap: 'balance' } as React.CSSProperties}>
