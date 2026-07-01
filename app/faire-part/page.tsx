@@ -6385,20 +6385,20 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
   const category = typeToCategory[ceremonyType] || 'couples'
   const w = Math.max(20, Math.min(400, size))
   const cx = localPos?.x ?? offsetX
-  const cy = Math.max(0, localPos?.y ?? offsetY)
+  const cy = localPos?.y ?? offsetY
 
   useEffect(() => {
     const mm = (e: MouseEvent) => {
       if (!draggingRef.current) return
       e.preventDefault()
       const nx = Math.max(-150, Math.min(150, dragOffset.current.x + e.clientX - dragStart.current.x))
-      const ny = Math.max(0, Math.min(200, dragOffset.current.y + e.clientY - dragStart.current.y))
+      const ny = Math.max(-200, Math.min(200, dragOffset.current.y + e.clientY - dragStart.current.y))
       setLocalPos({ x: nx, y: ny })
     }
     const tm = (e: TouchEvent) => {
       if (!draggingRef.current) return
       const nx = Math.max(-150, Math.min(150, dragOffset.current.x + e.touches[0].clientX - dragStart.current.x))
-      const ny = Math.max(0, Math.min(200, dragOffset.current.y + e.touches[0].clientY - dragStart.current.y))
+      const ny = Math.max(-200, Math.min(200, dragOffset.current.y + e.touches[0].clientY - dragStart.current.y))
       setLocalPos({ x: nx, y: ny })
     }
     const up = () => {
@@ -6421,7 +6421,7 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
   }
 
   return (
-    <div style={{ textAlign: 'center', position: 'relative', margin: '0 0 4px', padding: 0, overflow: 'hidden', lineHeight: 0 }}>
+    <div style={{ textAlign: 'center', position: 'relative', margin: '0 0 4px', padding: 0, overflow: isPhoto ? 'hidden' : 'visible', lineHeight: 0 }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
@@ -7749,7 +7749,7 @@ const firstDate = sorted[0]?.date
                     )}
                     {ceremony.type === 'Cérémonie religieuse / Houppa' && ceremony.penseesDefuntsActif && ceremony.penseesDefuntsNoms.filter(n => n.trim()).length > 0 && (
                       <DraggableElement id={pre+"defunts"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
-                        <div style={{ textAlign: 'center', marginBottom: 32, paddingBottom: 24, borderBottom: `1px solid ${G}22` }}>
+                        <div style={{ textAlign: 'center', marginBottom: data.premiumCover ? 8 : 32, paddingBottom: data.premiumCover ? 8 : 24, borderBottom: `1px solid ${G}22` }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: 16 }}>
                             <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
                             <img src="https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1781685771/bnl1dqjjovgay8l4wmlu.png" alt="" style={{ width: 50, height: 50, objectFit: 'contain' }} />
