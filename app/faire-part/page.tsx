@@ -807,19 +807,31 @@ function renderInvitationPhrase(
   }
 
   // Style des NOMS et PRÉNOMS mis en avant
-  const highlightStyle: React.CSSProperties = {
-    fontFamily: FP,
-    fontSize: 'clamp(18px, 4.5vw, 22px)',
-    color: accent,
-    fontWeight: 700,
-    letterSpacing: 3,
-    textTransform: 'uppercase',
-    textAlign: 'center',
-    margin: '6px 0 14px',
-    whiteSpace: 'nowrap',          // ← NOMS jamais coupés
-    overflowWrap: 'normal',
-    wordBreak: 'keep-all',
-  }
+  // Si le client a défini une police custom pour les prénoms (zoneStyles), on l'utilise
+  // Sinon on garde le style par défaut Playfair MAJUSCULES
+  const hasCustomPrenomFont = !!data.zoneStyles?.prenoms?.fontFamily
+  const highlightStyle: React.CSSProperties = hasCustomPrenomFont
+    ? applyZoneStyle({
+        fontFamily: FP,
+        fontSize: 'clamp(28px,7vw,42px)',
+        color: accent,
+        textAlign: 'center',
+        margin: '6px 0 14px',
+        lineHeight: 1.4,
+      }, 'prenoms', data.zoneStyles)
+    : {
+        fontFamily: FP,
+        fontSize: 'clamp(18px, 4.5vw, 22px)',
+        color: accent,
+        fontWeight: 700,
+        letterSpacing: 3,
+        textTransform: 'uppercase',
+        textAlign: 'center',
+        margin: '6px 0 14px',
+        whiteSpace: 'nowrap',
+        overflowWrap: 'normal',
+        wordBreak: 'keep-all',
+      }
 
   switch (ceremony.type) {
     case 'Shabbat Hatan': {
