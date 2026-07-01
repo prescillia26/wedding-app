@@ -476,6 +476,7 @@ interface FormData {
   customDesignPages?: string[] // URLs des pages uploadées (ordre d'affichage)
   customDesignCoverUrl?: string // image de couverture custom (remplace la cover getlovit)
   customDesignCoverVideoUrl?: string // vidéo de couverture custom (ex: enveloppe Canva/Etsy)
+  videoPosterUrl?: string // image poster (première frame) de la vidéo d'ouverture
   // ── Overlay texte sur vidéo d'ouverture ──
   videoOverlayText1?: string // ligne 1 (ex: prénoms)
   videoOverlayText2?: string // ligne 2 (ex: "ont le plaisir de vous convier")
@@ -8454,6 +8455,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
             videoOverlayShowBsd={data.videoOverlayShowBsd}
             videoOverlayTextColor={data.videoOverlayTextColor}
             videoOverlayBgColor={data.videoOverlayBgColor}
+            videoPosterUrl={data.videoPosterUrl}
           />
         )}
         {data.petalsEnabled && <FloatingPetals accent={theme.accent} />}
