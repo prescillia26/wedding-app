@@ -7769,7 +7769,7 @@ const firstDate = sorted[0]?.date
                         />
                       </AnimSection></DraggableElement>
                     )}
-                    {(ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Mairie') && (
+                    {(ceremony.type === 'Cérémonie religieuse / Houppa' || ceremony.type === 'Mairie' || ceremony.type === 'Henné') && (
                       <DraggableElement id={pre+"prenoms"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={250} skipAnim={canEdit}>
                         {/* Prénoms sur la même ligne — même style que l'accueil */}
                         <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,42px)', color: G, marginBottom: 8, lineHeight: 1.4, textAlign: 'center' }, 'prenoms', data.zoneStyles)}>
@@ -7810,6 +7810,15 @@ const firstDate = sorted[0]?.date
                         <InlineEdit
                           value={ov[`ceremony_${safeIdx}_honore`] || ''}
                           defaultValue={t.fairepart.cardHonore}
+                          editable={canEdit}
+                          onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_honore`]: v } })}
+                          onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_honore`, patch)}
+                          style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 15, color: TEXT, textAlign: 'center', marginTop: 16, marginBottom: 28, opacity: 0.78, lineHeight: 1.7, padding: '0 8px' }, 'narratif', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_honore`) }}
+                        />
+                      ) : ceremony.type === 'Henné' ? (
+                        <InlineEdit
+                          value={ov[`ceremony_${safeIdx}_honore`] || ''}
+                          defaultValue="ont le plaisir de vous inviter à leur Henné"
                           editable={canEdit}
                           onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`ceremony_${safeIdx}_honore`]: v } })}
                           onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_honore`, patch)}
