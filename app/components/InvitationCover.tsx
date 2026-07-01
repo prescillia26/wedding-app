@@ -140,17 +140,17 @@ export default function InvitationCover({
         overflow: 'hidden',
       }}>
         <style>{`
-          @keyframes videoButtonGlow {
-            0%, 100% { box-shadow: 0 0 20px rgba(255,255,255,0.1), 0 0 60px rgba(255,255,255,0); }
-            50% { box-shadow: 0 0 20px rgba(255,255,255,0.3), 0 0 60px rgba(255,255,255,0.1); }
+          @keyframes fadeFloat {
+            0%, 100% { opacity: 0.7; transform: translateY(0px); }
+            50% { opacity: 1; transform: translateY(-4px); }
+          }
+          @keyframes lineExpand {
+            0%, 100% { width: 40px; opacity: 0.5; }
+            50% { width: 120px; opacity: 1; }
           }
           @keyframes videoButtonAppear {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          @keyframes videoFadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
           }
         `}</style>
 
@@ -173,40 +173,50 @@ export default function InvitationCover({
           />
         )}
 
-        {/* Bouton "Ouvrir" avant que la vidéo ne démarre */}
+        {/* Bouton flottant élégant */}
         {phase === 0 && (
-          <div style={{
-            position: 'absolute', bottom: '10%', left: 0, right: 0,
-            display: 'flex', justifyContent: 'center', zIndex: 5,
-            animation: 'videoButtonAppear 1s ease 0.5s both',
-          }}>
-            <button
-              type="button"
-              onClick={handleVideoPlay}
-              style={{
-                fontFamily: PD, fontSize: 12, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase',
-                padding: '16px 40px', borderRadius: 0,
-                border: `1px solid ${videoOverlayTextColor ? videoOverlayTextColor + '99' : 'rgba(255,255,255,0.6)'}`,
-                background: videoOverlayTextColor ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.12)',
-                color: videoOverlayTextColor || 'white', cursor: 'pointer',
-                backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-                animation: 'videoButtonGlow 3s ease infinite',
-                transition: 'all 0.4s ease',
-                touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.25)'
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.9)'
-                e.currentTarget.style.transform = 'scale(1.05)'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.12)'
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'
-                e.currentTarget.style.transform = 'scale(1)'
-              }}
-            >
-              {videoOverlayText1 || 'Ouvrir l\u0027enveloppe'} ✦
-            </button>
+          <div
+            onClick={handleVideoPlay}
+            style={{
+              position: 'absolute',
+              bottom: '8%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 10,
+              textAlign: 'center',
+              cursor: 'pointer',
+              animation: 'videoButtonAppear 1s ease 0.5s both',
+              touchAction: 'manipulation',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            <div style={{
+              fontFamily: "'Montserrat', sans-serif",
+              fontSize: 11,
+              fontWeight: 400,
+              letterSpacing: 6,
+              textTransform: 'uppercase' as const,
+              color: videoOverlayTextColor || '#1B2A5E',
+              marginBottom: 8,
+              animation: 'fadeFloat 3s ease-in-out infinite',
+            }}>
+              {videoOverlayText1 || 'Découvrir votre faire-part'}
+            </div>
+            <div style={{
+              margin: '0 auto',
+              height: 0.5,
+              background: '#C9A264',
+              animation: 'lineExpand 2s ease-in-out infinite',
+            }} />
+            <div style={{
+              textAlign: 'center',
+              marginTop: 6,
+              color: '#C9A264',
+              fontSize: 8,
+              animation: 'fadeFloat 3s ease-in-out infinite 0.5s',
+            }}>
+              ◆
+            </div>
           </div>
         )}
 
