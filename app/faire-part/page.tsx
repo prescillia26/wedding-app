@@ -8371,8 +8371,8 @@ const firstDate = sorted[0]?.date
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
             {ornUrl && <img src={ornUrl} alt="" style={{ width: 160, height: 160, objectFit: 'contain', opacity: 0.65 } as React.CSSProperties} />}
           </div>
-          <div style={{ fontFamily: FS, fontSize: 40, color: G, marginBottom: 12, lineHeight: 1.2 }}>
-            {data.marie1Prenom} & {data.marie2Prenom}
+          <div style={{ fontFamily: data.premiumCover ? 'var(--font-playfair-display)' : FS, fontStyle: data.premiumCover ? 'italic' : undefined, fontSize: 40, color: G, marginBottom: 12, lineHeight: 1.2 }}>
+            {data.marie1Prenom} <span style={{ fontFamily: data.premiumCover ? 'var(--font-pinyon-script)' : 'var(--font-great-vibes)', fontSize: '0.65em', opacity: 0.55 }}>&</span> {data.marie2Prenom}
           </div>
           <div style={{ color: G, fontSize: 12, marginBottom: 18, opacity: 0.45 }}>✦</div>
           <a href="https://getlovit.fr" target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 11, letterSpacing: '0.2em', fontVariant: 'small-caps', color: G, textDecoration: 'none', opacity: 0.5, transition: 'opacity 0.3s ease' }}
