@@ -7286,10 +7286,10 @@ const firstDate = sorted[0]?.date
   <style>{`@keyframes premiumPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}@keyframes revealLTR{from{clip-path:inset(-20px 100% -20px -20px);opacity:0}to{clip-path:inset(-20px -20px -20px -20px);opacity:1}}`}</style>
   {/* Illustration aquarelle — fond principal */}
   {coupleUrl && (
-    <div style={{ position: 'relative', width: '100%', minHeight: '70svh', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'revealLTR 1.2s cubic-bezier(0.4,0,0.2,1) 1.5s both' : 'none' }}>
+    <div style={{ position: 'relative', width: '100%', minHeight: '100svh', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'revealLTR 1.2s cubic-bezier(0.4,0,0.2,1) 1.5s both' : 'none' }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={coupleUrl} alt="" style={{
-        width: '100%', height: '100%', minHeight: '70svh',
+        width: '100%', height: '100%', minHeight: '100svh',
         objectFit: 'cover', objectPosition: 'center 20%', display: 'block',
         WebkitMaskImage: 'radial-gradient(ellipse 90% 85% at 50% 50%, black 30%, transparent 100%)',
         maskImage: 'radial-gradient(ellipse 90% 85% at 50% 50%, black 30%, transparent 100%)',
@@ -7297,7 +7297,7 @@ const firstDate = sorted[0]?.date
     </div>
   )}
   {!coupleUrl && (
-    <div style={{ width: '100%', minHeight: '70svh' }} />
+    <div style={{ width: '100%', minHeight: '100svh' }} />
   )}
   {/* Overlay — tout le texte par-dessus l'illustration */}
   <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '12px 24px 8px', zIndex: 2, pointerEvents: 'none' }}>
