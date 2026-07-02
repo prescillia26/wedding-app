@@ -7284,7 +7284,7 @@ const firstDate = sorted[0]?.date
   backgroundColor: '#F7F3EC',
   backgroundImage: 'radial-gradient(ellipse at 15% 15%, rgba(201,162,100,0.07) 0%, transparent 50%), radial-gradient(ellipse at 85% 85%, rgba(27,42,94,0.05) 0%, transparent 50%), radial-gradient(ellipse at 85% 15%, rgba(196,113,74,0.04) 0%, transparent 40%), radial-gradient(ellipse at 15% 85%, rgba(201,162,100,0.04) 0%, transparent 40%)',
 }}>
-  <style>{`@keyframes premiumPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}@keyframes revealLTR{from{clip-path:inset(0 100% 0 0);opacity:0}to{clip-path:inset(0 0% 0 0);opacity:1}}`}</style>
+  <style>{`@keyframes premiumPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}@keyframes revealLTR{from{clip-path:inset(-20px 100% -20px -20px);opacity:0}to{clip-path:inset(-20px -20px -20px -20px);opacity:1}}`}</style>
   {/* Illustration aquarelle — fond principal */}
   {coupleUrl && (
     <div style={{ position: 'relative', width: '100%', minHeight: '100svh', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'revealLTR 1.2s cubic-bezier(0.4,0,0.2,1) 1.5s both' : 'none' }}>
