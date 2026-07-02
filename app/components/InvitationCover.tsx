@@ -140,17 +140,17 @@ export default function InvitationCover({
         overflow: 'hidden',
       }}>
         <style>{`
-          @keyframes fadeFloat {
-            0%, 100% { opacity: 0.7; transform: translateY(0px); }
-            50% { opacity: 1; transform: translateY(-4px); }
-          }
-          @keyframes lineExpand {
-            0%, 100% { width: 40px; opacity: 0.5; }
-            50% { width: 120px; opacity: 1; }
-          }
-          @keyframes videoButtonAppear {
+          @keyframes appearIn {
             from { opacity: 0; transform: translateX(-50%) translateY(20px); }
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
+          }
+          @keyframes fadeFloat {
+            0%, 100% { opacity: 0.6; transform: translateY(0px); }
+            50% { opacity: 1; transform: translateY(-6px); }
+          }
+          @keyframes lineExpand {
+            0%, 100% { width: 30px; opacity: 0.4; }
+            50% { width: 90px; opacity: 1; }
           }
         `}</style>
 
@@ -185,38 +185,50 @@ export default function InvitationCover({
               zIndex: 10,
               textAlign: 'center',
               cursor: 'pointer',
-              animation: 'videoButtonAppear 1s ease 0.5s both',
+              display: 'flex',
+              flexDirection: 'column' as const,
+              alignItems: 'center',
+              gap: 12,
+              animation: 'appearIn 1.5s ease-out both',
               touchAction: 'manipulation',
               WebkitTapHighlightColor: 'transparent',
             }}
           >
+            {/* Ligne dorée du haut */}
             <div style={{
-              fontFamily: "'Montserrat', sans-serif",
-              fontSize: 11,
-              fontWeight: 400,
+              height: 0.5,
+              background: 'linear-gradient(to right, transparent, #C9A264, transparent)',
+              animation: 'lineExpand 3s ease-in-out infinite',
+              width: 60,
+            }} />
+            {/* Texte principal */}
+            <div style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontStyle: 'italic',
+              fontWeight: 300,
+              fontSize: 22,
+              color: '#1B2A5E',
               letterSpacing: 6,
-              textTransform: 'uppercase' as const,
-              color: videoOverlayTextColor || '#1B2A5E',
-              marginBottom: 8,
-              animation: 'fadeFloat 3s ease-in-out infinite',
+              whiteSpace: 'nowrap' as const,
+              animation: 'fadeFloat 4s ease-in-out infinite',
             }}>
               {videoOverlayText1 || 'Découvrir votre faire-part'}
             </div>
+            {/* Losange doré */}
             <div style={{
-              margin: '0 auto',
-              height: 0.5,
-              background: '#C9A264',
-              animation: 'lineExpand 2s ease-in-out infinite',
-            }} />
-            <div style={{
-              textAlign: 'center',
-              marginTop: 6,
               color: '#C9A264',
               fontSize: 8,
-              animation: 'fadeFloat 3s ease-in-out infinite 0.5s',
+              animation: 'fadeFloat 4s ease-in-out infinite 0.8s',
             }}>
               ◆
             </div>
+            {/* Ligne dorée du bas */}
+            <div style={{
+              height: 0.5,
+              background: 'linear-gradient(to right, transparent, #C9A264, transparent)',
+              animation: 'lineExpand 3s ease-in-out infinite 0.5s',
+              width: 60,
+            }} />
           </div>
         )}
 
