@@ -5415,7 +5415,7 @@ function AnimSection({ children, delay = 0, style, animStyle = 'slide-up', skipA
 }
 
 // ── Menu flottant pour naviguer entre les événements ──────────────────────────
-function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize = 48, logoBold = 100, firstDate, editable, onLogoChange, premiumStyle }: { ceremonies: { type: string; customName?: string }[]; accent: string; theme: ThemeObj; logoUrl?: string; logoColor?: string; logoSize?: number; logoBold?: number; firstDate?: string; editable?: boolean; onLogoChange?: (d: Partial<FormData>) => void; premiumStyle?: boolean }) {
+function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize = 48, logoBold = 100, firstDate, editable, onLogoChange, premiumStyle, showAnim }: { ceremonies: { type: string; customName?: string }[]; accent: string; theme: ThemeObj; logoUrl?: string; logoColor?: string; logoSize?: number; logoBold?: number; firstDate?: string; editable?: boolean; onLogoChange?: (d: Partial<FormData>) => void; premiumStyle?: boolean; showAnim?: boolean }) {
   const [open, setOpen] = useState(false)
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
   const { t } = useT()
@@ -5471,6 +5471,7 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
 
   return (
     <>
+      {premiumStyle && <style>{`@keyframes revealLTR{from{clip-path:inset(-80px 100% -80px -80px);opacity:0}to{clip-path:inset(-80px -80px -80px -80px);opacity:1}}`}</style>}
       <div style={premiumStyle ? {
         position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
         width: '100%', maxWidth: 480, zIndex: 100,
@@ -5479,6 +5480,8 @@ function StickyHeader({ ceremonies, accent, theme, logoUrl, logoColor, logoSize 
         borderBottom: '0.5px solid rgba(201,162,100,0.2)',
         height: 68, padding: '0 16px', boxSizing: 'border-box',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        opacity: showAnim === false ? 0 : undefined,
+        animation: showAnim ? 'revealLTR 0.8s cubic-bezier(0.4,0,0.2,1) 0.1s both' : showAnim === false ? 'none' : undefined,
       } as React.CSSProperties : {
         position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
         width: '100%', maxWidth: 480, zIndex: 100,
@@ -7266,6 +7269,7 @@ const firstDate = sorted[0]?.date
         editable={role !== 'guest' && !!onUpdate}
         onLogoChange={onUpdate}
         premiumStyle={data.premiumCover}
+        showAnim={data.premiumCover ? showAccueilAnim : undefined}
       />
       <style>{`
         @keyframes sharedFadeIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
@@ -7295,7 +7299,7 @@ const firstDate = sorted[0]?.date
   backgroundColor: '#F7F3EC',
   backgroundImage: 'radial-gradient(ellipse at 15% 15%, rgba(201,162,100,0.07) 0%, transparent 50%), radial-gradient(ellipse at 85% 85%, rgba(27,42,94,0.05) 0%, transparent 50%), radial-gradient(ellipse at 85% 15%, rgba(196,113,74,0.04) 0%, transparent 40%), radial-gradient(ellipse at 15% 85%, rgba(201,162,100,0.04) 0%, transparent 40%)',
 }}>
-  <style>{`@keyframes premiumPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}@keyframes revealLTR{from{clip-path:inset(-50px 100% -50px -50px);opacity:0}to{clip-path:inset(-50px -50px -50px -50px);opacity:1}}`}</style>
+  <style>{`@keyframes premiumPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}@keyframes revealLTR{from{clip-path:inset(-80px 100% -80px -80px);opacity:0}to{clip-path:inset(-80px -80px -80px -80px);opacity:1}}`}</style>
   {/* Illustration aquarelle — fond principal */}
   {coupleUrl && (
     <div style={{ position: 'relative', width: '100%', minHeight: '100svh', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'revealLTR 1.2s cubic-bezier(0.4,0,0.2,1) 1.5s both' : 'none' }}>
