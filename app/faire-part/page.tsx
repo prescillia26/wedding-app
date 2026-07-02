@@ -5638,6 +5638,7 @@ interface SharedPageContentProps {
   ytMuted: boolean; onToggleYtMute: () => void
   onUpdate?: (d: Partial<FormData>) => void
   onTextEdit?: () => void
+  showAccueilAnim?: boolean
 }
 // ── 💌 ENVELOPPE PREMIUM ─────────────────────────────────────────────────────
 // Design : prénoms en haut, sceau au centre, "Touchez" en bas, ornements SVG
@@ -7128,7 +7129,7 @@ function CustomPageCard({ page, theme, editable, onUpdate, onRemove }: {
 }
 
 // ── SharedPageContent ─────────────────────────────────────────────────────────
-function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute, onUpdate, onTextEdit }: SharedPageContentProps) {
+function SharedPageContent({ data, theme, sorted: allSorted, role, lastShareId: _lastShareId, onRsvpOpen, onRsvpListOpen, onStartYoutube, ytIframeRef, ytMuted, onToggleYtMute, onUpdate, onTextEdit, showAccueilAnim }: SharedPageContentProps) {
   const { t, locale } = useT()
   const contentRef = useRef<HTMLDivElement>(null)
   const [currentCeremonyIdx, setCurrentCeremonyIdx] = useState(0)
@@ -7286,7 +7287,7 @@ const firstDate = sorted[0]?.date
   <style>{`@keyframes premiumPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}@keyframes revealLTR{from{clip-path:inset(0 100% 0 0);opacity:0}to{clip-path:inset(0 0% 0 0);opacity:1}}`}</style>
   {/* Illustration aquarelle — fond principal */}
   {coupleUrl && (
-    <div style={{ position: 'relative', width: '100%', minHeight: '100svh', animation: 'revealLTR 1.2s cubic-bezier(0.4,0,0.2,1) 1.5s both' }}>
+    <div style={{ position: 'relative', width: '100%', minHeight: '100svh', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'revealLTR 1.2s cubic-bezier(0.4,0,0.2,1) 1.5s both' : 'none' }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={coupleUrl} alt="" style={{
         width: '100%', height: '100%', minHeight: '100svh',
@@ -7306,7 +7307,7 @@ const firstDate = sorted[0]?.date
       <div style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10 }}>
         <DraggableElement id="pc_bsd" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
           <div style={{ textAlign: 'center', marginBottom: 8 }}>
-            <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 13, color: '#C9A264', letterSpacing: 6, margin: '4px 0', direction: 'rtl', animation: 'revealLTR 0.8s cubic-bezier(0.4,0,0.2,1) 0.2s both' }}>בס״ד</div>
+            <div style={{ fontFamily: 'var(--font-playfair-display)', fontSize: 13, color: '#C9A264', letterSpacing: 6, margin: '4px 0', direction: 'rtl', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'revealLTR 0.8s cubic-bezier(0.4,0,0.2,1) 0.2s both' : 'none' }}>בס״ד</div>
           </div>
         </DraggableElement>
       </div>
@@ -7315,13 +7316,13 @@ const firstDate = sorted[0]?.date
     <div style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10 }}>
       <DraggableElement id="pc_names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
         <div style={{ textAlign: 'center', padding: '10px 12px', background: 'radial-gradient(ellipse 90% 100% at 50% 50%, rgba(247,243,236,0.6) 0%, transparent 100%)', position: 'relative', zIndex: 2, marginTop: 12, whiteSpace: 'nowrap' }}>
-          <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(32px,7.5vw,52px)', color: '#1B2A5E', lineHeight: 1.15, textShadow: '0 2px 20px rgba(247,243,236,0.9)', animation: 'revealLTR 1s cubic-bezier(0.4,0,0.2,1) 0.5s both', display: 'inline-block' }}>
+          <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(32px,7.5vw,52px)', color: '#1B2A5E', lineHeight: 1.15, textShadow: '0 2px 20px rgba(247,243,236,0.9)', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'revealLTR 1s cubic-bezier(0.4,0,0.2,1) 0.5s both' : 'none', display: 'inline-block' }}>
             {data.marie1Prenom || 'Prénom'}
           </span>
-          <span style={{ fontFamily: 'var(--font-playfair-display)', fontStyle: 'italic', fontSize: 'clamp(18px,4vw,26px)', color: '#C9A264', letterSpacing: 6, margin: '0 6px', verticalAlign: 'middle', animation: 'revealLTR 0.8s cubic-bezier(0.4,0,0.2,1) 0.8s both', display: 'inline-block' }}>
+          <span style={{ fontFamily: 'var(--font-playfair-display)', fontStyle: 'italic', fontSize: 'clamp(18px,4vw,26px)', color: '#C9A264', letterSpacing: 6, margin: '0 6px', verticalAlign: 'middle', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'revealLTR 0.8s cubic-bezier(0.4,0,0.2,1) 0.8s both' : 'none', display: 'inline-block' }}>
             {'&'}
           </span>
-          <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(32px,7.5vw,52px)', color: '#1B2A5E', lineHeight: 1.15, textShadow: '0 2px 20px rgba(247,243,236,0.9)', animation: 'revealLTR 1s cubic-bezier(0.4,0,0.2,1) 1s both', display: 'inline-block' }}>
+          <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(32px,7.5vw,52px)', color: '#1B2A5E', lineHeight: 1.15, textShadow: '0 2px 20px rgba(247,243,236,0.9)', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'revealLTR 1s cubic-bezier(0.4,0,0.2,1) 1s both' : 'none', display: 'inline-block' }}>
             {data.marie2Prenom || 'Prénom'}
           </span>
         </div>
@@ -7330,7 +7331,7 @@ const firstDate = sorted[0]?.date
     {/* "ont le plaisir..." — draggable */}
     <div style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10 }}>
       <DraggableElement id="pc_phrase" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
-        <div style={{ fontFamily: 'var(--font-playfair-display)', fontStyle: 'italic', fontSize: 15, color: '#1B2A5E', letterSpacing: 3, textAlign: 'center', marginTop: 14, textShadow: '0 1px 10px rgba(247,243,236,0.8)', animation: 'revealLTR 0.8s cubic-bezier(0.4,0,0.2,1) 1.3s both' }}>
+        <div style={{ fontFamily: 'var(--font-playfair-display)', fontStyle: 'italic', fontSize: 15, color: '#1B2A5E', letterSpacing: 3, textAlign: 'center', marginTop: 14, textShadow: '0 1px 10px rgba(247,243,236,0.8)', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'revealLTR 0.8s cubic-bezier(0.4,0,0.2,1) 1.3s both' : 'none' }}>
           {data.textOverrides?.['global_pleaseJoin'] !== '__hidden__' && (data.textOverrides?.['global_pleaseJoin'] || 'ont le plaisir de vous convier à leur mariage')}
         </div>
       </DraggableElement>
@@ -7338,14 +7339,14 @@ const firstDate = sorted[0]?.date
     {/* Spacer */}
     <div style={{ flex: 1 }} />
     {/* Séparateur + bouton DÉCOUVRIR + dates — en bas */}
-    <div style={{ textAlign: 'center', flexShrink: 0, pointerEvents: 'auto', marginTop: -60, animation: 'revealLTR 0.8s cubic-bezier(0.4,0,0.2,1) 2s both' }}>
+    <div style={{ textAlign: 'center', flexShrink: 0, pointerEvents: 'auto', marginTop: -60, opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'revealLTR 0.8s cubic-bezier(0.4,0,0.2,1) 2s both' : 'none' }}>
       <div>
         <button type="button" onClick={() => { const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null; if (audio) audio.play().catch(() => {}); onStartYoutube?.(); const el = document.getElementById('first-content'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} onTouchEnd={(e) => { e.preventDefault(); const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null; if (audio) audio.play().catch(() => {}); onStartYoutube?.(); const el = document.getElementById('first-content'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} style={{ fontFamily: 'var(--font-tenor-sans)', fontSize: 11, fontWeight: 500, letterSpacing: '0.35em', textTransform: 'uppercase' as const, padding: '16px 52px', borderRadius: 0, minWidth: 200, border: '0.5px solid #C9A264', background: 'rgba(247,243,236,0.6)', color: '#1B2A5E', cursor: 'pointer', transition: 'all 0.3s ease', animation: 'premiumPulse 2.5s ease-in-out infinite', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', backdropFilter: 'blur(4px)' }}>
           DÉCOUVRIR ◆
         </button>
       </div>
       {/* Dates élégantes */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 12, alignItems: 'center', marginTop: 14, flexWrap: 'wrap', animation: 'revealLTR 0.8s cubic-bezier(0.4,0,0.2,1) 2.3s both' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 12, alignItems: 'center', marginTop: 14, flexWrap: 'wrap', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'revealLTR 0.8s cubic-bezier(0.4,0,0.2,1) 2.3s both' : 'none' }}>
         {(data.ceremonies || []).map((c: { date?: string; lieu?: string }, idx: number) => {
           if (!c.date && !c.lieu) return null
           const formatted = c.date ? (() => { const d = new Date(c.date + 'T12:00:00'); return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}` })() : ''
@@ -8372,6 +8373,13 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
   const [sharingStatus, setSharingStatus] = useState('')
   const [saving, setSaving] = useState(false)
   const [coverOpen, setCoverOpen] = useState(!data.customDesignMode) // cover fermée si design custom (pour montrer la cover image)
+  const [showAccueilAnim, setShowAccueilAnim] = useState(!data.customDesignMode)
+  useEffect(() => {
+    if (coverOpen && data.premiumCover && !showAccueilAnim) {
+      const t = setTimeout(() => setShowAccueilAnim(true), 500)
+      return () => clearTimeout(t)
+    }
+  }, [coverOpen, data.premiumCover, showAccueilAnim])
 
   // Ouvrir directement le modal RSVP si ?rsvp=1 dans l'URL
   useEffect(() => {
@@ -8591,6 +8599,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
           onToggleYtMute={toggleYtMute}
           onUpdate={onUpdate}
           onTextEdit={() => setTextEditOpen(true)}
+          showAccueilAnim={showAccueilAnim}
         />
         {role === 'couple' && (
           <>
@@ -8697,6 +8706,7 @@ function CardsView({ data, onEdit, onReset, isShared, role, onUpdate, isPaid = t
         onToggleYtMute={toggleYtMute}
         onUpdate={onUpdate}
         onTextEdit={() => setTextEditOpen(true)}
+        showAccueilAnim={true}
       />
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'white', boxShadow: '0 -2px 20px rgba(0,0,0,0.10)', padding: '8px 16px 12px' }}>
         <div style={{ textAlign: 'center', marginBottom: 6 }}>
