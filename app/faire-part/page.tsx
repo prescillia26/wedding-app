@@ -7966,23 +7966,42 @@ const firstDate = sorted[0]?.date
                         data.premiumCover ? (
                           <div style={{ textAlign: 'center', padding: '0 20px', marginBottom: 20 }}>
                             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#6B5A42', marginBottom: 4 }}>Les Familles</div>
-                            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 32, color: '#C9A264', marginBottom: 8 }}>Zeitoun et Ohayon</div>
+                            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 28, color: '#C9A264', marginBottom: 8 }}>Zeitoun &amp; Ohayon</div>
                             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 15, color: '#6B5A42', lineHeight: 1.7, marginBottom: 12 }}>sont ravis de vous convier au Shabbat Hatan de</div>
                             <div style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 38, color: '#1B2A5E', marginBottom: 20 }}>{data.marie1Prenom} &amp; {data.marie2Prenom}</div>
+                            {/* Séparateur */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', marginBottom: 20 }}>
+                              <div style={{ height: 0.5, background: '#C9A264', width: 40, opacity: 0.5 }} />
+                              <div style={{ color: '#C9A264', fontSize: 7 }}>◆</div>
+                              <div style={{ height: 0.5, background: '#C9A264', width: 40, opacity: 0.5 }} />
+                            </div>
+                            {/* Date */}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 8 }}>
+                              <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 9, letterSpacing: 3, color: '#1B2A5E', textTransform: 'uppercase' as const }}>Vendredi</div>
+                              <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 52, color: '#C9A264', border: '0.5px solid #C9A264', padding: '6px 14px', lineHeight: 1 }}>13</div>
+                              <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 9, letterSpacing: 3, color: '#1B2A5E', textTransform: 'uppercase' as const }}>Novembre</div>
+                            </div>
+                            <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 10, letterSpacing: 2, color: '#1B2A5E', marginBottom: 4 }}>2026</div>
+                            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 12, color: '#C9A264', marginBottom: 20 }}>י״א חֶשְׁוָן תשפ״ז</div>
+                            {/* Séparateur */}
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', marginBottom: 16 }}>
                               <div style={{ height: 0.5, background: '#C9A264', width: 40, opacity: 0.5 }} />
                               <div style={{ color: '#C9A264', fontSize: 7 }}>◆</div>
                               <div style={{ height: 0.5, background: '#C9A264', width: 40, opacity: 0.5 }} />
                             </div>
+                            {/* Lieu */}
                             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 16, color: '#1B2A5E', marginBottom: 16 }}>Dans la salle Bet Shmuël à Jérusalem</div>
+                            {/* Paracha */}
                             <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 8, letterSpacing: 2, textTransform: 'uppercase' as const, color: '#6B5A42', marginBottom: 6 }}>Paracha</div>
                             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 18, color: '#1B2A5E', marginBottom: 4 }}>Toledot</div>
                             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 20, color: '#C9A264', marginBottom: 24, direction: 'rtl' as const }}>תּוֹלְדוֹת</div>
+                            {/* Séparateur */}
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', marginBottom: 16 }}>
                               <div style={{ height: 0.5, background: '#C9A264', width: 40, opacity: 0.5 }} />
                               <div style={{ color: '#C9A264', fontSize: 7 }}>◆</div>
                               <div style={{ height: 0.5, background: '#C9A264', width: 40, opacity: 0.5 }} />
                             </div>
+                            {/* Note */}
                             <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: '#9B8A7A', lineHeight: 1.8 }}>Toutes les informations complémentaires concernant les horaires et l&apos;hébergement vous seront communiquées très prochainement.</div>
                           </div>
                         ) : (
