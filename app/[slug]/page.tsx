@@ -159,7 +159,7 @@ export async function generateMetadata(
       }],
     },
     twitter: {
-      card: 'summary_large_image',
+      card: 'summary',
       title,
       description,
       images: [ogImage || 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/watercolors/st6oedinlfobqf1tqgkk.png'],
