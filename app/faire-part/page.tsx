@@ -7697,7 +7697,7 @@ const firstDate = sorted[0]?.date
                     </AnimSection></DraggableElement></div>
                     {/* Illustration intégrée directement dans la carte */}
                     {(ceremony.illustrationUrl || ceremony.ceremonyImage) ? (
-                      <AnimSection animStyle={anim} delay={200} skipAnim={canEdit}>
+                      <AnimSection animStyle={anim} delay={200} skipAnim={canEdit} style={data.premiumCover && ceremony.type === 'Shabbat Hatan' ? { marginBottom: -60 } : undefined}>
                         <EditableIllustration
                           url={ceremony.illustrationUrl || ceremony.ceremonyImage!}
                           size={ceremony.illustrationSize ?? (ceremony.ceremonyImage && !ceremony.illustrationUrl ? 100 : 80)}
