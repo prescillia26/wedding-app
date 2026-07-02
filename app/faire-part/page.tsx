@@ -7307,8 +7307,8 @@ const firstDate = sorted[0]?.date
       <img src={coupleUrl} alt="" style={{
         width: '100%', height: '100%', minHeight: '100svh',
         objectFit: 'cover', objectPosition: 'center 20%', display: 'block',
-        WebkitMaskImage: 'radial-gradient(ellipse 90% 85% at 50% 50%, black 30%, transparent 100%)',
-        maskImage: 'radial-gradient(ellipse 90% 85% at 50% 50%, black 30%, transparent 100%)',
+        WebkitMaskImage: 'radial-gradient(ellipse 100% 95% at 50% 55%, black 50%, transparent 100%)',
+        maskImage: 'radial-gradient(ellipse 100% 95% at 50% 55%, black 50%, transparent 100%)',
       } as React.CSSProperties} />
     </div>
   )}
