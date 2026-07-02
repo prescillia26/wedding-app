@@ -1,13 +1,13 @@
 import type { Metadata } from 'next'
 import { redis } from '@/lib/redis'
 
-export async function generateMetadata({ searchParams }: { searchParams: Promise<{ share?: string }> | undefined }): Promise<Metadata> {
-  if (!searchParams) return {}
-  const params = await searchParams
-  const shareId = params?.share
-  if (!shareId) return {}
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function generateMetadata(props: any): Promise<Metadata> {
   try {
+    const params = props?.searchParams ? await props.searchParams : null
+    const shareId = params?.share
+    if (!shareId) return {}
+
     const data = await redis.get<Record<string, unknown>>(shareId)
     if (!data) return {}
 
