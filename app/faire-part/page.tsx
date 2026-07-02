@@ -7956,7 +7956,7 @@ const firstDate = sorted[0]?.date
                             onStyleChange={(patch) => setInlineStyle(`ceremony_${safeIdx}_ravies`, patch)}
                             style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, lineHeight: 1.8, opacity: 0.85, marginBottom: 8 }, 'narratif', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_ravies`) }}
                           />
-                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,42px)', color: G, marginBottom: data.premiumCover ? 8 : 8, lineHeight: 1.4, textAlign: 'center' }, 'prenoms', data.zoneStyles)}>
+                          <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,42px)', color: G, marginBottom: data.premiumCover ? -40 : 8, lineHeight: 1.4, textAlign: 'center' }, 'prenoms', data.zoneStyles)}>
                             {data.marie1Prenom || 'Prénom'} <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: '0.65em', opacity: 0.55 }}>&</span> {data.marie2Prenom || 'Prénom'}
                           </div>
                         </div>
