@@ -7708,7 +7708,18 @@ const firstDate = sorted[0]?.date
                     {data.mariageJuif && (
                       <div style={{ textAlign: 'right', fontSize: 14, fontFamily: 'serif', color: G, direction: 'rtl', fontWeight: 700, opacity: 0.85, letterSpacing: 1, marginBottom: 8, paddingRight: 4, textShadow: goldShadow }}>בס״ד</div>
                     )}
-                    <div style={{ position: 'relative', zIndex: 2 }}><DraggableElement id={pre+"titre"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} skipAnim={canEdit}>
+                    <div style={{ position: 'relative', zIndex: 2 }}>
+                      {data.premiumCover && data.logoWatermark && data.customLogoUrl && (
+                        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', pointerEvents: 'none', zIndex: 0, userSelect: 'none' as const }}>
+                          {data.logoWatermarkColor ? (
+                            <div style={{ width: data.logoWatermarkSize ?? 200, height: data.logoWatermarkSize ?? 200, backgroundColor: data.logoWatermarkColor, WebkitMaskImage: `url(${data.customLogoUrl})`, WebkitMaskSize: 'contain', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center', maskImage: `url(${data.customLogoUrl})`, maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', opacity: data.logoWatermarkOpacity ?? 0.06 } as React.CSSProperties} />
+                          ) : (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={data.customLogoUrl} alt="" style={{ width: data.logoWatermarkSize ?? 200, height: data.logoWatermarkSize ?? 200, objectFit: 'contain', opacity: data.logoWatermarkOpacity ?? 0.06 }} />
+                          )}
+                        </div>
+                      )}
+                      <DraggableElement id={pre+"titre"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} skipAnim={canEdit}>
                       <InlineEdit
                         value={ov[`ceremony_${safeIdx}_titre`] || ''}
                         defaultValue={title}
