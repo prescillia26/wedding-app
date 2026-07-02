@@ -6449,13 +6449,13 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
           {/* Taille */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
             <span style={{ fontSize: 9, color: accent, fontWeight: 600, minWidth: 32 }}>Taille</span>
-            <input type="range" min={20} max={200} step={1} value={w} onChange={e => onChangeSize(Number(e.target.value))} style={{ flex: 1, accentColor: accent, height: 3 }} />
+            <input type="range" min={20} max={400} step={1} value={w} onChange={e => onChangeSize(Number(e.target.value))} style={{ flex: 1, accentColor: accent, height: 3 }} />
             <span style={{ fontSize: 9, color: accent, fontWeight: 600, minWidth: 28, textAlign: 'right' }}>{w}%</span>
           </div>
           {/* Position horizontale */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
             <span style={{ fontSize: 9, color: accent, fontWeight: 600, minWidth: 32 }}>Pos. X</span>
-            <input type="range" min={-150} max={150} step={1} value={offsetX} onChange={e => onChangeOffsetX(Number(e.target.value))} style={{ flex: 1, accentColor: accent, height: 3 }} />
+            <input type="range" min={-300} max={300} step={1} value={offsetX} onChange={e => onChangeOffsetX(Number(e.target.value))} style={{ flex: 1, accentColor: accent, height: 3 }} />
             <span style={{ fontSize: 9, color: accent, fontWeight: 600, minWidth: 28, textAlign: 'right' }}>{offsetX}px</span>
           </div>
           {/* Position verticale */}
