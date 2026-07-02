@@ -7773,9 +7773,9 @@ const firstDate = sorted[0]?.date
                       data.premiumCover ? (
                         <AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
                           <div style={{ textAlign: 'center', padding: '16px 24px', margin: '8px 0 12px', borderTop: '0.5px solid rgba(201,162,100,0.3)', borderBottom: '0.5px solid rgba(201,162,100,0.3)' }}>
-                            <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#6B5A42', lineHeight: 1.8, margin: 0 }}>
+                            <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#1B2A5E', lineHeight: 1.8, margin: 0 }}>
                               En ce jour si important, nous aurons une forte pensée pour{' '}
-                              <span style={{ color: '#C9A264' }}>{ceremony.penseesDefuntsNoms.filter(n => n.trim()).join(', ').replace(/, ([^,]*)$/, ' et $1')}</span>
+                              {ceremony.penseesDefuntsNoms.filter(n => n.trim()).join(', ').replace(/, ([^,]*)$/, ' et $1')}
                               {' '}dont la mémoire veille sur nous et nous guide.
                             </p>
                           </div>
