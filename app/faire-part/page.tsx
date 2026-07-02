@@ -7752,7 +7752,7 @@ const firstDate = sorted[0]?.date
                     )}
                     {ceremony.type === 'Cérémonie religieuse / Houppa' && ceremony.penseesDefuntsActif && ceremony.penseesDefuntsNoms.filter(n => n.trim()).length > 0 && (
                       <DraggableElement id={pre+"defunts"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
-                        <div style={{ textAlign: 'center', marginBottom: data.premiumCover ? 20 : 32, paddingBottom: data.premiumCover ? 12 : 24, borderBottom: `1px solid ${G}22` }}>
+                        <div style={{ textAlign: 'center', marginBottom: data.premiumCover ? 8 : 32, paddingBottom: data.premiumCover ? 4 : 24, borderBottom: `1px solid ${G}22` }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: data.premiumCover ? 12 : 16 }}>
                             <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
                             <img src="https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1781685771/bnl1dqjjovgay8l4wmlu.png" alt="" style={{ width: 50, height: 50, objectFit: 'contain' }} />
@@ -7799,25 +7799,25 @@ const firstDate = sorted[0]?.date
                       // ── Premium layout: 2 colonnes famille mariée (gauche) / marié (droite) ──
                       if (data.premiumCover) {
                         const PF = 'var(--font-playfair-display)'
-                        const nameStyle: React.CSSProperties = { fontFamily: PF, fontStyle: 'italic', fontSize: 13, color: '#1B2A5E', lineHeight: 1.8, textAlign: 'center' }
+                        const nameStyle: React.CSSProperties = { fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: '#1B2A5E', lineHeight: 1.8, textAlign: 'left' as const }
                         return (
                         <AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
                           <div style={{ padding: '0 24px 12px', overflow: 'hidden' }}>
                             {/* 2 colonnes : famille 1 (gauche) — famille 2 (droite) */}
-                            <div style={{ display: 'flex', justifyContent: 'center', gap: 24 }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', width: '100%', gap: '4px 0', padding: '0 8px' }}>
                               {/* Colonne gauche — Famille Prescillia */}
-                              <div style={{ flex: 1, maxWidth: 200, textAlign: 'center' }}>
+                              <div>
                                 {gpPa1 && <div style={nameStyle}>{ov.gpPa1 || gpPa1}</div>}
                                 {gpMa1 && <div style={nameStyle}>{ov.gpMa1 || gpMa1}</div>}
-                                {hasGp && parents1.length > 0 && <div style={{ width: 40, height: 0.5, background: '#C9A264', opacity: 0.3, margin: '8px auto' }} />}
+                                {hasGp && parents1.length > 0 && <div style={{ width: 40, height: 0.5, background: '#C9A264', opacity: 0.3, margin: '8px 0' }} />}
                                 {parents1.map((l,j) => <div key={`p1_${j}`} style={nameStyle}>{ov[`parents1_${j}`] || l}</div>)}
                               </div>
                               {/* Colonne droite — Famille Jonas */}
-                              <div style={{ flex: 1, maxWidth: 200, textAlign: 'center' }}>
-                                {gpPa2 && <div style={nameStyle}>{ov.gpPa2 || gpPa2}</div>}
-                                {gpMa2 && <div style={nameStyle}>{ov.gpMa2 || gpMa2}</div>}
-                                {hasGp && parents2.length > 0 && <div style={{ width: 40, height: 0.5, background: '#C9A264', opacity: 0.3, margin: '8px auto' }} />}
-                                {parents2.map((l,j) => <div key={`p2_${j}`} style={nameStyle}>{ov[`parents2_${j}`] || l}</div>)}
+                              <div style={{ textAlign: 'right' }}>
+                                {gpPa2 && <div style={{ ...nameStyle, textAlign: 'right' }}>{ov.gpPa2 || gpPa2}</div>}
+                                {gpMa2 && <div style={{ ...nameStyle, textAlign: 'right' }}>{ov.gpMa2 || gpMa2}</div>}
+                                {hasGp && parents2.length > 0 && <div style={{ width: 40, height: 0.5, background: '#C9A264', opacity: 0.3, margin: '8px 0 8px auto' }} />}
+                                {parents2.map((l,j) => <div key={`p2_${j}`} style={{ ...nameStyle, textAlign: 'right' }}>{ov[`parents2_${j}`] || l}</div>)}
                               </div>
                             </div>
                             {/* Texte invitation centré */}
