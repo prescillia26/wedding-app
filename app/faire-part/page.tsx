@@ -7915,7 +7915,7 @@ const firstDate = sorted[0]?.date
                       <DraggableElement id={pre+"prenoms"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={250} skipAnim={canEdit}>
                         {/* Prénoms sur la même ligne — même style que l'accueil */}
                         <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,42px)', color: G, marginBottom: 8, lineHeight: 1.4, textAlign: 'center' }, 'prenoms', data.zoneStyles)}>
-                          {data.marie1Prenom} <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: '0.65em', opacity: 0.55 }}>&</span> {data.marie2Prenom}
+                          {data.marie1Prenom} <span style={{ fontFamily: 'var(--font-pinyon-script)', fontSize: '0.65em', opacity: 0.55 }}>&</span> {data.marie2Prenom}
                         </div>
                         {/* Prénoms hébraïques */}
                         {data.mariageJuif && (data.marie1PrenomHebreu || data.marie2PrenomHebreu) && (
@@ -7990,7 +7990,7 @@ const firstDate = sorted[0]?.date
                             style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 16, color: TEXT, lineHeight: 1.8, opacity: 0.85, marginBottom: 8 }, 'narratif', data.zoneStyles), ...getInlineStyle(`ceremony_${safeIdx}_ravies`) }}
                           />
                           <div style={applyZoneStyle({ fontFamily: FS, fontSize: 'clamp(28px,7vw,42px)', color: G, marginBottom: 8, lineHeight: 1.4, textAlign: 'center' }, 'prenoms', data.zoneStyles)}>
-                            {data.marie1Prenom || 'Prénom'} <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: '0.65em', opacity: 0.55 }}>&</span> {data.marie2Prenom || 'Prénom'}
+                            {data.marie1Prenom || 'Prénom'} <span style={{ fontFamily: 'var(--font-pinyon-script)', fontSize: '0.65em', opacity: 0.55 }}>&</span> {data.marie2Prenom || 'Prénom'}
                           </div>
                         </div>
                       ) : (
