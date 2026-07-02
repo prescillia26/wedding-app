@@ -7295,7 +7295,7 @@ const firstDate = sorted[0]?.date
 <div style={{
   position: 'relative', maxWidth: 480, margin: '0 auto',
   boxShadow: '0 8px 60px rgba(0,0,0,0.15)',
-  overflow: 'hidden',
+  overflow: 'visible',
   backgroundColor: '#F7F3EC',
   backgroundImage: 'radial-gradient(ellipse at 15% 15%, rgba(201,162,100,0.07) 0%, transparent 50%), radial-gradient(ellipse at 85% 85%, rgba(27,42,94,0.05) 0%, transparent 50%), radial-gradient(ellipse at 85% 15%, rgba(196,113,74,0.04) 0%, transparent 40%), radial-gradient(ellipse at 15% 85%, rgba(201,162,100,0.04) 0%, transparent 40%)',
 }}>
