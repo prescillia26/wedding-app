@@ -7336,7 +7336,7 @@ const firstDate = sorted[0]?.date
       </DraggableElement>
     </div>
     {/* Spacer */}
-    <div style={{ flex: 1 }} />
+    <div style={{ flex: 0.6 }} />
     {/* Dates élégantes — sous l'illustration */}
     <div style={{ textAlign: 'center', flexShrink: 0, pointerEvents: 'auto', padding: '0 16px', marginTop: 0, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 6, opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'revealLTR 0.8s cubic-bezier(0.4,0,0.2,1) 2s both' : 'none' }}>
       {/* Séparateur */}
