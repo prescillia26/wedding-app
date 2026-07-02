@@ -8130,7 +8130,19 @@ const firstDate = sorted[0]?.date
                       <DraggableElement id={pre+"note"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={460} skipAnim={canEdit}><div style={{ fontFamily: FC, fontStyle: 'italic', fontSize: 13, color: theme.textSecondaire, textAlign: 'center', marginBottom: 16, padding: '12px 0', borderTop: `1px solid ${G}18` }}>{ceremony.note}</div></AnimSection></DraggableElement>
                     )}
                     {ceremony.adresse && (
-                      <DraggableElement id={pre+"itineraire"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={480} skipAnim={canEdit}><div style={{ marginTop: data.continuousLayout ? 12 : 32 }}>
+                      <DraggableElement id={pre+"itineraire"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={480} skipAnim={canEdit}>{data.premiumCover ? (
+                        <div style={{ textAlign: 'center', marginTop: 12, marginBottom: 8 }}>
+                          <a
+                            href={`https://waze.com/ul?q=${encodeURIComponent(ceremony.adresse)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 9, fontWeight: 400, letterSpacing: 3, textTransform: 'uppercase' as const, color: '#1B2A5E', textDecoration: 'none', borderBottom: '0.5px solid #C9A264', paddingBottom: 2 }}
+                          >
+                            S&apos;y rendre
+                          </a>
+                        </div>
+                      ) : (
+                        <div style={{ marginTop: data.continuousLayout ? 12 : 32 }}>
                           <div style={{ textAlign: 'center' }}>
                             <div style={{ width: 60, height: 0.5, background: `linear-gradient(to right, transparent, ${G}30, transparent)`, margin: '0 auto 16px' }} />
                             <div style={{ fontFamily: FP, fontSize: 10, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase' as const, color: G, marginBottom: 16, opacity: 0.6 }}>
@@ -8138,7 +8150,8 @@ const firstDate = sorted[0]?.date
                             </div>
                             <ItineraireButtons adresse={ceremony.adresse} theme={theme} />
                           </div>
-                      </div></AnimSection></DraggableElement>
+                        </div>
+                      )}</AnimSection></DraggableElement>
                     )}
                     {(ceremony.transport || ceremony.hebergement) && (
                       <DraggableElement id={pre+"infos"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={500} skipAnim={canEdit}><div style={{ marginTop: data.continuousLayout ? 12 : 32, paddingTop: data.continuousLayout ? 8 : 24 }}>
