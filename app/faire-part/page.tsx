@@ -7299,7 +7299,7 @@ const firstDate = sorted[0]?.date
   backgroundColor: '#F7F3EC',
   backgroundImage: 'radial-gradient(ellipse at 15% 15%, rgba(201,162,100,0.07) 0%, transparent 50%), radial-gradient(ellipse at 85% 85%, rgba(27,42,94,0.05) 0%, transparent 50%), radial-gradient(ellipse at 85% 15%, rgba(196,113,74,0.04) 0%, transparent 40%), radial-gradient(ellipse at 15% 85%, rgba(201,162,100,0.04) 0%, transparent 40%)',
 }}>
-  <style>{`@keyframes premiumPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}@keyframes revealLTR{from{clip-path:inset(-80px 100% -80px -80px);opacity:0}to{clip-path:inset(-80px -80px -80px -80px);opacity:1}}`}</style>
+  <style>{`@keyframes premiumPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}@keyframes revealLTR{from{clip-path:inset(-80px 100% -80px -80px);opacity:0}to{clip-path:inset(-80px -80px -80px -80px);opacity:1}}@keyframes premiumFadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}`}</style>
   {/* Illustration aquarelle — fond principal */}
   {coupleUrl && (
     <div style={{ position: 'relative', width: '100%', minHeight: '100svh', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'revealLTR 1.2s cubic-bezier(0.4,0,0.2,1) 1.5s both' : 'none' }}>
@@ -7331,13 +7331,13 @@ const firstDate = sorted[0]?.date
     <div style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10 }}>
       <DraggableElement id="pc_names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
         <div style={{ textAlign: 'center', padding: '20px 12px 18px', background: 'radial-gradient(ellipse 90% 100% at 50% 50%, rgba(247,243,236,0.6) 0%, transparent 100%)', position: 'relative', zIndex: 2, marginTop: 12, whiteSpace: 'nowrap', overflow: 'visible' }}>
-          <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(32px,7.5vw,52px)', color: '#1B2A5E', lineHeight: 1.4, textShadow: '0 2px 20px rgba(247,243,236,0.9)', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'revealLTR 1s cubic-bezier(0.4,0,0.2,1) 0.5s both' : 'none', display: 'inline-block' }}>
+          <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(32px,7.5vw,52px)', color: '#1B2A5E', lineHeight: 1.4, textShadow: '0 2px 20px rgba(247,243,236,0.9)', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'premiumFadeIn 1s ease-out 0.5s both' : 'none', display: 'inline-block' }}>
             {data.marie1Prenom || 'Prénom'}
           </span>
-          <span style={{ fontFamily: 'var(--font-playfair-display)', fontStyle: 'italic', fontSize: 'clamp(18px,4vw,26px)', color: '#C9A264', letterSpacing: 6, margin: '0 6px', verticalAlign: 'middle', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'revealLTR 0.8s cubic-bezier(0.4,0,0.2,1) 0.8s both' : 'none', display: 'inline-block' }}>
+          <span style={{ fontFamily: 'var(--font-playfair-display)', fontStyle: 'italic', fontSize: 'clamp(18px,4vw,26px)', color: '#C9A264', letterSpacing: 6, margin: '0 6px', verticalAlign: 'middle', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'premiumFadeIn 0.8s ease-out 0.8s both' : 'none', display: 'inline-block' }}>
             {'&'}
           </span>
-          <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(32px,7.5vw,52px)', color: '#1B2A5E', lineHeight: 1.4, textShadow: '0 2px 20px rgba(247,243,236,0.9)', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'revealLTR 1s cubic-bezier(0.4,0,0.2,1) 1s both' : 'none', display: 'inline-block' }}>
+          <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(32px,7.5vw,52px)', color: '#1B2A5E', lineHeight: 1.4, textShadow: '0 2px 20px rgba(247,243,236,0.9)', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'premiumFadeIn 1s ease-out 1s both' : 'none', display: 'inline-block' }}>
             {data.marie2Prenom || 'Prénom'}
           </span>
         </div>
