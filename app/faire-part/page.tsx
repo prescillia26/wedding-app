@@ -7770,9 +7770,20 @@ const firstDate = sorted[0]?.date
                       </AnimSection></DraggableElement>
                     )}
                     {ceremony.type === 'Cérémonie religieuse / Houppa' && ceremony.penseesDefuntsActif && ceremony.penseesDefuntsNoms.filter(n => n.trim()).length > 0 && (
+                      data.premiumCover ? (
+                        <AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
+                          <div style={{ textAlign: 'center', padding: '16px 24px', margin: '8px 0 12px', borderTop: '0.5px solid rgba(201,162,100,0.3)', borderBottom: '0.5px solid rgba(201,162,100,0.3)' }}>
+                            <p style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 14, color: '#6B5A42', lineHeight: 1.8, margin: 0 }}>
+                              En ce jour si important, nous aurons une forte pensée pour{' '}
+                              <span style={{ color: '#C9A264' }}>{ceremony.penseesDefuntsNoms.filter(n => n.trim()).join(', ').replace(/, ([^,]*)$/, ' et $1')}</span>
+                              {' '}dont la mémoire veille sur nous et nous guide.
+                            </p>
+                          </div>
+                        </AnimSection>
+                      ) : (
                       <DraggableElement id={pre+"defunts"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
-                        <div style={{ textAlign: 'center', marginBottom: data.premiumCover ? 8 : 32, paddingBottom: data.premiumCover ? 4 : 24, borderBottom: `1px solid ${G}22` }}>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: data.premiumCover ? 12 : 16 }}>
+                        <div style={{ textAlign: 'center', marginBottom: 32, paddingBottom: 24, borderBottom: `1px solid ${G}22` }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: 16 }}>
                             <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
                             <img src="https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/v1781685771/bnl1dqjjovgay8l4wmlu.png" alt="" style={{ width: 50, height: 50, objectFit: 'contain' }} />
                             <div style={{ width: 60, height: 0.5, background: G, opacity: 0.4 }} />
@@ -7811,6 +7822,7 @@ const firstDate = sorted[0]?.date
                           )}
                         </div>
                       </AnimSection></DraggableElement>
+                      )
                     )}
                     {(hasGp || parents1.length > 0 || parents2.length > 0) && ceremony.type === 'Cérémonie religieuse / Houppa' && (() => {
                       const ovIf = (key: string, def: string) => ov[key] && ov[key] !== def ? ov[key] : ''
