@@ -7331,13 +7331,13 @@ const firstDate = sorted[0]?.date
     <div style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10 }}>
       <DraggableElement id="pc_names" layout={layout} onLayoutChange={setLayout} editable={canEdit}>
         <div style={{ textAlign: 'center', padding: '28px 12px 18px', background: 'radial-gradient(ellipse 90% 100% at 50% 50%, rgba(247,243,236,0.6) 0%, transparent 100%)', position: 'relative', zIndex: 2, marginTop: 16, whiteSpace: 'nowrap', overflow: 'visible' }}>
-          <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(22px,5.5vw,34px)', color: '#1B2A5E', lineHeight: 2.2, textShadow: '0 2px 20px rgba(247,243,236,0.9)', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'premiumFadeIn 1s ease-out 0.5s both' : 'none', display: 'inline-block' }}>
+          <span style={{ fontFamily: 'var(--font-playfair-display)', fontStyle: 'italic', fontSize: 'clamp(26px,6vw,40px)', color: '#1B2A5E', lineHeight: 1.4, textShadow: '0 2px 20px rgba(247,243,236,0.9)', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'premiumFadeIn 1s ease-out 0.5s both' : 'none', display: 'inline-block' }}>
             {data.marie1Prenom || 'Prénom'}
           </span>
-          <span style={{ fontFamily: 'var(--font-playfair-display)', fontStyle: 'italic', fontSize: 'clamp(14px,3vw,18px)', color: '#C9A264', letterSpacing: 6, margin: '0 6px', verticalAlign: 'middle', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'premiumFadeIn 0.8s ease-out 0.8s both' : 'none', display: 'inline-block' }}>
+          <span style={{ fontFamily: 'var(--font-pinyon-script)', fontSize: 'clamp(22px,5vw,34px)', color: '#C9A264', margin: '0 8px', verticalAlign: 'middle', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'premiumFadeIn 0.8s ease-out 0.8s both' : 'none', display: 'inline-block' }}>
             {'&'}
           </span>
-          <span style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 'clamp(22px,5.5vw,34px)', color: '#1B2A5E', lineHeight: 2.2, textShadow: '0 2px 20px rgba(247,243,236,0.9)', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'premiumFadeIn 1s ease-out 1s both' : 'none', display: 'inline-block' }}>
+          <span style={{ fontFamily: 'var(--font-playfair-display)', fontStyle: 'italic', fontSize: 'clamp(26px,6vw,40px)', color: '#1B2A5E', lineHeight: 1.4, textShadow: '0 2px 20px rgba(247,243,236,0.9)', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'premiumFadeIn 1s ease-out 1s both' : 'none', display: 'inline-block' }}>
             {data.marie2Prenom || 'Prénom'}
           </span>
         </div>
