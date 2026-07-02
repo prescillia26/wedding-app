@@ -7818,22 +7818,23 @@ const firstDate = sorted[0]?.date
                       // ── Premium layout: 2 colonnes sans séparation GP/parents ──
                       if (data.premiumCover) {
                         const PF = 'var(--font-playfair-display)'
-                        const colStyle: React.CSSProperties = { fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: '#1B2A5E', lineHeight: 2 }
+                        const colStyle: React.CSSProperties = { fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 13, color: '#1B2A5E', lineHeight: 1.6 }
+                        const fixAmp = (s: string) => s.replace(' & ', ' et ')
                         return (
                         <AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
                           <div style={{ width: '100%', padding: '0 16px', boxSizing: 'border-box' as const, marginBottom: 16 }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                               {/* Colonne gauche */}
                               <div style={{ ...colStyle, width: '48%', textAlign: 'left' }}>
-                                {gpPa1 && <div>{ov.gpPa1 || gpPa1}</div>}
-                                {gpMa1 && <div>{ov.gpMa1 || gpMa1}</div>}
-                                {parents1.map((l,j) => <div key={`p1_${j}`}>{ov[`parents1_${j}`] || l}</div>)}
+                                {gpPa1 && <div>{fixAmp(ov.gpPa1 || gpPa1)}</div>}
+                                {gpMa1 && <div>{fixAmp(ov.gpMa1 || gpMa1)}</div>}
+                                {parents1.map((l,j) => <div key={`p1_${j}`}>{fixAmp(ov[`parents1_${j}`] || l)}</div>)}
                               </div>
                               {/* Colonne droite */}
                               <div style={{ ...colStyle, width: '48%', textAlign: 'right' }}>
-                                {gpPa2 && <div>{ov.gpPa2 || gpPa2}</div>}
-                                {gpMa2 && <div>{ov.gpMa2 || gpMa2}</div>}
-                                {parents2.map((l,j) => <div key={`p2_${j}`}>{ov[`parents2_${j}`] || l}</div>)}
+                                {gpPa2 && <div>{fixAmp(ov.gpPa2 || gpPa2)}</div>}
+                                {gpMa2 && <div>{fixAmp(ov.gpMa2 || gpMa2)}</div>}
+                                {parents2.map((l,j) => <div key={`p2_${j}`}>{fixAmp(ov[`parents2_${j}`] || l)}</div>)}
                               </div>
                             </div>
                           </div>
