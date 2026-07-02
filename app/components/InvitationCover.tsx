@@ -145,8 +145,8 @@ export default function InvitationCover({
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
           }
           @keyframes fadeFloat {
-            0%, 100% { opacity: 0.6; transform: translateY(0px); }
-            50% { opacity: 1; transform: translateY(-6px); }
+            0%, 100% { opacity: 0.7; transform: translateY(0px); }
+            50% { opacity: 1; transform: translateY(-4px); }
           }
           @keyframes lineExpand {
             0%, 100% { width: 30px; opacity: 0.4; }
@@ -179,7 +179,7 @@ export default function InvitationCover({
             onClick={handleVideoPlay}
             style={{
               position: 'absolute',
-              bottom: '8%',
+              bottom: '10%',
               left: '50%',
               transform: 'translateX(-50%)',
               zIndex: 10,
@@ -188,7 +188,8 @@ export default function InvitationCover({
               display: 'flex',
               flexDirection: 'column' as const,
               alignItems: 'center',
-              gap: 12,
+              gap: 8,
+              width: '70%',
               animation: 'appearIn 1.5s ease-out both',
               touchAction: 'manipulation',
               WebkitTapHighlightColor: 'transparent',
@@ -196,21 +197,21 @@ export default function InvitationCover({
           >
             {/* Ligne dorée du haut */}
             <div style={{
+              width: '100%',
               height: 0.5,
               background: 'linear-gradient(to right, transparent, #C9A264, transparent)',
-              animation: 'lineExpand 3s ease-in-out infinite',
-              width: 60,
             }} />
             {/* Texte principal */}
             <div style={{
               fontFamily: "'Cormorant Garamond', serif",
               fontStyle: 'italic',
               fontWeight: 300,
-              fontSize: 22,
+              fontSize: 16,
               color: '#1B2A5E',
-              letterSpacing: 6,
-              whiteSpace: 'nowrap' as const,
-              animation: 'fadeFloat 4s ease-in-out infinite',
+              letterSpacing: 3,
+              width: '100%',
+              textAlign: 'center',
+              animation: 'fadeFloat 3s ease-in-out infinite',
             }}>
               {videoOverlayText1 || 'Découvrir votre faire-part'}
             </div>
@@ -218,16 +219,15 @@ export default function InvitationCover({
             <div style={{
               color: '#C9A264',
               fontSize: 8,
-              animation: 'fadeFloat 4s ease-in-out infinite 0.8s',
+              animation: 'fadeFloat 3s ease-in-out infinite 0.5s',
             }}>
               ◆
             </div>
             {/* Ligne dorée du bas */}
             <div style={{
+              width: '100%',
               height: 0.5,
               background: 'linear-gradient(to right, transparent, #C9A264, transparent)',
-              animation: 'lineExpand 3s ease-in-out infinite 0.5s',
-              width: 60,
             }} />
           </div>
         )}
