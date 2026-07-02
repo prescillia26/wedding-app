@@ -7338,29 +7338,36 @@ const firstDate = sorted[0]?.date
     </div>
     {/* Spacer */}
     <div style={{ flex: 1 }} />
-    {/* Séparateur + bouton DÉCOUVRIR + dates — en bas */}
-    <div style={{ textAlign: 'center', flexShrink: 0, pointerEvents: 'auto', marginTop: -60, opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'revealLTR 0.8s cubic-bezier(0.4,0,0.2,1) 2s both' : 'none' }}>
-      <div>
-        <button type="button" onClick={() => { const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null; if (audio) audio.play().catch(() => {}); onStartYoutube?.(); const el = document.getElementById('first-content'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} onTouchEnd={(e) => { e.preventDefault(); const audio = document.getElementById('lovit-audio') as HTMLAudioElement | null; if (audio) audio.play().catch(() => {}); onStartYoutube?.(); const el = document.getElementById('first-content'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} style={{ fontFamily: 'var(--font-tenor-sans)', fontSize: 11, fontWeight: 500, letterSpacing: '0.35em', textTransform: 'uppercase' as const, padding: '16px 52px', borderRadius: 0, minWidth: 200, border: '0.5px solid #C9A264', background: 'rgba(247,243,236,0.6)', color: '#1B2A5E', cursor: 'pointer', transition: 'all 0.3s ease', animation: 'premiumPulse 2.5s ease-in-out infinite', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', backdropFilter: 'blur(4px)' }}>
-          DÉCOUVRIR ◆
-        </button>
+    {/* Dates élégantes — sous l'illustration */}
+    <div style={{ textAlign: 'center', flexShrink: 0, pointerEvents: 'auto', padding: '12px 16px 0', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 6, opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'revealLTR 0.8s cubic-bezier(0.4,0,0.2,1) 2s both' : 'none' }}>
+      {/* Séparateur */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', justifyContent: 'center' }}>
+        <div style={{ height: 0.5, background: '#C9A264', width: 40 }} />
+        <div style={{ color: '#C9A264', fontSize: 7 }}>◆</div>
+        <div style={{ height: 0.5, background: '#C9A264', width: 40 }} />
       </div>
-      {/* Dates élégantes */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 12, alignItems: 'center', marginTop: 14, flexWrap: 'wrap', opacity: showAccueilAnim ? undefined : 0, animation: showAccueilAnim ? 'revealLTR 0.8s cubic-bezier(0.4,0,0.2,1) 2.3s both' : 'none' }}>
-        {(data.ceremonies || []).map((c: { date?: string; lieu?: string }, idx: number) => {
+      {/* Dates sur 2 lignes */}
+      {(() => {
+        const allCeremonies = (data.ceremonies || []).map((c: { date?: string; lieu?: string }) => {
           if (!c.date && !c.lieu) return null
           const formatted = c.date ? (() => { const d = new Date(c.date + 'T12:00:00'); return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}` })() : ''
           const lieu = c.lieu || ''
-          return (
-            <span key={idx} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              {idx > 0 && <span style={{ color: '#C9A264', fontSize: 6 }}>◆</span>}
-              <span style={{ fontFamily: 'var(--font-tenor-sans)', fontWeight: 300, fontSize: 8, letterSpacing: 2, color: '#C9A264' }}>
-                {formatted}{formatted && lieu ? ' · ' : ''}{lieu}
-              </span>
-            </span>
-          )
-        })}
-      </div>
+          return `${formatted}${formatted && lieu ? ' · ' : ''}${lieu}`
+        }).filter(Boolean) as string[]
+        const mid = Math.ceil(allCeremonies.length / 2)
+        const line1 = allCeremonies.slice(0, mid)
+        const line2 = allCeremonies.slice(mid)
+        const lineStyle: React.CSSProperties = { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }
+        const textStyle: React.CSSProperties = { fontFamily: 'Montserrat, sans-serif', fontWeight: 300, fontSize: 9, letterSpacing: 1.5, color: '#C9A264' }
+        return (<>
+          <div style={lineStyle}>
+            {line1.map((t, i) => <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>{i > 0 && <span style={{ color: '#C9A264', fontSize: 6 }}>◆</span>}<span style={textStyle}>{t}</span></span>)}
+          </div>
+          {line2.length > 0 && <div style={lineStyle}>
+            {line2.map((t, i) => <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>{i > 0 && <span style={{ color: '#C9A264', fontSize: 6 }}>◆</span>}<span style={textStyle}>{t}</span></span>)}
+          </div>}
+        </>)
+      })()}
     </div>
   </div>
 </div>
