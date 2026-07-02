@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
 import { redis } from '@/lib/redis'
 
-export async function generateMetadata({ searchParams }: { searchParams: Promise<{ share?: string }> }): Promise<Metadata> {
+export async function generateMetadata({ searchParams }: { searchParams: Promise<{ share?: string }> | undefined }): Promise<Metadata> {
+  if (!searchParams) return {}
   const params = await searchParams
-  const shareId = params.share
+  const shareId = params?.share
   if (!shareId) return {}
 
   try {
