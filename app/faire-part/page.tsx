@@ -6445,24 +6445,36 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
         }}
       />
       {editable && !showPicker && (
-        <div onPointerDown={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 2, lineHeight: 1, position: 'relative', zIndex: 10 }}>
-          <button type="button" onClick={(e) => { e.stopPropagation(); onChangeSize(Math.max(20, w - 10)) }} style={{
-            ...BTN, width: 28, height: 28, borderRadius: '50%', border: `2px solid ${accent}`,
-            background: 'white', color: accent, fontSize: 18, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, cursor: 'pointer',
-          }}>−</button>
-          <span style={{ fontSize: 10, color: accent, fontWeight: 600, minWidth: 30, textAlign: 'center' }}>{w}%</span>
-          <button type="button" onClick={(e) => { e.stopPropagation(); onChangeSize(Math.min(400, w + 10)) }} style={{
-            ...BTN, width: 28, height: 28, borderRadius: '50%', border: `2px solid ${accent}`,
-            background: 'white', color: accent, fontSize: 18, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, cursor: 'pointer',
-          }}>+</button>
-          <button type="button" onClick={() => setShowPicker(true)} style={{
-            ...BTN, padding: '3px 8px', borderRadius: 9999, border: `1px solid ${accent}30`,
-            background: 'white', color: accent, fontSize: 9, fontWeight: 600, cursor: 'pointer',
-          }}>Changer</button>
-          <button type="button" onClick={() => onRemove()} style={{
-            ...BTN, padding: '3px 8px', borderRadius: 9999, border: '1px solid #d4505030',
-            background: 'white', color: '#d45050', fontSize: 9, fontWeight: 600, cursor: 'pointer',
-          }}>Retirer</button>
+        <div onPointerDown={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} style={{ marginTop: 4, lineHeight: 1, position: 'relative', zIndex: 10, background: 'white', borderRadius: 10, padding: '8px 12px', border: `1px solid ${accent}22`, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+          {/* Taille */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+            <span style={{ fontSize: 9, color: accent, fontWeight: 600, minWidth: 32 }}>Taille</span>
+            <input type="range" min={20} max={200} step={1} value={w} onChange={e => onChangeSize(Number(e.target.value))} style={{ flex: 1, accentColor: accent, height: 3 }} />
+            <span style={{ fontSize: 9, color: accent, fontWeight: 600, minWidth: 28, textAlign: 'right' }}>{w}%</span>
+          </div>
+          {/* Position horizontale */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+            <span style={{ fontSize: 9, color: accent, fontWeight: 600, minWidth: 32 }}>Pos. X</span>
+            <input type="range" min={-150} max={150} step={1} value={offsetX} onChange={e => onChangeOffsetX(Number(e.target.value))} style={{ flex: 1, accentColor: accent, height: 3 }} />
+            <span style={{ fontSize: 9, color: accent, fontWeight: 600, minWidth: 28, textAlign: 'right' }}>{offsetX}px</span>
+          </div>
+          {/* Position verticale */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+            <span style={{ fontSize: 9, color: accent, fontWeight: 600, minWidth: 32 }}>Pos. Y</span>
+            <input type="range" min={-200} max={200} step={1} value={offsetY} onChange={e => onChangeOffsetY(Number(e.target.value))} style={{ flex: 1, accentColor: accent, height: 3 }} />
+            <span style={{ fontSize: 9, color: accent, fontWeight: 600, minWidth: 28, textAlign: 'right' }}>{offsetY}px</span>
+          </div>
+          {/* Boutons */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+            <button type="button" onClick={() => setShowPicker(true)} style={{
+              ...BTN, padding: '3px 8px', borderRadius: 9999, border: `1px solid ${accent}30`,
+              background: 'white', color: accent, fontSize: 9, fontWeight: 600, cursor: 'pointer',
+            }}>Changer</button>
+            <button type="button" onClick={() => onRemove()} style={{
+              ...BTN, padding: '3px 8px', borderRadius: 9999, border: '1px solid #d4505030',
+              background: 'white', color: '#d45050', fontSize: 9, fontWeight: 600, cursor: 'pointer',
+            }}>Retirer</button>
+          </div>
         </div>
       )}
       {editable && showPicker && (
