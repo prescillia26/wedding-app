@@ -7679,8 +7679,8 @@ const firstDate = sorted[0]?.date
                       {i % 2 === 0 ? <><OrnTR /><OrnBL /></> : <><OrnTL /><OrnBR /></>}
                     </>
                   )}
-                  {/* Logo en filigrane (watermark) — positionné derrière le titre */}
-                  {data.logoWatermark && data.customLogoUrl && (() => {
+                  {/* Logo en filigrane (watermark) — positionné derrière le titre (désactivé pour premium, géré dans le div titre) */}
+                  {!data.premiumCover && data.logoWatermark && data.customLogoUrl && (() => {
                     const wmSize = data.logoWatermarkSize ?? 180
                     const wmColor = data.logoWatermarkColor ?? ''
                     if (wmColor) {
