@@ -152,8 +152,8 @@ export async function generateMetadata(
       siteName: "Lov'it — Invitations de mariage",
       images: [{
         url: ogImage || 'https://gsihevihnthjsm8z.public.blob.vercel-storage.com/static/watercolors/st6oedinlfobqf1tqgkk.png',
-        width: 1200,
-        height: 630,
+        width: 800,
+        height: 400,
         alt: `Invitation de mariage de ${marie1Prenom} & ${marie2Prenom}`,
         type: 'image/png',
       }],
