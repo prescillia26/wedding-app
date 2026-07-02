@@ -71,6 +71,7 @@ const getData = cache(async (slug: string) => {
     style?: string
     illustrationCoupleId?: string
     styleAccueil?: string
+    ogImageUrl?: string
   }>(shareId)
   if (!data) return null
   return { shareId, data }
@@ -135,9 +136,9 @@ export async function generateMetadata(
     || result.data.customLogoUrl
     || result.data.luxeMonogramUrl
     || ''
-  const rawOg = userPhoto || fallbackImage
-  const isPhoto = !!userPhoto
-  const ogImage = rawOg ? toCloudinaryOgUrl(rawOg, result.data.ogVersion, bgColor, isPhoto) : ''
+  const rawOg = result.data.ogImageUrl || userPhoto || fallbackImage
+  const isPhoto = !!userPhoto && !result.data.ogImageUrl
+  const ogImage = result.data.ogImageUrl || (rawOg ? toCloudinaryOgUrl(rawOg, result.data.ogVersion, bgColor, isPhoto) : '')
 
   return {
     title,
