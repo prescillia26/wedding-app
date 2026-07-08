@@ -363,6 +363,8 @@ interface Ceremony {
   illustrationOffsetY?: number // décalage vertical en px
   // ── Masquer du carton-réponse ──
   rsvpHidden?: boolean
+  // ── Masquer la date hébraïque ──
+  hideHebrewDate?: boolean
   // ── Shabbat multi-jours ──
   multiJours?: ShabbatMoment[]
   // ── Photo de fond du lieu ──
@@ -8062,7 +8064,7 @@ const firstDate = sorted[0]?.date
                             </div>
                             <div style={applyZoneStyle({ fontFamily: FC, fontSize: 12, color: TEXT, letterSpacing: 3, marginTop: 8, opacity: 0.7 }, 'dateHeure', data.zoneStyles)}>{annee}</div>
                           </div>
-                          {data.mariageJuif && hebrewDate && <div style={{ fontFamily: 'serif', fontSize: 15, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 8, opacity: 0.8 }}>{hebrewDate}</div>}
+                          {data.mariageJuif && hebrewDate && !ceremony.hideHebrewDate && <div style={{ fontFamily: 'serif', fontSize: 15, color: G, direction: 'rtl', textAlign: 'center', marginBottom: 8, opacity: 0.8 }}>{hebrewDate}</div>}
                           {ceremony.heure && <div style={applyZoneStyle({ fontFamily: FP, fontSize: 20, fontWeight: 600, color: G, textAlign: 'center', marginBottom: data.continuousLayout ? 8 : 24, letterSpacing: 3, lineHeight: 1.2 }, 'dateHeure', data.zoneStyles)}>{formatHeure(ceremony.heure, locale)}</div>}
                           </>
                         )
