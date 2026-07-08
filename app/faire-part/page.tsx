@@ -6425,7 +6425,7 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
   }
 
   return (
-    <div style={{ textAlign: 'center', position: 'relative', margin: '0 0 4px', padding: 0, overflow: isPhoto ? 'hidden' : 'visible', lineHeight: 0 }}>
+    <div style={{ textAlign: 'center', position: 'relative', margin: '0 0 4px', padding: 0, overflow: 'hidden', lineHeight: 0 }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
@@ -6438,8 +6438,6 @@ function EditableIllustration({ url, size, offsetX, offsetY, editable, accent, c
           borderRadius: isPhoto ? 10 : 0,
           boxShadow: isPhoto ? '0 4px 20px rgba(0,0,0,0.12)' : 'none',
           mixBlendMode: isPhoto ? undefined : (darkBg ? undefined : 'multiply'),
-          WebkitMaskImage: undefined,
-          maskImage: undefined,
           verticalAlign: 'middle',
           transform: `translate(${cx}px, ${cy}px)`,
           cursor: editable ? (draggingRef.current ? 'grabbing' : 'grab') : 'default',
