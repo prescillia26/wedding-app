@@ -489,7 +489,7 @@ interface FormData {
   // ── Position du bouton Découvrir (page d'accueil) ──
   decouvrirButtonPosition?: { x: number; y: number }
   // ── Zones de texte personnalisées (ajoutées par les mariés) ──
-  customTextZones?: { id: string; text: string; x: number; y: number; style?: string }[]
+  customTextZones?: { id: string; text: string; x: number; y: number; style?: string; ceremonyIdx?: number }[]
   // ── Logo en filigrane (watermark) derrière le contenu ──
   logoWatermark?: boolean // afficher le logo en filigrane derrière chaque cérémonie
   logoWatermarkOpacity?: number // 0-1, default 0.06
@@ -7662,7 +7662,7 @@ const firstDate = sorted[0]?.date
               {/* Illustration aquarelle — rendue à l'intérieur de la carte (voir ci-dessous) */}
               <CeremonyCard isCard={isCard} accent={G} hasFrame={hasFrame}>
                 {i === 0 && !(data.customPages ?? []).some(p => p.position === safeIdx) && <div id="first-content" style={{ scrollMarginTop: 60 }} />}
-                <section id={`ceremony-${safeIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : (data.premiumCover ? (i === 0 ? 0 : (ceremony.type === 'Mairie' || ceremony.type === 'Henné') ? 40 : 16) : data.continuousLayout ? 0 : data.premiumCeremonyStyle ? 32 : 48), paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : (data.premiumCover ? 16 : data.continuousLayout ? 0 : data.premiumCeremonyStyle ? 32 : 48), paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: (hasFrame || data.premiumCover) ? 'hidden' : 'visible', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: data.continuousLayout ? 'none' : `1px solid ${G}1a`, background: ceremony.bgColor || theme.fond } : { background: hasFrame ? '#ffffff' : (ceremony.bgColor || theme.fond) }) }}>
+                <section id={`ceremony-${safeIdx}`} style={{ paddingTop: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.top ?? data.framePaddingV ?? 22}%` : (data.premiumCover ? (i === 0 ? 0 : (ceremony.type === 'Mairie' || ceremony.type === 'Henné') ? 40 : 16) : data.continuousLayout ? 0 : data.premiumCeremonyStyle ? 32 : 48), paddingBottom: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.bottom ?? data.framePaddingV ?? 22}%` : (data.premiumCover ? 16 : data.continuousLayout ? 0 : data.premiumCeremonyStyle ? 32 : 48), paddingLeft: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, paddingRight: hasFrame ? `${FRAMES_CUSTOM_PADDING[data.frameId ?? '']?.h ?? data.framePaddingH ?? 18}%` : undefined, position: 'relative', overflow: hasFrame ? 'hidden' : 'visible', scrollMarginTop: 60, overflowWrap: 'break-word', ...(!isCard ? { borderBottom: data.continuousLayout ? 'none' : `1px solid ${G}1a`, background: ceremony.bgColor || theme.fond } : { background: hasFrame ? '#ffffff' : (ceremony.bgColor || theme.fond) }) }}>
                   {hasFrame && frame.video ? (
                     <video src={frame.url!} autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: data.frameOpacity ?? 1, pointerEvents: 'none', zIndex: 0 }} />
                   ) : hasFrame ? (
@@ -8254,7 +8254,15 @@ const firstDate = sorted[0]?.date
         )}
 
         {/* ── Zones de texte personnalisées (ajoutées par les mariés) ── */}
-        {(data.customTextZones ?? []).map((zone) => {
+        {(data.customTextZones ?? []).filter((zone) => {
+          // Si la zone est liée à une cérémonie (ceremonyIdx), ne l'afficher que si cette cérémonie est dans sorted
+          if (typeof (zone as Record<string, unknown>).ceremonyIdx === 'number') {
+            const fullSorted = sortByDate(data.ceremonies ?? [])
+            const linkedCeremony = fullSorted[(zone as Record<string, unknown>).ceremonyIdx as number]
+            if (!linkedCeremony || !sorted.includes(linkedCeremony)) return false
+          }
+          return true
+        }).map((zone) => {
           const canEditZone = role !== 'guest' && !!onUpdate
           const zLayout = data.accueilLayout ?? {}
           const zSetLayout = (l: LayoutMap) => onUpdate?.({ accueilLayout: l })
