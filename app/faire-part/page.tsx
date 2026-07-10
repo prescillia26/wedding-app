@@ -7265,7 +7265,7 @@ const firstDate = sorted[0]?.date
         logoColor={data.headerLogoColor}
         logoSize={data.headerLogoSize ?? 48}
         logoBold={data.headerLogoBold ?? 100}
-        firstDate={sorted[0]?.date}
+        firstDate={(sorted.find(c => c.type === 'Cérémonie religieuse / Houppa') || sorted[0])?.date}
         editable={role !== 'guest' && !!onUpdate}
         onLogoChange={onUpdate}
         premiumStyle={data.premiumCover}
