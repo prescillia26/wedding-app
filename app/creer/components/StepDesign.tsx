@@ -132,25 +132,23 @@ function isColorDark(hex: string): boolean {
 
 /* ── Upload de logo ───────────────────────────────────────── */
 
+const MAX_LOGO_SIZE = 2 * 1024 * 1024 // 2 Mo
+
 function LogoUploader({ logoUrl, onChange }: { logoUrl: string; onChange: (url: string) => void }) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
 
-  const upload = async (file: File) => {
-    setUploading(true)
+  const handleFile = (file: File) => {
     setError('')
-    try {
-      const fd = new FormData()
-      fd.append('file', file)
-      const res = await fetch('/api/upload', { method: 'POST', body: fd })
-      const json = await res.json()
-      if (json.url) onChange(json.url)
-      else setError('Erreur lors du téléchargement')
-    } catch {
-      setError('Erreur réseau')
-    } finally {
-      setUploading(false)
+    if (file.size > MAX_LOGO_SIZE) {
+      setError(`Le logo est trop lourd (${(file.size / 1024 / 1024).toFixed(1)} Mo). Maximum : 2 Mo.`)
+      return
     }
+    setUploading(true)
+    const reader = new FileReader()
+    reader.onload = () => { onChange(reader.result as string); setUploading(false) }
+    reader.onerror = () => { setError('Erreur lors de la lecture du fichier.'); setUploading(false) }
+    reader.readAsDataURL(file)
   }
 
   if (logoUrl) {
@@ -173,7 +171,7 @@ function LogoUploader({ logoUrl, onChange }: { logoUrl: string; onChange: (url: 
           <p style={{ fontSize: 13, color: TEXT, margin: 0 }}>{uploading ? 'Téléchargement...' : 'Cliquez pour importer votre logo ou monogramme'}</p>
           <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>PNG, JPG — fond transparent recommandé</p>
         </div>
-        <input type="file" accept="image/*" disabled={uploading} onChange={e => { const f = e.target.files?.[0]; if (f) upload(f); e.target.value = '' }} style={{ display: 'none' }} />
+        <input type="file" accept="image/*" disabled={uploading} onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = '' }} style={{ display: 'none' }} />
       </label>
       {error && <p style={{ fontSize: 12, color: '#d45050', marginTop: 6 }}>{error}</p>}
     </div>
@@ -182,66 +180,37 @@ function LogoUploader({ logoUrl, onChange }: { logoUrl: string; onChange: (url: 
 
 /* ── Upload de musique ────────────────────────────────────── */
 
-function MusicUploader({ musicUrl, musicName, onChange }: { musicUrl: string; musicName: string; onChange: (url: string, name: string) => void }) {
-  const [uploading, setUploading] = useState(false)
-  const [error, setError] = useState('')
-
-  const upload = async (file: File) => {
-    setUploading(true)
-    setError('')
-    try {
-      const fd = new FormData()
-      fd.append('file', file)
-      const res = await fetch('/api/upload', { method: 'POST', body: fd })
-      const json = await res.json()
-      if (json.url) onChange(json.url, file.name)
-      else setError('Erreur lors du téléchargement')
-    } catch {
-      setError('Erreur réseau')
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  if (musicUrl) {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', border: `1px solid ${GOLD}44`, borderRadius: 10, background: '#faf5ea' }}>
-        <span style={{ fontSize: 18 }}>🎵</span>
-        <span style={{ flex: 1, fontSize: 12, color: TEXT, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{musicName || 'Musique importée'}</span>
-        <button type="button" onClick={() => onChange('', '')} style={{ background: 'none', border: 'none', color: '#d45050', fontSize: 13, fontFamily: 'var(--font-cormorant-garamond)', cursor: 'pointer' }}>
-          Supprimer
-        </button>
-      </div>
-    )
-  }
-
+function MusicInput({ musicUrl, onChange }: { musicUrl: string; onChange: (url: string) => void }) {
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-        <p style={{ fontSize: 11, color: '#9ca3af', margin: 0, flex: 1 }}>
-          Importez un fichier MP3 pour ajouter une musique de fond à votre faire-part
-        </p>
-        <a href="https://yt2mp3.gs" target="_blank" rel="noopener noreferrer" style={{
-          display: 'inline-flex', alignItems: 'center', gap: 5,
-          padding: '7px 14px', borderRadius: 9999,
-          background: `linear-gradient(135deg, ${GOLD}, #e8c96a)`,
-          color: 'white', fontSize: 12, fontWeight: 600,
-          textDecoration: 'none', whiteSpace: 'nowrap',
-          boxShadow: `0 2px 10px ${GOLD}44`,
-          fontFamily: 'var(--font-playfair-display)',
-        }}>
-          🎵 YouTube → MP3
-        </a>
+      <p style={{ fontSize: 13, color: '#9ca3af', margin: '0 0 10px', fontStyle: 'italic' }}>
+        Collez un lien YouTube pour ajouter une musique de fond à votre faire-part
+      </p>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <input
+          type="url"
+          value={musicUrl}
+          onChange={e => onChange(e.target.value)}
+          placeholder="https://www.youtube.com/watch?v=..."
+          style={{
+            flex: 1, padding: '10px 14px', borderRadius: 10,
+            border: `1.5px solid ${GOLD}44`, fontSize: 13,
+            fontFamily: 'var(--font-cormorant-garamond)', color: TEXT,
+            background: 'white', outline: 'none',
+          }}
+        />
+        {musicUrl && (
+          <button type="button" onClick={() => onChange('')} style={{
+            background: 'none', border: 'none', color: '#d45050',
+            fontSize: 13, fontFamily: 'var(--font-cormorant-garamond)', cursor: 'pointer',
+          }}>
+            Retirer
+          </button>
+        )}
       </div>
-      <label style={{ display: 'block', cursor: uploading ? 'wait' : 'pointer' }}>
-        <div style={{ border: `2px dashed ${GOLD}66`, borderRadius: 10, padding: 20, textAlign: 'center', background: uploading ? '#faf5ea' : 'white' }}>
-          <div style={{ fontSize: 24, marginBottom: 6 }}>{uploading ? '⏳' : '🎵'}</div>
-          <p style={{ fontSize: 13, color: TEXT, margin: 0 }}>{uploading ? 'Téléchargement...' : 'Cliquez pour importer votre musique'}</p>
-          <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>MP3, M4A, WAV</p>
-        </div>
-        <input type="file" accept="audio/mp3,audio/mpeg,audio/*" disabled={uploading} onChange={e => { const f = e.target.files?.[0]; if (f) upload(f); e.target.value = '' }} style={{ display: 'none' }} />
-      </label>
-      {error && <p style={{ fontSize: 12, color: '#d45050', marginTop: 6 }}>{error}</p>}
+      <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 6 }}>
+        Formats acceptés : youtube.com/watch?v=… ou youtu.be/…
+      </p>
     </div>
   )
 }
@@ -285,10 +254,9 @@ export default function StepDesign({ data, onChange }: { data: DesignData; onCha
       {/* ── Musique ── */}
       <div style={S.section}>
         <div style={S.sectionTitle}>Musique de fond (optionnel)</div>
-        <MusicUploader
+        <MusicInput
           musicUrl={data.musicUrl}
-          musicName={data.musicName}
-          onChange={(url, name) => onChange({ ...data, musicUrl: url, musicName: name })}
+          onChange={url => onChange({ ...data, musicUrl: url })}
         />
       </div>
     </div>

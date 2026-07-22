@@ -95,6 +95,11 @@ function formatHeure(heure: string): string {
   return heure.replace(':', 'h')
 }
 
+function extractYoutubeId(url: string): string | null {
+  const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]{11})/)
+  return m ? m[1] : null
+}
+
 function eventTitle(type: string, customName: string): string {
   if (type === 'Autre' && customName) return customName
   return type
@@ -547,8 +552,8 @@ export function generateStaticHtml(input: GenerateInput): string {
     .music-section {
       text-align: center; padding: 16px 20px;
     }
-    .music-section audio {
-      width: 100%; max-width: 320px;
+    .music-section iframe {
+      width: 100%; max-width: 360px; border-radius: 12px;
     }
 
     /* ── Footer ── */
@@ -607,9 +612,9 @@ export function generateStaticHtml(input: GenerateInput): string {
     ${eventsSections}
 
     <!-- Music -->
-    ${input.musicUrl ? `
+    ${input.musicUrl && extractYoutubeId(input.musicUrl) ? `
     <div class="music-section">
-      <audio controls src="${esc(input.musicUrl)}" preload="none"></audio>
+      <iframe src="https://www.youtube.com/embed/${extractYoutubeId(input.musicUrl)}?autoplay=1&loop=1" height="80" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
     </div>
     ` : ''}
 
