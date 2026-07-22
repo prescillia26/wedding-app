@@ -24,6 +24,7 @@ export interface GenerateInput {
   emailContact: string
   googleScriptUrl?: string
   mariageJuif?: boolean
+  accueilImageUrl?: string
 }
 
 export interface FamilleInput {
@@ -255,6 +256,7 @@ function renderHouppa(evt: EvenementInput, input: GenerateInput, imageUrl: strin
 
   return `
     <section class="event-section">
+      ${input.mariageJuif ? '<div class="bsd-corner">בס״ד</div>' : ''}
       <div class="card-title-calligraphie">La Houppa</div>
       ${renderLogo(input.logoUrl, p, input.marie1Prenom[0] || '', input.marie2Prenom[0] || '')}
       ${imageUrl ? `<img class="event-image" src="${esc(imageUrl)}" alt="Houppa">` : ''}
@@ -308,6 +310,7 @@ function renderHouppa(evt: EvenementInput, input: GenerateInput, imageUrl: strin
 function renderMairie(evt: EvenementInput, input: GenerateInput, imageUrl: string, p: HarmonizedPalette): string {
   return `
     <section class="event-section">
+      ${input.mariageJuif ? '<div class="bsd-corner">בס״ד</div>' : ''}
       <div class="card-title-calligraphie">La Mairie</div>
       ${renderLogo(input.logoUrl, p, input.marie1Prenom[0] || '', input.marie2Prenom[0] || '')}
       ${imageUrl ? `<img class="event-image" src="${esc(imageUrl)}" alt="Mairie">` : ''}
@@ -342,6 +345,7 @@ function renderMairie(evt: EvenementInput, input: GenerateInput, imageUrl: strin
 function renderHenne(evt: EvenementInput, input: GenerateInput, imageUrl: string, p: HarmonizedPalette): string {
   return `
     <section class="event-section">
+      ${input.mariageJuif ? '<div class="bsd-corner">בס״ד</div>' : ''}
       <div class="card-title-calligraphie">Le Henné</div>
       ${renderLogo(input.logoUrl, p, input.marie1Prenom[0] || '', input.marie2Prenom[0] || '')}
       ${imageUrl ? `<img class="event-image" src="${esc(imageUrl)}" alt="Henné">` : ''}
@@ -380,6 +384,7 @@ function renderAutre(evt: EvenementInput, input: GenerateInput, imageUrl: string
 
   return `
     <section class="event-section">
+      ${input.mariageJuif ? '<div class="bsd-corner">בס״ד</div>' : ''}
       ${renderSeparator()}
       <div class="card-title-calligraphie">${esc(title)}</div>
       ${renderLogo(input.logoUrl, p, input.marie1Prenom[0] || '', input.marie2Prenom[0] || '')}
@@ -410,6 +415,7 @@ function renderShabbat(evt: EvenementInput, input: GenerateInput, imageUrl: stri
 
   return `
     <section class="event-section">
+      ${input.mariageJuif ? '<div class="bsd-corner">בס״ד</div>' : ''}
       <div class="card-title-calligraphie">Shabbat Hatan</div>
       ${renderLogo(input.logoUrl, p, input.marie1Prenom[0] || '', input.marie2Prenom[0] || '')}
       ${imageUrl ? `<img class="event-image" src="${esc(imageUrl)}" alt="Shabbat Hatan">` : ''}
@@ -599,6 +605,37 @@ export function generateStaticHtml(input: GenerateInput): string {
       text-align: center; padding: 20px;
       min-height: 100vh; display: flex; flex-direction: column;
       align-items: center; justify-content: center;
+      position: relative;
+    }
+    .accueil-content {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; flex: 1;
+    }
+    .bsd {
+      font-family: serif; font-size: 16px; color: ${p.texteColor};
+      direction: rtl; margin-bottom: 16px; opacity: 0.8;
+    }
+    .bsd-corner {
+      font-family: serif; font-size: 13px; color: ${p.accentColor};
+      direction: rtl; text-align: right; opacity: 0.85;
+      padding: 0 20px; margin-bottom: 8px;
+    }
+    .scroll-hint {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 6px; padding-bottom: 24px;
+    }
+    .scroll-label {
+      font-family: '${p.titresFont}', serif;
+      font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+      color: ${p.texteColor}; opacity: 0.5;
+    }
+    .scroll-arrow {
+      font-size: 18px; color: ${p.texteColor}; opacity: 0.4;
+      animation: bounceDown 2s ease infinite;
+    }
+    @keyframes bounceDown {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(6px); }
     }
     .couple-names-display {
       display: flex; align-items: baseline; justify-content: center;
@@ -611,6 +648,14 @@ export function generateStaticHtml(input: GenerateInput): string {
     .couple-amp-big {
       font-family: '${p.prenomsFont}', cursive;
       font-size: clamp(16px, 4vw, 24px); color: ${p.accentColor}; opacity: 0.5;
+    }
+    .accueil-logo {
+      width: 80px; height: 80px; object-fit: contain; margin-bottom: 16px;
+    }
+    .accueil-label {
+      font-family: '${p.titresFont}', serif;
+      font-size: 11px; letter-spacing: 5px; text-transform: uppercase;
+      color: ${p.accentColor}; opacity: 0.7; margin-bottom: 8px;
     }
     .accueil-date {
       font-family: '${p.titresFont}', serif;
@@ -968,13 +1013,23 @@ export function generateStaticHtml(input: GenerateInput): string {
     </nav>
 
     <!-- Accueil -->
-    <section class="accueil animate">
-      <div class="couple-names-display">
-        <span class="couple-name-big">${esc(input.marie1Prenom)}</span>
-        <span class="couple-amp-big">&amp;</span>
-        <span class="couple-name-big">${esc(input.marie2Prenom)}</span>
+    <section class="accueil animate" ${input.accueilImageUrl ? `style="background-image:url('${esc(input.accueilImageUrl)}');background-size:cover;background-position:center"` : ''}>
+      <div class="accueil-content">
+        ${input.mariageJuif ? '<div class="bsd">בס״ד</div>' : ''}
+        ${input.logoUrl ? `<img src="${esc(input.logoUrl)}" alt="logo" class="accueil-logo">` : ''}
+        <div class="accueil-label">MARIAGE</div>
+        <div class="couple-names-display">
+          <span class="couple-name-big">${esc(input.marie1Prenom)}</span>
+          <span class="couple-amp-big">&amp;</span>
+          <span class="couple-name-big">${esc(input.marie2Prenom)}</span>
+        </div>
+        ${renderSeparator()}
+        <p class="accueil-date">${footerMonths.toUpperCase()}</p>
       </div>
-      <p class="accueil-date delay-1 animate">${formatDateFr(firstDate).toUpperCase()}</p>
+      <div class="scroll-hint">
+        <span class="scroll-label">FAITES DÉFILER</span>
+        <span class="scroll-arrow">↓</span>
+      </div>
     </section>
 
     <!-- Cérémonies -->
