@@ -87,14 +87,19 @@ function formatDateBox(dateStr: string): string {
   if (!dateStr) return ''
   try {
     const d = new Date(dateStr + 'T00:00:00')
+    const year = String(d.getFullYear()).split('').join(' ')
     return `
       <div class="date-box">
-        <span class="date-day-name">${JOURS[d.getDay()]}</span>
-        <span class="date-day-num">${d.getDate()}</span>
-        <span class="date-month">${MOIS[d.getMonth()]}</span>
-        <span class="date-year">${d.getFullYear()}</span>
+        <div class="date-row">
+          <span class="date-line"></span>
+          <span class="date-day-name">${JOURS[d.getDay()].toUpperCase()}</span>
+          <div class="date-num-frame"><span class="date-day-num">${d.getDate()}</span></div>
+          <span class="date-month-name">${MOIS[d.getMonth()].toUpperCase()}</span>
+          <span class="date-line"></span>
+        </div>
+        <div class="date-year">${year}</div>
       </div>`
-  } catch { return `<div class="event-date-upper">${dateStr}</div>` }
+  } catch { return '' }
 }
 
 function formatHeure(heure: string): string {
@@ -193,10 +198,11 @@ function renderLogo(logoUrl: string, p: HarmonizedPalette, m1Initial: string, m2
   return `<div class="logo-section"><span class="logo-text">${esc(m1Initial)}&amp;${esc(m2Initial)}</span></div>`
 }
 
-function renderItineraireBtn(adresse: string, p: HarmonizedPalette): string {
+function renderMapButtons(adresse: string): string {
   if (!adresse) return ''
   return `<div class="event-buttons">
-    <a class="btn-itineraire" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(adresse)}" target="_blank" rel="noopener">Itinéraire</a>
+    <a class="btn-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(adresse)}" target="_blank" rel="noopener">GOOGLE MAPS</a>
+    <a class="btn-map" href="https://waze.com/ul?q=${encodeURIComponent(adresse)}" target="_blank" rel="noopener">WAZE</a>
   </div>`
 }
 
@@ -208,10 +214,10 @@ function renderNote(note: string, p: HarmonizedPalette): string {
 function renderInfoBlocks(evt: EvenementInput): string {
   let html = ''
   if (evt.transport) {
-    html += `<div class="event-info-block"><span class="info-icon">&#9654;</span><div><strong>Transport</strong><p>${esc(evt.transport)}</p></div></div>`
+    html += `<div class="info-text-block"><span class="info-label">Transport</span><span class="info-detail">${esc(evt.transport)}</span></div>`
   }
   if (evt.hebergement) {
-    html += `<div class="event-info-block"><span class="info-icon">&#9654;</span><div><strong>Hébergement</strong><p>${esc(evt.hebergement)}</p></div></div>`
+    html += `<div class="info-text-block"><span class="info-label">Hébergement</span><span class="info-detail">${esc(evt.hebergement)}</span></div>`
   }
   return html
 }
@@ -239,51 +245,33 @@ function renderHouppa(evt: EvenementInput, input: GenerateInput, imageUrl: strin
     ? 'ont la joie de vous faire part du mariage de leurs petits-enfants et enfants'
     : 'ont la joie de vous faire part du mariage de leurs enfants'
 
-  // Pensée défunts
+  // Pensée défunts (texte simple, fidèle au screenshot)
   let penseeHtml = ''
   if (evt.penseesDefuntsActif && evt.penseesDefuntsNoms && evt.penseesDefuntsNoms.length > 0) {
-    const intro = evt.penseesDefuntsIntro || 'Zihrona Levraha — Que leur mémoire soit une bénédiction'
-    const fin = evt.penseesDefuntsFin || 'Présents dans nos cœurs en ce jour'
-    const noms = evt.penseesDefuntsNoms.filter(n => n.trim()).map(n => `<div class="pensee-nom">${esc(n)} ז״ל</div>`).join('')
-    penseeHtml = `
-      <div class="pensee-section">
-        <div class="pensee-header">
-          <div class="pensee-line"></div>
-          <img src="https://res.cloudinary.com/dau96mui2/image/upload/v1781685771/bnl1dqjjovgay8l4wmlu.png" alt="" class="pensee-candle">
-          <div class="pensee-line"></div>
-        </div>
-        <div class="pensee-intro">${esc(intro)}</div>
-        <div class="pensee-noms">${noms}</div>
-        <div class="pensee-fin">${esc(fin)}</div>
-      </div>`
+    const noms = evt.penseesDefuntsNoms.filter(n => n.trim()).map(n => esc(n)).join(', ')
+    const fin = evt.penseesDefuntsFin || 'dont la mémoire veille sur nous.'
+    penseeHtml = `<div class="pensee-text">${evt.penseesDefuntsIntro || 'En ce jour si solennel, nous aurons une pensée pour'} ${noms} ${fin}</div>`
   }
 
   return `
     <section class="event-section">
-      ${renderSeparator()}
-      <div class="card-title">LA HOUPPA</div>
+      <div class="card-title-calligraphie">La Houppa</div>
       ${renderLogo(input.logoUrl, p, input.marie1Prenom[0] || '', input.marie2Prenom[0] || '')}
       ${imageUrl ? `<img class="event-image" src="${esc(imageUrl)}" alt="Houppa">` : ''}
 
-      ${hasGp ? `
-      <div class="famille-grid">
-        <div class="famille-col">
-          ${gpPa1 ? `<div>${gpPa1}</div>` : '<div>&nbsp;</div>'}
-          ${gpMa1 ? `<div>${gpMa1}</div>` : '<div>&nbsp;</div>'}
-        </div>
-        <div class="famille-sep"></div>
-        <div class="famille-col famille-col-right">
-          ${gpPa2 ? `<div>${gpPa2}</div>` : '<div>&nbsp;</div>'}
-          ${gpMa2 ? `<div>${gpMa2}</div>` : '<div>&nbsp;</div>'}
-        </div>
-      </div>` : ''}
+      <div class="hebrew-verse">קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה</div>
+      <div class="thin-line"></div>
 
       <div class="famille-grid">
         <div class="famille-col">
+          ${hasGp ? `${gpPa1 ? `<div>${gpPa1}</div>` : '<div>&nbsp;</div>'}` : ''}
+          ${hasGp ? `${gpMa1 ? `<div>${gpMa1}</div>` : '<div>&nbsp;</div>'}` : ''}
           ${parents1 ? `<div>${parents1}</div>` : ''}
         </div>
         <div class="famille-sep"></div>
         <div class="famille-col famille-col-right">
+          ${hasGp ? `${gpPa2 ? `<div>${gpPa2}</div>` : '<div>&nbsp;</div>'}` : ''}
+          ${hasGp ? `${gpMa2 ? `<div>${gpMa2}</div>` : '<div>&nbsp;</div>'}` : ''}
           ${parents2 ? `<div>${parents2}</div>` : ''}
         </div>
       </div>
@@ -298,16 +286,19 @@ function renderHouppa(evt: EvenementInput, input: GenerateInput, imageUrl: strin
 
       <div class="honore-text">et seront honorés de votre présence à la cérémonie religieuse qui sera célébrée le</div>
 
-      <div class="event-date-upper">${formatDateFr(evt.date).toUpperCase()}</div>
+      ${formatDateBox(evt.date)}
       <div class="event-time-large">${formatHeure(evt.heure)}</div>
 
+      ${renderSeparator()}
       <div class="event-lieu-text">
-        ${evt.lieu ? `<div>${formatLieu(evt.lieu)}</div>` : ''}
-        <div class="reception-text">ainsi qu'à la réception qui suivra</div>
+        ${evt.lieu ? `<div class="lieu-bold">${formatLieu(evt.lieu)}</div>` : ''}
         ${evt.adresse ? `<div class="event-adresse">${esc(evt.adresse)}</div>` : ''}
       </div>
 
-      ${renderItineraireBtn(evt.adresse, p)}
+      ${renderMapButtons(evt.adresse)}
+
+      <div class="reception-text">La cérémonie sera suivie d'une réception.</div>
+
       ${penseeHtml}
       ${renderNote(evt.note, p)}
       ${renderInfoBlocks(evt)}
@@ -317,8 +308,7 @@ function renderHouppa(evt: EvenementInput, input: GenerateInput, imageUrl: strin
 function renderMairie(evt: EvenementInput, input: GenerateInput, imageUrl: string, p: HarmonizedPalette): string {
   return `
     <section class="event-section">
-      ${renderSeparator()}
-      <div class="card-title">LA MAIRIE</div>
+      <div class="card-title-calligraphie">La Mairie</div>
       ${renderLogo(input.logoUrl, p, input.marie1Prenom[0] || '', input.marie2Prenom[0] || '')}
       ${imageUrl ? `<img class="event-image" src="${esc(imageUrl)}" alt="Mairie">` : ''}
 
@@ -328,25 +318,21 @@ function renderMairie(evt: EvenementInput, input: GenerateInput, imageUrl: strin
         <span class="couple-name">${esc(input.marie2Prenom)}</span>
       </div>
 
-      <div class="mairie-sediront">se diront</div>
-      <div class="mairie-oui">« Oui »</div>
+      <div class="mairie-sediront">se diront « OUI »</div>
 
-      <div class="event-date-bold">${formatDateFrCap(evt.date)}</div>
+      ${formatDateBox(evt.date)}
+      <div class="event-time-large">${formatHeure(evt.heure)}</div>
 
+      ${renderSeparator()}
       <div class="event-lieu-text">
-        ${evt.lieu ? `<div>${conjonctionLieu(evt.lieu)}</div>` : ''}
+        ${evt.lieu ? `<div class="lieu-bold">${esc(evt.lieu)}</div>` : ''}
         ${evt.adresse ? `<div class="event-adresse">${esc(evt.adresse)}</div>` : ''}
       </div>
 
-      <div class="event-time-large">${formatHeure(evt.heure)}</div>
-
-      ${renderItineraireBtn(evt.adresse, p)}
+      ${renderMapButtons(evt.adresse)}
 
       ${evt.suiviDAutre && evt.evenementSuivantNom ? `
-      <div class="suivi-section">
-        <div class="suivi-text">La mairie sera suivie de ${esc(evt.evenementSuivantNom)}</div>
-        ${evt.evenementSuivantAdresse ? `<div class="suivi-adresse">${esc(evt.evenementSuivantAdresse)}</div>` : ''}
-      </div>` : ''}
+      <div class="suivi-text-italic">La Mairie sera suivie ${esc(evt.evenementSuivantNom)}.</div>` : ''}
 
       ${renderNote(evt.note, p)}
       ${renderInfoBlocks(evt)}
@@ -356,27 +342,34 @@ function renderMairie(evt: EvenementInput, input: GenerateInput, imageUrl: strin
 function renderHenne(evt: EvenementInput, input: GenerateInput, imageUrl: string, p: HarmonizedPalette): string {
   return `
     <section class="event-section">
-      ${renderSeparator()}
-      <div class="card-title">LE HENNÉ</div>
+      <div class="card-title-calligraphie">Le Henné</div>
       ${renderLogo(input.logoUrl, p, input.marie1Prenom[0] || '', input.marie2Prenom[0] || '')}
       ${imageUrl ? `<img class="event-image" src="${esc(imageUrl)}" alt="Henné">` : ''}
 
-      <div class="henne-ornament">✦  ✦  ✦</div>
+      <div class="familles-label">Les Familles</div>
+      <div class="familles-noms">${esc(input.famille1.pere.nom || input.famille1.mere.nom)} <span class="couple-amp">&amp;</span> ${esc(input.famille2.pere.nom || input.famille2.mere.nom)}</div>
 
       <div class="henne-invite">
-        Vous êtes chaleureusement invités à célébrer la soirée du henné de<br>
-        <span class="couple-name-inline">${esc(input.marie1Prenom)} &amp; ${esc(input.marie2Prenom)}</span>
+        ont le plaisir de vous convier à une soirée<br>
+        des Mille et Une Nuits pour célébrer le Henné de
       </div>
 
-      <div class="event-date-upper">${formatDateFr(evt.date).toUpperCase()}</div>
+      <div class="couple-names-inline">
+        <span class="couple-name">${esc(input.marie1Prenom)}</span>
+        <span class="couple-amp">&amp;</span>
+        <span class="couple-name">${esc(input.marie2Prenom)}</span>
+      </div>
+
+      ${formatDateBox(evt.date)}
       <div class="event-time-large">${formatHeure(evt.heure)}</div>
 
+      ${renderSeparator()}
       <div class="event-lieu-text">
-        ${evt.lieu ? `<div>${formatLieu(evt.lieu)}</div>` : ''}
+        ${evt.lieu ? `<div class="lieu-bold">${formatLieu(evt.lieu)}</div>` : ''}
         ${evt.adresse ? `<div class="event-adresse">${esc(evt.adresse)}</div>` : ''}
       </div>
 
-      ${renderItineraireBtn(evt.adresse, p)}
+      ${renderMapButtons(evt.adresse)}
       ${renderNote(evt.note, p)}
       ${renderInfoBlocks(evt)}
     </section>`
@@ -388,7 +381,7 @@ function renderAutre(evt: EvenementInput, input: GenerateInput, imageUrl: string
   return `
     <section class="event-section">
       ${renderSeparator()}
-      <div class="card-title">${esc(title).toUpperCase()}</div>
+      <div class="card-title-calligraphie">${esc(title)}</div>
       ${renderLogo(input.logoUrl, p, input.marie1Prenom[0] || '', input.marie2Prenom[0] || '')}
       ${imageUrl ? `<img class="event-image" src="${esc(imageUrl)}" alt="${esc(title)}">` : ''}
 
@@ -396,15 +389,52 @@ function renderAutre(evt: EvenementInput, input: GenerateInput, imageUrl: string
         Rejoignez <span class="couple-name-inline">${esc(input.marie1Prenom)} &amp; ${esc(input.marie2Prenom)}</span> pour ${esc(title.toLowerCase())}
       </div>
 
-      <div class="event-date-upper">${formatDateFr(evt.date).toUpperCase()}</div>
+      ${formatDateBox(evt.date)}
       <div class="event-time-large">${formatHeure(evt.heure)}</div>
 
+      ${renderSeparator()}
       <div class="event-lieu-text">
-        ${evt.lieu ? `<div>${formatLieu(evt.lieu)}</div>` : ''}
+        ${evt.lieu ? `<div class="lieu-bold">${formatLieu(evt.lieu)}</div>` : ''}
         ${evt.adresse ? `<div class="event-adresse">${esc(evt.adresse)}</div>` : ''}
       </div>
 
-      ${renderItineraireBtn(evt.adresse, p)}
+      ${renderMapButtons(evt.adresse)}
+      ${renderNote(evt.note, p)}
+      ${renderInfoBlocks(evt)}
+    </section>`
+}
+
+function renderShabbat(evt: EvenementInput, input: GenerateInput, imageUrl: string, p: HarmonizedPalette): string {
+  const famille1Nom = input.famille1.pere.nom || input.famille1.mere.nom
+  const famille2Nom = input.famille2.pere.nom || input.famille2.mere.nom
+
+  return `
+    <section class="event-section">
+      <div class="card-title-calligraphie">Shabbat Hatan</div>
+      ${renderLogo(input.logoUrl, p, input.marie1Prenom[0] || '', input.marie2Prenom[0] || '')}
+      ${imageUrl ? `<img class="event-image" src="${esc(imageUrl)}" alt="Shabbat Hatan">` : ''}
+
+      <div class="familles-label">Les Familles</div>
+      <div class="familles-noms">${esc(famille1Nom)} <span class="couple-amp">&amp;</span> ${esc(famille2Nom)}</div>
+
+      <div class="shabbat-invite">sont ravies de vous convier au Shabbat Hatan de</div>
+
+      <div class="couple-names-inline">
+        <span class="couple-name">${esc(input.marie1Prenom)}</span>
+        <span class="couple-amp">&amp;</span>
+        <span class="couple-name">${esc(input.marie2Prenom)}</span>
+      </div>
+
+      ${formatDateBox(evt.date)}
+      <div class="event-time-large">${formatHeure(evt.heure)}</div>
+
+      ${renderSeparator()}
+      <div class="event-lieu-text">
+        ${evt.lieu ? `<div class="lieu-bold">${formatLieu(evt.lieu)}</div>` : ''}
+        ${evt.adresse ? `<div class="event-adresse">${esc(evt.adresse)}</div>` : ''}
+      </div>
+
+      ${renderMapButtons(evt.adresse)}
       ${renderNote(evt.note, p)}
       ${renderInfoBlocks(evt)}
     </section>`
@@ -416,6 +446,7 @@ function renderCeremonySection(evt: EvenementInput, input: GenerateInput, p: Har
   if (t.includes('houppa') || t.includes('religieuse')) return renderHouppa(evt, input, imageUrl, p)
   if (t.includes('mairie')) return renderMairie(evt, input, imageUrl, p)
   if (t.includes('henn')) return renderHenne(evt, input, imageUrl, p)
+  if (t.includes('shabbat')) return renderShabbat(evt, input, imageUrl, p)
   return renderAutre(evt, input, imageUrl, p)
 }
 
@@ -564,7 +595,11 @@ export function generateStaticHtml(input: GenerateInput): string {
     .sep-dot { color: ${p.accentColor}; font-size: 8px; opacity: 0.5; }
 
     /* ── Accueil ── */
-    .accueil { text-align: center; padding: 52px 20px 40px; }
+    .accueil {
+      text-align: center; padding: 20px;
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
     .couple-names-display {
       display: flex; align-items: baseline; justify-content: center;
       gap: clamp(6px, 2vw, 12px); flex-wrap: wrap;
@@ -584,30 +619,39 @@ export function generateStaticHtml(input: GenerateInput): string {
     }
 
     /* ── Cartes cérémonies ── */
-    .event-section { text-align: center; padding: 0 20px 40px; }
-    .card-title {
-      font-size: small; letter-spacing: 3px; text-transform: uppercase;
-      color: ${p.accentColor}; text-align: center; margin-bottom: 16px;
+    .event-section {
+      text-align: center; padding: 40px 20px;
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .card-title-calligraphie {
+      font-family: '${p.prenomsFont}', cursive;
+      font-size: clamp(36px, 9vw, 52px); color: ${p.accentColor};
+      text-align: center; margin-bottom: 20px; line-height: 1.2;
     }
     .event-image {
-      max-width: 180px; width: 80%; height: auto;
-      margin: 0 auto 20px; display: block; opacity: 0.85;
+      width: 100%; max-width: 100%; height: auto;
+      margin: 0 auto 24px; display: block;
     }
 
-    /* ── Familles (grille 3 colonnes) ── */
+    /* ── Familles (grille 3 colonnes alignées) ── */
     .famille-grid {
       display: grid; grid-template-columns: 1fr auto 1fr;
-      gap: 8px; margin-bottom: 4px; align-items: start;
+      gap: 0 12px; margin-bottom: 20px; align-items: center;
+      max-width: 95%; margin-left: auto; margin-right: auto;
     }
     .famille-col {
       font-family: 'Cormorant Garamond', serif; font-style: italic;
-      font-size: clamp(10px, 2.8vw, 13px); color: ${p.accentColor};
-      line-height: 2; white-space: nowrap;
+      font-size: clamp(11px, 2.8vw, 14px); color: ${p.accentColor};
+      line-height: 2;
+    }
+    .famille-col div {
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .famille-col-right { text-align: right; }
     .famille-sep {
       width: 1px; background: ${p.accentColor}; opacity: 0.3;
-      align-self: stretch; min-height: 20px;
+      align-self: stretch; min-height: 40px;
     }
 
     /* ── Textes partagés ── */
@@ -639,48 +683,77 @@ export function generateStaticHtml(input: GenerateInput): string {
       margin-bottom: 16px; line-height: 1.6;
     }
 
-    /* ── Dates & heures ── */
-    .event-date-upper {
-      font-family: '${p.titresFont}', serif;
-      font-size: clamp(14px, 3.5vw, 22px); color: ${p.accentColor};
-      text-align: center; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px;
+    /* ── Date encadrée ── */
+    .date-box { text-align: center; margin-bottom: 8px; }
+    .date-row {
+      display: flex; align-items: center; justify-content: center; gap: 0;
     }
-    .event-date-bold {
-      font-family: '${p.titresFont}', serif; font-weight: bold;
-      font-size: clamp(14px, 3.5vw, 20px); text-align: center;
-      color: ${p.texteColor}; margin-bottom: 12px;
+    .date-day-name {
+      font-family: '${p.titresFont}', serif;
+      font-size: clamp(11px, 2.5vw, 14px); letter-spacing: 4px; text-transform: uppercase;
+      color: ${p.accentColor}; flex: 1; text-align: right; padding-right: 16px;
+    }
+    .date-num-frame {
+      border: 1.5px solid ${p.accentColor}55; padding: 12px 20px;
+    }
+    .date-day-num {
+      font-family: '${p.titresFont}', serif;
+      font-size: clamp(28px, 7vw, 42px); color: ${p.texteColor}; line-height: 1;
+    }
+    .date-month-name {
+      font-family: '${p.titresFont}', serif;
+      font-size: clamp(11px, 2.5vw, 14px); letter-spacing: 4px; text-transform: uppercase;
+      color: ${p.accentColor}; flex: 1; text-align: left; padding-left: 16px;
+    }
+    .date-line {
+      flex: 1; height: 1px; background: ${p.accentColor}; opacity: 0.3;
+    }
+    .date-year {
+      font-family: '${p.titresFont}', serif;
+      font-size: 12px; letter-spacing: 6px; color: ${p.accentColor};
+      opacity: 0.6; margin-top: 8px;
     }
     .event-time-large {
-      font-family: '${p.titresFont}', serif;
-      font-size: clamp(18px, 4.5vw, 26px); color: ${p.accentColor};
-      text-align: center; margin-bottom: 16px; letter-spacing: 2px;
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: clamp(20px, 5vw, 28px); color: ${p.accentColor};
+      text-align: center; margin-bottom: 16px;
     }
 
     /* ── Lieu & adresse ── */
     .event-lieu-text {
-      font-family: 'Cormorant Garamond', serif; font-style: italic;
-      font-size: clamp(14px, 3.5vw, 20px); text-align: center;
-      color: ${p.texteColor}; line-height: 1.6; max-width: 90%; margin: 0 auto; margin-bottom: 16px;
+      text-align: center; max-width: 90%; margin: 0 auto 16px;
+      line-height: 1.6;
+    }
+    .lieu-bold {
+      font-family: '${p.titresFont}', serif; font-weight: 700;
+      font-size: clamp(16px, 4vw, 22px); color: ${p.texteColor};
+      margin-bottom: 4px;
     }
     .event-adresse {
-      font-size: clamp(11px, 2.5vw, 14px); margin-top: 8px;
-      color: ${p.texteSecondaireColor};
-    }
-    .reception-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(13px, 3vw, 16px); color: ${p.texteSecondaireColor};
       margin-top: 4px;
     }
-
-    /* ── Boutons ── */
-    .event-buttons { display: flex; gap: 8px; justify-content: center; margin: 20px 0 8px; }
-    .btn-itineraire {
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 10px 24px; border-radius: 9999px;
-      border: 1px solid ${p.accentColor}; background: transparent;
-      color: ${p.accentColor}; font-family: 'Cormorant Garamond', serif;
-      font-style: italic; font-size: 15px; text-decoration: none;
-      transition: opacity 0.2s;
+    .reception-text {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 16px; color: ${p.texteColor}; margin-top: 16px; line-height: 1.6;
     }
-    .btn-itineraire:hover { opacity: 0.8; }
+    .suivi-text-italic {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 16px; color: ${p.texteColor}; margin-top: 16px; line-height: 1.6;
+    }
+
+    /* ── Boutons Maps/Waze ── */
+    .event-buttons { display: flex; gap: 12px; justify-content: center; margin: 20px 0 16px; }
+    .btn-map {
+      padding: 12px 28px; border-radius: 4px;
+      border: 1.5px solid ${p.accentColor}55; background: transparent;
+      color: ${p.accentColor};
+      font-family: '${p.titresFont}', serif;
+      font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase;
+      text-decoration: none; transition: opacity 0.2s;
+    }
+    .btn-map:hover { opacity: 0.7; }
 
     /* ── Note ── */
     .event-note-block {
@@ -692,54 +765,57 @@ export function generateStaticHtml(input: GenerateInput): string {
       font-size: 13px; text-align: center; color: ${p.texteColor};
     }
 
-    /* ── Info blocks ── */
-    .event-info-block {
-      display: flex; align-items: flex-start; gap: 10px;
-      text-align: left; margin-top: 16px;
-      padding: 12px 16px; border-radius: 8px;
-      background: ${p.fondSecondaryColor}; border: 1px solid ${p.accentColor}15;
+    /* ── Info transport/hébergement ── */
+    .info-text-block {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 15px; color: ${p.texteColor}; text-align: center;
+      margin-top: 12px; line-height: 1.6;
     }
-    .info-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
-    .event-info-block strong {
-      font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: ${p.titresColor};
+    .info-label {
+      display: block; font-style: normal;
+      font-family: '${p.titresFont}', serif; font-size: 11px;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: ${p.accentColor}; margin-bottom: 4px; opacity: 0.7;
     }
-    .event-info-block p {
-      font-size: 14px; color: ${p.texteSecondaireColor}; margin-top: 4px; line-height: 1.5;
+    .info-detail { display: block; }
+
+    /* ── Houppa spécifique ── */
+    .hebrew-verse {
+      font-family: serif; font-size: clamp(12px, 3.5vw, 16px);
+      color: ${p.accentColor}; direction: rtl; text-align: center;
+      line-height: 1.9; margin-bottom: 16px; padding: 4px 14px;
+    }
+    .thin-line {
+      height: 1px; background: ${p.accentColor}; opacity: 0.3;
+      margin: 0 auto 20px; max-width: 80%;
     }
 
     /* ── Mairie spécifique ── */
     .mairie-sediront {
       font-family: 'Cormorant Garamond', serif; font-style: italic;
       font-size: clamp(16px, 4vw, 22px); text-align: center;
-      color: ${p.texteColor}; margin-bottom: 8px;
-    }
-    .mairie-oui {
-      font-family: '${p.prenomsFont}', cursive;
-      font-size: clamp(48px, 12vw, 72px); color: ${p.accentColor};
-      text-align: center; margin-bottom: 20px; line-height: 1;
-    }
-    .suivi-section {
-      text-align: center; padding-top: 20px; margin-top: 20px;
-      border-top: 1px solid ${p.accentColor}; line-height: 1.8; max-width: 90%; margin-left: auto; margin-right: auto;
-    }
-    .suivi-text {
-      font-family: '${p.titresFont}', serif; font-weight: bold;
-      font-size: clamp(12px, 3vw, 16px); color: ${p.texteColor};
-    }
-    .suivi-adresse {
-      font-family: 'Cormorant Garamond', serif; font-style: italic;
-      font-size: clamp(11px, 2.5vw, 14px); color: ${p.texteSecondaireColor}; margin-top: 4px;
+      color: ${p.texteColor}; margin-bottom: 20px;
     }
 
     /* ── Henné spécifique ── */
-    .henne-ornament {
-      text-align: center; font-size: 24px; letter-spacing: 0.5em;
-      color: ${p.accentColor}; margin-bottom: 24px;
+    .familles-label {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 16px; color: ${p.texteColor}; text-align: center; margin-bottom: 8px;
+    }
+    .familles-noms {
+      font-family: '${p.prenomsFont}', cursive;
+      font-size: clamp(28px, 7vw, 40px); color: ${p.accentColor};
+      text-align: center; margin-bottom: 16px;
     }
     .henne-invite {
       font-family: 'Cormorant Garamond', serif; font-style: italic;
-      font-size: 20px; text-align: center; color: ${p.texteColor};
-      line-height: 1.7; margin-bottom: 28px;
+      font-size: 18px; text-align: center; color: ${p.texteColor};
+      line-height: 1.7; margin-bottom: 24px;
+    }
+    .shabbat-invite {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 18px; text-align: center; color: ${p.texteColor};
+      line-height: 1.7; margin-bottom: 24px;
     }
     .autre-invite {
       font-family: 'Cormorant Garamond', serif; font-style: italic;
@@ -748,33 +824,18 @@ export function generateStaticHtml(input: GenerateInput): string {
     }
 
     /* ── Pensée défunts ── */
-    .pensee-section {
-      text-align: center; margin: 32px 0; padding-bottom: 24px;
-      border-bottom: 1px solid ${p.accentColor}22;
-    }
-    .pensee-header {
-      display: flex; align-items: center; justify-content: center;
-      gap: 14px; margin-bottom: 16px;
-    }
-    .pensee-line { width: 60px; height: 0.5px; background: ${p.accentColor}; opacity: 0.4; }
-    .pensee-candle { width: 50px; height: 50px; object-fit: contain; }
-    .pensee-intro {
+    .pensee-text {
       font-family: 'Cormorant Garamond', serif; font-style: italic;
-      font-size: 14px; color: ${p.texteColor}; opacity: 0.85;
-      margin-bottom: 14px; line-height: 1.6; padding: 0 12px;
-    }
-    .pensee-noms { display: flex; flex-direction: column; gap: 4px; margin-bottom: 14px; }
-    .pensee-nom {
-      font-family: '${p.titresFont}', serif;
-      font-size: 16px; color: ${p.texteColor}; font-weight: 500; line-height: 1.6;
-    }
-    .pensee-fin {
-      font-family: 'Cormorant Garamond', serif; font-style: italic;
-      font-size: 13px; color: ${p.texteColor}; opacity: 0.75; line-height: 1.6; padding: 0 12px;
+      font-size: 16px; color: ${p.texteColor}; text-align: center;
+      line-height: 1.7; margin: 24px auto; max-width: 90%; padding: 0 12px;
     }
 
     /* ── RSVP ── */
-    .rsvp-section { padding: 40px 20px; text-align: center; }
+    .rsvp-section {
+      padding: 40px 20px; text-align: center;
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
     .rsvp-header {
       font-family: '${p.titresFont}', serif; font-weight: bold;
       font-size: clamp(12px, 2.5vw, 16px); color: ${p.accentColor};
