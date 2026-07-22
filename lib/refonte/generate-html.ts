@@ -776,7 +776,7 @@ export function generateStaticHtml(input: GenerateInput): string {
     .date-year {
       font-family: '${p.titresFont}', serif;
       font-size: 12px; letter-spacing: 6px; color: ${p.accentColor};
-      opacity: 0.6; margin-top: 8px;
+      opacity: 0.6; margin-top: 8px; padding-left: 6px;
     }
     .event-time-large {
       font-family: 'Cormorant Garamond', serif; font-style: italic;
