@@ -705,13 +705,34 @@ export function generateStaticHtml(input: GenerateInput): string {
           mode: 'no-cors'
         }).then(done).catch(done);
       } else {
-        // Pas de script configuré — on affiche quand même le succès
-        done();
+        // Pas de Google Apps Script configuré — fallback mailto
+        var email = '${esc(input.emailContact || '')}';
+        if (email) {
+          var subject = encodeURIComponent('RSVP - ' + nom);
+          var body = encodeURIComponent(
+            'Nom : ' + nom + '\\n' +
+            'Présence : ' + ceremonies.join(', ') + '\\n' +
+            'Nombre de personnes : ' + nbPersonnes +
+            (message ? '\\nMessage : ' + message : '')
+          );
+          window.location.href = 'mailto:' + email + '?subject=' + subject + '&body=' + body;
+          showFallbackSuccess();
+        } else {
+          showError('Le formulaire RSVP n\\'est pas encore configuré. Contactez les mariés directement.');
+        }
       }
 
       function done() {
         document.getElementById('rsvp-form-container').style.display = 'none';
         document.getElementById('rsvp-success').style.display = 'block';
+      }
+
+      function showFallbackSuccess() {
+        document.getElementById('rsvp-form-container').style.display = 'none';
+        var s = document.getElementById('rsvp-success');
+        s.querySelector('h3').textContent = 'Presque terminé !';
+        s.querySelector('p').textContent = 'Votre application email va s\\'ouvrir — envoyez le message pour confirmer votre présence.';
+        s.style.display = 'block';
       }
     }
 
