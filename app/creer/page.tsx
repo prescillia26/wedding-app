@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import StepInfos, { type InfosData, EMPTY_INFOS } from './components/StepInfos'
 import StepEvenements, { type EvenementsData, createEmptyEvenement } from './components/StepEvenements'
 import StepDesign, { type DesignData, EMPTY_DESIGN } from './components/StepDesign'
@@ -21,6 +21,35 @@ const INITIAL_DATA: WizardData = {
   evenements: [createEmptyEvenement()],
   design: { ...EMPTY_DESIGN },
   images: {},
+}
+
+/* ── Persistance localStorage ─────────────────────────────── */
+
+const STORAGE_KEY = 'wizard-refonte'
+
+interface SavedState {
+  step: number
+  data: WizardData
+}
+
+function saveToStorage(step: number, data: WizardData) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ step, data }))
+  } catch { /* quota exceeded — on ignore silencieusement */ }
+}
+
+function loadFromStorage(): SavedState | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return null
+    return JSON.parse(raw) as SavedState
+  } catch {
+    return null
+  }
+}
+
+function clearStorage() {
+  try { localStorage.removeItem(STORAGE_KEY) } catch { /* noop */ }
 }
 
 /* ── Styles ────────────────────────────────────────────────── */
@@ -133,6 +162,30 @@ export default function CreerPage() {
   const [generating, setGenerating] = useState(false)
   const [previewHtml, setPreviewHtml] = useState<string | null>(null)
   const [error, setError] = useState('')
+  const [restored, setRestored] = useState(false)
+
+  // Restaurer depuis localStorage au montage
+  useEffect(() => {
+    const saved = loadFromStorage()
+    if (saved) {
+      setStep(saved.step)
+      setData(saved.data)
+    }
+    setRestored(true)
+  }, [])
+
+  // Sauvegarder à chaque changement (après restauration)
+  useEffect(() => {
+    if (restored) saveToStorage(step, data)
+  }, [step, data, restored])
+
+  const handleReset = useCallback(() => {
+    clearStorage()
+    setStep(0)
+    setData({ ...INITIAL_DATA, evenements: [createEmptyEvenement()] })
+    setPreviewHtml(null)
+    setError('')
+  }, [])
 
   const canGoNext = () => {
     if (step === 0) {
@@ -203,9 +256,19 @@ export default function CreerPage() {
         <a href="/" style={{ fontFamily: 'var(--font-great-vibes)', fontSize: 28, color: GOLD, textDecoration: 'none' }}>
           Lov&apos;it
         </a>
-        <a href="/" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: TEXT, textDecoration: 'none', opacity: 0.6 }}>
-          ← Retour à l&apos;accueil
-        </a>
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+          {restored && step > 0 && (
+            <button type="button" onClick={() => { if (confirm('Recommencer le formulaire depuis zéro ?')) handleReset() }} style={{
+              background: 'none', border: 'none', fontFamily: 'var(--font-cormorant-garamond)',
+              fontSize: 13, color: '#d45050', cursor: 'pointer', opacity: 0.7,
+            }}>
+              Recommencer
+            </button>
+          )}
+          <a href="/" style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 13, color: TEXT, textDecoration: 'none', opacity: 0.6 }}>
+            ← Retour à l&apos;accueil
+          </a>
+        </div>
       </header>
 
       {/* ── Stepper ── */}

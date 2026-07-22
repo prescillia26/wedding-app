@@ -48,28 +48,36 @@ const TEXT = '#3a3330'
 
 /* ── Composant pour un événement ──────────────────────────── */
 
+const MAX_IMAGE_SIZE = 2 * 1024 * 1024 // 2 MB
+
 function EventImagePicker({ event, imageUrl, onChange }: {
   event: Evenement
   imageUrl: string
   onChange: (url: string) => void
 }) {
   const [uploading, setUploading] = useState(false)
+  const [error, setError] = useState('')
   const gallery = getGalleryForEvent(event.type)
   const eventName = event.type === 'Autre' && event.customName ? event.customName : event.type
 
   const handleImport = async (file: File) => {
+    setError('')
+    if (file.size > MAX_IMAGE_SIZE) {
+      setError(`L'image est trop lourde (${(file.size / 1024 / 1024).toFixed(1)} Mo). Maximum autorisé : 2 Mo.`)
+      return
+    }
     setUploading(true)
     try {
-      // Convertir en base64 pour embarquer dans le HTML statique
       const reader = new FileReader()
       reader.onload = () => {
         onChange(reader.result as string)
         setUploading(false)
       }
-      reader.onerror = () => setUploading(false)
+      reader.onerror = () => { setUploading(false); setError('Erreur lors de la lecture du fichier.') }
       reader.readAsDataURL(file)
     } catch {
       setUploading(false)
+      setError('Erreur lors de la lecture du fichier.')
     }
   }
 
@@ -121,6 +129,13 @@ function EventImagePicker({ event, imageUrl, onChange }: {
           </button>
         ))}
       </div>
+
+      {/* Erreur upload */}
+      {error && (
+        <p style={{ color: '#d45050', fontSize: 13, fontFamily: 'var(--font-cormorant-garamond)', margin: '0 0 8px', textAlign: 'center' }}>
+          {error}
+        </p>
+      )}
 
       {/* Import custom */}
       <label style={{ display: 'block', cursor: uploading ? 'wait' : 'pointer' }}>
