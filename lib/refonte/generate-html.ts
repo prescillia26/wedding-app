@@ -126,22 +126,41 @@ function joinName(prenom: string, nom: string): string {
   return [prenom, nom].filter(Boolean).join(' ')
 }
 
-function fmtGpCouple(pPrenom: string, pNom: string, mPrenom: string, mNom: string): string {
-  const hasPere = pPrenom || pNom
-  const hasMere = mPrenom || mNom
-  if (hasPere && hasMere) return `M. &amp; Mme ${esc(joinName(pPrenom, pNom || mNom))}`
-  if (hasPere) return `M. ${esc(joinName(pPrenom, pNom))}`
-  if (hasMere) return `Mme ${esc(joinName(mPrenom, mNom))}`
+// Format GP couple — only living (non-disparu)
+function fmtGpCoupleLiving(gp: GrandParentInput): string {
+  const hasPere = (gp.grandPerePrenom || gp.grandPereNom) && !gp.grandPereDisparu
+  const hasMere = (gp.grandMerePrenom || gp.grandMereNom) && !gp.grandMereDisparu
+  if (hasPere && hasMere) return `M. &amp; Mme ${esc(joinName(gp.grandPerePrenom, gp.grandPereNom || gp.grandMereNom))}`
+  if (hasPere) return `M. ${esc(joinName(gp.grandPerePrenom, gp.grandPereNom))}`
+  if (hasMere) return `Mme ${esc(joinName(gp.grandMerePrenom, gp.grandMereNom))}`
   return ''
 }
 
-function fmtParentsLine(pere: { prenom: string; nom: string }, mere: { prenom: string; nom: string }): string {
-  const pFull = joinName(pere.prenom, pere.nom)
-  const mFull = joinName(mere.prenom, mere.nom)
+// Format parent line — only living (non-disparu)
+function fmtParentsLineLiving(pere: { prenom: string; nom: string; disparu: boolean }, mere: { prenom: string; nom: string; disparu: boolean }): string {
+  const pFull = !pere.disparu ? joinName(pere.prenom, pere.nom) : ''
+  const mFull = !mere.disparu ? joinName(mere.prenom, mere.nom) : ''
   if (pFull && mFull) return `M. &amp; Mme ${esc(pFull)}`
   if (pFull) return `M. ${esc(pFull)}`
   if (mFull) return `Mme ${esc(mFull)}`
   return ''
+}
+
+// Collect all deceased names from families
+function collectDisparus(f1: FamilleInput, f2: FamilleInput): string[] {
+  const noms: string[] = []
+  // Parents
+  if (f1.pere.disparu && (f1.pere.prenom || f1.pere.nom)) noms.push(joinName(f1.pere.prenom, f1.pere.nom))
+  if (f1.mere.disparu && (f1.mere.prenom || f1.mere.nom)) noms.push(joinName(f1.mere.prenom, f1.mere.nom))
+  if (f2.pere.disparu && (f2.pere.prenom || f2.pere.nom)) noms.push(joinName(f2.pere.prenom, f2.pere.nom))
+  if (f2.mere.disparu && (f2.mere.prenom || f2.mere.nom)) noms.push(joinName(f2.mere.prenom, f2.mere.nom))
+  // Grands-parents
+  const gps = [f1.grandParentsPaternels, f1.grandParentsMaternels, f2.grandParentsPaternels, f2.grandParentsMaternels]
+  for (const gp of gps) {
+    if (gp.grandPereDisparu && (gp.grandPerePrenom || gp.grandPereNom)) noms.push(joinName(gp.grandPerePrenom, gp.grandPereNom))
+    if (gp.grandMereDisparu && (gp.grandMerePrenom || gp.grandMereNom)) noms.push(joinName(gp.grandMerePrenom, gp.grandMereNom))
+  }
+  return noms
 }
 
 function formatLieu(lieu: string): string {
@@ -232,26 +251,27 @@ function renderSeparator(): string {
 function renderHouppa(evt: EvenementInput, input: GenerateInput, imageUrl: string, p: HarmonizedPalette): string {
   const f1 = input.famille1, f2 = input.famille2
 
-  // Grands-parents
-  const gpPa1 = fmtGpCouple(f1.grandParentsPaternels.grandPerePrenom, f1.grandParentsPaternels.grandPereNom, f1.grandParentsPaternels.grandMerePrenom, f1.grandParentsPaternels.grandMereNom)
-  const gpMa1 = fmtGpCouple(f1.grandParentsMaternels.grandPerePrenom, f1.grandParentsMaternels.grandPereNom, f1.grandParentsMaternels.grandMerePrenom, f1.grandParentsMaternels.grandMereNom)
-  const gpPa2 = fmtGpCouple(f2.grandParentsPaternels.grandPerePrenom, f2.grandParentsPaternels.grandPereNom, f2.grandParentsPaternels.grandMerePrenom, f2.grandParentsPaternels.grandMereNom)
-  const gpMa2 = fmtGpCouple(f2.grandParentsMaternels.grandPerePrenom, f2.grandParentsMaternels.grandPereNom, f2.grandParentsMaternels.grandMerePrenom, f2.grandParentsMaternels.grandMereNom)
+  // Grands-parents VIVANTS uniquement pour la grille
+  const gpPa1 = fmtGpCoupleLiving(f1.grandParentsPaternels)
+  const gpMa1 = fmtGpCoupleLiving(f1.grandParentsMaternels)
+  const gpPa2 = fmtGpCoupleLiving(f2.grandParentsPaternels)
+  const gpMa2 = fmtGpCoupleLiving(f2.grandParentsMaternels)
   const hasGp = gpPa1 || gpMa1 || gpPa2 || gpMa2
 
-  const parents1 = fmtParentsLine(f1.pere, f1.mere)
-  const parents2 = fmtParentsLine(f2.pere, f2.mere)
+  // Parents VIVANTS uniquement pour la grille
+  const parents1 = fmtParentsLineLiving(f1.pere, f1.mere)
+  const parents2 = fmtParentsLineLiving(f2.pere, f2.mere)
 
   const joie = hasGp
     ? 'ont la joie de vous faire part du mariage de leurs petits-enfants et enfants'
     : 'ont la joie de vous faire part du mariage de leurs enfants'
 
-  // Pensée défunts (texte simple, fidèle au screenshot)
+  // Pensée défunts — auto-générée à partir des parents/GP marqués disparu
+  const disparus = collectDisparus(f1, f2)
   let penseeHtml = ''
-  if (evt.penseesDefuntsActif && evt.penseesDefuntsNoms && evt.penseesDefuntsNoms.length > 0) {
-    const noms = evt.penseesDefuntsNoms.filter(n => n.trim()).map(n => esc(n)).join(', ')
-    const fin = evt.penseesDefuntsFin || 'dont la mémoire veille sur nous.'
-    penseeHtml = `<div class="pensee-text">${evt.penseesDefuntsIntro || 'En ce jour si solennel, nous aurons une pensée pour'} ${noms} ${fin}</div>`
+  if (disparus.length > 0) {
+    const nomsStr = disparus.map(n => esc(n)).join(', ')
+    penseeHtml = `<div class="pensee-text">En ce jour si solennel, nous aurons une pensée pour ${nomsStr} dont la mémoire veille sur nous.</div>`
   }
 
   return `
