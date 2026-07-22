@@ -587,7 +587,7 @@ export function generateStaticHtml(input: GenerateInput): string {
     .logo-img { height: 36px; width: auto; }
     .logo-text {
       font-family: '${p.prenomsFont}', cursive;
-      font-size: 20px; color: ${p.prenomsColor};
+      font-size: 28px; color: ${p.prenomsColor};
     }
     .navbar .logo-section { margin-bottom: 0; }
     .countdown {
@@ -670,7 +670,7 @@ export function generateStaticHtml(input: GenerateInput): string {
       font-size: clamp(16px, 4vw, 24px); color: ${p.accentColor}; opacity: 0.5;
     }
     .accueil-logo {
-      width: 80px; height: 80px; object-fit: contain; margin-bottom: 16px;
+      width: 120px; height: 120px; object-fit: contain; margin-bottom: 20px;
     }
     .accueil-label {
       font-family: '${p.titresFont}', serif;
@@ -1023,9 +1023,9 @@ export function generateStaticHtml(input: GenerateInput): string {
 
     <!-- Navbar -->
     <nav class="navbar">
-      <div style="width:36px;height:36px;flex-shrink:0">
+      <div style="width:48px;height:48px;flex-shrink:0">
         ${input.logoUrl
-          ? `<img src="${esc(input.logoUrl)}" alt="logo" style="height:36px;width:auto">`
+          ? `<img src="${esc(input.logoUrl)}" alt="logo" style="height:48px;width:auto">`
           : `<span class="logo-text">${esc(input.marie1Prenom[0] || '')}&amp;${esc(input.marie2Prenom[0] || '')}</span>`
         }
       </div>
