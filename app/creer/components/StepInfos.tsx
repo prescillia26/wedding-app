@@ -34,6 +34,7 @@ export interface InfosData {
   famille1: FamilleInfo
   famille2: FamilleInfo
   emailContact: string
+  mariageJuif: boolean
 }
 
 export const EMPTY_PARENT: ParentInfo = { prenom: '', nom: '', disparu: false }
@@ -54,6 +55,7 @@ export const EMPTY_INFOS: InfosData = {
   famille1: { ...EMPTY_FAMILLE, pere: { ...EMPTY_PARENT }, mere: { ...EMPTY_PARENT }, grandParentsPaternels: { ...EMPTY_GP }, grandParentsMaternels: { ...EMPTY_GP } },
   famille2: { ...EMPTY_FAMILLE, pere: { ...EMPTY_PARENT }, mere: { ...EMPTY_PARENT }, grandParentsPaternels: { ...EMPTY_GP }, grandParentsMaternels: { ...EMPTY_GP } },
   emailContact: '',
+  mariageJuif: false,
 }
 
 /* ── Styles ────────────────────────────────────────────────── */
@@ -185,6 +187,21 @@ export default function StepInfos({ data, onChange }: { data: InfosData; onChang
       <div style={S.section}>
         <div style={S.sectionTitle}>Contact</div>
         <Field label="Email des mariés (pour recevoir les RSVP)" value={data.emailContact} onChange={v => onChange({ ...data, emailContact: v })} placeholder="sarah.david@email.com" />
+      </div>
+
+      {/* ── Mariage juif ── */}
+      <div style={S.section}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+          <input
+            type="checkbox"
+            checked={data.mariageJuif}
+            onChange={e => onChange({ ...data, mariageJuif: e.target.checked })}
+            style={{ width: 18, height: 18, accentColor: GOLD }}
+          />
+          <span style={{ fontFamily: 'var(--font-cormorant-garamond)', fontSize: 15, color: TEXT }}>
+            Mariage juif <span style={{ fontSize: 13, opacity: 0.6 }}>(affiche בס״ד sur chaque page)</span>
+          </span>
+        </label>
       </div>
     </div>
   )

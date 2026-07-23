@@ -93,6 +93,7 @@ function wizardToGenerateInput(data: WizardData): GenerateInput {
     musicUrl: data.design.musicUrl,
     images: data.images,
     emailContact: data.infos.emailContact,
+    mariageJuif: data.infos.mariageJuif,
   }
 }
 
