@@ -80,10 +80,6 @@ const testData: GenerateInput = {
       note: 'Merci de prévoir une tenue de cérémonie',
       transport: 'Métro Notre-Dame-de-Lorette (ligne 12)',
       hebergement: 'Hôtel Raphael — tarif préférentiel code COHENLEVY',
-      penseesDefuntsActif: true,
-      penseesDefuntsIntro: 'Zihrona Levraha — Que leur mémoire soit une bénédiction',
-      penseesDefuntsNoms: ['Henri Cohen', 'Jacques Levy', 'Germaine Levy'],
-      penseesDefuntsFin: 'Présents dans nos cœurs en ce jour',
     },
   ],
 
