@@ -280,11 +280,20 @@ function renderHouppa(evt: EvenementInput, input: GenerateInput, tp: TemplatePal
   const gpMa1 = fmtGpCoupleLiving(f1.grandParentsMaternels)
   const gpPa2 = fmtGpCoupleLiving(f2.grandParentsPaternels)
   const gpMa2 = fmtGpCoupleLiving(f2.grandParentsMaternels)
-  const hasGp = !!(gpPa1 || gpMa1 || gpPa2 || gpMa2)
 
   const parents1 = fmtParentsLineLiving(f1.pere, f1.mere)
   const parents2 = fmtParentsLineLiving(f2.pere, f2.mere)
 
+  // Construire les lignes en excluant les vides
+  const lignesGauche = [gpPa1, gpMa1, parents1].filter(l => l?.trim())
+  const lignesDroite = [gpPa2, gpMa2, parents2].filter(l => l?.trim())
+  const maxLignes = Math.max(lignesGauche.length, lignesDroite.length)
+
+  // Padding EN HAUT : les vides en haut, les noms en bas alignés
+  const paddedGauche = [...Array(maxLignes - lignesGauche.length).fill(''), ...lignesGauche]
+  const paddedDroite = [...Array(maxLignes - lignesDroite.length).fill(''), ...lignesDroite]
+
+  const hasGp = !!(gpPa1 || gpMa1 || gpPa2 || gpMa2)
   const joie = hasGp
     ? 'ont la joie de vous faire part du mariage de leurs petits-enfants et enfants'
     : 'ont la joie de vous faire part du mariage de leurs enfants'
@@ -307,15 +316,11 @@ function renderHouppa(evt: EvenementInput, input: GenerateInput, tp: TemplatePal
 
     <div class="famille-grid">
       <div class="famille-col">
-        ${hasGp ? `${gpPa1 ? `<div>${gpPa1}</div>` : '<div>&nbsp;</div>'}` : ''}
-        ${hasGp ? `${gpMa1 ? `<div>${gpMa1}</div>` : '<div>&nbsp;</div>'}` : ''}
-        ${parents1 ? `<div>${parents1}</div>` : ''}
+        ${paddedGauche.map(l => l ? `<div>${l}</div>` : '<div>&nbsp;</div>').join('\n        ')}
       </div>
       <div class="famille-sep"></div>
       <div class="famille-col famille-col-right">
-        ${hasGp ? `${gpPa2 ? `<div>${gpPa2}</div>` : '<div>&nbsp;</div>'}` : ''}
-        ${hasGp ? `${gpMa2 ? `<div>${gpMa2}</div>` : '<div>&nbsp;</div>'}` : ''}
-        ${parents2 ? `<div>${parents2}</div>` : ''}
+        ${paddedDroite.map(l => l ? `<div>${l}</div>` : '<div>&nbsp;</div>').join('\n        ')}
       </div>
     </div>
 
