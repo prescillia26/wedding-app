@@ -3154,25 +3154,25 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
         )}
         {/* Grands-parents alignés — espace vide si un côté manque */}
         {hasGp && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 8, marginBottom: 4, alignItems: 'start' }}>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, lineHeight: 2, whiteSpace: 'nowrap' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto minmax(0,1fr)', gap: 8, marginBottom: 4, alignItems: 'start' }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, lineHeight: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               <div style={{ visibility: gpPa1 ? 'visible' : 'hidden' }}>{gpPa1 || '\u00A0'}</div>
               <div style={{ visibility: gpMa1 ? 'visible' : 'hidden' }}>{gpMa1 || '\u00A0'}</div>
             </div>
             <div style={{ width: 1, background: theme.accent, opacity: 0.3, alignSelf: 'stretch', minHeight: 20 }} />
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, textAlign: 'right', lineHeight: 2, whiteSpace: 'nowrap' }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, textAlign: 'right', lineHeight: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               <div style={{ visibility: gpPa2 ? 'visible' : 'hidden' }}>{gpPa2 || '\u00A0'}</div>
               <div style={{ visibility: gpMa2 ? 'visible' : 'hidden' }}>{gpMa2 || '\u00A0'}</div>
             </div>
           </div>
         )}
         {/* Parents toujours alignés */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 8, marginBottom: 24, alignItems: 'start' }}>
-          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, lineHeight: 2, whiteSpace: 'nowrap' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto minmax(0,1fr)', gap: 8, marginBottom: 24, alignItems: 'start' }}>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, lineHeight: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {parents1.map((l, i) => <div key={i}>{l}</div>)}
           </div>
           <div style={{ width: 1, background: theme.accent, opacity: 0.3, alignSelf: 'stretch', minHeight: 40 }} />
-          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, textAlign: 'right', lineHeight: 2, whiteSpace: 'nowrap' }}>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, textAlign: 'right', lineHeight: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {parents2.map((l, i) => <div key={i}>{l}</div>)}
           </div>
         </div>
@@ -3403,25 +3403,25 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
         <div style={{ textAlign: 'center', fontSize: 22, letterSpacing: '0.4em', color: theme.accent, marginBottom: 24 }}>✡ ✦ ✡</div>
         {/* Grands-parents alignés — espace vide si un côté manque */}
         {hasGp && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 8, marginBottom: 4, alignItems: 'start' }}>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, lineHeight: 2, whiteSpace: 'nowrap' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto minmax(0,1fr)', gap: 8, marginBottom: 4, alignItems: 'start' }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, lineHeight: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               <div style={{ visibility: gpPa1 ? 'visible' : 'hidden' }}>{gpPa1 || '\u00A0'}</div>
               <div style={{ visibility: gpMa1 ? 'visible' : 'hidden' }}>{gpMa1 || '\u00A0'}</div>
             </div>
             <div style={{ width: 1, background: theme.accent, opacity: 0.3, alignSelf: 'stretch', minHeight: 20 }} />
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, textAlign: 'right', lineHeight: 2, whiteSpace: 'nowrap' }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, textAlign: 'right', lineHeight: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               <div style={{ visibility: gpPa2 ? 'visible' : 'hidden' }}>{gpPa2 || '\u00A0'}</div>
               <div style={{ visibility: gpMa2 ? 'visible' : 'hidden' }}>{gpMa2 || '\u00A0'}</div>
             </div>
           </div>
         )}
         {/* Parents toujours alignés */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 8, marginBottom: 24, alignItems: 'start' }}>
-          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, lineHeight: 2, whiteSpace: 'nowrap' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto minmax(0,1fr)', gap: 8, marginBottom: 24, alignItems: 'start' }}>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, lineHeight: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {parents1.map((l, i) => <div key={i}>{l}</div>)}
           </div>
           <div style={{ width: 1, background: theme.accent, opacity: 0.3, alignSelf: 'stretch', minHeight: 40 }} />
-          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, textAlign: 'right', lineHeight: 2, whiteSpace: 'nowrap' }}>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, textAlign: 'right', lineHeight: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {parents2.map((l, i) => <div key={i}>{l}</div>)}
           </div>
         </div>
