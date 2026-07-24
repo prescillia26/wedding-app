@@ -5365,7 +5365,9 @@ function AnimSection({ children, delay = 0, style, animStyle = 'slide-up', skipA
       }
     }, { threshold: 0.12 })
     obs.observe(el)
-    return () => obs.disconnect()
+    // Fallback : si l'animation ne se déclenche pas après 3s, forcer la visibilité
+    const fallback = setTimeout(() => { if (el.style.opacity === '0') el.style.opacity = '1' }, 3000)
+    return () => { obs.disconnect(); clearTimeout(fallback) }
   }, [animStyle, delay, skipAnim])
   return (
     <div ref={ref} style={{ opacity: skipAnim ? 1 : 0, ...style }}>
