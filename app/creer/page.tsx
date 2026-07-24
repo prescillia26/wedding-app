@@ -90,6 +90,7 @@ function wizardToGenerateInput(data: WizardData): GenerateInput {
     })),
     paletteId: data.design.paletteId,
     logoUrl: data.design.logoUrl,
+    logoSize: data.design.logoSize,
     musicUrl: data.design.musicUrl,
     images: data.images,
     emailContact: data.infos.emailContact,

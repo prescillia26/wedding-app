@@ -21,6 +21,7 @@ export interface GenerateInput {
   evenements: EvenementInput[]
   paletteId: string
   logoUrl: string
+  logoSize?: number
   musicUrl: string
   images: Record<string, string>
   emailContact: string
@@ -560,7 +561,7 @@ function buildCss(tp: TemplatePalette): string {
       0%,100% { transform:translateY(0); }
       50% { transform:translateY(6px); }
     }
-    .accueil-logo { width:120px; height:120px; object-fit:contain; margin-bottom:20px; }
+    .accueil-logo { object-fit:contain; }
     .accueil-label {
       font-family:'${tp.labelFont}',serif;
       font-size:11px; letter-spacing:5px; text-transform:uppercase;
@@ -1024,7 +1025,11 @@ export function generateStaticHtml(input: GenerateInput): string {
     <section class="accueil animate"${input.accueilImageUrl ? ` style="background-image:url('${esc(input.accueilImageUrl)}');background-size:cover;background-position:center"` : ''}>
       ${input.mariageJuif ? '<div class="bsd">בס״ד</div>' : ''}
       <div class="accueil-content">
-        ${input.logoUrl ? `<img src="${esc(input.logoUrl)}" alt="logo" class="accueil-logo">` : ''}
+        ${input.logoUrl ? (() => {
+          const sz = input.logoSize || 120
+          const mb = Math.max(4, 20 - (sz - 120) / 4)
+          return `<img src="${esc(input.logoUrl)}" alt="logo" class="accueil-logo" style="width:${sz}px;height:${sz}px;margin-bottom:${mb}px;">`
+        })() : ''}
         <div class="accueil-label">MARIAGE</div>
         <div class="couple-names-display">
           <span class="couple-name-big">${esc(input.marie1Prenom)}</span>

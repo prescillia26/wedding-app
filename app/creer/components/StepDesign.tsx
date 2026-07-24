@@ -8,6 +8,7 @@ import { HARMONIZED_PALETTES, type HarmonizedPalette } from '@/lib/refonte/palet
 export interface DesignData {
   paletteId: string
   logoUrl: string
+  logoSize: number
   musicUrl: string
   musicName: string
 }
@@ -15,6 +16,7 @@ export interface DesignData {
 export const EMPTY_DESIGN: DesignData = {
   paletteId: 'ivoire-dore',
   logoUrl: '',
+  logoSize: 120,
   musicUrl: '',
   musicName: '',
 }
@@ -249,6 +251,26 @@ export default function StepDesign({ data, onChange }: { data: DesignData; onCha
       <div style={S.section}>
         <div style={S.sectionTitle}>Logo ou monogramme (optionnel)</div>
         <LogoUploader logoUrl={data.logoUrl} onChange={url => onChange({ ...data, logoUrl: url })} />
+        {data.logoUrl && (
+          <div style={{ marginTop: 16 }}>
+            <label style={{ ...S.label, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Taille du logo</span>
+              <span style={{ fontWeight: 400, color: '#9ca3af' }}>{data.logoSize}px</span>
+            </label>
+            <input
+              type="range"
+              min={80}
+              max={200}
+              value={data.logoSize}
+              onChange={e => onChange({ ...data, logoSize: Number(e.target.value) })}
+              style={{ width: '100%', accentColor: GOLD }}
+            />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-cormorant-garamond)', fontSize: 11, color: '#9ca3af' }}>
+              <span>80px</span>
+              <span>200px</span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── Musique ── */}
