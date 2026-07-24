@@ -501,7 +501,7 @@ function buildCss(tp: TemplatePalette): string {
       backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
       border-bottom:0.5px solid ${tp.accentColor}22;
     }
-    .nav-logo { height:36px; width:auto; }
+    .nav-logo { width:auto; object-fit:contain; }
     .nav-initials {
       font-family:'${tp.titreFont}',cursive; font-size:28px; color:${tp.accentColor};
     }
@@ -541,9 +541,8 @@ function buildCss(tp: TemplatePalette): string {
       display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1;
     }
     .bsd {
-      position:absolute; top:12px; right:16px;
       font-family:serif; font-size:13px; color:${tp.accentColor};
-      direction:rtl; opacity:0.85;
+      direction:rtl; opacity:0.85; text-align:center; margin-bottom:8px;
     }
     .scroll-hint {
       display:flex; flex-direction:column; align-items:center; gap:6px; padding-bottom:24px;
@@ -565,7 +564,7 @@ function buildCss(tp: TemplatePalette): string {
     .accueil-label {
       font-family:'${tp.labelFont}',serif;
       font-size:11px; letter-spacing:5px; text-transform:uppercase;
-      color:${tp.accentColor}; opacity:0.7; margin-bottom:8px;
+      color:${tp.accentColor}; opacity:0.7; margin-bottom:4px;
     }
     .couple-names-display {
       display:flex; align-items:baseline; justify-content:center;
@@ -1014,7 +1013,7 @@ export function generateStaticHtml(input: GenerateInput): string {
     <nav class="navbar">
       <div style="width:48px;height:48px;flex-shrink:0;display:flex;align-items:center">
         ${input.logoUrl
-          ? `<img src="${esc(input.logoUrl)}" alt="logo" class="nav-logo">`
+          ? `<img src="${esc(input.logoUrl)}" alt="logo" class="nav-logo" style="height:${Math.max(36, (input.logoSize || 160) * 0.4)}px;">`
           : `<span class="nav-initials">${esc(input.marie1Prenom[0] || '')}${esc(input.marie2Prenom[0] || '')}</span>`
         }
       </div>
@@ -1023,10 +1022,10 @@ export function generateStaticHtml(input: GenerateInput): string {
 
     <!-- Accueil -->
     <section class="accueil animate"${input.accueilImageUrl ? ` style="background-image:url('${esc(input.accueilImageUrl)}');background-size:cover;background-position:center"` : ''}>
-      ${input.mariageJuif ? '<div class="bsd">בס״ד</div>' : ''}
       <div class="accueil-content">
+        ${input.mariageJuif ? '<div class="bsd">בס״ד</div>' : ''}
         ${input.logoUrl ? (() => {
-          const sz = input.logoSize || 120
+          const sz = input.logoSize || 160
           const mb = Math.max(4, 20 - (sz - 120) / 4)
           return `<img src="${esc(input.logoUrl)}" alt="logo" class="accueil-logo" style="width:${sz}px;height:${sz}px;margin-bottom:${mb}px;">`
         })() : ''}

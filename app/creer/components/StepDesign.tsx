@@ -16,7 +16,7 @@ export interface DesignData {
 export const EMPTY_DESIGN: DesignData = {
   paletteId: 'ivoire-dore',
   logoUrl: '',
-  logoSize: 120,
+  logoSize: 160,
   musicUrl: '',
   musicName: '',
 }
