@@ -255,8 +255,8 @@ function renderMairie(evt: EvenementInput, input: GenerateInput, tp: TemplatePal
   return `
   <section class="event-section" style="position:relative;">
     ${bsdCorner(input.mariageJuif, tp)}
-    ${imageUrl ? `<img class="event-image" src="${esc(imageUrl)}" alt="Mairie">` : ''}
     <div class="card-title-calligraphie">La Mairie</div>
+    ${imageUrl ? `<img class="event-image" src="${esc(imageUrl)}" alt="Mairie">` : ''}
     ${coupleNames(input.marie1Prenom, input.marie2Prenom)}
     <div class="mairie-sediront">se diront &laquo; OUI &raquo;</div>
     ${dateBox(evt.date, tp)}
@@ -308,8 +308,8 @@ function renderHouppa(evt: EvenementInput, input: GenerateInput, tp: TemplatePal
   return `
   <section class="event-section" style="position:relative;">
     ${bsdCorner(input.mariageJuif, tp)}
-    ${imageUrl ? `<img class="event-image" src="${esc(imageUrl)}" alt="Houppa">` : ''}
     <div class="card-title-calligraphie">La Houppa</div>
+    ${imageUrl ? `<img class="event-image" src="${esc(imageUrl)}" alt="Houppa">` : ''}
 
     ${input.mariageJuif ? `<div class="hebrew-verse">קוֹל שָׂשׂוֹן וְקוֹל שִׂמְחָה קוֹל חָתָן וְקוֹל כַּלָּה</div>` : ''}
     <div class="thin-line"></div>
@@ -349,8 +349,8 @@ function renderHenne(evt: EvenementInput, input: GenerateInput, tp: TemplatePale
   return `
   <section class="event-section" style="position:relative;">
     ${bsdCorner(input.mariageJuif, tp)}
-    ${imageUrl ? `<img class="event-image" src="${esc(imageUrl)}" alt="Henné">` : ''}
     <div class="card-title-calligraphie">Le Henné</div>
+    ${imageUrl ? `<img class="event-image" src="${esc(imageUrl)}" alt="Henné">` : ''}
     <div class="ornements">&#10043; &#10047; &#10048;</div>
     <div class="henne-invite">Vous êtes chaleureusement invités à célébrer la soirée du henné de</div>
     ${coupleNames(input.marie1Prenom, input.marie2Prenom)}
@@ -373,8 +373,8 @@ function renderShabbat(evt: EvenementInput, input: GenerateInput, tp: TemplatePa
   return `
   <section class="event-section" style="position:relative;">
     ${bsdCorner(input.mariageJuif, tp)}
-    ${imageUrl ? `<img class="event-image" src="${esc(imageUrl)}" alt="Shabbat Hatan">` : ''}
     <div class="card-title-calligraphie">Shabbat Hatan</div>
+    ${imageUrl ? `<img class="event-image" src="${esc(imageUrl)}" alt="Shabbat Hatan">` : ''}
     <div class="shabbat-invite">Les familles ${esc(famille1Nom)} &amp; ${esc(famille2Nom)} vous convient au Shabbat Hatan de</div>
     ${coupleNames(input.marie1Prenom, input.marie2Prenom)}
     ${dateBox(evt.date, tp)}
@@ -394,8 +394,8 @@ function renderAutre(evt: EvenementInput, input: GenerateInput, tp: TemplatePale
   return `
   <section class="event-section" style="position:relative;">
     ${bsdCorner(input.mariageJuif, tp)}
-    ${imageUrl ? `<img class="event-image" src="${esc(imageUrl)}" alt="${esc(title)}">` : ''}
     <div class="card-title-calligraphie">${esc(title)}</div>
+    ${imageUrl ? `<img class="event-image" src="${esc(imageUrl)}" alt="${esc(title)}">` : ''}
     <div class="autre-invite">Rejoignez ${esc(input.marie1Prenom)} &amp; ${esc(input.marie2Prenom)} pour ${esc(title.toLowerCase())}</div>
     ${dateBox(evt.date, tp)}
     <div class="event-time-large">${formatHeure(evt.heure)}</div>
