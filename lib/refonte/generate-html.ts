@@ -260,7 +260,6 @@ function renderMairie(evt: EvenementInput, input: GenerateInput, tp: TemplatePal
     <div class="mairie-sediront">se diront &laquo; OUI &raquo;</div>
     ${dateBox(evt.date, tp)}
     <div class="event-time-large">${formatHeure(evt.heure)}</div>
-    ${separator(tp)}
     <div class="event-lieu-text">
       ${evt.lieu ? `<div class="lieu-bold">${esc(evt.lieu)}</div>` : ''}
       ${evt.adresse ? `<div class="event-adresse">${esc(evt.adresse)}</div>` : ''}
@@ -330,8 +329,6 @@ function renderHouppa(evt: EvenementInput, input: GenerateInput, tp: TemplatePal
 
     ${dateBox(evt.date, tp)}
     <div class="event-time-large">${formatHeure(evt.heure)}</div>
-    ${separator(tp)}
-
     <div class="event-lieu-text">
       ${evt.lieu ? `<div class="lieu-bold">${formatLieu(evt.lieu)}</div>` : ''}
       ${evt.adresse ? `<div class="event-adresse">${esc(evt.adresse)}</div>` : ''}
@@ -358,7 +355,6 @@ function renderHenne(evt: EvenementInput, input: GenerateInput, tp: TemplatePale
     ${coupleNames(input.marie1Prenom, input.marie2Prenom)}
     ${dateBox(evt.date, tp)}
     <div class="event-time-large">${formatHeure(evt.heure)}</div>
-    ${separator(tp)}
     <div class="event-lieu-text">
       ${evt.lieu ? `<div class="lieu-bold">${formatLieu(evt.lieu)}</div>` : ''}
       ${evt.adresse ? `<div class="event-adresse">${esc(evt.adresse)}</div>` : ''}
@@ -382,7 +378,6 @@ function renderShabbat(evt: EvenementInput, input: GenerateInput, tp: TemplatePa
     ${coupleNames(input.marie1Prenom, input.marie2Prenom)}
     ${dateBox(evt.date, tp)}
     <div class="event-time-large">${formatHeure(evt.heure)}</div>
-    ${separator(tp)}
     <div class="event-lieu-text">
       ${evt.lieu ? `<div class="lieu-bold">${formatLieu(evt.lieu)}</div>` : ''}
       ${evt.adresse ? `<div class="event-adresse">${esc(evt.adresse)}</div>` : ''}
@@ -403,7 +398,6 @@ function renderAutre(evt: EvenementInput, input: GenerateInput, tp: TemplatePale
     <div class="autre-invite">Rejoignez ${esc(input.marie1Prenom)} &amp; ${esc(input.marie2Prenom)} pour ${esc(title.toLowerCase())}</div>
     ${dateBox(evt.date, tp)}
     <div class="event-time-large">${formatHeure(evt.heure)}</div>
-    ${separator(tp)}
     <div class="event-lieu-text">
       ${evt.lieu ? `<div class="lieu-bold">${formatLieu(evt.lieu)}</div>` : ''}
       ${evt.adresse ? `<div class="event-adresse">${esc(evt.adresse)}</div>` : ''}
