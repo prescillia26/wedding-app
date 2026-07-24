@@ -7881,11 +7881,11 @@ const firstDate = sorted[0]?.date
                       }
 
                       // ── Standard layout (original, unchanged) ──
-                      const gpStyle = { fontFamily: FC, fontStyle: 'italic' as const, fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' as const }
+                      const gpStyle = { fontFamily: FC, fontStyle: 'italic' as const, fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' as const, overflow: 'hidden' as const, textOverflow: 'ellipsis' as const }
                       return (
                       <>
                       <AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 2, textAlign: 'center' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 6, marginBottom: 2, textAlign: 'center' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                             {gpPa1 && <DraggableElement id={pre+"gpPa1"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ovIf('gpPa1', gpPa1)} defaultValue={gpPa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpPa1: v } })} onStyleChange={(patch) => setInlineStyle('gpPa1', patch)} style={{ ...gpStyle, ...getInlineStyle('gpPa1') }} /></DraggableElement>}
                             {gpMa1 && <DraggableElement id={pre+"gpMa1"} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ovIf('gpMa1', gpMa1)} defaultValue={gpMa1} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, gpMa1: v } })} onStyleChange={(patch) => setInlineStyle('gpMa1', patch)} style={{ ...gpStyle, ...getInlineStyle('gpMa1') }} /></DraggableElement>}
@@ -7898,12 +7898,12 @@ const firstDate = sorted[0]?.date
                       </AnimSection>
                       {(parents1.length > 0 || parents2.length > 0) && (
                         <AnimSection animStyle={anim} delay={150} skipAnim={canEdit}>
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 6, textAlign: 'center' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                              {parents1.map((l,j)=><DraggableElement key={j} id={pre+`p1_${j}`} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ov[`parents1_${j}`] && ov[`parents1_${j}`] !== l ? ov[`parents1_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents1_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents1_${j}`, patch)} style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles), ...getInlineStyle(`parents1_${j}`) }} /></DraggableElement>)}
+                          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 6, marginBottom: 6, textAlign: 'center' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 1, overflow: 'hidden' }}>
+                              {parents1.map((l,j)=><DraggableElement key={j} id={pre+`p1_${j}`} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ov[`parents1_${j}`] && ov[`parents1_${j}`] !== l ? ov[`parents1_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents1_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents1_${j}`, patch)} style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }, 'parents', data.zoneStyles), ...getInlineStyle(`parents1_${j}`) }} /></DraggableElement>)}
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                              {parents2.map((l,j)=><DraggableElement key={j} id={pre+`p2_${j}`} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ov[`parents2_${j}`] && ov[`parents2_${j}`] !== l ? ov[`parents2_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents2_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents2_${j}`, patch)} style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' }, 'parents', data.zoneStyles), ...getInlineStyle(`parents2_${j}`) }} /></DraggableElement>)}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 1, overflow: 'hidden' }}>
+                              {parents2.map((l,j)=><DraggableElement key={j} id={pre+`p2_${j}`} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ov[`parents2_${j}`] && ov[`parents2_${j}`] !== l ? ov[`parents2_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents2_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents2_${j}`, patch)} style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }, 'parents', data.zoneStyles), ...getInlineStyle(`parents2_${j}`) }} /></DraggableElement>)}
                             </div>
                           </div>
                         </AnimSection>
