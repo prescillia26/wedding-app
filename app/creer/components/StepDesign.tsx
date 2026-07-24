@@ -326,9 +326,11 @@ export default function StepDesign({ data, onChange }: { data: DesignData; onCha
                 <div style={{ marginTop: 16 }}>
                   <div style={{ ...S.label, marginBottom: 8 }}>Aperçu sur votre faire-part</div>
                   <div style={{
-                    background: palette.fondColor, borderRadius: 12,
-                    padding: 24, textAlign: 'center',
-                    border: `1px solid ${palette.accentColor}22`,
+                    width: '100%', height: 160,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexDirection: 'column', overflow: 'hidden',
+                    background: palette.fondColor, borderRadius: 8,
+                    border: `1px solid ${palette.accentColor}33`,
                   }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
