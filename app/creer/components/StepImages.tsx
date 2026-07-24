@@ -2,42 +2,35 @@
 
 import { useState } from 'react'
 import type { Evenement } from './StepEvenements'
+import { byCategory, type Visual } from '@/lib/visuals'
 
 /* ── Types ─────────────────────────────────────────────────── */
 
+export interface ImageEntry {
+  url: string
+  isCustom: boolean
+}
+
 export interface ImagesData {
-  /** Clé = event.id, valeur = URL de l'image (galerie ou importée en base64) */
-  [eventId: string]: string
+  [eventId: string]: ImageEntry
 }
 
-/* ── Galerie d'images proposées par type d'événement ──────── */
+/* ── Galerie par type d'événement ─────────────────────────── */
 
-const GALLERY_IMAGES: Record<string, { url: string; label: string }[]> = {
-  'Mairie': [
-    { url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765484/1_ruabdh.png', label: 'Floral 1' },
-    { url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765486/2_xh3erh.png', label: 'Floral 2' },
-    { url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765487/3_zdnq1l.png', label: 'Floral 3' },
-    { url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765490/4_szuz80.png', label: 'Floral 4' },
-  ],
-  'Cérémonie religieuse / Houppa': [
-    { url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765492/5_dgvzjn.png', label: 'Floral 5' },
-    { url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765509/6_bbgeun.png', label: 'Floral 6' },
-    { url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765511/7_h5mjjm.png', label: 'Floral 7' },
-    { url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765513/8_grn4zh.png', label: 'Floral 8' },
-  ],
-  'default': [
-    { url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765484/1_ruabdh.png', label: 'Floral 1' },
-    { url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765486/2_xh3erh.png', label: 'Floral 2' },
-    { url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765487/3_zdnq1l.png', label: 'Floral 3' },
-    { url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765490/4_szuz80.png', label: 'Floral 4' },
-    { url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765492/5_dgvzjn.png', label: 'Floral 5' },
-    { url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776765509/6_bbgeun.png', label: 'Floral 6' },
-    { url: 'https://res.cloudinary.com/dau96mui2/image/upload/v1776783658/Design_sans_titre_tzwipm.png', label: 'Floral 9' },
-  ],
+function getImagesForType(type: string): Visual[] {
+  const t = type.toLowerCase()
+  if (t.includes('mairie')) return byCategory('mairie')
+  if (t.includes('houppa') || t.includes('religieuse')) return byCategory('houppa')
+  if (t.includes('shabbat')) return byCategory('shabbat')
+  if (t.includes('henn')) return byCategory('beach')
+  return byCategory('couples')
 }
 
-function getGalleryForEvent(type: string): { url: string; label: string }[] {
-  return GALLERY_IMAGES[type] || GALLERY_IMAGES['default']
+function getDefaultImage(type: string): ImageEntry {
+  const images = getImagesForType(type)
+  return images.length > 0
+    ? { url: images[0].url, isCustom: false }
+    : { url: '', isCustom: false }
 }
 
 /* ── Styles ────────────────────────────────────────────────── */
@@ -46,39 +39,34 @@ const GOLD = '#C9A84C'
 const DARK = '#2a2520'
 const TEXT = '#3a3330'
 
-/* ── Composant pour un événement ──────────────────────────── */
-
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024 // 2 MB
 
-function EventImagePicker({ event, imageUrl, onChange }: {
+/* ── Composant pour un événement ──────────────────────────── */
+
+function EventImagePicker({ event, entry, onChange }: {
   event: Evenement
-  imageUrl: string
-  onChange: (url: string) => void
+  entry: ImageEntry
+  onChange: (e: ImageEntry) => void
 }) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
-  const gallery = getGalleryForEvent(event.type)
+  const gallery = getImagesForType(event.type)
   const eventName = event.type === 'Autre' && event.customName ? event.customName : event.type
 
-  const handleImport = async (file: File) => {
+  const handleImport = (file: File) => {
     setError('')
     if (file.size > MAX_IMAGE_SIZE) {
-      setError(`L'image est trop lourde (${(file.size / 1024 / 1024).toFixed(1)} Mo). Maximum autorisé : 2 Mo.`)
+      setError(`L'image est trop lourde (${(file.size / 1024 / 1024).toFixed(1)} Mo). Maximum : 2 Mo.`)
       return
     }
     setUploading(true)
-    try {
-      const reader = new FileReader()
-      reader.onload = () => {
-        onChange(reader.result as string)
-        setUploading(false)
-      }
-      reader.onerror = () => { setUploading(false); setError('Erreur lors de la lecture du fichier.') }
-      reader.readAsDataURL(file)
-    } catch {
+    const reader = new FileReader()
+    reader.onload = () => {
+      onChange({ url: reader.result as string, isCustom: true })
       setUploading(false)
-      setError('Erreur lors de la lecture du fichier.')
     }
+    reader.onerror = () => { setUploading(false); setError('Erreur lors de la lecture du fichier.') }
+    reader.readAsDataURL(file)
   }
 
   return (
@@ -90,45 +78,47 @@ function EventImagePicker({ event, imageUrl, onChange }: {
         Cette image apparaîtra sous le titre de l&apos;événement
       </p>
 
-      {/* Image sélectionnée */}
-      {imageUrl && (
+      {/* Image custom sélectionnée */}
+      {entry.isCustom && entry.url && (
         <div style={{ marginBottom: 14, textAlign: 'center' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={imageUrl}
+            src={entry.url}
             alt={eventName}
             style={{ maxWidth: '100%', maxHeight: 160, objectFit: 'contain', borderRadius: 10, border: `1px solid ${GOLD}33` }}
           />
           <div style={{ marginTop: 6 }}>
-            <button type="button" onClick={() => onChange('')} style={{ background: 'none', border: 'none', color: '#d45050', fontSize: 12, fontFamily: 'var(--font-cormorant-garamond)', cursor: 'pointer' }}>
-              Retirer l&apos;image
+            <button type="button" onClick={() => onChange(getDefaultImage(event.type))} style={{ background: 'none', border: 'none', color: '#d45050', fontSize: 12, fontFamily: 'var(--font-cormorant-garamond)', cursor: 'pointer' }}>
+              Supprimer et revenir à la galerie
             </button>
           </div>
         </div>
       )}
 
       {/* Galerie */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: 8, marginBottom: 12 }}>
-        {gallery.map(img => (
-          <button
-            key={img.url}
-            type="button"
-            onClick={() => onChange(img.url)}
-            style={{
-              padding: 4,
-              border: imageUrl === img.url ? `2px solid ${GOLD}` : '1.5px solid #e0d8cc',
-              borderRadius: 8,
-              background: 'white',
-              cursor: 'pointer',
-              boxShadow: imageUrl === img.url ? `0 0 0 2px ${GOLD}33` : 'none',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={img.url} alt={img.label} style={{ width: '100%', height: 70, objectFit: 'contain', borderRadius: 4 }} />
-          </button>
-        ))}
-      </div>
+      {!entry.isCustom && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 14 }}>
+          {gallery.map(img => (
+            <button
+              key={img.id}
+              type="button"
+              onClick={() => onChange({ url: img.url, isCustom: false })}
+              style={{
+                padding: 4,
+                border: entry.url === img.url ? `2.5px solid ${GOLD}` : '1.5px solid #e0d8cc',
+                borderRadius: 10,
+                background: 'white',
+                cursor: 'pointer',
+                boxShadow: entry.url === img.url ? `0 0 0 3px ${GOLD}33` : 'none',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={img.url} alt={img.label} style={{ width: '100%', height: 100, objectFit: 'contain', borderRadius: 6 }} />
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Erreur upload */}
       {error && (
@@ -138,20 +128,22 @@ function EventImagePicker({ event, imageUrl, onChange }: {
       )}
 
       {/* Import custom */}
-      <label style={{ display: 'block', cursor: uploading ? 'wait' : 'pointer' }}>
-        <div style={{
-          border: `1.5px dashed ${GOLD}55`,
-          borderRadius: 8,
-          padding: '10px 14px',
-          textAlign: 'center',
-          background: uploading ? '#faf5ea' : '#faf8f4',
-        }}>
-          <span style={{ fontSize: 13, color: TEXT, fontFamily: 'var(--font-cormorant-garamond)' }}>
-            {uploading ? '⏳ Importation...' : '📁 Importer votre propre image'}
-          </span>
-        </div>
-        <input type="file" accept="image/*" disabled={uploading} onChange={e => { const f = e.target.files?.[0]; if (f) handleImport(f); e.target.value = '' }} style={{ display: 'none' }} />
-      </label>
+      {!entry.isCustom && (
+        <label style={{ display: 'block', cursor: uploading ? 'wait' : 'pointer' }}>
+          <div style={{
+            border: `1.5px dashed ${GOLD}55`,
+            borderRadius: 8,
+            padding: '10px 14px',
+            textAlign: 'center',
+            background: uploading ? '#faf5ea' : '#faf8f4',
+          }}>
+            <span style={{ fontSize: 13, color: TEXT, fontFamily: 'var(--font-cormorant-garamond)' }}>
+              {uploading ? 'Importation...' : 'Utiliser ma propre image'}
+            </span>
+          </div>
+          <input type="file" accept="image/png,image/jpeg,image/webp" disabled={uploading} onChange={e => { const f = e.target.files?.[0]; if (f) handleImport(f); e.target.value = '' }} style={{ display: 'none' }} />
+        </label>
+      )}
     </div>
   )
 }
@@ -182,14 +174,17 @@ export default function StepImages({ events, data, onChange }: {
         Choisissez une image pour chaque événement — elle apparaîtra sous le titre
       </p>
 
-      {events.map(event => (
-        <EventImagePicker
-          key={event.id}
-          event={event}
-          imageUrl={data[event.id] || ''}
-          onChange={url => onChange({ ...data, [event.id]: url })}
-        />
-      ))}
+      {events.map(event => {
+        const entry = data[event.id] || getDefaultImage(event.type)
+        return (
+          <EventImagePicker
+            key={event.id}
+            event={event}
+            entry={entry}
+            onChange={e => onChange({ ...data, [event.id]: e })}
+          />
+        )
+      })}
     </div>
   )
 }

@@ -92,7 +92,9 @@ function wizardToGenerateInput(data: WizardData): GenerateInput {
     logoUrl: data.design.logoUrl,
     logoSize: data.design.logoSize,
     musicUrl: data.design.musicUrl,
-    images: data.images,
+    images: Object.fromEntries(
+      Object.entries(data.images).map(([k, v]) => [k, typeof v === 'string' ? v : v.url])
+    ),
     emailContact: data.infos.emailContact,
     mariageJuif: data.infos.mariageJuif,
   }
