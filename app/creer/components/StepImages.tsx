@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import type { Evenement } from './StepEvenements'
-import { byCategory, type Visual } from '@/lib/visuals'
+import { byCategory, type VisualRefonte } from '@/lib/refonte/visuals-refonte'
 
 /* ── Types ─────────────────────────────────────────────────── */
 
@@ -17,13 +17,13 @@ export interface ImagesData {
 
 /* ── Galerie par type d'événement ─────────────────────────── */
 
-function getImagesForType(type: string): Visual[] {
+function getImagesForType(type: string): VisualRefonte[] {
   const t = type.toLowerCase()
   if (t.includes('mairie')) return byCategory('mairie')
   if (t.includes('houppa') || t.includes('religieuse')) return byCategory('houppa')
   if (t.includes('shabbat')) return byCategory('shabbat')
-  if (t.includes('henn')) return byCategory('beach')
-  return byCategory('couples')
+  if (t.includes('henn')) return byCategory('henne')
+  return byCategory('mairie')
 }
 
 function getDefaultImage(type: string): ImageEntry {
@@ -114,7 +114,7 @@ function EventImagePicker({ event, entry, onChange }: {
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={img.url} alt={img.label} style={{ width: '100%', height: 100, objectFit: 'contain', borderRadius: 6 }} />
+              <img src={img.url} alt={img.id} style={{ width: '100%', height: 100, objectFit: 'contain', borderRadius: 6 }} />
             </button>
           ))}
         </div>
