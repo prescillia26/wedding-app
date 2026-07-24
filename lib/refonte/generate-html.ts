@@ -84,6 +84,29 @@ function toTemplatePalette(p: HarmonizedPalette): TemplatePalette {
   }
 }
 
+/* ── Filtre CSS pour coloriser le logo ─────────────────────── */
+
+function hexToFilter(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16) / 255
+  const g = parseInt(hex.slice(3, 5), 16) / 255
+  const b = parseInt(hex.slice(5, 7), 16) / 255
+  const max = Math.max(r, g, b), min = Math.min(r, g, b)
+  const l = (max + min) / 2
+  let h = 0, s = 0
+  if (max !== min) {
+    const d = max - min
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6
+    else if (max === g) h = ((b - r) / d + 2) / 6
+    else h = ((r - g) / d + 4) / 6
+    h *= 360
+  }
+  const hueRotate = Math.round(h - 50)
+  const saturate = Math.round(s * 1000)
+  const brightness = Math.round(l * 200)
+  return `brightness(0) saturate(100%) invert(${Math.round(l * 100)}%) sepia(50%) saturate(${saturate}%) hue-rotate(${hueRotate}deg) brightness(${brightness}%)`
+}
+
 /* ── Utilitaires ──────────────────────────────────────────── */
 
 function esc(str: string): string {
@@ -986,6 +1009,7 @@ function buildJs(input: GenerateInput): string {
 export function generateStaticHtml(input: GenerateInput): string {
   const rawPalette = getHarmonizedPalette(input.paletteId)
   const tp = toTemplatePalette(rawPalette)
+  const logoFilter = hexToFilter(tp.accentColor)
   const fontsUrl = getGoogleFontsUrl()
   const footerMonths = getFooterMonths(input.evenements)
 
@@ -1013,7 +1037,7 @@ export function generateStaticHtml(input: GenerateInput): string {
     <nav class="navbar">
       <div style="width:48px;height:48px;flex-shrink:0;display:flex;align-items:center">
         ${input.logoUrl
-          ? `<img src="${esc(input.logoUrl)}" alt="logo" class="nav-logo" style="height:${Math.max(36, (input.logoSize || 160) * 0.4)}px;">`
+          ? `<img src="${esc(input.logoUrl)}" alt="logo" class="nav-logo" style="height:${Math.max(36, (input.logoSize || 160) * 0.4)}px;filter:${logoFilter};">`
           : `<span class="nav-initials">${esc(input.marie1Prenom[0] || '')}${esc(input.marie2Prenom[0] || '')}</span>`
         }
       </div>
@@ -1027,7 +1051,7 @@ export function generateStaticHtml(input: GenerateInput): string {
         ${input.logoUrl ? (() => {
           const sz = input.logoSize || 160
           const mb = Math.max(4, 20 - (sz - 120) / 4)
-          return `<img src="${esc(input.logoUrl)}" alt="logo" class="accueil-logo" style="width:${sz}px;height:${sz}px;margin-bottom:${mb}px;">`
+          return `<img src="${esc(input.logoUrl)}" alt="logo" class="accueil-logo" style="width:${sz}px;height:${sz}px;margin-bottom:${mb}px;filter:${logoFilter};">`
         })() : ''}
         <div class="accueil-label">MARIAGE</div>
         <div class="couple-names-display">

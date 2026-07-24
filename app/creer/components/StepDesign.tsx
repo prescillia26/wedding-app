@@ -132,6 +132,60 @@ function isColorDark(hex: string): boolean {
   return (r * 299 + g * 587 + b * 114) / 1000 < 128
 }
 
+/* ── Filtre CSS pour coloriser le logo ─────────────────────── */
+
+function hexToHSL(hex: string): { h: number; s: number; l: number } {
+  const r = parseInt(hex.slice(1, 3), 16) / 255
+  const g = parseInt(hex.slice(3, 5), 16) / 255
+  const b = parseInt(hex.slice(5, 7), 16) / 255
+  const max = Math.max(r, g, b), min = Math.min(r, g, b)
+  const l = (max + min) / 2
+  if (max === min) return { h: 0, s: 0, l }
+  const d = max - min
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+  let h = 0
+  if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6
+  else if (max === g) h = ((b - r) / d + 2) / 6
+  else h = ((r - g) / d + 4) / 6
+  return { h: h * 360, s, l }
+}
+
+export function hexToFilter(hex: string): string {
+  const { h, s, l } = hexToHSL(hex)
+  // brightness(0) → noir, puis invert+sepia pour base, hue-rotate pour teinte
+  const hueRotate = Math.round(h - 50)
+  const saturate = Math.round(s * 1000)
+  const brightness = Math.round(l * 200)
+  return `brightness(0) saturate(100%) invert(${Math.round(l * 100)}%) sepia(50%) saturate(${saturate}%) hue-rotate(${hueRotate}deg) brightness(${brightness}%)`
+}
+
+/* ── Suppression de fond blanc ─────────────────────────────── */
+
+function removeBackground(file: File): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = img.width
+      canvas.height = img.height
+      const ctx = canvas.getContext('2d')!
+      ctx.drawImage(img, 0, 0)
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+      const d = imageData.data
+      for (let i = 0; i < d.length; i += 4) {
+        if (d[i] > 240 && d[i + 1] > 240 && d[i + 2] > 240) {
+          d[i + 3] = 0
+        }
+      }
+      ctx.putImageData(imageData, 0, 0)
+      resolve(canvas.toDataURL('image/png'))
+      URL.revokeObjectURL(url)
+    }
+    img.src = url
+  })
+}
+
 /* ── Upload de logo ───────────────────────────────────────── */
 
 const MAX_LOGO_SIZE = 2 * 1024 * 1024 // 2 Mo
@@ -140,17 +194,21 @@ function LogoUploader({ logoUrl, onChange }: { logoUrl: string; onChange: (url: 
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
 
-  const handleFile = (file: File) => {
+  const handleFile = async (file: File) => {
     setError('')
     if (file.size > MAX_LOGO_SIZE) {
       setError(`Le logo est trop lourd (${(file.size / 1024 / 1024).toFixed(1)} Mo). Maximum : 2 Mo.`)
       return
     }
     setUploading(true)
-    const reader = new FileReader()
-    reader.onload = () => { onChange(reader.result as string); setUploading(false) }
-    reader.onerror = () => { setError('Erreur lors de la lecture du fichier.'); setUploading(false) }
-    reader.readAsDataURL(file)
+    try {
+      const result = await removeBackground(file)
+      onChange(result)
+    } catch {
+      setError('Erreur lors du traitement du logo.')
+    } finally {
+      setUploading(false)
+    }
   }
 
   if (logoUrl) {
@@ -169,9 +227,8 @@ function LogoUploader({ logoUrl, onChange }: { logoUrl: string; onChange: (url: 
     <div>
       <label style={{ display: 'block', cursor: uploading ? 'wait' : 'pointer' }}>
         <div style={{ border: `2px dashed ${GOLD}66`, borderRadius: 10, padding: 20, textAlign: 'center', background: uploading ? '#faf5ea' : 'white' }}>
-          <div style={{ fontSize: 24, marginBottom: 6 }}>{uploading ? '⏳' : '🖼'}</div>
-          <p style={{ fontSize: 13, color: TEXT, margin: 0 }}>{uploading ? 'Téléchargement...' : 'Cliquez pour importer votre logo ou monogramme'}</p>
-          <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>PNG, JPG — fond transparent recommandé</p>
+          <p style={{ fontSize: 13, color: TEXT, margin: 0 }}>{uploading ? 'Suppression du fond...' : 'Cliquez pour importer votre logo ou monogramme'}</p>
+          <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>PNG, JPG — le fond blanc sera automatiquement supprimé</p>
         </div>
         <input type="file" accept="image/*" disabled={uploading} onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = '' }} style={{ display: 'none' }} />
       </label>
@@ -269,6 +326,40 @@ export default function StepDesign({ data, onChange }: { data: DesignData; onCha
               <span>80px</span>
               <span>200px</span>
             </div>
+
+            {/* Aperçu sur fond palette */}
+            {(() => {
+              const palette = HARMONIZED_PALETTES.find(p => p.id === data.paletteId) || HARMONIZED_PALETTES[0]
+              const filter = hexToFilter(palette.accentColor)
+              return (
+                <div style={{ marginTop: 16 }}>
+                  <div style={{ ...S.label, marginBottom: 8 }}>Aperçu sur votre faire-part</div>
+                  <div style={{
+                    background: palette.fondColor, borderRadius: 12,
+                    padding: 24, textAlign: 'center',
+                    border: `1px solid ${palette.accentColor}22`,
+                  }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={data.logoUrl}
+                      alt="Aperçu logo"
+                      style={{
+                        width: data.logoSize, height: data.logoSize,
+                        objectFit: 'contain',
+                        filter,
+                      }}
+                    />
+                    <p style={{
+                      fontFamily: `'${palette.prenomsFont}', cursive`,
+                      fontSize: 11, color: palette.accentColor,
+                      marginTop: 8, letterSpacing: 4, textTransform: 'uppercase',
+                    }}>
+                      MARIAGE
+                    </p>
+                  </div>
+                </div>
+              )
+            })()}
           </div>
         )}
       </div>
