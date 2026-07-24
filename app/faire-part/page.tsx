@@ -3155,12 +3155,12 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
         {/* Grands-parents alignés — espace vide si un côté manque */}
         {hasGp && (
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto minmax(0,1fr)', gap: 8, marginBottom: 4, alignItems: 'start' }}>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, lineHeight: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, lineHeight: 2 }}>
               <div style={{ visibility: gpPa1 ? 'visible' : 'hidden' }}>{gpPa1 || '\u00A0'}</div>
               <div style={{ visibility: gpMa1 ? 'visible' : 'hidden' }}>{gpMa1 || '\u00A0'}</div>
             </div>
             <div style={{ width: 1, background: theme.accent, opacity: 0.3, alignSelf: 'stretch', minHeight: 20 }} />
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, textAlign: 'right', lineHeight: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, textAlign: 'right', lineHeight: 2 }}>
               <div style={{ visibility: gpPa2 ? 'visible' : 'hidden' }}>{gpPa2 || '\u00A0'}</div>
               <div style={{ visibility: gpMa2 ? 'visible' : 'hidden' }}>{gpMa2 || '\u00A0'}</div>
             </div>
@@ -3168,11 +3168,11 @@ function CardHouppa({ ceremony, data, theme, isShared, cardIdx }: CardProps) {
         )}
         {/* Parents toujours alignés */}
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto minmax(0,1fr)', gap: 8, marginBottom: 24, alignItems: 'start' }}>
-          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, lineHeight: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, lineHeight: 2 }}>
             {parents1.map((l, i) => <div key={i}>{l}</div>)}
           </div>
           <div style={{ width: 1, background: theme.accent, opacity: 0.3, alignSelf: 'stretch', minHeight: 40 }} />
-          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, textAlign: 'right', lineHeight: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, textAlign: 'right', lineHeight: 2 }}>
             {parents2.map((l, i) => <div key={i}>{l}</div>)}
           </div>
         </div>
@@ -3404,12 +3404,12 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
         {/* Grands-parents alignés — espace vide si un côté manque */}
         {hasGp && (
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto minmax(0,1fr)', gap: 8, marginBottom: 4, alignItems: 'start' }}>
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, lineHeight: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, lineHeight: 2 }}>
               <div style={{ visibility: gpPa1 ? 'visible' : 'hidden' }}>{gpPa1 || '\u00A0'}</div>
               <div style={{ visibility: gpMa1 ? 'visible' : 'hidden' }}>{gpMa1 || '\u00A0'}</div>
             </div>
             <div style={{ width: 1, background: theme.accent, opacity: 0.3, alignSelf: 'stretch', minHeight: 20 }} />
-            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, textAlign: 'right', lineHeight: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, textAlign: 'right', lineHeight: 2 }}>
               <div style={{ visibility: gpPa2 ? 'visible' : 'hidden' }}>{gpPa2 || '\u00A0'}</div>
               <div style={{ visibility: gpMa2 ? 'visible' : 'hidden' }}>{gpMa2 || '\u00A0'}</div>
             </div>
@@ -3417,11 +3417,11 @@ function CarteShabbatHatan({ ceremony, data, theme, isShared, cardIdx }: CardPro
         )}
         {/* Parents toujours alignés */}
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto minmax(0,1fr)', gap: 8, marginBottom: 24, alignItems: 'start' }}>
-          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, lineHeight: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, lineHeight: 2 }}>
             {parents1.map((l, i) => <div key={i}>{l}</div>)}
           </div>
           <div style={{ width: 1, background: theme.accent, opacity: 0.3, alignSelf: 'stretch', minHeight: 40 }} />
-          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, textAlign: 'right', lineHeight: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div style={{ fontFamily: 'var(--font-cormorant-garamond)', fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: theme.accent, textAlign: 'right', lineHeight: 2 }}>
             {parents2.map((l, i) => <div key={i}>{l}</div>)}
           </div>
         </div>
@@ -7881,7 +7881,7 @@ const firstDate = sorted[0]?.date
                       }
 
                       // ── Standard layout (original, unchanged) ──
-                      const gpStyle = { fontFamily: FC, fontStyle: 'italic' as const, fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap' as const, overflow: 'hidden' as const, textOverflow: 'ellipsis' as const }
+                      const gpStyle = { fontFamily: FC, fontStyle: 'italic' as const, fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5 }
                       return (
                       <>
                       <AnimSection animStyle={anim} delay={120} skipAnim={canEdit}>
@@ -7899,11 +7899,11 @@ const firstDate = sorted[0]?.date
                       {(parents1.length > 0 || parents2.length > 0) && (
                         <AnimSection animStyle={anim} delay={150} skipAnim={canEdit}>
                           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 6, marginBottom: 6, textAlign: 'center' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 1, overflow: 'hidden' }}>
-                              {parents1.map((l,j)=><DraggableElement key={j} id={pre+`p1_${j}`} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ov[`parents1_${j}`] && ov[`parents1_${j}`] !== l ? ov[`parents1_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents1_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents1_${j}`, patch)} style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }, 'parents', data.zoneStyles), ...getInlineStyle(`parents1_${j}`) }} /></DraggableElement>)}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                              {parents1.map((l,j)=><DraggableElement key={j} id={pre+`p1_${j}`} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ov[`parents1_${j}`] && ov[`parents1_${j}`] !== l ? ov[`parents1_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents1_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents1_${j}`, patch)} style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5 }, 'parents', data.zoneStyles), ...getInlineStyle(`parents1_${j}`) }} /></DraggableElement>)}
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 1, overflow: 'hidden' }}>
-                              {parents2.map((l,j)=><DraggableElement key={j} id={pre+`p2_${j}`} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ov[`parents2_${j}`] && ov[`parents2_${j}`] !== l ? ov[`parents2_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents2_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents2_${j}`, patch)} style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }, 'parents', data.zoneStyles), ...getInlineStyle(`parents2_${j}`) }} /></DraggableElement>)}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                              {parents2.map((l,j)=><DraggableElement key={j} id={pre+`p2_${j}`} layout={layout} onLayoutChange={setLayout} editable={canEdit}><InlineEdit value={ov[`parents2_${j}`] && ov[`parents2_${j}`] !== l ? ov[`parents2_${j}`] : ''} defaultValue={l} editable={canEdit} onChange={(v) => onUpdate?.({ textOverrides: { ...data.textOverrides, [`parents2_${j}`]: v } })} onStyleChange={(patch) => setInlineStyle(`parents2_${j}`, patch)} style={{ ...applyZoneStyle({ fontFamily: FC, fontStyle: 'italic', fontSize: 'clamp(10px, 2.8vw, 13px)', color: TEXT, lineHeight: 1.5 }, 'parents', data.zoneStyles), ...getInlineStyle(`parents2_${j}`) }} /></DraggableElement>)}
                             </div>
                           </div>
                         </AnimSection>
