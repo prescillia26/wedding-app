@@ -90,21 +90,16 @@ function hexToFilter(hex: string): string {
   const r = parseInt(hex.slice(1, 3), 16) / 255
   const g = parseInt(hex.slice(3, 5), 16) / 255
   const b = parseInt(hex.slice(5, 7), 16) / 255
-  const max = Math.max(r, g, b), min = Math.min(r, g, b)
-  const l = (max + min) / 2
-  let h = 0, s = 0
-  if (max !== min) {
-    const d = max - min
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
-    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6
-    else if (max === g) h = ((b - r) / d + 2) / 6
-    else h = ((r - g) / d + 4) / 6
-    h *= 360
+  const luminance = 0.299 * r + 0.587 * g + 0.114 * b
+  const saturation = Math.max(r, g, b) - Math.min(r, g, b)
+  let hue = 0
+  if (saturation > 0) {
+    if (r === Math.max(r, g, b)) hue = ((g - b) / saturation) * 60
+    else if (g === Math.max(r, g, b)) hue = (2 + (b - r) / saturation) * 60
+    else hue = (4 + (r - g) / saturation) * 60
+    if (hue < 0) hue += 360
   }
-  const hueRotate = Math.round(h - 50)
-  const saturate = Math.round(s * 1000)
-  const brightness = Math.round(l * 200)
-  return `brightness(0) saturate(100%) invert(${Math.round(l * 100)}%) sepia(50%) saturate(${saturate}%) hue-rotate(${hueRotate}deg) brightness(${brightness}%)`
+  return `invert(1) sepia(1) saturate(${Math.round(saturation * 500)}%) hue-rotate(${Math.round(hue - 45)}deg) brightness(${Math.round(luminance * 120)}%)`
 }
 
 /* ── Utilitaires ──────────────────────────────────────────── */
