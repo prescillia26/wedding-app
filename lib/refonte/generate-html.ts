@@ -564,7 +564,7 @@ function buildCss(tp: TemplatePalette): string {
     .accueil-label {
       font-family:'${tp.labelFont}',serif;
       font-size:11px; letter-spacing:5px; text-transform:uppercase;
-      color:${tp.accentColor}; opacity:0.7; margin-bottom:4px;
+      color:${tp.accentColor}; opacity:0.7; margin-bottom:16px;
     }
     .couple-names-display {
       display:flex; align-items:baseline; justify-content:center;
