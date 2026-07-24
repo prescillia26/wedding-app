@@ -675,11 +675,11 @@ function buildCss(tp: TemplatePalette): string {
     .event-time-large {
       font-family:'${tp.texteFont}',serif; font-style:italic;
       font-size:clamp(20px,5vw,28px); color:${tp.accentColor};
-      text-align:center; margin-bottom:16px;
+      text-align:center; margin-bottom:8px;
     }
 
     /* ── Lieu & adresse ── */
-    .event-lieu-text { text-align:center; max-width:90%; margin:0 auto 16px; line-height:1.6; }
+    .event-lieu-text { text-align:center; max-width:90%; margin:0 auto 8px; line-height:1.6; }
     .lieu-bold {
       font-family:'${tp.labelFont}',serif; font-weight:700;
       font-size:clamp(16px,4vw,22px); color:${tp.texteColor}; margin-bottom:4px;
