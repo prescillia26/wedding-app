@@ -598,6 +598,8 @@ function buildCss(tp: TemplatePalette): string {
     .event-image {
       width:100%; max-width:100%; height:auto;
       margin:0 auto 24px; display:block; mix-blend-mode:multiply;
+      mask-image:radial-gradient(ellipse 85% 85% at center,black 40%,transparent 100%);
+      -webkit-mask-image:radial-gradient(ellipse 85% 85% at center,black 40%,transparent 100%);
     }
 
     /* ── Familles grille ── */
