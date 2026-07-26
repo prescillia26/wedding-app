@@ -597,7 +597,7 @@ function buildCss(tp: TemplatePalette): string {
     }
     .event-image {
       width:100%; max-width:100%; height:auto;
-      margin:0 auto 24px; display:block;
+      margin:0 auto 24px; display:block; mix-blend-mode:multiply;
     }
 
     /* ── Familles grille ── */
